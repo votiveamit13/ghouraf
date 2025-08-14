@@ -1,4 +1,6 @@
 
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -15,39 +17,47 @@ import {
 } from "reactstrap";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://127.0.0.1:3000/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("authToken", data.token);
+        navigate("/admin/index");
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      setError("An error occurred during login");
+      console.log("error:", err)
+    }
+  };
   return (
     <>
-      <Col lg="5" md="7" className="shadow border rounded-lg">
-        <Card className="bg-secondary shadow border-0">
+      <Col className="mt-[100px] text-center align-center d-flex justify-center w-full h-auto">
+        <Card className="bg-secondary shadow border-0 w-[400px]">
           <CardHeader className="bg-transparent pb-4">
-            <div className="text-muted text-center mt-2 mb-3">
-              <small>Login in with</small>
-            </div>
-            <div className="btn-wrapper text-center d-flex justify-center">
-              <Button
-                className="btn-neutral btn-icon d-flex w-[35%] justify-center align-center"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/google.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Google</span>
-              </Button>
+            <div className="text-muted text-center mt-2 text-[20px] font-bold">
+              <large>Login</large>
             </div>
           </CardHeader>
           <CardBody className="px-lg-5 py-lg-3">
-            <div className="text-center text-muted mb-4">
-              <small>Or Login in with credentials</small>
-            </div>
-            <Form role="form">
+            <Form role="form" onSubmit={handleSubmit}>
+              {error && <div className="text-danger mb-3">{error}</div>}
               <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -59,6 +69,9 @@ const Login = () => {
                     placeholder="Email"
                     type="email"
                     autoComplete="new-email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </InputGroup>
               </FormGroup>
@@ -73,12 +86,15 @@ const Login = () => {
                     placeholder="Password"
                     type="password"
                     autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </InputGroup>
               </FormGroup>
 
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button className="my-4" color="primary" type="submit">
                   Login
                 </Button>
               </div>
