@@ -5,7 +5,14 @@ import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
 import Login from "views/examples/Login";
 
-var routes = [
+export const adminRoutes = [
+  {
+    path: "/login",
+    name: "Login",
+    icon: "ni ni-key-25 text-orange",
+    component: <Login/>,
+    layout: "/admin",
+  },
   {
     path: "/index",
     name: "Dashboard",
@@ -13,14 +20,14 @@ var routes = [
     component: <Index />,
     layout: "/admin",
   },
-    {
+  {
     path: "/tables",
     name: "User Management",
     icon: "ni ni-bullet-list-67 text-red",
     component: <Tables />,
     layout: "/admin",
   },
-    {
+  {
     path: "/user-profile",
     name: "User Profile",
     icon: "ni ni-single-02 text-yellow",
@@ -40,13 +47,13 @@ var routes = [
     icon: "ni ni-pin-3 text-orange",
     component: <Maps />,
     layout: "/admin",
-  },
-  {
-    path: "/login",
-    name: "Login",
-    icon: "ni ni-key-25 text-orange",
-    component: <Login/>,
-    layout: "/auth",
   }
 ];
+
+
+export const publicRoutes = [
+  // Will be added in future
+];
+
+const routes = [...adminRoutes, ...publicRoutes];
 export default routes;
