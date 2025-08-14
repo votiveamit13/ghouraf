@@ -15,6 +15,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -38,6 +39,7 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("authToken", data.token);
         navigate("/admin/index");
+        toast.success("Login Successful")
       } else {
         setError(data.message || "Login failed");
       }
@@ -51,8 +53,15 @@ const Login = () => {
       <Col className="mt-[100px] text-center align-center d-flex justify-center w-full h-auto">
         <Card className="bg-secondary shadow border-0 w-[400px]">
           <CardHeader className="bg-transparent pb-4">
-            <div className="text-muted text-center mt-2 text-[20px] font-bold">
-              <large>Login</large>
+            <div className="text-mutedmt-2">
+              <div className="mt-3">
+                <img
+                  src={require("../../assets/img/theme/Ghouraf.png")}
+                  alt="Logo"
+                  style={{ width: '100%', height: 'auto' }}
+                />
+              </div>
+              <large className="font-semibold text-m">Welcome Back! Login to Continue</large>
             </div>
           </CardHeader>
           <CardBody className="px-lg-5 py-lg-3">

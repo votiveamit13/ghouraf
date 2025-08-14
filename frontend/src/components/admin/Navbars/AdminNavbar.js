@@ -1,6 +1,5 @@
 
-import { Link } from "react-router-dom";
-// reactstrap components
+import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownItem,
@@ -17,8 +16,16 @@ import {
   Container,
   Media,
 } from "reactstrap";
+import { toast } from "react-toastify";
 
 const AdminNavbar = (props) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/admin/login");
+    toast.success("Logout Successful")
+  };
   return (
     <>
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -78,7 +85,7 @@ const AdminNavbar = (props) => {
                   <span>Support</span>
                 </DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+                <DropdownItem onClick={handleLogout}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>
