@@ -1,5 +1,5 @@
 import express from "express";
-import { login } from "../controllers/admin.controller.mjs";
+import { login } from "../controllers/admin/admin.controller.mjs";
 import { loginValidation } from "../validations/login.request.mjs";
 
 const router = express.Router();
