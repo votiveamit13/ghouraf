@@ -1,0 +1,1 @@
+export default ["Furnished", "Semi Furnished", "Unfurnished"]

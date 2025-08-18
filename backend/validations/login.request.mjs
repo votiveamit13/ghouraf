@@ -1,9 +1,7 @@
-import { body } from "express-validator";
+import Joi from "joi";
 
-export const loginValidation = [
-  body("email")
-    .isEmail().withMessage("Email must be valid")
-    .notEmpty().withMessage("Email is required"),
-  body("password")
-    .notEmpty().withMessage("Password is required")
-];
+export const loginValidator = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required()
+
+});

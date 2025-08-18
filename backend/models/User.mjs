@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 
+const ProfileSchema = new mongoose.Schema({
+  fullName: String,
+  age: Number,
+  gender: { type: String, enum: ['male', 'female'], index: true },
+  occupation: String,
+  bio: { type: String, index: 'text' },
+  city: { type: String, index: true },
+  state: String,
+  country: String,
+  lifestyleTags: [String], // e.g., non-smoker, early-riser
+  photos: [String], // cloudinary URLs
+})
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -11,14 +24,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  is_varified: {
+  isVarified: {
     type: Boolean,
     default: false
   },
-  is_admin: {
+  isAdmin: {
     type: Boolean,
     default: false
-  }
+  },
+  status: { type: String, enum: ['active', 'banned'], default: 'active' },
+  profile: ProfileSchema,
 }, {
   toJSON: {
     transform: function (doc, ret) {
