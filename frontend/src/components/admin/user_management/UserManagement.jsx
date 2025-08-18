@@ -1,15 +1,7 @@
-import React, { useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardFooter,
-  Table,
-  Container,
-  Row,
-  Badge,
-} from "reactstrap";
+import React, { useState, useMemo } from "react";
 import PaginationComponent from "../../common/Pagination";
 import Header from "components/admin/Headers/Header.js";
+import SearchFilter from "components/common/SearchFilter";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([
@@ -21,11 +13,9 @@ const UserManagement = () => {
     { id: 6, name: "Sophia Taylor", email: "sophia@example.com", active: true },
     { id: 7, name: "David Lee", email: "david@example.com", active: false },
   ]);
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
-
-  const totalPages = Math.ceil(users.length / pageSize);
+  const pageSize = 10;
 
   const handleActionChange = (id, value) => {
     setUsers((prevUsers) =>
@@ -35,79 +25,96 @@ const UserManagement = () => {
     );
   };
 
-  // slice users for current page
+  const filteredUsers = useMemo(() => {
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [users, searchTerm]);
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const paginatedUsers = users.slice(startIndex, startIndex + pageSize);
+  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
 
   return (
     <>
       <Header />
-      {/* Page content */}
-      <Container className="mt--7" fluid>
-        <Row>
-          <div className="col">
-            <Card className="shadow">
-              <CardHeader className="border-0">
-                <h3 className="mb-0">User Management</h3>
-              </CardHeader>
-
-              {/* Table */}
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th scope="col">S. No.</th>
-                    <th scope="col">User Name</th>
-                    <th scope="col">Email Id</th>
-                    <th scope="col">Active</th>
-                    <th scope="col">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedUsers.map((user, index) => (
-                    <tr key={user.id}>
-                      <td>{startIndex + index + 1}</td>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>
-                        <Badge
-                          color=""
-                          className="badge-dot"
-                          style={{ cursor: "default" }}
-                        >
-                          <i
-                            className={user.active ? "bg-success" : "bg-danger"}
-                          />
-                          {user.active ? "Active" : "Blocked"}
-                        </Badge>
-                      </td>
-                      <td>
-                        <select
-                          value={user.active ? "unblock" : "block"}
-                          onChange={(e) =>
-                            handleActionChange(user.id, e.target.value)
-                          }
-                          className="form-control form-control-sm"
-                        >
-                          <option value="unblock">Unblock</option>
-                          <option value="block">Block</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-
-              <CardFooter className="py-4">
-                <PaginationComponent
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={(page) => setCurrentPage(page)}
-                />
-              </CardFooter>
-            </Card>
+      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+            <h3 className="text-lg font-semibold text-gray-800">
+              User Management
+            </h3>
+            <SearchFilter
+              placeholder="Search by name or email..."
+              onSearch={setSearchTerm}
+            />
           </div>
-        </Row>
-      </Container>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 text-left font-semibold">S. No.</th>
+                  <th className="px-3 py-3 text-left font-semibold">
+                    User Name
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold">
+                    Email Id
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold">Status</th>
+                  <th className="px-3 py-3 text-left font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {paginatedUsers.map((user, index) => (
+                  <tr key={user.id}>
+                    <td className="px-3 py-3">{startIndex + index + 1}</td>
+                    <td className="px-3 py-3">{user.name}</td>
+                    <td className="px-3 py-3">{user.email}</td>
+                    <td className="px-3 py-3">
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[60%] ${
+                          user.active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full mr-2 ${
+                            user.active ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        ></span>
+                        {user.active ? "Active" : "Blocked"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <select
+                        value={user.active ? "unblock" : "block"}
+                        onChange={(e) =>
+                          handleActionChange(user.id, e.target.value)
+                        }
+                        className="block w-32 px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      >
+                        <option value="unblock">Unblock</option>
+                        <option value="block">Block</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="px-6 py-4 border-t border-gray-200">
+            <PaginationComponent
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        </div>
+      </div>
     </>
   );
 };
