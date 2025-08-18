@@ -1,9 +1,9 @@
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Maps from "views/examples/Maps.js";
-import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
 import Login from "views/examples/Login";
+import UserManagement from "components/admin/user_management/UserManagement";
 
 export const adminRoutes = [
   {
@@ -12,6 +12,7 @@ export const adminRoutes = [
     icon: "ni ni-key-25 text-orange",
     component: <Login/>,
     layout: "/admin",
+    showInSidebar: false
   },
   {
     path: "/index",
@@ -19,12 +20,13 @@ export const adminRoutes = [
     icon: "ni ni-tv-2 text-primary",
     component: <Index />,
     layout: "/admin",
+    showInSidebar: true
   },
   {
-    path: "/tables",
+    path: "/user-management",
     name: "User Management",
     icon: "ni ni-bullet-list-67 text-red",
-    component: <Tables />,
+    component: <UserManagement/>,
     layout: "/admin",
   },
   {
