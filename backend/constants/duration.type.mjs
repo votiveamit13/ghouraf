@@ -1,0 +1,1 @@
+export default ["6 months", "12 months", "Flexible"]

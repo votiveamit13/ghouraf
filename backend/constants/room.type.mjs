@@ -1,0 +1,1 @@
+export default ['1RK', '2RK', '1BHK', '2BHK', '3BHK', 'shared', 'private', 'other'];
