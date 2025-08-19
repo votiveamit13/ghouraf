@@ -1,1 +1,1 @@
-export default ["Early Riser", "Non-smoker", Pet - friendly]
+export default ["Early Riser", "Non-smoker", "Pet-friendly"]
