@@ -1,55 +1,50 @@
-import Index from "views/Index.js";
-import Profile from "views/examples/Profile.js";
-import Maps from "views/examples/Maps.js";
-import Icons from "views/examples/Icons.js";
-import Login from "views/examples/Login";
-import UserManagement from "components/admin/user_management/UserManagement";
+// import Profile from "views/examples/Profile.js";
+// import Maps from "views/examples/Maps.js";
+// import Icons from "views/examples/Icons.js";
+
+import Posts from "pages/admin/post-management/page";
+import Users from "pages/admin/user-management/page";
+import LoginPage from "pages/admin/login/page";
+import AdminDashboard from "pages/admin/page";
 
 export const adminRoutes = [
   {
     path: "/login",
     name: "Login",
-    icon: "ni ni-key-25 text-orange",
-    component: <Login/>,
+    icon: "ni ni-key-25 text-[#565ABF]",
+    component: <LoginPage/>,
     layout: "/admin",
     showInSidebar: false
   },
   {
-    path: "/index",
+    path: "",
     name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Index />,
+    icon: "ni ni-tv-2 text-[#565ABF]",
+    component: <AdminDashboard/>,
     layout: "/admin",
     showInSidebar: true
   },
   {
     path: "/user-management",
     name: "User Management",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: <UserManagement/>,
+    icon: "ni ni-bullet-list-67 text-[#565ABF]",
+    component: <Users/>,
     layout: "/admin",
   },
   {
-    path: "/user-profile",
-    name: "User Profile",
-    icon: "ni ni-single-02 text-yellow",
-    component: <Profile />,
+    path: "/post-management",
+    name: "Post Management",
+    icon: "ni ni-single-02 text-[#565ABF]",
+    component: <Posts/>,
     layout: "/admin",
   },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: "ni ni-planet text-blue",
-    component: <Icons />,
-    layout: "/admin",
-  },
-  {
-    path: "/maps",
-    name: "Maps",
-    icon: "ni ni-pin-3 text-orange",
-    component: <Maps />,
-    layout: "/admin",
-  }
+  // {
+  //   path: "/user-profile",
+  //   name: "User Profile",
+  //   icon: "ni ni-single-02 text-[#565ABF]",
+  //   component: <Profile />,
+  //   layout: "/admin",
+  // },
 ];
 
 

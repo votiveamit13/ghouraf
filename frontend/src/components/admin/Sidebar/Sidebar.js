@@ -57,18 +57,7 @@ const Sidebar = (props) => {
   };
 
   const { routes, logo } = props;
-  let navbarBrandProps;
-  if (logo && logo.innerLink) {
-    navbarBrandProps = {
-      to: logo.innerLink,
-      tag: Link,
-    };
-  } else if (logo && logo.outterLink) {
-    navbarBrandProps = {
-      href: logo.outterLink,
-      target: "_blank",
-    };
-  }
+
 
   return (
     <Navbar
