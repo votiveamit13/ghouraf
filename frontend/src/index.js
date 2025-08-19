@@ -7,9 +7,10 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
 import './tailwind.css';
 import AdminLayout from "layouts/Admin.js";
-import GuestNavbar from "components/Navbar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Home from "pages/public/HomePage/page";
+import Public from "layouts/Public";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -17,7 +18,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="*" element={<div><GuestNavbar /></div>} />
+      <Route path="/" element={<Public><Home/></Public>} />
     </Routes>
     <ToastContainer
       position="bottom-right"

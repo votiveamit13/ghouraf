@@ -6,6 +6,9 @@ import Posts from "pages/admin/post-management/page";
 import Users from "pages/admin/user-management/page";
 import LoginPage from "pages/admin/login/page";
 import AdminDashboard from "pages/admin/page";
+import CreatePost from "pages/admin/post-management/create-post/page";
+import { BsPostcard } from "react-icons/bs";
+import { IoCreateOutline } from "react-icons/io5";
 
 export const adminRoutes = [
   {
@@ -32,11 +35,24 @@ export const adminRoutes = [
     layout: "/admin",
   },
   {
-    path: "/post-management",
     name: "Post Management",
     icon: "ni ni-single-02 text-[#565ABF]",
-    component: <Posts/>,
-    layout: "/admin",
+    subRoutes: [
+            {
+        path: "/post-management/create-post",
+        name: "Create Post",
+        icon: <IoCreateOutline className="text-[#565ABF]"/>,
+        component: <CreatePost/>,
+        layout: "/admin",
+      },
+      {
+        path: "/post-management",
+        name: "View Posts",
+        icon: <BsPostcard className="text-[#565ABF]"/>,
+        component: <Posts/>,
+        layout: "/admin",
+      }
+    ]
   },
   // {
   //   path: "/user-profile",

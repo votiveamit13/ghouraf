@@ -25,17 +25,27 @@ const Admin = (props) => {
     return <Navigate to="/admin/login" replace />;
   }
 
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route path={prop.path} element={prop.component} key={key} exact />
-        );
-      } else {
-        return null;
-      }
-    });
-  };
+const getRoutes = (routes) => {
+  return routes.flatMap((prop, key) => {
+    if (prop.subRoutes) {
+      // recursively build subRoutes
+      return getRoutes(prop.subRoutes);
+    }
+
+    if (prop.layout === "/admin") {
+      return (
+        <Route
+          path={prop.path}
+          element={prop.component}
+          key={prop.path || key}
+        />
+      );
+    }
+
+    return [];
+  });
+};
+
 
   const getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {
@@ -71,7 +81,7 @@ const Admin = (props) => {
         )}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/admin/index" replace />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
       </div>
     </>
