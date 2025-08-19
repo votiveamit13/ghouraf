@@ -1,18 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { validationResult } from "express-validator";
 import User from "../../models/User.mjs";
 
 export const login = async (req, res) => {
   try {
-    // Validate request
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({
-        message: "Validation error",
-        errors: errors.array().map(err => err.msg)
-      });
-    }
+
 
     const { email, password } = req.body;
 

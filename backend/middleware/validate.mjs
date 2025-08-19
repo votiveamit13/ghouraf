@@ -11,7 +11,7 @@ export const validate = (schema) => {
                 errors[key].push(err.message);
             });
             let message = error.details[0].message;
-            if (error.details.length > 0) {
+            if (error.details.length > 1) {
                 message = `${error.details[0].message} (and ${error.details.length - 1} more errors)`
             }
 

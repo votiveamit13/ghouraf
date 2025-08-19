@@ -3,13 +3,10 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/User.mjs";
 import { profileValidator } from "../validations/profile.validator.mjs";
-import { validationFormate } from "../utils/response.formate.mjs";
-import { signupValidator } from "../validations/signup.request.mjs";
-import { loginValidator } from "../validations/login.request.mjs";
+
 
 export const signup = async (req, res) => {
     try {
-
 
         const { email, password } = req.body;
 
@@ -38,7 +35,6 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-
 
         const { email, password } = req.body;
 

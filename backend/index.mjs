@@ -6,6 +6,8 @@ import adminRoutes from "./routes/admin.route.mjs";
 import userRoutes from "./routes/user.route.mjs";
 import dbConnection from "./config/db.connection.mjs";
 import User from "./models/User.mjs";
+import helmet from "helmet";
+import morgan from "morgan";
 
 
 dotenv.config();
@@ -13,9 +15,10 @@ const app = express();
 
 app.use(cors());
 
+app.use(helmet())
+app.use(morgan('dev'))
+
 app.use(express.json());
-
-
 
 app.use("/api/admin", adminRoutes);
 
