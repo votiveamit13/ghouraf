@@ -8,7 +8,7 @@ import { LuUserPen } from "react-icons/lu";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const linkClass = "font-bold hover:text-[#A321A6]";
+  const linkClass = "hover:text-[#A321A6]";
   const activeClass = "text-purple-600";
 
   return (
@@ -33,7 +33,7 @@ export default function Navbar() {
               to="/browse"
               onClick={(e) => e.preventDefault()}
               className={({ isActive }) =>
-                `${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
               }
             >
               Browse
@@ -42,7 +42,7 @@ export default function Navbar() {
               to="/place-wanted"
               onClick={(e) => e.preventDefault()}
               className={({ isActive }) =>
-                `${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
               }
             >
               Place Wanted
@@ -50,7 +50,7 @@ export default function Navbar() {
             <NavLink
               to="/team-up"
               className={({ isActive }) =>
-                `${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
               }
             >
               Team Up
@@ -58,7 +58,7 @@ export default function Navbar() {
             <NavLink
               to="/more-info"
               className={({ isActive }) =>
-                `${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
               }
             >
               More Info
@@ -70,7 +70,7 @@ export default function Navbar() {
               <NavLink
                 to="/register"
                 className={({ isActive }) =>
-                  `flex items-center ${linkClass} ${
+                  `font-semibold flex items-center ${linkClass} ${
                     isActive ? activeClass : "text-[#565ABF]"
                   }`
                 }
@@ -78,12 +78,12 @@ export default function Navbar() {
                 <LuUserPen size={30} className="mr-1" /> Register
               </NavLink>
 
-              <span className="text-[#565ABF] font-bold">/</span>
+              <span className="text-[#565ABF]">/</span>
 
               <NavLink
                 to="/login"
                 className={({ isActive }) =>
-                  `flex items-center ${linkClass} ${
+                  `font-semibold flex items-center ${linkClass} ${
                     isActive ? activeClass : "text-[#565ABF]"
                   }`
                 }

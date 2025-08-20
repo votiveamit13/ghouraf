@@ -14,7 +14,7 @@ export default function HeroSection() {
     >
       <div className="absolute inset-0 bg-black/40"></div>
 
-      <div className="relative z-10 text-center px-4 max-w-3xl mt-[65px]">
+      <div className="relative z-10 text-center px-4 max-w-3xl mt-[150px]">
         <h1 className="text-white text-3xl sm:text-5xl font-bold mb-2">
           Welcome! Let’s get started
         </h1>
@@ -22,7 +22,7 @@ export default function HeroSection() {
           Find the right home for you
         </p>
 
-<div className="flex justify-center">
+<div className="flex justify-center lg:h-[45px] md:h-[45px] h-[35px]">
   <div className="flex lg:w-[60%] md:w-[60%] w-[80%] rounded-tl-[12px] rounded-tr-[12px] overflow-hidden shadow-lg">
     <button
       onClick={() => setActiveTab("spaces")}
