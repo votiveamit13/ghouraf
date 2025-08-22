@@ -11,6 +11,8 @@ import { IoLogoFacebook } from "react-icons/io5";
 import google from "assets/img/icons/google.png";
 import { FaRegUser } from "react-icons/fa";
 import { BsGenderMale } from "react-icons/bs";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,9 +21,54 @@ export default function Navbar() {
   const [activeField, setActiveField] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const linkClass = "hover:text-[#A321A6]";
   const activeClass = "text-purple-600";
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "",
+    dob: "",
+    password: "",
+    confirmPassword: "",
+    termsAccepted: false,
+  });
+
+const handleChange = (e) => {
+  const { name, type, value, checked } = e.target;
+  setForm({
+    ...form,
+    [name]: type === "checkbox" ? checked : value,
+  });
+};
+
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://127.0.0.1:3000/api/auth/register", {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        gender: form.gender,
+        dob: form.dob,
+        password: form.password,
+        termsAccepted: form.termsAccepted,
+      });
+
+      localStorage.setItem("token", res.data.token);
+      toast.success("Register Successful");
+      setRegisterDialog(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Registeration Failed");
+    }
+  };
 
   return (
     <nav className="bg-white fixed top-0 left-0 w-full z-20">
@@ -324,11 +371,7 @@ export default function Navbar() {
             >
               ✕
             </button>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-            >
+            <form onSubmit={handleRegister}>
               <div className="px-5 py-4">
                 <h3 className="text-2xl font-semibold text-black mb-3">
                   Create Account
@@ -350,6 +393,9 @@ export default function Navbar() {
                       </span>
                       <input
                         type="text"
+                        name="firstName"
+                        value={form.firstName}
+                        onChange={handleChange}
                         placeholder="First Name"
                         required
                         onFocus={() => setActiveField("firstName")}
@@ -373,6 +419,9 @@ export default function Navbar() {
                       </span>
                       <input
                         type="text"
+                        name="lastName"
+                        value={form.lastName}
+                        onChange={handleChange}
                         placeholder="Last Name"
                         required
                         onFocus={() => setActiveField("lastName")}
@@ -399,6 +448,9 @@ export default function Navbar() {
                       </span>
                       <input
                         type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
                         placeholder="Enter your email address"
                         required
                         onFocus={() => setActiveField("email")}
@@ -421,13 +473,16 @@ export default function Navbar() {
                         <BsGenderMale color="black" />
                       </span>
                       <select
+                        name="gender"
+                        value={form.gender}
+                        onChange={handleChange}
                         onFocus={() => setActiveField("gender")}
                         required
                         className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
                       >
-                        <option>Select Gender</option>
-                        <option>Male</option>
-                        <option>Female</option>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                       </select>
                     </div>
                   </div>
@@ -448,6 +503,9 @@ export default function Navbar() {
                   </span>
                   <input
                     type="date"
+                    name="dob"
+                    value={form.dob}
+                    onChange={handleChange}
                     placeholder="Enter your DOB"
                     required
                     onFocus={() => setActiveField("dob")}
@@ -472,6 +530,9 @@ export default function Navbar() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     required
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
                     onFocus={() => setActiveField("password")}
                     className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
                   />
@@ -504,6 +565,9 @@ export default function Navbar() {
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Re enter your password"
+                    name="confirmPassword"
+                    value={form.confirmPassword}
+                    onChange={handleChange}
                     onFocus={() => setActiveField("confirmPassword")}
                     className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
                   />
@@ -522,7 +586,7 @@ export default function Navbar() {
 
                 <div className="flex justify-between items-center mb-4">
                   <label className="flex items-center space-x-2 text-sm text-[#1C1C1E]">
-                    <input type="checkbox" className="w-4 h-4" />
+                    <input type="checkbox" name="termsAccepted" checked={form.termsAccepted} onChange={handleChange} className="w-4 h-4" />
                     <span>
                       Yes, I have read and agree to the{" "}
                       <a
@@ -542,7 +606,10 @@ export default function Navbar() {
                   </label>
                 </div>
 
-                <button className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4">
+                <button
+                  type="submit"
+                  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4"
+                >
                   Register
                 </button>
 

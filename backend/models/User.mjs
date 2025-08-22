@@ -1,16 +1,18 @@
 import mongoose from "mongoose";
 
 const ProfileSchema = new mongoose.Schema({
-  fullName: String,
+  firstName: String,
+  lastName: String,
   age: Number,
   gender: { type: String, enum: ['male', 'female'], index: true },
+  dob: { type: Date},
   occupation: String,
   bio: { type: String, index: 'text' },
   city: { type: String, index: true },
   state: String,
   country: String,
-  lifestyleTags: [String], // e.g., non-smoker, early-riser
-  photos: [String], // cloudinary URLs
+  lifestyleTags: [String],
+  photos: [String],
 })
 
 const userSchema = new mongoose.Schema({
@@ -24,7 +26,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  isVarified: {
+  isVerified: {
     type: Boolean,
     default: false
   },
@@ -32,6 +34,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+    termsAccepted: { type: Boolean, default: false },
   status: { type: String, enum: ['active', 'banned'], default: 'active' },
   profile: ProfileSchema,
 }, {

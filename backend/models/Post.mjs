@@ -28,7 +28,7 @@ const PostSchema = new mongoose.Schema({
     description: String,
     photos: [String],
     location: AddressSchema,
-    rent: Number, // for OFFERING: rent per room/unit; for LOOKING/TEAM_UP: budget per person
+    rent: Number,
     roomType: { type: String, enum: roomType },
     furnishing: { type: String, enum: furnishedType },
     moveInDate: Date,
@@ -41,7 +41,7 @@ const PostSchema = new mongoose.Schema({
         max: Number
     },
     status: { type: String, enum: ['active', 'closed'], default: 'active', index: true },
-    interestedCount: { type: Number, default: 0 }, // derived but cached for sort
+    interestedCount: { type: Number, default: 0 },
 }, { timestamps: true })
 
 PostSchema.index({ 'rent.amount': 1 })

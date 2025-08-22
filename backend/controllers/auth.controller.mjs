@@ -8,16 +8,22 @@ import { profileValidator } from "../validations/profile.validator.mjs";
 export const signup = async (req, res) => {
     try {
 
-        const { email, password } = req.body;
+        const { email, password, firstName, lastName, gender, dob, termsAccepted  } = req.body;
 
-        // Check admin existence
         const isExist = await User.findOne({ email });
         if (isExist) {
-            return res.status(400).json({ message: "Email is alredy exist" });
+            return res.status(400).json({ message: "Email is already exist" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ email: email, password: hashedPassword });
+
+        const profile = {
+            firstName,
+            lastName,
+            gender,
+            dob,
+        }
+        const user = await User.create({ email: email, password: hashedPassword, termsAccepted, profile });
 
         // Generate token
         const token = jwt.sign(
@@ -25,6 +31,7 @@ export const signup = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
+console.log("Signup body:", req.body);
 
         res.status(201).json({ "message": "Signup successfully", data: user, token: token });
     } catch (err) {

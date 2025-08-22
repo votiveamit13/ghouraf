@@ -1,7 +1,11 @@
 import Joi from "joi";
 
 export const profileValidator = Joi.object({
-    fullName: Joi.string().min(3).max(50).required().messages({
+    firstName: Joi.string().min(3).max(50).required().messages({
+        "string.min": "Full name must be at least 3 characters",
+        "string.max": "Full name cannot exceed 50 characters",
+    }),
+        lastName: Joi.string().min(3).max(50).required().messages({
         "string.min": "Full name must be at least 3 characters",
         "string.max": "Full name cannot exceed 50 characters",
     }),
