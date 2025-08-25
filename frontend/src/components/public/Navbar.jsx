@@ -18,6 +18,7 @@ import { auth } from "../../firebase";
 import { GoSync } from "react-icons/go";
 import { FiEdit } from "react-icons/fi";
 import { useAuth } from "context/AuthContext";
+import Loader from "components/common/Loader";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export default function Navbar() {
     termsAccepted: false,
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
-   const { user, login, logout } = useAuth();
+   const { user, login, logout, loading } = useAuth();
 
 
 
@@ -433,9 +434,14 @@ const handleLogout = () => {
                   </a>
                 </div>
 
-                <button type="submit" className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4">
-                  Login
-                </button>
+<button
+  type="submit"
+  disabled={loading}
+  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
+>
+  {loading ? <Loader size={6} /> : "Login"}
+</button>
+
 
                 <div className="flex gap-4 mb-4">
                   <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
