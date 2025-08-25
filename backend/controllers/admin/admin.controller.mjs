@@ -8,19 +8,16 @@ export const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Check admin existence
     const admin = await User.findOne({ email });
     if (!admin) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Generate token
     const token = jwt.sign(
       { id: admin._id, role: "admin" },
       process.env.JWT_SECRET,

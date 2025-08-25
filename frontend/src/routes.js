@@ -54,18 +54,11 @@ export const adminRoutes = [
       }
     ]
   },
-  // {
-  //   path: "/user-profile",
-  //   name: "User Profile",
-  //   icon: "ni ni-single-02 text-[#565ABF]",
-  //   component: <Profile />,
-  //   layout: "/admin",
-  // },
 ];
 
 
 export const publicRoutes = [
-  // Will be added in future
+
 ];
 
 const routes = [...adminRoutes, ...publicRoutes];

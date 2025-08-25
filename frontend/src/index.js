@@ -11,15 +11,21 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Home from "pages/public/HomePage/page";
 import Public from "layouts/Public";
-
+import UserDashboard from "pages/user/page";
+import PrivateRoute from "components/auth/PrivateRoute";
+import { AuthProvider } from "context/AuthContext";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/" element={<Public><Home/></Public>} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route path="/" element={<Public><Home/></Public>} />
+        <Route element={<PrivateRoute/>}>
+          <Route path="/user" element={<Public><UserDashboard/></Public>} />
+        </Route>
+      </Routes>
     <ToastContainer
       position="bottom-right"
       autoClose={3000}
@@ -30,5 +36,6 @@ root.render(
       draggable
       theme="colored"
     />
+     </AuthProvider>
   </BrowserRouter>
 );

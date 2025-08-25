@@ -24,12 +24,11 @@ app.use("/api/admin", adminRoutes);
 
 app.use("/api", userRoutes);
 
-// Connect to MongoDB
 dbConnection().then(async () => {
   const existingAdmin = await User.findOne({ email: "admin@example.com" });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash("admin123", 10);
-    await User.create({ email: "admin@example.com", password: hashedPassword, is_admin: true, is_varified: true });
+    await User.create({ email: "admin@example.com", password: hashedPassword, isAdmin: true});
     console.log("Default admin created");
   }
 });

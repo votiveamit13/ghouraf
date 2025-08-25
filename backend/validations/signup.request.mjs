@@ -5,6 +5,6 @@ export const signupValidator = Joi.object({
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
     gender: Joi.string().valid("male", "female").required(),
-    dob: Joi.date().iso().required(),
+    dob: Joi.date().required(),
     termsAccepted: Joi.boolean().required(),
 });

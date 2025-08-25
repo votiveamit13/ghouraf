@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
-import { HiMenu, HiX } from "react-icons/hi";
+import { HiMenu, HiX, HiOutlineMail } from "react-icons/hi";
 import { Img } from "react-image";
-import { LuUserPen } from "react-icons/lu";
+import { LuUserPen, LuUserRound, LuMessageSquareText, LuLogOut  } from "react-icons/lu";
 import { TfiEmail } from "react-icons/tfi";
-import { GrLock } from "react-icons/gr";
+import { GrLock, GrFavorite  } from "react-icons/gr";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { IoLogoFacebook } from "react-icons/io5";
 import google from "assets/img/icons/google.png";
@@ -13,8 +13,14 @@ import { FaRegUser } from "react-icons/fa";
 import { BsGenderMale } from "react-icons/bs";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
+import { GoSync } from "react-icons/go";
+import { FiEdit } from "react-icons/fi";
+import { useAuth } from "context/AuthContext";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [loginDialog, setLoginDialog] = useState(false);
   const [registerDialog, setRegisterDialog] = useState(false);
@@ -33,6 +39,10 @@ export default function Navbar() {
     confirmPassword: "",
     termsAccepted: false,
   });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+   const { user, login, logout } = useAuth();
+
+
 
 const handleChange = (e) => {
   const { name, type, value, checked } = e.target;
@@ -43,32 +53,51 @@ const handleChange = (e) => {
 };
 
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+const handleRegister = async (e) => {
+  e.preventDefault();
+  if (form.password !== form.confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
 
-    try {
-      const res = await axios.post("http://127.0.0.1:3000/api/auth/register", {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        gender: form.gender,
-        dob: form.dob,
-        password: form.password,
-        termsAccepted: form.termsAccepted,
-      });
+  try {
+    await axios.post(`http://127.0.0.1:3000/api/auth/register`, {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      gender: form.gender,
+      dob: form.dob,
+      password: form.password,
+      termsAccepted: form.termsAccepted,
+    });
 
-      localStorage.setItem("token", res.data.token);
-      toast.success("Register Successful");
-      setRegisterDialog(false);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Registeration Failed");
-    }
-  };
+    toast.success("Register successful. Please check your email for verification.");
+    setRegisterDialog(false);
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Registration Failed");
+  }
+};
+
+const handleLogin = async (e) => {
+  e.preventDefault();
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
+    const idToken = await userCred.user.getIdToken();
+    await login(idToken);
+    toast.success("Login Successful");
+      navigate("/user");
+      setLoginDialog(false);
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login Failed");
+  }
+};
+
+
+const handleLogout = () => {
+  logout();
+    navigate("/");
+    toast.info("Logout Successful");
+};
 
   return (
     <nav className="bg-white fixed top-0 left-0 w-full z-20">
@@ -132,41 +161,112 @@ const handleChange = (e) => {
             </NavLink>
           </div>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <div className="hidden md:flex items-center space-x-2">
-              <NavLink
-                className={({ isActive }) =>
-                  `font-semibold flex items-center ${linkClass} ${
-                    isActive ? activeClass : "text-[#565ABF]"
-                  }`
-                }
-                onClick={() => setRegisterDialog(true)}
-              >
-                <LuUserPen size={30} className="mr-1" /> Register
-              </NavLink>
+<div className="hidden md:flex items-center space-x-6">
+  {!user ? (
+    <>
+      <div className="hidden md:flex items-center space-x-2">
+        <NavLink
+          className={({ isActive }) =>
+            `font-semibold flex items-center hover:text-[#A321A6] ${
+              isActive ? "text-purple-600" : "text-[#565ABF]"
+            }`
+          }
+          onClick={() => setRegisterDialog(true)}
+        >
+          <LuUserPen size={30} className="mr-1" /> Register
+        </NavLink>
 
-              <span className="text-[#565ABF]">/</span>
+        <span className="text-[#565ABF]">/</span>
 
-              <NavLink
-                className={({ isActive }) =>
-                  `font-semibold flex items-center ${linkClass} ${
-                    isActive ? activeClass : "text-[#565ABF]"
-                  }`
-                }
-                onClick={() => setLoginDialog(true)}
-              >
-                Login
-              </NavLink>
-            </div>
+        <NavLink
+          className={({ isActive }) =>
+            `font-semibold flex items-center hover:text-[#A321A6] ${
+              isActive ? "text-purple-600" : "text-[#565ABF]"
+            }`
+          }
+          onClick={() => setLoginDialog(true)}
+        >
+          Login
+        </NavLink>
+      </div>
 
-            <button className="flex items-center px-4 py-3 bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
-              <IoIosAddCircleOutline
-                className="text-2xl font-bold"
-                strokeWidth={2.5}
-              />
-              <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
-            </button>
-          </div>
+      <button className="flex items-center px-4 py-3 bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
+        <IoIosAddCircleOutline
+          className="text-2xl font-bold"
+          strokeWidth={2.5}
+        />
+        <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
+      </button>
+    </>
+  ) : (
+    <div className="flex items-center space-x-4">
+      <span className="font-semibold text-black">
+        Hi, {user.profile.firstName?.split(" ")[0] || "User"}
+      </span>
+      <a href="/user/messages" className="text-black hover:text-[#A321A6]">
+        <HiOutlineMail  size={22} />
+      </a>
+       <div className="relative">
+    <button
+      onClick={() => setDropdownOpen(!dropdownOpen)}
+      className="focus:outline-none"
+    >
+      <img
+        src={user.photoURL || require("../../assets/img/ghouraf/default-avatar.png")}
+        alt="Profile"
+        className="w-10 h-10 rounded-full border border-gray-300"
+      />
+    </button>
+
+    {/* Dropdown Menu */}
+    {dropdownOpen && (
+      <div
+        className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+        onClick={() => setDropdownOpen(false)}
+      >
+        <a
+          href="/user"
+          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+        >
+          <LuUserRound size={20} className="mr-2" /> My Account
+        </a>
+        <a
+          href="/user/my-ads"
+          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+        >
+          <GoSync size={20} className="mr-2"/> My Ads
+        </a>
+        <a
+          href="/user/saved-ads"
+          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+        >
+          <GrFavorite size={20} className="mr-2"/> Saved Ads
+        </a>
+        <a
+          href="/user/messages"
+          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+        >
+          <LuMessageSquareText size={20} className="mr-2" /> Messages
+        </a>
+        <a
+          href="/user/edit"
+          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+        >
+          <FiEdit size={20} className="mr-2"/> Edit My Details
+        </a>
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+        >
+          <LuLogOut size={20} className="mr-2"/> Logout
+        </button>
+      </div>
+    )}
+  </div>
+    </div>
+  )}
+</div>
+
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
@@ -255,9 +355,7 @@ const handleChange = (e) => {
               ✕
             </button>
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
+              onSubmit={handleLogin}
             >
               <div className="px-6 py-4">
                 <h3 className="text-2xl font-semibold text-black mb-4">
@@ -278,6 +376,9 @@ const handleChange = (e) => {
                   </span>
                   <input
                     type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
                     placeholder="Enter your email address"
                     onFocus={() => setActiveField("email")}
                     className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
@@ -299,6 +400,9 @@ const handleChange = (e) => {
                   </span>
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
                     placeholder="Enter your password"
                     onFocus={() => setActiveField("password")}
                     className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
@@ -329,7 +433,7 @@ const handleChange = (e) => {
                   </a>
                 </div>
 
-                <button className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4">
+                <button type="submit" className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4">
                   Login
                 </button>
 

@@ -1,24 +1,22 @@
-import jwt from 'jsonwebtoken'
-import User from '../models/User.mjs'
+import { authAdmin } from "../config/firebase.mjs";
+import User from "../models/User.mjs";
 
 export const auth = async (req, res, next) => {
-    const header = req.headers.authorization || ''
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null
-    if (!token) return res.status(401).json({ message: 'Unauthorized' })
-    try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET)
-        console.log("payload", payload)
-        const user = await User.findById(payload.id)
-        console.log("auth user", user)
-        if (!user || user.status === 'banned') return res.status(403).json({ message: 'Forbidden' })
-        req.user = user
-        next()
-    } catch (e) {
-        return res.status(401).json({ message: 'Invalid token' })
-    }
-}
+  try {
+    const hdr = req.headers.authorization || "";
+    const token = hdr.startsWith("Bearer ") ? hdr.slice(7) : null;
+    if (!token) return res.status(401).json({ message: "Missing bearer token" });
 
-export const requireVerified = (req, res, next) => {
-    if (!req.user.emailVerified) return res.status(403).json({ message: 'Verify email first' })
-    next()
-}
+    const decoded = await authAdmin.verifyIdToken(token);
+
+    const user = await User.findOne({ firebaseUid: decoded.uid });
+    if (!user) return res.status(404).json({ message: "User profile not found" });
+
+    req.user = user;
+    req.firebase = decoded;
+    next();
+  } catch (err) {
+    console.error("Auth error:", err);
+    return res.status(401).json({ message: "Unauthorized", error: err.message });
+  }
+};

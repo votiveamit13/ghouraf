@@ -21,7 +21,18 @@
       rel="stylesheet"
     />
     <title>Ghouraf</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE"></script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_Z-1uhQUfD1SJ1CgkpKw9mwK6c2U6xz8",
+    authDomain: "ghouraf-521e3.firebaseapp.com",
+    projectId: "ghouraf-521e3",
+    storageBucket: "ghouraf-521e3.firebasestorage.app",
+    messagingSenderId: "726384458818",
+    appId: "1:726384458818:web:413289761e400c4121c1db"
+  };
+  const app = initializeApp(firebaseConfig);
+</script>
   </head>
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>

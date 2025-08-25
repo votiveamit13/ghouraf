@@ -1,5 +1,5 @@
 import express from "express";
-import { signup, login, updateProfile, getProfile } from "../controllers/auth.controller.mjs";
+import { signup, login, updateProfile, getProfile, resendVerificationEmail } from "../controllers/auth.controller.mjs";
 
 import postRoutes from "./post.route.mjs";
 import { auth } from "../middleware/auth.mjs";
@@ -12,6 +12,8 @@ const router = express.Router();
 router.post("/auth/register", validate(signupValidator), signup);
 
 router.post("/auth/login", validate(loginValidator), login);
+
+router.post("/auth/resend-verification", (req, res, next) => next(), resendVerificationEmail);
 
 router.put("/auth/profile", auth, updateProfile);
 
