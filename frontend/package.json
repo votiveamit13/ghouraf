@@ -3,6 +3,7 @@
   "version": "1.2.4",
   "description": "ghouraf",
   "main": "index.js",
+  "homepage": "/ghouraf",
   "scripts": {
     "start": "react-scripts start",
     "build": "cross-env PUBLIC_URL=/ react-scripts build",

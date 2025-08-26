@@ -17,7 +17,7 @@ import { AuthProvider } from "context/AuthContext";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
+  <BrowserRouter basename="/ghouraf">
     <AuthProvider>
       <Routes>
         <Route path="/admin/*" element={<AdminLayout />} />
