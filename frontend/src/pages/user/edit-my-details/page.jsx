@@ -34,7 +34,7 @@ export default function EditMyDetails() {
                         fields={[
                             { label: "First Name", name: "firstName", placeholder: "First Name", type: "text", value: `${user.profile?.firstName}` },
                             { label: "Last Name", name: "lastName", placeholder: "Last Name", type: "text", value: `${user.profile?.lastName}` },
-                            { label: "Your Name", name: "password", placeholder: "Your Password", type: "password" },
+                            { label: "Your Password", name: "password", placeholder: "Your Password", type: "password" },
                         ]}
                         onSubmit={handleSave}
                     />

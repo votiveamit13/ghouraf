@@ -29,8 +29,9 @@ export default function Navbar() {
   const [activeField, setActiveField] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [active, setActive] = useState("spaces");
   const linkClass = "hover:text-[#A321A6]";
-  const activeClass = "text-purple-600";
+  const activeClass = "text-[#A321A6]";
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -42,9 +43,12 @@ export default function Navbar() {
     termsAccepted: false,
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
-   const { user, login, logout, loading } = useAuth();
+   const { user, login, logout } = useAuth();
 const [showEmailVerification, setShowEmailVerification] = useState(false);
 const [pendingEmail, setPendingEmail] = useState("");
+const [loginLoading, setLoginLoading] = useState(false);
+const [registerLoading, setRegisterLoading] = useState(false);
+
 
 
 const handleChange = (e) => {
@@ -62,7 +66,7 @@ const handleRegister = async (e) => {
     toast.error("Passwords do not match");
     return;
   }
-
+setRegisterLoading(true);
   try {
     await axios.post(`http://127.0.0.1:3000/api/auth/register`, {
       firstName: form.firstName,
@@ -78,30 +82,39 @@ const handleRegister = async (e) => {
     setRegisterDialog(false);
   } catch (err) {
     toast.error(err.response?.data?.message || "Registration Failed");
+  } finally {
+    setRegisterLoading(false);
   }
 };
 
 const handleLogin = async (e) => {
   e.preventDefault();
-
+  setLoginLoading(true);
+  try {
     const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
     const idToken = await userCred.user.getIdToken();
-const res = await login(idToken);
+    const res = await login(idToken);
 
-if (res.emailVerified === false) {
-  setPendingEmail(form.email);
-  setShowEmailVerification(true);
-  return;
-}
+    if (res.emailVerified === false) {
+      setPendingEmail(form.email);
+      setShowEmailVerification(true);
+      return;
+    }
 
-if (res.user) {
-  toast.success("Login Successful");
-  navigate("/user");
-  setLoginDialog(false);
-} else {
-  toast.error(res.message || "Login Failed");
-}
+    if (res.user) {
+      toast.success("Login Successful");
+      navigate("/user");
+      setLoginDialog(false);
+    } else {
+      toast.error(res.message || "Login Failed");
+    }
+  } catch (err) {
+    toast.error(err.message || "Login Failed");
+  } finally {
+    setLoginLoading(false);
+  }
 };
+
 
 
 const handleLogout = () => {
@@ -126,79 +139,64 @@ const handleLogout = () => {
             </NavLink>
           </div>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8 mr--8">
-            <NavLink
-              to="/spaces"
-              onClick={(e) => e.preventDefault()}
-              className={({ isActive }) =>
-                `font-semibold ${linkClass} ${
-                  isActive ? activeClass : "text-[#565ABF]"
-                }`
-              }
-            >
-              Spaces
-            </NavLink>
-            <NavLink
-              to="/place-wanted"
-              onClick={(e) => e.preventDefault()}
-              className={({ isActive }) =>
-                `font-semibold ${linkClass} ${
-                  isActive ? activeClass : "text-[#565ABF]"
-                }`
-              }
-            >
-              Place Wanted
-            </NavLink>
-            <NavLink
-              to="/team-up"
-              className={({ isActive }) =>
-                `font-semibold ${linkClass} ${
-                  isActive ? activeClass : "text-[#565ABF]"
-                }`
-              }
-            >
-              Team Up
-            </NavLink>
-            <NavLink
-              to="/more-info"
-              className={({ isActive }) =>
-                `font-semibold ${linkClass} ${
-                  isActive ? activeClass : "text-[#565ABF]"
-                }`
-              }
-            >
-              More Info
-            </NavLink>
+            <button
+        onClick={() => setActive("spaces")}
+        className={`font-semibold ${linkClass} ${
+          active === "spaces" ? activeClass : "text-[#565ABF]"
+        }`}
+      >
+        Spaces
+      </button>
+
+      <button
+        onClick={() => setActive("place-wanted")}
+        className={`font-semibold ${linkClass} ${
+          active === "place-wanted" ? activeClass : "text-[#565ABF]"
+        }`}
+      >
+        Place Wanted
+      </button>
+
+      <button
+        onClick={() => setActive("team-up")}
+        className={`font-semibold ${linkClass} ${
+          active === "team-up" ? activeClass : "text-[#565ABF]"
+        }`}
+      >
+        Team Up
+      </button>
+
+      <button
+        onClick={() => setActive("more-info")}
+        className={`font-semibold ${linkClass} ${
+          active === "more-info" ? activeClass : "text-[#565ABF]"
+        }`}
+      >
+        More Info
+      </button>
           </div>
 
 <div className="hidden md:flex items-center space-x-6">
   {!user ? (
     <>
       <div className="hidden md:flex items-center space-x-2">
-        <NavLink
-          className={({ isActive }) =>
-            `font-semibold flex items-center hover:text-[#A321A6] ${
-              isActive ? "text-purple-600" : "text-[#565ABF]"
-            }`
-          }
-          onClick={() => setRegisterDialog(true)}
-        >
-          <LuUserPen size={30} className="mr-1" /> Register
-        </NavLink>
+<button
+  onClick={() => setRegisterDialog(true)}
+  className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
+>
+  <LuUserPen size={30} className="mr-1" /> Register
+</button>
 
-        <span className="text-[#565ABF]">/</span>
+<span className="text-[#565ABF]">/</span>
 
-        <NavLink
-          className={({ isActive }) =>
-            `font-semibold flex items-center hover:text-[#A321A6] ${
-              isActive ? "text-purple-600" : "text-[#565ABF]"
-            }`
-          }
-          onClick={() => setLoginDialog(true)}
-        >
-          Login
-        </NavLink>
+<button
+  onClick={() => setLoginDialog(true)}
+  className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
+>
+  Login
+</button>
+
       </div>
 
       <button className="flex items-center px-4 py-3 bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
@@ -214,7 +212,7 @@ const handleLogout = () => {
       <span className="font-semibold text-black">
         Hi, {user.profile.firstName?.split(" ")[0] || "User"}
       </span>
-      <a href="/user/messages" className="text-black hover:text-[#A321A6]">
+      <a href="/user" className="text-black hover:text-[#A321A6]">
         <HiOutlineMail  size={22} />
       </a>
        <div className="relative">
@@ -229,7 +227,6 @@ const handleLogout = () => {
       />
     </button>
 
-    {/* Dropdown Menu */}
     {dropdownOpen && (
       <div
         className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg border border-gray-200 py-2 z-50"
@@ -242,19 +239,19 @@ const handleLogout = () => {
           <LuUserRound size={20} className="mr-2" /> My Account
         </a>
         <a
-          href="/user/my-ads"
+          href="/user"
           className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
         >
           <GoSync size={20} className="mr-2"/> My Ads
         </a>
         <a
-          href="/user/saved-ads"
+          href="/user"
           className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
         >
           <GrFavorite size={20} className="mr-2"/> Saved Ads
         </a>
         <a
-          href="/user/messages"
+          href="/user"
           className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
         >
           <LuMessageSquareText size={20} className="mr-2" /> Messages
@@ -278,8 +275,6 @@ const handleLogout = () => {
   )}
 </div>
 
-
-          {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -291,7 +286,6 @@ const handleLogout = () => {
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
       {isOpen && (
         <div className="md:hidden bg-white shadow-lg px-4 pb-2 pt-4 space-y-4">
           <NavLink
@@ -446,11 +440,22 @@ const handleLogout = () => {
 
 <button
   type="submit"
-  disabled={loading}
+  disabled={loginLoading}
   className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
 >
-  {loading ? <Loader size={6} /> : "Login"}
+  {loginLoading ? (
+    <div className="flex items-center justify-center w-6 h-6">
+      <div className="transform scale-70">
+        <Loader />
+      </div>
+    </div>
+  ) : (
+    "Login"
+  )}
 </button>
+
+
+
 
 
                 <div className="flex gap-4 mb-4">
@@ -726,12 +731,22 @@ const handleLogout = () => {
                   </label>
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4"
-                >
-                  Register
-                </button>
+<button
+  type="submit"
+  disabled={registerLoading}
+  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
+>
+  {registerLoading ? (
+    <div className="flex items-center justify-center w-6 h-6">
+      <div className="transform scale-70">
+        <Loader />
+      </div>
+    </div>
+  ) : (
+    "Register"
+  )}
+</button>
+
 
                 <div className="flex gap-4 mb-4">
                   <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
