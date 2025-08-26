@@ -2,19 +2,14 @@ import { useState } from "react";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
 
-
-
-export default function EmailVerification() {
+export default function EmailVerification({ email, onClose }) {
   const [loading, setLoading] = useState(false);
-  const apiUrl = process.env.PUBLIC_API_URL;
-  const location = useLocation();
-const email = location.state?.email;
+
   const handleResend = async () => {
     try {
       setLoading(true);
-      await axios.post(`${apiUrl}/auth/resend-verification`, { email });
+      await axios.post(`http://127.0.0.1:3000/api/auth/resend-verification`, { email });
       toast.success("Verification email resent successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to resend verification");
@@ -34,14 +29,21 @@ const email = location.state?.email;
         <h2 className="text-bold text-lg text-[#565ABF]">
           Please verify your Email
         </h2>
-        <p className="mb-4">Verification email sent to your registered email id.</p>
+        <p className="mb-4">Verification email sent to {email}.</p>
 
         <button
           onClick={handleResend}
           disabled={loading}
-          className="mt-2 px-4 py-2 bg-[#565ABF] text-white rounded-lg hover:bg-[#A321A6] disabled:opacity-50"
+          className="mt-2 mr-2 px-4 py-2 bg-[#565ABF] text-white rounded-lg hover:bg-[#A321A6] disabled:opacity-50"
         >
           {loading ? "Resending..." : "Resend Verification Email"}
+        </button>
+
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-2 border border-gray-400 rounded-lg text-gray-600 hover:bg-gray-100"
+        >
+          Close
         </button>
       </div>
     </div>

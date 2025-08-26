@@ -4,10 +4,11 @@ import { LuMessageSquareText } from "react-icons/lu";
 import { GoSync } from "react-icons/go";
 import { GrFavorite } from "react-icons/gr";
 import Loader from "components/common/Loader";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function UserDashboard() {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
   if (loading) return <Loader fullScreen />;
    if (!user) return <Navigate to="/" replace />;
@@ -36,7 +37,7 @@ export default function UserDashboard() {
             </div>
           </div>
         </button>
-        <button className="align-left text-left">
+        <button className="align-left text-left" onClick={() => navigate("/user/edit-my-details")}>
           <div className="p-4 rounded-[10px] border border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">

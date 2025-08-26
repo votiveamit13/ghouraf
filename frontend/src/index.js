@@ -14,16 +14,18 @@ import Public from "layouts/Public";
 import UserDashboard from "pages/user/page";
 import PrivateRoute from "components/auth/PrivateRoute";
 import { AuthProvider } from "context/AuthContext";
+import EditMyDetails from "pages/user/edit-my-details/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter basename="/ghouraf">
+  <BrowserRouter>
     <AuthProvider>
       <Routes>
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="/" element={<Public><Home/></Public>} />
         <Route element={<PrivateRoute/>}>
           <Route path="/user" element={<Public><UserDashboard/></Public>} />
+          <Route path="/user/edit-my-details" element={<Public><EditMyDetails/></Public>} />
         </Route>
       </Routes>
     <ToastContainer

@@ -19,6 +19,7 @@ import { GoSync } from "react-icons/go";
 import { FiEdit } from "react-icons/fi";
 import { useAuth } from "context/AuthContext";
 import Loader from "components/common/Loader";
+import EmailVerification from "components/user/EmailVerification";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -42,7 +43,8 @@ export default function Navbar() {
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
    const { user, login, logout, loading } = useAuth();
-
+const [showEmailVerification, setShowEmailVerification] = useState(false);
+const [pendingEmail, setPendingEmail] = useState("");
 
 
 const handleChange = (e) => {
@@ -81,16 +83,24 @@ const handleRegister = async (e) => {
 
 const handleLogin = async (e) => {
   e.preventDefault();
-  try {
+
     const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
     const idToken = await userCred.user.getIdToken();
-    await login(idToken);
-    toast.success("Login Successful");
-      navigate("/user");
-      setLoginDialog(false);
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Login Failed");
-  }
+const res = await login(idToken);
+
+if (res.emailVerified === false) {
+  setPendingEmail(form.email);
+  setShowEmailVerification(true);
+  return;
+}
+
+if (res.user) {
+  toast.success("Login Successful");
+  navigate("/user");
+  setLoginDialog(false);
+} else {
+  toast.error(res.message || "Login Failed");
+}
 };
 
 
@@ -250,7 +260,7 @@ const handleLogout = () => {
           <LuMessageSquareText size={20} className="mr-2" /> Messages
         </a>
         <a
-          href="/user/edit"
+          href="/user/edit-my-details"
           className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
         >
           <FiEdit size={20} className="mr-2"/> Edit My Details
@@ -752,6 +762,14 @@ const handleLogout = () => {
           </div>
         </div>
       )}
+
+      {showEmailVerification && (
+  <EmailVerification
+    email={pendingEmail}
+    onClose={() => setShowEmailVerification(false)}
+  />
+)}
+
     </nav>
   );
 }

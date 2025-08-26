@@ -32,15 +32,24 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, [fetchProfile]);
 
-  const login = async (idToken) => {
+const login = async (idToken) => {
+  try {
     const res = await axios.post("http://127.0.0.1:3000/api/auth/login", { idToken });
-    if (res.data?.user) {
+
+    if (res.data?.user && res.data?.emailVerified) {
       setUser(res.data.user);
       setToken(idToken);
       localStorage.setItem("token", idToken);
     }
+
     return res.data;
-  };
+  } catch (err) {
+    // Pass backend response back
+    return err.response?.data || { message: err.message, emailVerified: false };
+  }
+};
+
+
 
   const logout = () => {
     setUser(null);
