@@ -1,7 +1,3 @@
-// import Profile from "views/examples/Profile.js";
-// import Maps from "views/examples/Maps.js";
-// import Icons from "views/examples/Icons.js";
-
 import Posts from "pages/admin/post-management/page";
 import Users from "pages/admin/user-management/page";
 import LoginPage from "pages/admin/login/page";
