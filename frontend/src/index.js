@@ -24,7 +24,7 @@ root.render(
       <Routes>
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="/" element={<Public><Home/></Public>} />
-        <Route path="/auth/verified" element={<AuthVerified/>} />
+        <Route path="/auth/verified" element={<Public><AuthVerified/></Public>} />
         <Route element={<PrivateRoute/>}>
           <Route path="/user" element={<Public><UserDashboard/></Public>} />
           <Route path="/user/edit-my-details" element={<Public><EditMyDetails/></Public>} />
