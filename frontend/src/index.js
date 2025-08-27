@@ -16,6 +16,7 @@ import PrivateRoute from "components/auth/PrivateRoute";
 import { AuthProvider } from "context/AuthContext";
 import EditMyDetails from "pages/user/edit-my-details/page";
 import AuthVerified from "pages/authverified/AuthVerified";
+import MyAds from "pages/user/my-ads/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -28,6 +29,7 @@ root.render(
         <Route element={<PrivateRoute/>}>
           <Route path="/user" element={<Public><UserDashboard/></Public>} />
           <Route path="/user/edit-my-details" element={<Public><EditMyDetails/></Public>} />
+          <Route path="/user/my-ads" element={<Public><MyAds/></Public>} />
         </Route>
       </Routes>
     <ToastContainer

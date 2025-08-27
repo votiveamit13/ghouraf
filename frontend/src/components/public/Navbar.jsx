@@ -239,7 +239,7 @@ const handleLogout = () => {
           <LuUserRound size={20} className="mr-2" /> My Account
         </a>
         <a
-          href="/user"
+          href="/user/my-ads"
           className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
         >
           <GoSync size={20} className="mr-2"/> My Ads
