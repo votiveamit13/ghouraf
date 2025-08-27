@@ -68,7 +68,7 @@ const handleRegister = async (e) => {
   }
 setRegisterLoading(true);
   try {
-    await axios.post(`http://216.10.243.87:3000/api/auth/register`, {
+    await axios.post(`http://127.0.0.1:3000/api/auth/register`, {
       firstName: form.firstName,
       lastName: form.lastName,
       email: form.email,
