@@ -34,13 +34,13 @@ export const adminRoutes = [
     name: "Post Management",
     icon: "ni ni-single-02 text-[#565ABF]",
     subRoutes: [
-            {
-        path: "/post-management/create-post",
-        name: "Create Post",
-        icon: <IoCreateOutline className="text-[#565ABF]"/>,
-        component: <CreatePost/>,
-        layout: "/admin",
-      },
+      //       {
+      //   path: "/post-management/create-post",
+      //   name: "Create Post",
+      //   icon: <IoCreateOutline className="text-[#565ABF]"/>,
+      //   component: <CreatePost/>,
+      //   layout: "/admin",
+      // },
       {
         path: "/post-management",
         name: "View Posts",
