@@ -11,7 +11,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://216.10.243.87:3000/api/admin/login", {
+      const response = await fetch("https://216.10.243.87:3000/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -9,7 +9,7 @@ export default function EmailVerification({ email, onClose }) {
   const handleResend = async () => {
     try {
       setLoading(true);
-      await axios.post(`http://216.10.243.87:3000/api/auth/resend-verification`, { email });
+      await axios.post(`https://216.10.243.87:3000/api/auth/resend-verification`, { email });
       toast.success("Verification email resent successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to resend verification");

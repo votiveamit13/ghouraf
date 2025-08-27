@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     try {
-      const res = await axios.get("http://216.10.243.87:3000/api/auth/me", {
+      const res = await axios.get("https://216.10.243.87:3000/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data);
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
 
 const login = async (idToken) => {
   try {
-    const res = await axios.post("http://216.10.243.87:3000/api/auth/login", { idToken });
+    const res = await axios.post("https://216.10.243.87:3000/api/auth/login", { idToken });
 
     if (res.data?.user && res.data?.emailVerified) {
       setUser(res.data.user);
