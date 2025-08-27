@@ -68,7 +68,7 @@ const handleRegister = async (e) => {
   }
 setRegisterLoading(true);
   try {
-    await axios.post(`https://ghouraf.votivereact.in/api/auth/register`, {
+    await axios.post(`https://ghouraf.votivereact.in/backend/api/auth/register`, {
       firstName: form.firstName,
       lastName: form.lastName,
       email: form.email,
