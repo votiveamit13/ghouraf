@@ -21,12 +21,56 @@ export const signup = async (req, res) => {
       const verifyLink = await authAdmin.generateEmailVerificationLink(email, actionCodeSettings);
 
       await sendEmail({
-        to: email,
-        subject: "Verify your email",
-        html: `<p>Hi ${firstName},</p>
-               <p>Please confirm your email by clicking the link below:</p>
-               <p><a href="${verifyLink}">Verify Email</a></p>`
-      });
+  to: email,
+  subject: "Verify your email",
+  html: `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+      <title>Email Verification</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f4;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4">
+        <tr>
+          <td align="center" style="padding:40px 0;">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+              <tr>
+                <td align="center" bgcolor="#A321A6" style="padding:20px;">
+                  <h1 style="color:#ffffff; margin:0; font-size:24px;">Welcome to Ghouraf 🎉</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:30px; color:#333333; font-size:16px; line-height:1.5;">
+                  <p>Hi <b>${firstName}</b>,</p>
+                  <p>Thanks for signing up! Please confirm your email address by clicking the button below.</p>
+                  <table border="0" cellspacing="0" cellpadding="0" style="margin:30px auto;">
+                    <tr>
+                      <td align="center" bgcolor="#A321A6" style="border-radius:6px;">
+                        <a href="${verifyLink}" target="_blank" style="display:inline-block; padding:12px 25px; font-size:16px; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:6px;">
+                          Verify Email
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+                  <p style="word-break:break-all; color:#A321A6;"><a href="${verifyLink}" target="_blank" style="color:#A321A6;">${verifyLink}</a></p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" bgcolor="#f4f4f4" style="padding:15px; font-size:12px; color:#666;">
+                  Ghouraf. All rights reserved.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `
+});
+
 
       const profile = { firstName, lastName, gender, dob };
       const user = await User.create({
@@ -100,10 +144,58 @@ export const resendVerificationEmail = async (req, res) => {
 
 await sendEmail({
   to: email,
-  subject: "Resend: verify your email",
-  html: `<p>Click the link to verify your email:</p>
-         <p><a href="${link}">Verify Email</a></p>`,
+  subject: "Resend: Verify your email",
+  html: `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+      <title>Resend Verification</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f4;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4">
+        <tr>
+          <td align="center" style="padding:40px 0;">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+              <tr>
+                <td align="center" bgcolor="#A321A6" style="padding:20px;">
+                  <h1 style="color:#ffffff; margin:0; font-size:22px;">Verify Your Email</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:30px; color:#333333; font-size:16px; line-height:1.5;">
+                  <p>Hi there,</p>
+                  <p>We noticed you haven’t verified your email yet. Please click the button below to confirm your email address and activate your account.</p>
+                  <table border="0" cellspacing="0" cellpadding="0" style="margin:30px auto;">
+                    <tr>
+                      <td align="center" bgcolor="#A321A6" style="border-radius:6px;">
+                        <a href="${link}" target="_blank" style="display:inline-block; padding:12px 25px; font-size:16px; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:6px;">
+                          Verify Email
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+                  <p style="word-break:break-all; color:#A321A6;">
+                    <a href="${link}" target="_blank" style="color:#A321A6;">${link}</a>
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" bgcolor="#f4f4f4" style="padding:15px; font-size:12px; color:#666;">
+                  This is an automated message. If you already verified, you can safely ignore this email.<br/>
+                  Ghouraf. All rights reserved.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `
 });
+
 
 
     res.json({ message: "Verification email resent" });

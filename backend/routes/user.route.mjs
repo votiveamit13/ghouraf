@@ -13,7 +13,7 @@ router.post("/auth/register", validate(signupValidator), signup);
 
 router.post("/auth/login", validate(loginValidator), login);
 
-router.post("/auth/resend-verification", (req, res, next) => next(), resendVerificationEmail);
+router.post("/auth/resend-verification", resendVerificationEmail);
 
 router.put("/auth/profile", auth, updateProfile);
 
