@@ -9,6 +9,7 @@ export default function DetailsForm({ title, fields, onSubmit }) {
     }, {})
   );
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -41,10 +42,15 @@ export default function DetailsForm({ title, fields, onSubmit }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit(formData);
+    setIsSaving(true);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -67,6 +73,7 @@ export default function DetailsForm({ title, fields, onSubmit }) {
                   className={`form-control ${
                     errors[field.name] ? "border-red-500" : ""
                   }`}
+                   disabled={isSaving}
                 />
                 {errors[field.name] && (
                   <div className="text-red-500 text-[12px] mt-1">
@@ -89,7 +96,15 @@ export default function DetailsForm({ title, fields, onSubmit }) {
             type="submit"
             className="btn bg-[#565ABF] text-white text-[14px] font-medium mt-3 rounded-[12px] flex items-center gap-2"
           >
-            Save Changes <FaArrowRightLong/>
+            {isSaving ? (
+              <>
+                Saving...
+              </>
+            ) : (
+              <>
+                Save Changes <FaArrowRightLong />
+              </>
+            )}
           </button>
         </form>
       </div>

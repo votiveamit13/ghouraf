@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 export default function EditMyDetails() {
     const { user, loading, token } = useAuth();
-
+  const apiUrl = process.env.REACT_APP_API_URL;
     if (loading) return <Loader fullScreen />;
     if (!user) return <Navigate to="/" replace />;
     const initialProfile = {
@@ -19,30 +19,32 @@ export default function EditMyDetails() {
         dob: `${user.profile?.dob}`,
     };
 
-    const handleSaveProfile = async (data) => {
-        try{
-            const formData = new FormData();
-            formData.append("section", "profile");
-            for (const key in data) {
-                formData.append(key, data[key]);
-            }
+const handleSaveProfile = async (data) => {
+  try {
+    const formData = new FormData();
 
-            const res = await axios.put("https://ghouraf.votivereact.in/api/auth/profile", formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            console.log("Profile Updated:", res.data);
-            toast.success("Profile Updated");
-        } catch (err) {
-            console.error("Profile update failed:", err.response?.data || err.message);
-            toast.error(err.message);
-        }
-    };
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
+    formData.append("section", "profile");
+    const res = await axios.put(`${apiUrl}/auth/profile`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log("Profile Updated:", res.data);
+    toast.success("Profile Updated");
+  } catch (err) {
+    console.error("Profile update failed:", err.response?.data || err.message);
+    toast.error(err.message);
+  }
+};
+
     const handleSave = async (data, section) => {
         try{
-            const res = await axios.put("https://ghouraf.votivereact.in/api/auth/profile",
+            const res = await axios.put(`${apiUrl}/auth/profile`,
                 { ...data, section},
                 { headers: { Authorization: `Bearer ${token}`}}
             );
@@ -50,7 +52,8 @@ export default function EditMyDetails() {
             toast.success("Updated successfully")
         } catch (err) {
             console.error("Update failed", err.response?.data || err.message);
-            toast.error(err.message);
+            const errorMsg = err.response?.data?.message || err.message || "Something went wrong";
+    toast.error(errorMsg);
         }
     };
     return (
@@ -79,8 +82,8 @@ export default function EditMyDetails() {
                     <DetailsForm
                         title="Change Your Password"
                         fields={[
-                            { label: "Your current password", name: "currentPassword", placeholder: "Current Password", type: "text" },
-                            { label: "Choose new password", name: "newPassword", placeholder: "New Password", type: "text" },
+                            { label: "Your current password", name: "currentPassword", placeholder: "Current Password", type: "password" },
+                            { label: "Choose new password", name: "newPassword", placeholder: "New Password", type: "password" },
                             { label: "Confirm new password", name: "confirmPassword", placeholder: "Confirm New Password", type: "password" },
                         ]}
                         onSubmit={(data) => handleSave(data, "password")}

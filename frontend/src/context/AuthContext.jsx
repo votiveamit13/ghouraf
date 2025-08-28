@@ -4,9 +4,11 @@ import axios from "axios";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const apiUrl = process.env.REACT_APP_API_URL;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+
 
   const fetchProfile = useCallback(async () => {
     if (!token) {
@@ -14,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     try {
-      const res = await axios.get("https://ghouraf.votivereact.in/api/auth/me", {
+      const res = await axios.get(`${apiUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data);
@@ -26,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, apiUrl]);
 
   useEffect(() => {
     fetchProfile();
@@ -34,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
 const login = async (idToken) => {
   try {
-    const res = await axios.post("https://ghouraf.votivereact.in/api/auth/login", { idToken });
+    const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
 
     if (res.data?.user && res.data?.emailVerified) {
       setUser(res.data.user);
@@ -44,8 +46,8 @@ const login = async (idToken) => {
 
     return res.data;
   } catch (err) {
-    // Pass backend response back
     return err.response?.data || { message: err.message, emailVerified: false };
+
   }
 };
 

@@ -80,12 +80,14 @@ export const signup = async (req, res) => {
   `
       });
 
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const profile = { firstName, lastName, gender, dob };
       const user = await User.create({
         firebaseUid: fbUser.uid,
         email,
         termsAccepted,
+        password: hashedPassword,
         profile,
       });
 
@@ -214,9 +216,12 @@ export const resendVerificationEmail = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-  try{
+  try {
     const { section } = req.body;
     let updates = {};
+
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     if (section === "name") {
       const { firstName, lastName, password } = req.body;
@@ -224,55 +229,83 @@ export const updateProfile = async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
       }
 
-      const user = await User.findById(req.user._id).select("+password");
       const valid = await bcrypt.compare(password, user.password);
-      if(!valid) return res.status(401).json({ message: "Invalid password"});
+      if (!valid) return res.status(401).json({ message: "Invalid password" });
 
       updates["profile.firstName"] = firstName;
       updates["profile.lastName"] = lastName;
+
+      await authAdmin.updateUser(user.firebaseUid, {
+        displayName: `${firstName} ${lastName}`,
+      });
     }
 
-    else if (section === "email") {
-      const { email, confirmEmail, password } = req.body;
-      if(!email || !confirmEmail || !password) {
-        return res.status(400).json({ message: "All fields are required"});
-      }
+else if (section === "email") {
+  const { email, confirmEmail, password } = req.body;
+  if (!email || !confirmEmail || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  if (email !== confirmEmail) {
+    return res.status(400).json({ message: "Emails do not match" });
+  }
 
-      if(email !== confirmEmail){
-        return res.status(400).json({ message: "Emails do not match"});
-      }
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.status(401).json({ message: "Invalid password" });
 
-      const user = await User.findById(req.user._id).select("+password");
-      const valid = await bcrypt.compare(password, user.password);
-      if(!valid) return res.status(401).json({ message: "Invalid password"});
+  const newEmail = email.toLowerCase();
 
-      updates.email = email.toLowerCase();
+  const emailExists = await User.findOne({
+    email: newEmail,
+    _id: { $ne: user._id },
+  });
+  if (emailExists) {
+    return res.status(400).json({ message: "Email already exists in system" });
+  }
+
+  try {
+    const existingFbUser = await authAdmin.getUserByEmail(newEmail);
+    if (existingFbUser && existingFbUser.uid !== user.firebaseUid) {
+      return res.status(400).json({ message: "Email already exists in Firebase" });
     }
+  } catch (fbErr) {
+    if (fbErr.code !== "auth/user-not-found") {
+      console.error("Firebase email check error:", fbErr);
+      return res.status(500).json({ message: "Error checking email in Firebase" });
+    }
+  }
+
+  await authAdmin.updateUser(user.firebaseUid, { email: newEmail });
+
+  updates.email = newEmail;
+}
+
 
     else if (section === "password") {
-      const {currentPassword, newPassword, confirmPassword} = req.body;
-      if(!currentPassword || !newPassword || !confirmPassword) {
-        return res.status(400).json({ message: "All fields are required"});
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
       }
 
-      if(newPassword !== confirmPassword) {
-        return res.status(400).json({ message: "Passwords do not match"});
-      }
-
-      const user = await User.findById(req.user._id).select("+password");
       const valid = await bcrypt.compare(currentPassword, user.password);
-      if(!valid) return res.status(401).json({ message: "Invalid Password"});
+      if (!valid) return res.status(401).json({ message: "Invalid password" });
 
       const hashed = await bcrypt.hash(newPassword, 10);
+
+      await authAdmin.updateUser(user.firebaseUid, { password: newPassword });
+
       updates.password = hashed;
     }
 
-    else if(section === "profile") {
-        if (!req.body) {
-    return res.status(400).json({ message: "No profile data received" });
-  }
-      const { error } = profileValidator.validate(req.body, {abortEarly: false});
-      if(error) return res.status(422).json(validationFormat(error));
+    else if (section === "profile") {
+      if (!req.body) {
+        return res.status(400).json({ message: "No profile data received" });
+      }
+
+      const { error } = profileValidator.validate(req.body, { abortEarly: false });
+      if (error) return res.status(422).json(validationFormat(error));
 
       const allowed = [
         "firstName",
@@ -289,14 +322,14 @@ export const updateProfile = async (req, res) => {
         "lifestyleTags",
       ];
 
-       const sets = {};
-  for (const k of allowed) {
-    if (k in req.body) {
-      sets[`profile.${k}`] = req.body[k];
-    }
-  }
+      const sets = {};
+      for (const k of allowed) {
+        if (k in req.body) {
+          sets[`profile.${k}`] = req.body[k];
+        }
+      }
 
-            if (req.file) {
+      if (req.file) {
         fileHandler.validateExtension(req.file.originalname, "image");
         const savedFile = fileHandler.saveFile(req.file, "profile_pics");
         const photoUrl = `${req.protocol}://${req.get("host")}${savedFile.relativePath}`;
@@ -322,6 +355,7 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 export const getProfile = async (req, res) => {
   res.json(req.user);

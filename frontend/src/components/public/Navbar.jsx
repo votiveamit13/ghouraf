@@ -3,9 +3,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiMenu, HiX, HiOutlineMail } from "react-icons/hi";
 import { Img } from "react-image";
-import { LuUserPen, LuUserRound, LuMessageSquareText, LuLogOut  } from "react-icons/lu";
+import { LuUserPen, LuUserRound, LuMessageSquareText, LuLogOut } from "react-icons/lu";
 import { TfiEmail } from "react-icons/tfi";
-import { GrLock, GrFavorite  } from "react-icons/gr";
+import { GrLock, GrFavorite } from "react-icons/gr";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { IoLogoFacebook } from "react-icons/io5";
 import google from "assets/img/icons/google.png";
@@ -20,8 +20,10 @@ import { FiEdit } from "react-icons/fi";
 import { useAuth } from "context/AuthContext";
 import Loader from "components/common/Loader";
 import EmailVerification from "components/user/EmailVerification";
+import { getErrorMessage } from "utils/errorHandler";
 
 export default function Navbar() {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [loginDialog, setLoginDialog] = useState(false);
@@ -43,85 +45,85 @@ export default function Navbar() {
     termsAccepted: false,
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
-   const { user, login, logout } = useAuth();
-const [showEmailVerification, setShowEmailVerification] = useState(false);
-const [pendingEmail, setPendingEmail] = useState("");
-const [loginLoading, setLoginLoading] = useState(false);
-const [registerLoading, setRegisterLoading] = useState(false);
+  const { user, login, logout } = useAuth();
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [registerLoading, setRegisterLoading] = useState(false);
 
 
 
-const handleChange = (e) => {
-  const { name, type, value, checked } = e.target;
-  setForm({
-    ...form,
-    [name]: type === "checkbox" ? checked : value,
-  });
-};
-
-
-const handleRegister = async (e) => {
-  e.preventDefault();
-  if (form.password !== form.confirmPassword) {
-    toast.error("Passwords do not match");
-    return;
-  }
-setRegisterLoading(true);
-  try {
-    await axios.post(`https://ghouraf.votivereact.in/api/auth/register`, {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      gender: form.gender,
-      dob: form.dob,
-      password: form.password,
-      termsAccepted: form.termsAccepted,
+  const handleChange = (e) => {
+    const { name, type, value, checked } = e.target;
+    setForm({
+      ...form,
+      [name]: type === "checkbox" ? checked : value,
     });
+  };
 
-    toast.success("Register successful. Please check your email for verification.");
-    setRegisterDialog(false);
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Registration Failed");
-  } finally {
-    setRegisterLoading(false);
-  }
-};
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setLoginLoading(true);
-  try {
-    const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
-    const idToken = await userCred.user.getIdToken();
-    const res = await login(idToken);
-
-    if (res.emailVerified === false) {
-      setPendingEmail(form.email);
-      setShowEmailVerification(true);
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
+    setRegisterLoading(true);
+    try {
+      await axios.post(`${apiUrl}/auth/register`, {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        gender: form.gender,
+        dob: form.dob,
+        password: form.password,
+        termsAccepted: form.termsAccepted,
+      });
 
-    if (res.user) {
-      toast.success("Login Successful");
-      navigate("/user");
-      setLoginDialog(false);
-    } else {
-      toast.error(res.message || "Login Failed");
+      toast.success("Register successful. Please check your email for verification.");
+      setRegisterDialog(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Registration Failed");
+    } finally {
+      setRegisterLoading(false);
     }
-  } catch (err) {
-    toast.error(err.message || "Login Failed");
-  } finally {
-    setLoginLoading(false);
-  }
-};
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
+      const idToken = await userCred.user.getIdToken();
+      const res = await login(idToken);
+
+      if (res.emailVerified === false) {
+        setPendingEmail(form.email);
+        setShowEmailVerification(true);
+        return;
+      }
+
+      if (res.user) {
+        toast.success("Login Successful");
+        navigate("/user");
+        setLoginDialog(false);
+      } else {
+        toast.error(res.message || "Login Failed");
+      }
+    } catch (err) {
+       toast.error(getErrorMessage(err));
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
 
 
-const handleLogout = () => {
-  logout();
+  const handleLogout = () => {
+    logout();
     navigate("/");
     toast.info("Logout Successful");
-};
+  };
 
   return (
     <nav className="bg-white fixed top-0 left-0 w-full z-20">
@@ -141,139 +143,135 @@ const handleLogout = () => {
 
           <div className="hidden md:flex space-x-8 mr--8">
             <button
-        onClick={() => setActive("spaces")}
-        className={`font-semibold ${linkClass} ${
-          active === "spaces" ? activeClass : "text-[#565ABF]"
-        }`}
-      >
-        Spaces
-      </button>
+              onClick={() => setActive("spaces")}
+              className={`font-semibold ${linkClass} ${active === "spaces" ? activeClass : "text-[#565ABF]"
+                }`}
+            >
+              Spaces
+            </button>
 
-      <button
-        onClick={() => setActive("place-wanted")}
-        className={`font-semibold ${linkClass} ${
-          active === "place-wanted" ? activeClass : "text-[#565ABF]"
-        }`}
-      >
-        Place Wanted
-      </button>
+            <button
+              onClick={() => setActive("place-wanted")}
+              className={`font-semibold ${linkClass} ${active === "place-wanted" ? activeClass : "text-[#565ABF]"
+                }`}
+            >
+              Place Wanted
+            </button>
 
-      <button
-        onClick={() => setActive("team-up")}
-        className={`font-semibold ${linkClass} ${
-          active === "team-up" ? activeClass : "text-[#565ABF]"
-        }`}
-      >
-        Team Up
-      </button>
+            <button
+              onClick={() => setActive("team-up")}
+              className={`font-semibold ${linkClass} ${active === "team-up" ? activeClass : "text-[#565ABF]"
+                }`}
+            >
+              Team Up
+            </button>
 
-      <button
-        onClick={() => setActive("more-info")}
-        className={`font-semibold ${linkClass} ${
-          active === "more-info" ? activeClass : "text-[#565ABF]"
-        }`}
-      >
-        More Info
-      </button>
+            <button
+              onClick={() => setActive("more-info")}
+              className={`font-semibold ${linkClass} ${active === "more-info" ? activeClass : "text-[#565ABF]"
+                }`}
+            >
+              More Info
+            </button>
           </div>
 
-<div className="hidden md:flex items-center space-x-6">
-  {!user ? (
-    <>
-      <div className="hidden md:flex items-center space-x-2">
-<button
-  onClick={() => setRegisterDialog(true)}
-  className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
->
-  <LuUserPen size={30} className="mr-1" /> Register
-</button>
+          <div className="hidden md:flex items-center space-x-6">
+            {!user ? (
+              <>
+                <div className="hidden md:flex items-center space-x-2">
+                  <button
+                    onClick={() => setRegisterDialog(true)}
+                    className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
+                  >
+                    <LuUserPen size={30} className="mr-1" /> Register
+                  </button>
 
-<span className="text-[#565ABF]">/</span>
+                  <span className="text-[#565ABF]">/</span>
 
-<button
-  onClick={() => setLoginDialog(true)}
-  className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
->
-  Login
-</button>
+                  <button
+                    onClick={() => setLoginDialog(true)}
+                    className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
+                  >
+                    Login
+                  </button>
 
-      </div>
+                </div>
 
-      <button className="flex items-center px-4 py-3 bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
-        <IoIosAddCircleOutline
-          className="text-2xl font-bold"
-          strokeWidth={2.5}
-        />
-        <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
-      </button>
-    </>
-  ) : (
-    <div className="flex items-center space-x-4">
-      <span className="font-semibold text-black">
-        Hi, {user.profile.firstName?.split(" ")[0] || "User"}
-      </span>
-      <a href="/user" className="text-black hover:text-[#A321A6]">
-        <HiOutlineMail  size={22} />
-      </a>
-       <div className="relative">
-    <button
-      onClick={() => setDropdownOpen(!dropdownOpen)}
-      className="focus:outline-none"
-    >
-      <img
-        src={user.photoURL || require("../../assets/img/ghouraf/default-avatar.png")}
-        alt="Profile"
-        className="w-10 h-10 rounded-full border border-gray-300"
-      />
-    </button>
+                <button className="flex items-center px-4 py-3 bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
+                  <IoIosAddCircleOutline
+                    className="text-2xl font-bold"
+                    strokeWidth={2.5}
+                  />
+                  <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <span className="font-semibold text-black">
+                  Hi, {user.profile.firstName?.split(" ")[0] || "User"}
+                </span>
+                <a href="/user" className="text-black hover:text-[#A321A6]">
+                  <HiOutlineMail size={22} />
+                </a>
+                <div className="relative">
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="focus:outline-none"
+                  >
+                    <img
+                      src={user.profile?.photo || require("../../assets/img/ghouraf/default-avatar.png")}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full border border-gray-300"
+                    />
+                  </button>
 
-    {dropdownOpen && (
-      <div
-        className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg border border-gray-200 py-2 z-50"
-        onClick={() => setDropdownOpen(false)}
-      >
-        <a
-          href="/user"
-          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-        >
-          <LuUserRound size={20} className="mr-2" /> My Account
-        </a>
-        <a
-          href="/user/my-ads"
-          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-        >
-          <GoSync size={20} className="mr-2"/> My Ads
-        </a>
-        <a
-          href="/user"
-          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-        >
-          <GrFavorite size={20} className="mr-2"/> Saved Ads
-        </a>
-        <a
-          href="/user"
-          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-        >
-          <LuMessageSquareText size={20} className="mr-2" /> Messages
-        </a>
-        <a
-          href="/user/edit-my-details"
-          className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-        >
-          <FiEdit size={20} className="mr-2"/> Edit My Details
-        </a>
-        <button
-          onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-        >
-          <LuLogOut size={20} className="mr-2"/> Logout
-        </button>
-      </div>
-    )}
-  </div>
-    </div>
-  )}
-</div>
+                  {dropdownOpen && (
+                    <div
+                      className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <a
+                        href="/user"
+                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                      >
+                        <LuUserRound size={20} className="mr-2" /> My Account
+                      </a>
+                      <a
+                        href="/user/my-ads"
+                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                      >
+                        <GoSync size={20} className="mr-2" /> My Ads
+                      </a>
+                      <a
+                        href="/user"
+                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                      >
+                        <GrFavorite size={20} className="mr-2" /> Saved Ads
+                      </a>
+                      <a
+                        href="/user"
+                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                      >
+                        <LuMessageSquareText size={20} className="mr-2" /> Messages
+                      </a>
+                      <a
+                        href="/user/edit-my-details"
+                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                      >
+                        <FiEdit size={20} className="mr-2" /> Edit My Details
+                      </a>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                      >
+                        <LuLogOut size={20} className="mr-2" /> Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="md:hidden">
             <button
@@ -324,8 +322,7 @@ const handleLogout = () => {
           <span className="flex space-x-2">
             <NavLink
               className={({ isActive }) =>
-                `flex items-center ${linkClass} ${
-                  isActive ? activeClass : "text-[#565ABF]"
+                `flex items-center ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
                 }`
               }
               onClick={() => setRegisterDialog(true)}
@@ -335,8 +332,7 @@ const handleLogout = () => {
             /
             <NavLink
               className={({ isActive }) =>
-                `flex items-center ${linkClass} ${
-                  isActive ? activeClass : "text-[#565ABF]"
+                `flex items-center ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
                 }`
               }
               onClick={() => setLoginDialog(true)}
@@ -370,11 +366,10 @@ const handleLogout = () => {
                   Email
                 </label>
                 <div
-                  className={`flex items-center mb-4 transition-all ${
-                    activeField === "email"
+                  className={`flex items-center mb-4 transition-all ${activeField === "email"
                       ? "border-b-2 border-[#A321A6]"
                       : "border-b border-gray-300"
-                  }`}
+                    }`}
                 >
                   <span className="text-gray-500 mr-2">
                     <TfiEmail color="black" />
@@ -394,11 +389,10 @@ const handleLogout = () => {
                   Password
                 </label>
                 <div
-                  className={`flex items-center mb-3 transition-all ${
-                    activeField === "password"
+                  className={`flex items-center mb-3 transition-all ${activeField === "password"
                       ? "border-b-2 border-[#A321A6]"
                       : "border-b border-gray-300"
-                  }`}
+                    }`}
                 >
                   <span className="text-gray-500 mr-2">
                     <GrLock color="black" />
@@ -438,21 +432,21 @@ const handleLogout = () => {
                   </a>
                 </div>
 
-<button
-  type="submit"
-  disabled={loginLoading}
-  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
->
-  {loginLoading ? (
-    <div className="flex items-center justify-center w-6 h-6">
-      <div className="transform scale-70">
-        <Loader />
-      </div>
-    </div>
-  ) : (
-    "Login"
-  )}
-</button>
+                <button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
+                >
+                  {loginLoading ? (
+                    <div className="flex items-center justify-center w-6 h-6">
+                      <div className="transform scale-70">
+                        <Loader />
+                      </div>
+                    </div>
+                  ) : (
+                    "Login"
+                  )}
+                </button>
 
 
 
@@ -507,11 +501,10 @@ const handleLogout = () => {
                       First Name
                     </label>
                     <div
-                      className={`flex items-center mb-2 transition-all ${
-                        activeField === "firstName"
+                      className={`flex items-center mb-2 transition-all ${activeField === "firstName"
                           ? "border-b-2 border-[#A321A6]"
                           : "border-b border-gray-300"
-                      }`}
+                        }`}
                     >
                       <span className="text-gray-500 mr-2">
                         <FaRegUser color="black" />
@@ -533,11 +526,10 @@ const handleLogout = () => {
                       Last Name
                     </label>
                     <div
-                      className={`flex items-center mb-2 transition-all ${
-                        activeField === "lastName"
+                      className={`flex items-center mb-2 transition-all ${activeField === "lastName"
                           ? "border-b-2 border-[#A321A6]"
                           : "border-b border-gray-300"
-                      }`}
+                        }`}
                     >
                       <span className="text-gray-500 mr-2">
                         <FaRegUser color="black" />
@@ -562,11 +554,10 @@ const handleLogout = () => {
                       Email
                     </label>
                     <div
-                      className={`flex items-center mb-2 transition-all ${
-                        activeField === "email"
+                      className={`flex items-center mb-2 transition-all ${activeField === "email"
                           ? "border-b-2 border-[#A321A6]"
                           : "border-b border-gray-300"
-                      }`}
+                        }`}
                     >
                       <span className="text-gray-500 mr-2">
                         <TfiEmail color="black" />
@@ -588,11 +579,10 @@ const handleLogout = () => {
                       Gender
                     </label>
                     <div
-                      className={`flex items-center mb-2 transition-all ${
-                        activeField === "gender"
+                      className={`flex items-center mb-2 transition-all ${activeField === "gender"
                           ? "border-b-2 border-[#A321A6]"
                           : "border-b border-gray-300"
-                      }`}
+                        }`}
                     >
                       <span className="text-gray-500 mr-2">
                         <BsGenderMale color="black" />
@@ -617,11 +607,10 @@ const handleLogout = () => {
                   Date of Birth
                 </label>
                 <div
-                  className={`flex items-center mb-2 transition-all ${
-                    activeField === "dob"
+                  className={`flex items-center mb-2 transition-all ${activeField === "dob"
                       ? "border-b-2 border-[#A321A6]"
                       : "border-b border-gray-300"
-                  }`}
+                    }`}
                 >
                   <span className="text-gray-500 mr-2">
                     <FaRegUser color="black" />
@@ -642,11 +631,10 @@ const handleLogout = () => {
                   Password
                 </label>
                 <div
-                  className={`flex items-center mb-2 transition-all ${
-                    activeField === "password"
+                  className={`flex items-center mb-2 transition-all ${activeField === "password"
                       ? "border-b-2 border-[#A321A6]"
                       : "border-b border-gray-300"
-                  }`}
+                    }`}
                 >
                   <span className="text-gray-500 mr-2">
                     <GrLock color="black" />
@@ -678,11 +666,10 @@ const handleLogout = () => {
                   Confirm Password
                 </label>
                 <div
-                  className={`flex items-center mb-2 transition-all ${
-                    activeField === "confirmPassword"
+                  className={`flex items-center mb-2 transition-all ${activeField === "confirmPassword"
                       ? "border-b-2 border-[#A321A6]"
                       : "border-b border-gray-300"
-                  }`}
+                    }`}
                 >
                   <span className="text-gray-500 mr-2">
                     <GrLock color="black" />
@@ -731,21 +718,21 @@ const handleLogout = () => {
                   </label>
                 </div>
 
-<button
-  type="submit"
-  disabled={registerLoading}
-  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
->
-  {registerLoading ? (
-    <div className="flex items-center justify-center w-6 h-6">
-      <div className="transform scale-70">
-        <Loader />
-      </div>
-    </div>
-  ) : (
-    "Register"
-  )}
-</button>
+                <button
+                  type="submit"
+                  disabled={registerLoading}
+                  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
+                >
+                  {registerLoading ? (
+                    <div className="flex items-center justify-center w-6 h-6">
+                      <div className="transform scale-70">
+                        <Loader />
+                      </div>
+                    </div>
+                  ) : (
+                    "Register"
+                  )}
+                </button>
 
 
                 <div className="flex gap-4 mb-4">
@@ -779,11 +766,11 @@ const handleLogout = () => {
       )}
 
       {showEmailVerification && (
-  <EmailVerification
-    email={pendingEmail}
-    onClose={() => setShowEmailVerification(false)}
-  />
-)}
+        <EmailVerification
+          email={pendingEmail}
+          onClose={() => setShowEmailVerification(false)}
+        />
+      )}
 
     </nav>
   );

@@ -4,6 +4,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 
 export default function ProfileEdit({ initialData, onSave }) {
   const [editMode, setEditMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     ...initialData,
     dob: initialData.dob ? initialData.dob.split("T")[0] : "",
@@ -68,11 +69,16 @@ export default function ProfileEdit({ initialData, onSave }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
-    if (!validate()) return;
+const handleSave = async () => {
+  if (!validate()) return;
+  setIsSaving(true);
+  try {
+    await onSave(formData);
     setEditMode(false);
-    onSave(formData);
-  };
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   return (
     <div className="bg-white mb-5 shadow-sm rounded-[12px] border-[1px] border-[#D7D7D7]">
@@ -182,29 +188,40 @@ export default function ProfileEdit({ initialData, onSave }) {
         </div>
 
         <div className="mt-3">
-          {editMode ? (
-            <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
-              >
-                Save <FaArrowRightLong/>
-              </button>
-              <button
-                onClick={() => setEditMode(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded-[12px]"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setEditMode(true)}
-              className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
-            >
-              Edit Details <FaArrowRightLong/>
-            </button>
-          )}
+{editMode ? (
+  <div className="flex gap-2">
+    <button
+      onClick={handleSave}
+      disabled={isSaving}
+      className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2 disabled:opacity-70"
+    >
+      {isSaving ? (
+        <>
+          Saving...
+        </>
+      ) : (
+        <>
+          Save <FaArrowRightLong />
+        </>
+      )}
+    </button>
+    <button
+      onClick={() => setEditMode(false)}
+      disabled={isSaving}
+      className="bg-gray-400 text-white px-4 py-2 rounded-[12px]"
+    >
+      Cancel
+    </button>
+  </div>
+) : (
+  <button
+    onClick={() => setEditMode(true)}
+    className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
+  >
+    Edit Details <FaArrowRightLong />
+  </button>
+)}
+
         </div>
       </div>
     </div>

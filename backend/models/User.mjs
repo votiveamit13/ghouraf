@@ -13,7 +13,7 @@ const ProfileSchema = new mongoose.Schema({
   state: String,
   country: String,
   lifestyleTags: [String],
-  photos: [String],
+  photo: String,
 });
 
 const userSchema = new mongoose.Schema(
@@ -30,10 +30,8 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
     password: {
-      type: String,
-      required: function () {
-        return this.isAdmin === true;
-      },
+   type: String,
+  required: true,
     },
     isAdmin: {
       type: Boolean,
