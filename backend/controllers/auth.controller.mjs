@@ -2,6 +2,15 @@ import { authAdmin } from "../config/firebase.mjs";
 import User from "../models/User.mjs";
 import { profileValidator } from "../validations/profile.validator.mjs";
 import { sendEmail } from "../utils/email.mjs";
+import bcrypt from "bcrypt";
+import { fileHandler } from "../utils/fileHandler.mjs";
+
+const validationFormat = (error) => {
+  return error.details.map((d) => ({
+    field: d.path.join("."),
+    message: d.message,
+  }));
+};
 
 export const signup = async (req, res) => {
   try {
@@ -21,9 +30,9 @@ export const signup = async (req, res) => {
       const verifyLink = await authAdmin.generateEmailVerificationLink(email, actionCodeSettings);
 
       await sendEmail({
-  to: email,
-  subject: "Verify your email",
-  html: `
+        to: email,
+        subject: "Verify your email",
+        html: `
   <!DOCTYPE html>
   <html>
     <head>
@@ -37,7 +46,7 @@ export const signup = async (req, res) => {
             <table width="600" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
               <tr>
                 <td align="center" bgcolor="#A321A6" style="padding:20px;">
-                  <h1 style="color:#ffffff; margin:0; font-size:24px;">Welcome to Ghouraf 🎉</h1>
+                  <h1 style="color:#ffffff; margin:0; font-size:24px;">Welcome to Ghouraf</h1>
                 </td>
               </tr>
               <tr>
@@ -69,7 +78,7 @@ export const signup = async (req, res) => {
     </body>
   </html>
   `
-});
+      });
 
 
       const profile = { firstName, lastName, gender, dob };
@@ -110,7 +119,6 @@ export const signup = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   try {
     const { idToken } = req.body;
@@ -142,10 +150,10 @@ export const resendVerificationEmail = async (req, res) => {
     };
     const link = await authAdmin.generateEmailVerificationLink(email, actionCodeSettings);
 
-await sendEmail({
-  to: email,
-  subject: "Resend: Verify your email",
-  html: `
+    await sendEmail({
+      to: email,
+      subject: "Resend: Verify your email",
+      html: `
   <!DOCTYPE html>
   <html>
     <head>
@@ -194,7 +202,7 @@ await sendEmail({
     </body>
   </html>
   `
-});
+    });
 
 
 
@@ -206,15 +214,113 @@ await sendEmail({
 };
 
 export const updateProfile = async (req, res) => {
-  const { error } = profileValidator.validate(req.body, { abortEarly: false });
-  if (error) return res.status(422).json(validationFormate(error));
+  try{
+    const { section } = req.body;
+    let updates = {};
 
-  const allowed = ['firstName', 'lastName', 'age', 'gender', 'occupation', 'bio', 'city', 'state', 'country', 'lifestyleTags', 'photos'];
-  const sets = {};
-  for (const k of allowed) if (k in req.body) sets[`profile.${k}`] = req.body[k];
+    if (section === "name") {
+      const { firstName, lastName, password } = req.body;
+      if (!firstName || !lastName || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
 
-  await User.findByIdAndUpdate(req.user._id, { $set: sets });
-  res.json({ message: 'Profile updated' });
+      const user = await User.findById(req.user._id).select("+password");
+      const valid = await bcrypt.compare(password, user.password);
+      if(!valid) return res.status(401).json({ message: "Invalid password"});
+
+      updates["profile.firstName"] = firstName;
+      updates["profile.lastName"] = lastName;
+    }
+
+    else if (section === "email") {
+      const { email, confirmEmail, password } = req.body;
+      if(!email || !confirmEmail || !password) {
+        return res.status(400).json({ message: "All fields are required"});
+      }
+
+      if(email !== confirmEmail){
+        return res.status(400).json({ message: "Emails do not match"});
+      }
+
+      const user = await User.findById(req.user._id).select("+password");
+      const valid = await bcrypt.compare(password, user.password);
+      if(!valid) return res.status(401).json({ message: "Invalid password"});
+
+      updates.email = email.toLowerCase();
+    }
+
+    else if (section === "password") {
+      const {currentPassword, newPassword, confirmPassword} = req.body;
+      if(!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "All fields are required"});
+      }
+
+      if(newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match"});
+      }
+
+      const user = await User.findById(req.user._id).select("+password");
+      const valid = await bcrypt.compare(currentPassword, user.password);
+      if(!valid) return res.status(401).json({ message: "Invalid Password"});
+
+      const hashed = await bcrypt.hash(newPassword, 10);
+      updates.password = hashed;
+    }
+
+    else if(section === "profile") {
+        if (!req.body) {
+    return res.status(400).json({ message: "No profile data received" });
+  }
+      const { error } = profileValidator.validate(req.body, {abortEarly: false});
+      if(error) return res.status(422).json(validationFormat(error));
+
+      const allowed = [
+        "firstName",
+        "lastName",
+        "age",
+        "mobile",
+        "gender",
+        "dob",
+        "occupation",
+        "bio",
+        "city",
+        "state",
+        "country",
+        "lifestyleTags",
+      ];
+
+       const sets = {};
+  for (const k of allowed) {
+    if (k in req.body) {
+      sets[`profile.${k}`] = req.body[k];
+    }
+  }
+
+            if (req.file) {
+        fileHandler.validateExtension(req.file.originalname, "image");
+        const savedFile = fileHandler.saveFile(req.file, "profile_pics");
+        const photoUrl = `${req.protocol}://${req.get("host")}${savedFile.relativePath}`;
+        sets["profile.photo"] = photoUrl;
+      }
+
+      updates = { ...updates, ...sets };
+    }
+
+    if (!Object.keys(updates).length) {
+      return res.status(400).json({ message: "No valid updates provided" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updates },
+      { new: true }
+    );
+
+    res.json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
 export const getProfile = async (req, res) => {

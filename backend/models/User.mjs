@@ -4,6 +4,7 @@ const ProfileSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   age: Number,
+  mobile: Number,
   gender: { type: String, enum: ["male", "female"], index: true },
   dob: Date,
   occupation: String,

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 export default function DetailsForm({ title, fields, onSubmit }) {
   const [formData, setFormData] = useState(
@@ -14,7 +15,7 @@ export default function DetailsForm({ title, fields, onSubmit }) {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setErrors({ ...errors, [e.target.name]: "" }); // clear error on change
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const validate = () => {
@@ -25,7 +26,6 @@ export default function DetailsForm({ title, fields, onSubmit }) {
       }
     });
 
-    // ✅ Special validations
     if ("email" in formData && "confirmEmail" in formData) {
       if (formData.email !== formData.confirmEmail) {
         newErrors.confirmEmail = "Emails do not match";
@@ -77,7 +77,6 @@ export default function DetailsForm({ title, fields, onSubmit }) {
             ))}
           </div>
 
-          {/* Forgot password only for password form */}
           {fields.some((f) => f.name.toLowerCase().includes("password")) && (
             <div className="mt-2 text-[12px] text-[#565ABF]">
               <a href="/" className="hover:text-[#565ABF]">
@@ -88,9 +87,9 @@ export default function DetailsForm({ title, fields, onSubmit }) {
 
           <button
             type="submit"
-            className="btn bg-[#565ABF] text-white text-[14px] font-medium mt-3 rounded-[12px]"
+            className="btn bg-[#565ABF] text-white text-[14px] font-medium mt-3 rounded-[12px] flex items-center gap-2"
           >
-            Save Changes →
+            Save Changes <FaArrowRightLong/>
           </button>
         </form>
       </div>

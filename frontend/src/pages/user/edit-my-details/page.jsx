@@ -3,26 +3,55 @@ import DetailsForm from "components/user/editmydetails/DetailsForm";
 import ProfileEdit from "components/user/editmydetails/ProfileEdit";
 import { useAuth } from "context/AuthContext";
 import { Navigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 export default function EditMyDetails() {
-    const { user, loading } = useAuth();
+    const { user, loading, token } = useAuth();
 
     if (loading) return <Loader fullScreen />;
     if (!user) return <Navigate to="/" replace />;
-  const initialProfile = {
-    photo: "https://via.placeholder.com/150",
-    gender: `${user.profile?.gender}`,
-    age: 28,
-    mobile: "+33 123 456 789",
-    dob: `${user.profile?.dob}`,
-  };
+    const initialProfile = {
+        photo: `${user.profile?.photo}`,
+        gender: `${user.profile?.gender}`,
+        age: 28,
+        mobile: `${user.profile?.mobile || ""}`,
+        dob: `${user.profile?.dob}`,
+    };
 
-    const handleSaveProfile = (data) => {
-    console.log("Updated profile:", data);
-    // 🔜 Call your API here (FormData for photo upload)
-  };
-    const handleSave = (data) => {
-        console.log("Form submitted:", data);
-        // 🔜 Call API here
+    const handleSaveProfile = async (data) => {
+        try{
+            const formData = new FormData();
+            formData.append("section", "profile");
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
+
+            const res = await axios.put("https://ghouraf.votivereact.in/api/auth/profile", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.log("Profile Updated:", res.data);
+            toast.success("Profile Updated");
+        } catch (err) {
+            console.error("Profile update failed:", err.response?.data || err.message);
+            toast.error(err.message);
+        }
+    };
+    const handleSave = async (data, section) => {
+        try{
+            const res = await axios.put("https://ghouraf.votivereact.in/api/auth/profile",
+                { ...data, section},
+                { headers: { Authorization: `Bearer ${token}`}}
+            );
+            console.log("Updated", res.data);
+            toast.success("Updated successfully")
+        } catch (err) {
+            console.error("Update failed", err.response?.data || err.message);
+            toast.error(err.message);
+        }
     };
     return (
         <>
@@ -36,7 +65,7 @@ export default function EditMyDetails() {
                             { label: "Last Name", name: "lastName", placeholder: "Last Name", type: "text", value: `${user.profile?.lastName}` },
                             { label: "Your Password", name: "password", placeholder: "Your Password", type: "password" },
                         ]}
-                        onSubmit={handleSave}
+                        onSubmit={(data) => handleSave(data, "name")}
                     />
                     <DetailsForm
                         title="Change Email Address"
@@ -45,16 +74,16 @@ export default function EditMyDetails() {
                             { label: "Confirm Email", name: "confirmEmail", placeholder: "Your Confirm Email", type: "text" },
                             { label: "Your Password", name: "password", placeholder: "Your Password", type: "password" },
                         ]}
-                        onSubmit={handleSave}
+                        onSubmit={(data) => handleSave(data, "email")}
                     />
-                                        <DetailsForm
+                    <DetailsForm
                         title="Change Your Password"
                         fields={[
-                            { label: "Your current password", name: "currentPassword", placeholder: "Current Password", type: "text"},
+                            { label: "Your current password", name: "currentPassword", placeholder: "Current Password", type: "text" },
                             { label: "Choose new password", name: "newPassword", placeholder: "New Password", type: "text" },
                             { label: "Confirm new password", name: "confirmPassword", placeholder: "Confirm New Password", type: "password" },
                         ]}
-                        onSubmit={handleSave}
+                        onSubmit={(data) => handleSave(data, "password")}
                     />
                     <ProfileEdit initialData={initialProfile} onSave={handleSaveProfile} />
                 </div>

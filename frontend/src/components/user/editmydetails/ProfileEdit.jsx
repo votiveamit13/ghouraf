@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { FiEdit } from "react-icons/fi";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 export default function ProfileEdit({ initialData, onSave }) {
   const [editMode, setEditMode] = useState(false);
@@ -42,7 +43,6 @@ export default function ProfileEdit({ initialData, onSave }) {
       });
     }
 
-    // clear error when typing
     setErrors({ ...errors, [name]: "" });
   };
 
@@ -57,7 +57,6 @@ export default function ProfileEdit({ initialData, onSave }) {
   const validate = () => {
     let newErrors = {};
 
-    // ✅ Mobile number validation (10-15 digits, no letters)
     if (!formData.mobile) {
       newErrors.mobile = "Mobile number is required";
     } else if (!/^\+?[0-9]{10,15}$/.test(formData.mobile)) {
@@ -70,19 +69,18 @@ export default function ProfileEdit({ initialData, onSave }) {
   };
 
   const handleSave = () => {
-    if (!validate()) return; // stop if invalid
+    if (!validate()) return;
     setEditMode(false);
     onSave(formData);
   };
 
   return (
-    <div className="bg-white mb-5 shadow-sm rounded-[12px] border border-[#D7D7D7]">
+    <div className="bg-white mb-5 shadow-sm rounded-[12px] border-[1px] border-[#D7D7D7]">
       <div className="bg-[#565ABF] px-4 py-3 text-white text-[20px] font-medium rounded-t-[12px]">
         Profile Edit
       </div>
 
       <div className="card-body">
-        {/* Profile Photo */}
         <div className="flex items-center gap-4 mb-3 relative">
           <div className="relative">
             <img
@@ -114,7 +112,6 @@ export default function ProfileEdit({ initialData, onSave }) {
           </span>
         </div>
 
-        {/* Gender */}
         <div className="flex items-center gap-4 text-[16px] text-black mb-2">
           <label className="font-medium w-32">Gender:</label>
           {editMode ? (
@@ -130,7 +127,6 @@ export default function ProfileEdit({ initialData, onSave }) {
           )}
         </div>
 
-        {/* Age (read-only) */}
         <div className="flex items-center gap-4 text-[16px] text-black mb-2">
           <label className="font-medium w-32">Age:</label>
           {editMode ? (
@@ -146,7 +142,6 @@ export default function ProfileEdit({ initialData, onSave }) {
           )}
         </div>
 
-        {/* Mobile */}
         <div className="flex flex-col mb-2">
           <div className="flex items-center gap-4 text-[16px] text-black">
             <label className="font-medium w-32">Mobile No:</label>
@@ -171,7 +166,6 @@ export default function ProfileEdit({ initialData, onSave }) {
           )}
         </div>
 
-        {/* DOB */}
         <div className="flex items-center gap-4 text-[16px] text-black">
           <label className="font-medium w-32">DOB:</label>
           {editMode ? (
@@ -187,15 +181,14 @@ export default function ProfileEdit({ initialData, onSave }) {
           )}
         </div>
 
-        {/* Buttons */}
         <div className="mt-3">
           {editMode ? (
             <div className="flex gap-2">
               <button
                 onClick={handleSave}
-                className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px]"
+                className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
               >
-                Save →
+                Save <FaArrowRightLong/>
               </button>
               <button
                 onClick={() => setEditMode(false)}
@@ -207,9 +200,9 @@ export default function ProfileEdit({ initialData, onSave }) {
           ) : (
             <button
               onClick={() => setEditMode(true)}
-              className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px]"
+              className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
             >
-              Edit Details →
+              Edit Details <FaArrowRightLong/>
             </button>
           )}
         </div>

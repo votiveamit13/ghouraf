@@ -2,6 +2,7 @@ import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 import { FiPhoneCall } from "react-icons/fi";
 import { LuMailOpen } from "react-icons/lu";
 import { IoIosArrowForward } from "react-icons/io";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 export default function Footer() {
   return (
@@ -84,8 +85,8 @@ export default function Footer() {
             placeholder="Your email address"
             className="w-full p-3 rounded-md mb-3 text-black focus:outline-none"
           />
-          <button className="w-full hover:bg-gray-700 text-white p-3 border font-semibold rounded-md mb-3 flex items-center justify-center">
-            Sign Up →
+          <button className="w-full hover:bg-gray-700 text-white p-3 border font-semibold rounded-md mb-3 flex items-center justify-center gap-2">
+            Sign Up <FaArrowRightLong/>
           </button>
           <div className="flex items-center text-xs">
             <input type="checkbox" className="mr-2" />

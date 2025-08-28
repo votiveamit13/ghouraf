@@ -8,6 +8,7 @@ import dbConnection from "./config/db.connection.mjs";
 import User from "./models/User.mjs";
 import helmet from "helmet";
 import morgan from "morgan";
+import path from "path";
 
 
 dotenv.config();
@@ -19,7 +20,7 @@ app.use(helmet())
 app.use(morgan('dev'))
 
 app.use(express.json());
-
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/admin", adminRoutes);
 
 app.use("/api", userRoutes);

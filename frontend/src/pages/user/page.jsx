@@ -21,9 +21,9 @@ export default function UserDashboard() {
         <span className="text-[15px] text-black">Your account is a basic account
         </span>
       </div>
-      <div className="p-5 gap-5 d-flex mt-5 justify-between align-center rounded-[12px] border border-[#D7D7D7] box-shadow: 0px 12px 48px 0px #0022330F;">
+      <div className="p-5 gap-5 d-flex mt-5 justify-between align-center rounded-[12px] border-[1px] border-[#D7D7D7] box-shadow: 0px 12px 48px 0px #0022330F;">
         <button className="align-left text-left">
-          <div className="p-4 rounded-[10px] border border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Messages</span>
@@ -38,7 +38,7 @@ export default function UserDashboard() {
           </div>
         </button>
         <button className="align-left text-left" onClick={() => navigate("/user/edit-my-details")}>
-          <div className="p-4 rounded-[10px] border border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Edit my details</span>
@@ -53,7 +53,7 @@ export default function UserDashboard() {
           </div>
         </button>
         <button className="align-left text-left" onClick={() => navigate("/user/my-ads")}>
-          <div className="p-4 rounded-[10px] border border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>My ads</span>
@@ -68,7 +68,7 @@ export default function UserDashboard() {
           </div>
         </button>
         <button className="align-left text-left">
-          <div className="p-4 rounded-[10px] border border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Saved ads</span>
