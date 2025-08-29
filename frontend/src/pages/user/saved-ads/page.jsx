@@ -179,15 +179,15 @@ export default function SavedAds() {
                                 </span>
                             </div>
                             <div className="flex flex-col flex-grow text-black p-1 mt-2">
-                                <h3 className="font-semibold text-[18px] sm:text-[20px] text-black">{ad.title}</h3>
-                                <p className="text-[16px] sm:text-[18px] flex items-center gap-1">
+                                <h3 className="font-semibold text-[16px] sm:text-[18px] text-black">{ad.title}</h3>
+                                <p className="text-[15px] sm:text-[18px] flex items-center gap-1">
                                     <TfiLocationPin /> {ad.location}
                                 </p>
-                                <p className="text-[16px] sm:text-[18px]">
+                                <p className="text-[15px] sm:text-[18px]">
                                     1 bed apartment - <span className="text-[#565ABF]">{ad.available}</span>
                                 </p>
-                                <p className="font-semibold text-[18px] sm:text-[20px]">{ad.price}</p>
-                                <p className="text-[16px] sm:text-[18px]">{ad.desc}</p>
+                                <p className="font-semibold text-[15px] sm:text-[18px]">{ad.price}</p>
+                                <p className="text-[15px] sm:text-[18px]">{ad.desc}</p>
                             </div>
                         </div>
                     ))
