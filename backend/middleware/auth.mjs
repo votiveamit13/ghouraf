@@ -12,6 +12,13 @@ export const auth = async (req, res, next) => {
     const user = await User.findOne({ firebaseUid: decoded.uid });
     if (!user) return res.status(404).json({ message: "User profile not found" });
 
+    if (user.status === "inactive") {
+      return res.status(403).json({
+        message: "Your account has banned. Contact support.",
+        inactive: true,
+      });
+    }
+
     req.user = user;
     req.firebase = decoded;
     next();

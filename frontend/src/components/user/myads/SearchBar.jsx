@@ -2,7 +2,7 @@ import React from "react";
 
 export default function SearchBar() {
   return (
-    <div className="bg-white text-black rounded-[4px] box-shadow: 0px 5px 20px 0px #00000017 border-[1px] border-[#D7D7D7] mb-4">
+    <div className="bg-white text-black rounded-[4px] shadow-xl border-[1px] border-[#D7D7D7] mb-4">
       <div className="px-3 py-2 border-b">
           <h2 className="font-medium text-black text-[18px]">Search</h2>
       </div>

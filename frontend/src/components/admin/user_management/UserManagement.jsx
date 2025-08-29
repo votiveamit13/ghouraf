@@ -1,37 +1,66 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import PaginationComponent from "../../common/Pagination";
 import Header from "components/admin/Headers/Header.js";
 import SearchFilter from "components/common/SearchFilter";
+import { toast } from "react-toastify";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", active: true },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", active: false },
-    { id: 3, name: "Mike Brown", email: "mike@example.com", active: true },
-    { id: 4, name: "Emily Davis", email: "emily@example.com", active: true },
-    { id: 5, name: "Chris Wilson", email: "chris@example.com", active: false },
-    { id: 6, name: "Sophia Taylor", email: "sophia@example.com", active: true },
-    { id: 7, name: "David Lee", email: "david@example.com", active: false },
-  ]);
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
+      const apiUrl = process.env.REACT_APP_API_URL;
 
-  const handleActionChange = (id, value) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === id ? { ...user, active: value === "unblock" } : user
-      )
-    );
+  const token = localStorage.getItem("authToken");
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try{
+        const res = await axios.get(`${apiUrl}/admin/users`, {
+          headers: { Authorization: `Bearer ${token}`},
+        });
+        setUsers(res.data);
+      } catch (err) {
+        console.error("Error fetching users", err);
+      }
+    };
+    fetchUsers();
+  }, [token, apiUrl]);
+
+  const handleActionChange = async (mongoId, value) => {
+    const status = value === "unblock" ? "active" : "inactive";
+    try {
+      const res = await axios.patch(`${apiUrl}/admin/users/${mongoId}/status`,
+        { status },
+        { headers: {Authorization: `Bearer ${token}` }}
+      );
+
+      setUsers(prev =>
+        prev.map( u => (u._id === mongoId ? res.data.user : u))
+      );
+          if (status === "inactive") {
+      toast.success("User has blocked");
+    } else {
+      toast.success("User has unblocked");
+    }
+    } catch (err) {
+      console.error("Error updating status", err);
+    }
   };
 
-  const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+const filteredUsers = useMemo(() => {
+  return users.filter((user) => {
+    const fullName = `${user.profile?.firstName || ""} ${user.profile?.lastName || ""}`;
+    const email = user.email || "";
+
+    return (
+      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      email.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [users, searchTerm]);
+  });
+}, [users, searchTerm]);
+
   const totalPages = Math.ceil(filteredUsers.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
@@ -52,7 +81,7 @@ const UserManagement = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+            <table className="min-w-full text-sm text-gray-700">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-3 py-3 text-left font-semibold">S. No.</th>
@@ -68,31 +97,31 @@ const UserManagement = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
                 {paginatedUsers.map((user, index) => (
-                  <tr key={user.id}>
+                  <tr key={user._id}>
                     <td className="px-3 py-3">{startIndex + index + 1}</td>
-                    <td className="px-3 py-3">{user.name}</td>
+                    <td className="px-3 py-3"> {user.profile?.firstName} {user.profile?.lastName}</td>
                     <td className="px-3 py-3">{user.email}</td>
                     <td className="px-3 py-3">
                       <span
                         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[60%] ${
-                          user.active
+                          user.status === "active"
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
                         <span
                           className={`w-2 h-2 rounded-full mr-2 ${
-                            user.active ? "bg-green-500" : "bg-red-500"
+                            user.status === "active" ? "bg-green-500" : "bg-red-500"
                           }`}
                         ></span>
-                        {user.active ? "Active" : "Blocked"}
+                        {user.status === "active" ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-3 py-3">
                       <select
-                        value={user.active ? "unblock" : "block"}
+                        value={user.status === "active" ? "unblock" : "block"}
                         onChange={(e) =>
-                          handleActionChange(user.id, e.target.value)
+                          handleActionChange(user._id, e.target.value)
                         }
                         className="block w-32 px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                       >

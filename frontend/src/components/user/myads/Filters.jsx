@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 export default function Filters() {
-  // default filter values
   const defaultFilters = {
     minValue: 0,
     maxValue: 1300,
@@ -22,7 +21,6 @@ export default function Filters() {
   const min = 0;
   const max = 1300;
 
-  // range handlers
   const handleMinChange = (e) => {
     const value = Math.min(Number(e.target.value), filters.maxValue - 10);
     setFilters({ ...filters, minValue: value });
@@ -33,14 +31,12 @@ export default function Filters() {
     setFilters({ ...filters, maxValue: value });
   };
 
-  // reset all filters
   const handleReset = () => {
     setFilters(defaultFilters);
   };
 
   return (
-    <div className="bg-white text-black rounded-[4px] border-[1px] border-[#D7D7D7] mb-4">
-      {/* header */}
+    <div className="bg-white text-black rounded-[4px] border-[1px] border-[#D7D7D7] mb-4 shadow-xl">
       <div className="px-3 py-2 border-b flex justify-between items-center mb-3">
         <h2 className="font-medium text-black text-[18px]">Filters</h2>
         <button
@@ -52,7 +48,6 @@ export default function Filters() {
         </button>
       </div>
 
-      {/* Price */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Price</label>
         <div className="ml-5 border-[1px] border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-4 py-2 mt-2 text-sm">
@@ -66,7 +61,6 @@ export default function Filters() {
           <span>${max}</span>
         </div>
 
-        {/* range slider */}
         <div className="relative w-full mt-1 h-2">
           <div className="absolute top-1/2 transform -translate-y-1/2 w-full h-2 bg-gray-200 rounded-full"></div>
           <div
@@ -123,7 +117,6 @@ export default function Filters() {
           `}</style>
         </div>
 
-        {/* price type */}
         <div className="flex justify-center space-x-8 mt-3 mb-3">
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -146,7 +139,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Size */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Size of Apartment</label>
         <div className="flex space-x-2 mt-2 mb-3">
@@ -175,7 +167,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Furnishing */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Furnishing</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -193,7 +184,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Smoking */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Smoking</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -215,7 +205,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Property Type */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Property Type</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -237,7 +226,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Rooms Available */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Rooms Available For</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -259,7 +247,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Bedrooms */}
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Number of bedrooms</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -276,7 +263,6 @@ export default function Filters() {
         </div>
       </div>
 
-      {/* Move-In date */}
       <div className="mb-4 px-3 py-2 text-black">
         <label className="font-medium text-[18px]">Move-In date</label>
         <div className="space-y-1 mt-1">

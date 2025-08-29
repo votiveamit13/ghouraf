@@ -45,6 +45,7 @@ export default function Navbar() {
     termsAccepted: false,
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false); // NEW for mobile submenu
   const { user, login, logout } = useAuth();
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
@@ -111,7 +112,7 @@ export default function Navbar() {
         toast.error(res.message || "Login Failed");
       }
     } catch (err) {
-       toast.error(getErrorMessage(err));
+      toast.error(getErrorMessage(err));
     } finally {
       setLoginLoading(false);
     }
@@ -126,82 +127,50 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white fixed top-0 left-0 w-full z-20">
+    <nav className="bg-white fixed top-0 left-0 w-full z-20 p-[5px] shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          <div className="flex items-center space-x-2">
-            <NavLink to="/" className="flex items-center">
-              <Img
-                src={require("../../assets/img/theme/Ghouraf.png")}
-                className="lg:w-40 md:w-40 sm:w-80 w-60"
-                loader={<p>Loading...</p>}
-                unloader={<p>Failed to load</p>}
-                alt="Logo"
-              />
-            </NavLink>
-          </div>
+          <NavLink to="/" className="flex items-center">
+            <Img
+              src={require("../../assets/img/theme/Ghouraf.png")}
+              className="lg:w-40 md:w-40 sm:w-80 w-60"
+              alt="Logo"
+            />
+          </NavLink>
 
-          <div className="hidden md:flex space-x-8 mr--8">
-            <button
-              onClick={() => setActive("spaces")}
-              className={`font-semibold ${linkClass} ${active === "spaces" ? activeClass : "text-[#565ABF]"
-                }`}
-            >
-              Spaces
-            </button>
-
-            <button
-              onClick={() => setActive("place-wanted")}
-              className={`font-semibold ${linkClass} ${active === "place-wanted" ? activeClass : "text-[#565ABF]"
-                }`}
-            >
-              Place Wanted
-            </button>
-
-            <button
-              onClick={() => setActive("team-up")}
-              className={`font-semibold ${linkClass} ${active === "team-up" ? activeClass : "text-[#565ABF]"
-                }`}
-            >
-              Team Up
-            </button>
-
-            <button
-              onClick={() => setActive("more-info")}
-              className={`font-semibold ${linkClass} ${active === "more-info" ? activeClass : "text-[#565ABF]"
-                }`}
-            >
-              More Info
-            </button>
+          {/* DESKTOP MENU */}
+          <div className="hidden md:flex space-x-8">
+            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
+              <button
+                key={item}
+                onClick={() => setActive(item)}
+                className={`font-semibold ${linkClass} ${active === item ? activeClass : "text-[#565ABF]"
+                  }`}
+              >
+                {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              </button>
+            ))}
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
             {!user ? (
               <>
-                <div className="hidden md:flex items-center space-x-2">
-                  <button
-                    onClick={() => setRegisterDialog(true)}
-                    className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
-                  >
-                    <LuUserPen size={30} className="mr-1" /> Register
-                  </button>
+                <button
+                  onClick={() => setRegisterDialog(true)}
+                  className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]"
+                >
+                  <LuUserPen size={30} className="mr-1" /> Register
+                </button>
+                <span className="text-[#565ABF] ml-1">/</span>
+                <button
+                  onClick={() => setLoginDialog(true)}
+                  className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF] ml-1"
+                >
+                  Login
+                </button>
 
-                  <span className="text-[#565ABF]">/</span>
-
-                  <button
-                    onClick={() => setLoginDialog(true)}
-                    className={`font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]`}
-                  >
-                    Login
-                  </button>
-
-                </div>
-
-                <button className="flex items-center px-4 py-3 bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
-                  <IoIosAddCircleOutline
-                    className="text-2xl font-bold"
-                    strokeWidth={2.5}
-                  />
+                <button className="flex items-center px-[12px] py-[12px] bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
+                  <IoIosAddCircleOutline className="text-2xl font-bold" />
                   <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
                 </button>
               </>
@@ -219,52 +188,37 @@ export default function Navbar() {
                     className="focus:outline-none"
                   >
                     <img
-                      src={user.profile?.photo || require("../../assets/img/ghouraf/default-avatar.png")}
+                      src={
+                        user.profile?.photo ||
+                        require("../../assets/img/ghouraf/default-avatar.png")
+                      }
                       alt="Profile"
                       className="w-10 h-10 rounded-full border border-gray-300"
                     />
                   </button>
 
                   {dropdownOpen && (
-                    <div
-                      className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg border border-gray-200 py-2 z-50"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      <a
-                        href="/user"
-                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-                      >
-                        <LuUserRound size={20} className="mr-2" /> My Account
+                    <div className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg py-2 z-50">
+                      <a href="/user" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                        <LuUserRound className="mr-2" /> My Account
                       </a>
-                      <a
-                        href="/user/my-ads"
-                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-                      >
-                        <GoSync size={20} className="mr-2" /> My Ads
+                      <a href="/user/my-ads" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                        <GoSync className="mr-2" /> My Ads
                       </a>
-                      <a
-                        href="/user"
-                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-                      >
-                        <GrFavorite size={20} className="mr-2" /> Saved Ads
+                      <a href="/user/saved-ads" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                        <GrFavorite className="mr-2" /> Saved Ads
                       </a>
-                      <a
-                        href="/user"
-                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-                      >
-                        <LuMessageSquareText size={20} className="mr-2" /> Messages
+                      <a href="/user" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                        <LuMessageSquareText className="mr-2" /> Messages
                       </a>
-                      <a
-                        href="/user/edit-my-details"
-                        className="flex items-center px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
-                      >
-                        <FiEdit size={20} className="mr-2" /> Edit My Details
+                      <a href="/user/edit-my-details" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                        <FiEdit className="mr-2" /> Edit My Details
                       </a>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-[16px] text-[#1A1A1A] hover:text-[#565ABF]"
+                        className="flex items-center w-full px-4 py-2 hover:text-[#565ABF]"
                       >
-                        <LuLogOut size={20} className="mr-2" /> Logout
+                        <LuLogOut className="mr-2" /> Logout
                       </button>
                     </div>
                   )}
@@ -276,7 +230,7 @@ export default function Navbar() {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-purple-600 text-2xl flex align-items-center"
+              className="text-purple-600 text-2xl"
             >
               {isOpen ? <HiX size={40} /> : <HiMenu size={40} />}
             </button>
@@ -284,87 +238,115 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* MOBILE MENU */}
       {isOpen && (
-        <div className="md:hidden bg-white shadow-lg px-4 pb-2 pt-4 space-y-4">
-          <NavLink
-            to="/spaces"
-            className={({ isActive }) =>
-              `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-            }
-          >
-            Spaces
-          </NavLink>
-          <NavLink
-            to="/place-wanted"
-            className={({ isActive }) =>
-              `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-            }
-          >
-            Place Wanted
-          </NavLink>
-          <NavLink
-            to="/team-up"
-            className={({ isActive }) =>
-              `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-            }
-          >
-            Team Up
-          </NavLink>
-          <NavLink
-            to="/more-info"
-            className={({ isActive }) =>
-              `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-            }
-          >
-            More Info
-          </NavLink>
-
-          <span className="flex space-x-2">
+        <div className="md:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4">
+          {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
             <NavLink
+              key={item}
+              to={`/${item}`}
               className={({ isActive }) =>
-                `flex items-center ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
+                `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
                 }`
               }
-              onClick={() => setRegisterDialog(true)}
             >
-              <LuUserPen size={30} className="mr-1" /> Register
+              {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             </NavLink>
-            /
-            <NavLink
-              className={({ isActive }) =>
-                `flex items-center ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
-                }`
-              }
-              onClick={() => setLoginDialog(true)}
-            >
-              Login
-            </NavLink>
-          </span>
+          ))}
 
-          <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-            <IoIosAddCircleOutline className="mr-1 text-lg" /> Post Ad
-          </button>
+          {!user ? (
+            <>
+              <span className="flex space-x-2">
+                <button
+                  onClick={() => setRegisterDialog(true)}
+                  className="flex items-center text-[#565ABF] hover:text-[#A321A6]"
+                >
+                  <LuUserPen size={30} className="mr-1" /> Register
+                </button>
+                /
+                <button
+                  onClick={() => setLoginDialog(true)}
+                  className="text-[#565ABF] hover:text-[#A321A6]"
+                >
+                  Login
+                </button>
+              </span>
+              <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                <IoIosAddCircleOutline className="mr-1 text-lg" /> Post Ad
+              </button>
+            </>
+          ) : (
+            <div className="border-t pt-3">
+              <div
+                onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <img
+                    src={
+                      user.profile?.photo ||
+                      require("../../assets/img/ghouraf/default-avatar.png")
+                    }
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full border"
+                  />
+                  <span className="font-semibold">
+                    Hi, {user.profile.firstName?.split(" ")[0] || "User"}
+                  </span>
+                  <a href="/user" className="text-black hover:text-[#A321A6]">
+                    <HiOutlineMail size={22} />
+                  </a>
+                </div>
+                <span>{mobileDropdownOpen ? "▲" : "▼"}</span>
+              </div>
+
+              {mobileDropdownOpen && (
+                <div className="mt-3 space-y-2 pl-2">
+                  <a href="/user" className="flex items-center py-1 hover:text-[#565ABF]">
+                    <LuUserRound className="mr-2" /> My Account
+                  </a>
+                  <a href="/user/my-ads" className="flex items-center py-1 hover:text-[#565ABF]">
+                    <GoSync className="mr-2" /> My Ads
+                  </a>
+                  <a href="/user/saved-ads" className="flex items-center py-1 hover:text-[#565ABF]">
+                    <GrFavorite className="mr-2" /> Saved Ads
+                  </a>
+                  <a href="/user" className="flex items-center py-1 hover:text-[#565ABF]">
+                    <LuMessageSquareText className="mr-2" /> Messages
+                  </a>
+                  <a href="/user/edit-my-details" className="flex items-center py-1 hover:text-[#565ABF]">
+                    <FiEdit className="mr-2" /> Edit My Details
+                  </a>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full py-1 hover:text-[#565ABF]"
+                  >
+                    <LuLogOut className="mr-2" /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
       {loginDialog && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg">
+          <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg
+      sm:max-w-md md:max-w-lg">
             <button
-              className="absolute top-0 right-4 text-gray-600 hover:text-black text-xl mt-2"
+              className="absolute top-2 right-3 text-gray-600 hover:text-black text-xl"
               onClick={() => setLoginDialog(false)}
             >
               ✕
             </button>
-            <form
-              onSubmit={handleLogin}
-            >
-              <div className="px-6 py-4">
-                <h3 className="text-2xl font-semibold text-black mb-4">
+
+            <form onSubmit={handleLogin}>
+              <div className="px-6 py-4 sm:px-4 sm:py-3">
+                <h3 className="text-2xl font-semibold text-black mb-4 sm:text-xl sm:mb-3">
                   Login
                 </h3>
-                <label className="text-sm font-medium text-gray-600">
-                  Email
-                </label>
+
+                <label className="text-sm font-medium text-gray-600">Email</label>
                 <div
                   className={`flex items-center mb-4 transition-all ${activeField === "email"
                       ? "border-b-2 border-[#A321A6]"
@@ -384,10 +366,7 @@ export default function Navbar() {
                     className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
                   />
                 </div>
-
-                <label className="text-sm font-medium text-gray-600">
-                  Password
-                </label>
+                <label className="text-sm font-medium text-gray-600">Password</label>
                 <div
                   className={`flex items-center mb-3 transition-all ${activeField === "password"
                       ? "border-b-2 border-[#A321A6]"
@@ -411,15 +390,11 @@ export default function Navbar() {
                     className="text-gray-500"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <AiOutlineEyeInvisible />
-                    ) : (
-                      <AiOutlineEye />
-                    )}
+                    {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </button>
                 </div>
 
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                   <label className="flex items-center space-x-2 text-sm text-[#1C1C1E]">
                     <input type="checkbox" className="w-4 h-4" />
                     <span>Remember me</span>
@@ -435,7 +410,7 @@ export default function Navbar() {
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center"
+                  className="w-full bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md mb-4 flex items-center justify-center sm:py-2"
                 >
                   {loginLoading ? (
                     <div className="flex items-center justify-center w-6 h-6">
@@ -448,17 +423,13 @@ export default function Navbar() {
                   )}
                 </button>
 
-
-
-
-
-                <div className="flex gap-4 mb-4">
+                <div className="flex gap-4 mb-4 flex-col sm:flex-row">
                   <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                     <img src={google} alt="Google" className="w-5 h-5" />
                     Google
                   </button>
                   <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
-                    <IoLogoFacebook size={25} />
+                    <IoLogoFacebook size={22} />
                     Facebook
                   </button>
                 </div>
@@ -481,6 +452,7 @@ export default function Navbar() {
         </div>
       )}
 
+
       {registerDialog && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg top-[12px]">
@@ -502,8 +474,8 @@ export default function Navbar() {
                     </label>
                     <div
                       className={`flex items-center mb-2 transition-all ${activeField === "firstName"
-                          ? "border-b-2 border-[#A321A6]"
-                          : "border-b border-gray-300"
+                        ? "border-b-2 border-[#A321A6]"
+                        : "border-b border-gray-300"
                         }`}
                     >
                       <span className="text-gray-500 mr-2">
@@ -527,8 +499,8 @@ export default function Navbar() {
                     </label>
                     <div
                       className={`flex items-center mb-2 transition-all ${activeField === "lastName"
-                          ? "border-b-2 border-[#A321A6]"
-                          : "border-b border-gray-300"
+                        ? "border-b-2 border-[#A321A6]"
+                        : "border-b border-gray-300"
                         }`}
                     >
                       <span className="text-gray-500 mr-2">
@@ -555,8 +527,8 @@ export default function Navbar() {
                     </label>
                     <div
                       className={`flex items-center mb-2 transition-all ${activeField === "email"
-                          ? "border-b-2 border-[#A321A6]"
-                          : "border-b border-gray-300"
+                        ? "border-b-2 border-[#A321A6]"
+                        : "border-b border-gray-300"
                         }`}
                     >
                       <span className="text-gray-500 mr-2">
@@ -580,8 +552,8 @@ export default function Navbar() {
                     </label>
                     <div
                       className={`flex items-center mb-2 transition-all ${activeField === "gender"
-                          ? "border-b-2 border-[#A321A6]"
-                          : "border-b border-gray-300"
+                        ? "border-b-2 border-[#A321A6]"
+                        : "border-b border-gray-300"
                         }`}
                     >
                       <span className="text-gray-500 mr-2">
@@ -608,8 +580,8 @@ export default function Navbar() {
                 </label>
                 <div
                   className={`flex items-center mb-2 transition-all ${activeField === "dob"
-                      ? "border-b-2 border-[#A321A6]"
-                      : "border-b border-gray-300"
+                    ? "border-b-2 border-[#A321A6]"
+                    : "border-b border-gray-300"
                     }`}
                 >
                   <span className="text-gray-500 mr-2">
@@ -632,8 +604,8 @@ export default function Navbar() {
                 </label>
                 <div
                   className={`flex items-center mb-2 transition-all ${activeField === "password"
-                      ? "border-b-2 border-[#A321A6]"
-                      : "border-b border-gray-300"
+                    ? "border-b-2 border-[#A321A6]"
+                    : "border-b border-gray-300"
                     }`}
                 >
                   <span className="text-gray-500 mr-2">
@@ -667,8 +639,8 @@ export default function Navbar() {
                 </label>
                 <div
                   className={`flex items-center mb-2 transition-all ${activeField === "confirmPassword"
-                      ? "border-b-2 border-[#A321A6]"
-                      : "border-b border-gray-300"
+                    ? "border-b-2 border-[#A321A6]"
+                    : "border-b border-gray-300"
                     }`}
                 >
                   <span className="text-gray-500 mr-2">

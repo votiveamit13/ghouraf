@@ -130,6 +130,14 @@ export const login = async (req, res) => {
     const user = await User.findOne({ firebaseUid: decoded.uid });
 
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    if(user.status === "inactive") {
+      return res.status(403).json({
+        message: "Your account is banned. Kindly contact support.",
+        inactive: true,
+      });
+    }
+
     if (!decoded.email_verified) {
       return res.status(403).json({ message: "Please verify your email first", emailVerified: false });
     }

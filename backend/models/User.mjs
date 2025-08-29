@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     termsAccepted: { type: Boolean, default: false },
-    status: { type: String, enum: ["active", "banned"], default: "active" },
+    status: { type: String, enum: ["active", "inactive"], default: "active" },
     profile: ProfileSchema,
   },
   {

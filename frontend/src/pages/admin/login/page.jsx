@@ -7,11 +7,12 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+    const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://ghouraf.votivereact.in/api/admin/login", {
+      const response = await fetch(`${apiUrl}/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

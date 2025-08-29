@@ -54,7 +54,7 @@ export default function DetailsForm({ title, fields, onSubmit }) {
   };
 
   return (
-    <div className="bg-white mb-5 shadow-sm rounded-[12px] border-[1px] border-[#D7D7D7]">
+    <div className="bg-white mb-5 shadow-xl rounded-[12px] border-[1px] border-[#D7D7D7]">
       <div className="bg-[#565ABF] px-4 py-3 text-white text-[20px] font-medium rounded-t-[12px]">
         {title}
       </div>

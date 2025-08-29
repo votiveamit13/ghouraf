@@ -125,7 +125,7 @@ export default function MyAds(){
       const itemsPerPage = 10;
   const totalPages = Math.ceil(properties.length / itemsPerPage);
     return(
-<div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 bg-gray-50 min-h-screen">
+<div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
       <div className="col-span-1 space-y-4">
         <SearchBar />
         <Filters />
