@@ -4,6 +4,8 @@ import LoginPage from "pages/admin/login/page";
 import AdminDashboard from "pages/admin/page";
 // import CreatePost from "pages/admin/post-management/create-post/page";
 import { BsPostcard } from "react-icons/bs";
+import Edit from "pages/admin/user-management/edit-details/page";
+import ViewDetails from "pages/admin/user-management/view-details/page";
 // import { IoCreateOutline } from "react-icons/io5";
 
 export const adminRoutes = [
@@ -29,6 +31,18 @@ export const adminRoutes = [
     icon: "ni ni-bullet-list-67 text-[#565ABF]",
     component: <Users/>,
     layout: "/admin",
+  },
+  {
+    path: "/user-management/edit-details",
+    component: <Edit/>,
+    layout: "/admin",
+    showInSidebar: false
+  },
+  {
+    path: "/user-management/view-details",
+    component: <ViewDetails/>,
+    layout: "/admin",
+    showInSidebar: false
   },
   {
     name: "Post Management",

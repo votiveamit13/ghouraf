@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../../models/User.mjs";
+import { authAdmin } from "../../config/firebase.mjs";
+import { fileHandler } from "../../utils/fileHandler.mjs";
+import { profileValidator } from "../../validations/profile.validator.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -69,5 +72,133 @@ export const updateUserStatus = async (req, res) => {
   } catch (err) {
     console.error("Error updating status:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateUserDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let updates = {};
+
+    const user = await User.findById(id).select("+password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.isAdmin) return res.status(403).json({ message: "Admins cannot be modified" });
+
+    if (req.body.email) {
+      const newEmail = req.body.email.toLowerCase();
+
+      const emailExists = await User.findOne({ email: newEmail, _id: { $ne: id } });
+      if (emailExists) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      try {
+        const fbUser = await authAdmin.getUserByEmail(newEmail);
+        if (fbUser && fbUser.uid !== user.firebaseUid) {
+          return res.status(400).json({ message: "Email already exist" });
+        }
+      } catch (err) {
+        if (err.code !== "auth/user-not-found") {
+          return res.status(500).json({ message: "Error checking" });
+        }
+      }
+
+      await authAdmin.updateUser(user.firebaseUid, { email: newEmail });
+      updates.email = newEmail;
+    }
+
+    if (req.body.newPassword) {
+      if (req.body.confirmPassword && req.body.newPassword !== req.body.confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
+      }
+
+      const hashed = await bcrypt.hash(req.body.newPassword, 10);
+
+      await authAdmin.updateUser(user.firebaseUid, { password: req.body.newPassword });
+
+      updates.password = hashed;
+    }
+
+    if (req.body.firstName || req.body.lastName) {
+      const firstName = req.body.firstName || user.profile?.firstName;
+      const lastName = req.body.lastName || user.profile?.lastName;
+
+      updates["profile.firstName"] = firstName;
+      updates["profile.lastName"] = lastName;
+
+      await authAdmin.updateUser(user.firebaseUid, {
+        displayName: `${firstName} ${lastName}`.trim(),
+      });
+    }
+
+    const allowed = [
+      "age",
+      "mobile",
+      "gender",
+      "dob",
+      "occupation",
+      "bio",
+      "city",
+      "state",
+      "country",
+      "lifestyleTags",
+    ];
+
+    const sets = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) {
+        sets[`profile.${key}`] = req.body[key];
+      }
+    }
+
+    if (req.file) {
+      fileHandler.validateExtension(req.file.originalname, "image");
+      const savedFile = fileHandler.saveFile(req.file, "profile_pics");
+      const photoUrl = `${req.protocol}://${req.get("host")}${savedFile.relativePath}`;
+      sets["profile.photo"] = photoUrl;
+    }
+
+    updates = { ...updates, ...sets };
+    if (!Object.keys(updates).length) {
+      return res.status(400).json({ message: "No valid updates provided" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true }
+    ).select("-password -__v");
+
+    res.json({ message: "User updated successfully", user: updatedUser });
+  } catch (err) {
+    console.error("Admin update user error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if(!user) return res.status(404).json({ message: "User not found" });
+    if(user.isAdmin) return res.status(403).json({ message: "Admins cannot be deleted" });
+
+    if(user.firebaseUid) {
+      try {
+        await authAdmin.deleteUser(user.firebaseUid);
+      } catch (err) {
+        console.error("Error deleting user", err);
+        return res.status(500).json({ message: "Failed to delete user", error: err.message});
+      }
+    }
+
+    await User.findByIdAndDelete(id);
+
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error("Admin delete user error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
