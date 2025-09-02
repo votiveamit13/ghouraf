@@ -37,7 +37,7 @@ export default function UserDashboard() {
             </div>
           </div>
         </button>
-        <button className="align-left text-left" onClick={() => navigate("/user/edit-my-details")}>
+        <button className="align-left text-left">
           <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
