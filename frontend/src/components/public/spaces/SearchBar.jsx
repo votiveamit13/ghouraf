@@ -9,7 +9,7 @@ export default function SearchBar() {
       <div className="px-3 py-2 flex flex-col gap-3 text-[16px] text-black">
         <div className="space-y-1">
           <label className="flex items-center space-x-2 text-[16px] text-black">
-            <input type="radio" name="searchType" className="w-4 h-4"/>
+            <input type="radio" name="searchType" className="w-4 h-4" checked/>
             <span>Space For Rent</span>
           </label>
           <label className="flex items-center space-x-2 text-[16px] text-black">

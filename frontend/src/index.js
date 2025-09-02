@@ -18,6 +18,8 @@ import EditMyDetails from "pages/user/edit-my-details/page";
 import AuthVerified from "pages/authverified/AuthVerified";
 import MyAds from "pages/user/my-ads/page";
 import SavedAds from "pages/user/saved-ads/page";
+import Spaces from "pages/public/spaces/page";
+import AboutUs from "pages/public/aboutus/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -26,6 +28,8 @@ root.render(
       <Routes>
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="/" element={<Public><Home/></Public>} />
+        <Route path="/spaces" element={<Public><Spaces/></Public>} />
+        <Route path="/about-us" element={<Public><AboutUs/></Public>} />
         <Route path="/auth/verified" element={<Public><AuthVerified/></Public>} />
         <Route element={<PrivateRoute/>}>
           <Route path="/user" element={<Public><UserDashboard/></Public>} />

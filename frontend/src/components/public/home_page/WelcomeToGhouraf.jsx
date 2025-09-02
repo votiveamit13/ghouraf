@@ -32,10 +32,10 @@ export default function WelcomeToGhouraf() {
         </div>
 
         <div className="w-full md:w-1/2">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+          <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black">
             Welcome to <span className="text-[#A321A6]">Ghouraf.</span>
           </h2>
-          <h3 className="text-lg font-semibold mb-4">
+          <h3 className="text-lg font-semibold mb-4 text-black">
             Created by Flatmates <br /> for Flatmates
           </h3>
           <p className="mb-5 leading-relaxed text-[#1A1A1A]">

@@ -45,7 +45,7 @@ export default function Navbar() {
     termsAccepted: false,
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false); // NEW for mobile submenu
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const { user, login, logout } = useAuth();
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
@@ -141,14 +141,14 @@ export default function Navbar() {
           {/* DESKTOP MENU */}
           <div className="hidden md:flex space-x-8">
             {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
-              <button
+              <NavLink
                 key={item}
-                onClick={() => setActive(item)}
+              to={`/${item}`}
                 className={`font-semibold ${linkClass} ${active === item ? activeClass : "text-[#565ABF]"
                   }`}
               >
                 {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-              </button>
+              </NavLink>
             ))}
           </div>
 
