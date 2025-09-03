@@ -2,8 +2,55 @@ import heroImage from "assets/img/ghouraf/hero-section.jpg";
 import { FiPhoneCall } from "react-icons/fi";
 import { TfiEmail } from "react-icons/tfi";
 import { PiMapPinLine } from "react-icons/pi";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function ContactUs() {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        subject: "",
+        message: "",
+    });
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrors({});
+
+        try {
+            const res = await axios.post(`${apiUrl}/sendMessage`, formData);
+
+            toast.success(res.data.message || "Message sent successfully!");
+            setFormData({
+                fullName: "",
+                email: "",
+                subject: "",
+                message: "",
+            });
+        } catch (err) {
+            if (err.response?.status === 400 && err.response.data?.errors) {
+                const fieldErrors = {};
+                err.response.data.errors.forEach((e) => {
+                    fieldErrors[e.path] = e.message;
+                });
+                setErrors(fieldErrors);
+            } else {
+                toast.error(err.response?.data?.message || "Something went wrong!");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <div className="w-full">
             <section
@@ -42,34 +89,70 @@ export default function ContactUs() {
 
                     <div className="md:col-span-3 p-5">
                         <h2 className="text-xl font-semibold mb-5 text-black">Send Message</h2>
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSubmit}>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <input
+                                        type="text"
+                                        name="fullName"
+                                        placeholder="Full name"
+                                        value={formData.fullName}
+                                        onChange={handleChange}
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
+                                    />
+                                    {errors.fullName && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email address"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
+                                    />
+                                    {errors.email && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div>
                                 <input
                                     type="text"
-                                    placeholder="Full name"
+                                    name="subject"
+                                    placeholder="Subject"
+                                    value={formData.subject}
+                                    onChange={handleChange}
                                     className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
                                 />
-                                <input
-                                    type="email"
-                                    placeholder="Email address"
-                                    className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
-                                />
+                                {errors.subject && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.subject}</p>
+                                )}
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Subjects"
-                                className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
-                            />
-                            <textarea
-                                rows="4"
-                                placeholder="Message"
-                                className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
-                            ></textarea>
+
+                            <div>
+                                <textarea
+                                    rows="4"
+                                    name="message"
+                                    placeholder="Message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    className="w-full border-[1px] border-[#D7D7D7] rounded-[5px] px-3 py-2"
+                                ></textarea>
+                                {errors.message && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                                )}
+                            </div>
+
                             <button
                                 type="submit"
-                                className="bg-[#565ABF] text-[16px] font-semibold text-white px-4 py-[15px] rounded-[4px] transition"
+                                disabled={loading}
+                                className="bg-[#565ABF] text-[16px] font-semibold text-white px-4 py-[15px] rounded-[4px] transition disabled:opacity-50"
                             >
-                                Send Message
+                                {loading ? "Sending..." : "Send Message"}
                             </button>
                         </form>
                     </div>

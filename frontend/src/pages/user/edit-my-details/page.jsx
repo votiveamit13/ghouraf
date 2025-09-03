@@ -19,6 +19,7 @@ export default function EditMyDetails() {
         dob: `${user.profile?.dob}`,
     };
 
+
 const handleSaveProfile = async (data) => {
   try {
     const formData = new FormData();

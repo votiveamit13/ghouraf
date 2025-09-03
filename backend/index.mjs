@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import cors from "cors";
 import adminRoutes from "./routes/admin.route.mjs";
 import userRoutes from "./routes/user.route.mjs";
+import guestRoutes from "./routes/guest.route.mjs";
 import dbConnection from "./config/db.connection.mjs";
 import User from "./models/User.mjs";
 import helmet from "helmet";
@@ -18,14 +19,19 @@ app.set("trust proxy", 1);
 
 app.use(cors());
 
-app.use(helmet())
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+
 app.use(morgan('dev'))
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/admin", adminRoutes);
 
-app.use("/api", userRoutes);
+app.use("/api", userRoutes, guestRoutes);
 
 dbConnection().then(async () => {
   const existingAdmin = await User.findOne({ email: "admin@example.com" });

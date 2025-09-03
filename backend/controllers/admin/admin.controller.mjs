@@ -4,6 +4,7 @@ import User from "../../models/User.mjs";
 import { authAdmin } from "../../config/firebase.mjs";
 import { fileHandler } from "../../utils/fileHandler.mjs";
 import { profileValidator } from "../../validations/profile.validator.mjs";
+import ContactForm from "../../models/ContactForm.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -176,7 +177,6 @@ export const updateUserDetails = async (req, res) => {
   }
 };
 
-
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -199,6 +199,33 @@ export const deleteUser = async (req, res) => {
     res.json({ message: "User deleted successfully" });
   } catch (err) {
     console.error("Admin delete user error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const getAllMessage = async (req, res) => {
+  try {
+    const messages = await ContactForm.find().select("-__v");
+    res.json(messages);
+  } catch (err) {
+    console.error("Error fetching messages:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const message = await ContactForm.findById(id);
+    if(!message) return res.status(404).json({ message: "Message not found" });
+
+    await ContactForm.findByIdAndDelete(id);
+
+    res.json({ message: "Message deleted successfully" });
+  } catch (err) {
+    console.error("Admin delete message error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
