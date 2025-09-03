@@ -20,6 +20,8 @@ import MyAds from "pages/user/my-ads/page";
 import SavedAds from "pages/user/saved-ads/page";
 import Spaces from "pages/public/spaces/page";
 import AboutUs from "pages/public/aboutus/page";
+import ContactUs from "pages/public/contactus/page";
+import Faqs from "pages/public/faq/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -30,6 +32,8 @@ root.render(
         <Route path="/" element={<Public><Home/></Public>} />
         <Route path="/spaces" element={<Public><Spaces/></Public>} />
         <Route path="/about-us" element={<Public><AboutUs/></Public>} />
+        <Route path="/contact-us" element={<Public><ContactUs/></Public>} />
+        <Route path="/faq" element={<Public><Faqs/></Public>} />
         <Route path="/auth/verified" element={<Public><AuthVerified/></Public>} />
         <Route element={<PrivateRoute/>}>
           <Route path="/user" element={<Public><UserDashboard/></Public>} />

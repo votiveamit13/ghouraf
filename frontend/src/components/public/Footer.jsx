@@ -59,8 +59,13 @@ export default function Footer() {
                 <IoIosArrowForward color="#565ABF"/> Who We Are
               </a>
             </li>
+                        <li>
+              <a href="/faq" className="hover:text-white d-flex align-items-center">
+                <IoIosArrowForward color="#565ABF"/> FAQ
+              </a>
+            </li>
             <li>
-              <a href="/" className="hover:text-white d-flex align-items-center">
+              <a href="/contact-us" className="hover:text-white d-flex align-items-center">
                 <IoIosArrowForward color="#565ABF"/> Contact Us
               </a>
             </li>
