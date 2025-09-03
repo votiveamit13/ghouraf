@@ -154,8 +154,8 @@ export const updateUserDetails = async (req, res) => {
     if (req.file) {
       fileHandler.validateExtension(req.file.originalname, "image");
       const savedFile = fileHandler.saveFile(req.file, "profile_pics");
-      const photoUrl = `${req.protocol}://${req.get("host")}${savedFile.relativePath}`;
-      sets["profile.photo"] = photoUrl;
+  const photoUrl = `${process.env.FRONTEND_URL}${savedFile.relativePath}`;
+  sets["profile.photo"] = photoUrl;
     }
 
     updates = { ...updates, ...sets };
