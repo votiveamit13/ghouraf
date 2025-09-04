@@ -16,6 +16,8 @@ const AdminNavbar = () => {
     { name: "User Management", path: "/admin/user-management" },
     { name: "Post Management", path: "/admin/post-management" },
     { name: "Contact Forms", path: "/admin/contact-forms"},
+    { name: "FAQ Management", path: "/admin/faq-management"},
+    { name: "Add FAQ", path: "/admin/faq-management/add"},
   ];
 
   const filteredOptions = sidebarOptions.filter((opt) =>

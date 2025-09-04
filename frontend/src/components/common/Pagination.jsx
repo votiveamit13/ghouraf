@@ -13,7 +13,6 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
         className="pagination justify-content-end mb-0"
         listClassName="justify-content-end mb-0"
       >
-        {/* Prev Button */}
         <PaginationItem disabled={currentPage === 1}>
           <PaginationLink
             href="#"
@@ -27,7 +26,6 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
           </PaginationLink>
         </PaginationItem>
 
-        {/* Page Numbers */}
         {pages.map((page) => (
           <PaginationItem key={page} active={page === currentPage}>
             <PaginationLink
@@ -42,7 +40,6 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
           </PaginationItem>
         ))}
 
-        {/* Next Button */}
         <PaginationItem disabled={currentPage === totalPages}>
           <PaginationLink
             href="#"

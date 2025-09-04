@@ -11,7 +11,7 @@ export const contactFormCreateSchema = Joi.object({
             "string.empty": "Email is required",
             "string.email": "Please provide a valid email address"
         }),
-    subject: Joi.string().trim().max(150).allow("").required()
+    subject: Joi.string().trim().max(150).required()
         .messages({
             "string.empty": "Subject is required"
         }),

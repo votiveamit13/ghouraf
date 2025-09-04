@@ -38,11 +38,11 @@ export default function ContactUs() {
                 message: "",
             });
         } catch (err) {
-            if (err.response?.status === 400 && err.response.data?.errors) {
+            if (err.response?.status === 422 && err.response.data?.errors) {
                 const fieldErrors = {};
-                err.response.data.errors.forEach((e) => {
-                    fieldErrors[e.path] = e.message;
-                });
+                Object.entries(err.response.data.errors).forEach(([key, messages]) => {
+            fieldErrors[key] = messages[0];
+        });
                 setErrors(fieldErrors);
             } else {
                 toast.error(err.response?.data?.message || "Something went wrong!");

@@ -3,8 +3,9 @@ import jwt from "jsonwebtoken";
 import User from "../../models/User.mjs";
 import { authAdmin } from "../../config/firebase.mjs";
 import { fileHandler } from "../../utils/fileHandler.mjs";
-import { profileValidator } from "../../validations/profile.validator.mjs";
 import ContactForm from "../../models/ContactForm.mjs";
+import Faq from "../../models/faq.mjs";
+import faq from "../../models/faq.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -155,8 +156,8 @@ export const updateUserDetails = async (req, res) => {
     if (req.file) {
       fileHandler.validateExtension(req.file.originalname, "image");
       const savedFile = fileHandler.saveFile(req.file, "profile_pics");
-  const photoUrl = `${process.env.FRONTEND_URL}${savedFile.relativePath}`;
-  sets["profile.photo"] = photoUrl;
+      const photoUrl = `${process.env.FRONTEND_URL}${savedFile.relativePath}`;
+      sets["profile.photo"] = photoUrl;
     }
 
     updates = { ...updates, ...sets };
@@ -182,15 +183,15 @@ export const deleteUser = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id);
-    if(!user) return res.status(404).json({ message: "User not found" });
-    if(user.isAdmin) return res.status(403).json({ message: "Admins cannot be deleted" });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.isAdmin) return res.status(403).json({ message: "Admins cannot be deleted" });
 
-    if(user.firebaseUid) {
+    if (user.firebaseUid) {
       try {
         await authAdmin.deleteUser(user.firebaseUid);
       } catch (err) {
         console.error("Error deleting user", err);
-        return res.status(500).json({ message: "Failed to delete user", error: err.message});
+        return res.status(500).json({ message: "Failed to delete user", error: err.message });
       }
     }
 
@@ -219,7 +220,7 @@ export const deleteMessage = async (req, res) => {
     const { id } = req.params;
 
     const message = await ContactForm.findById(id);
-    if(!message) return res.status(404).json({ message: "Message not found" });
+    if (!message) return res.status(404).json({ message: "Message not found" });
 
     await ContactForm.findByIdAndDelete(id);
 
@@ -229,3 +230,105 @@ export const deleteMessage = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+export const addFaq = async (req, res) => {
+  try {
+    const {question, answer, status} = req.body;
+
+    const faq = await Faq.create({ question, answer, status });
+
+    return res.status(201).json({
+      message: "FAQ Added",
+      data: faq
+    });
+  } catch (err) {
+    console.error("FAQ Added error", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getAllFaq = async (req, res) => {
+  try {
+    const faqs = await Faq.find().select("-__v");
+    res.json(faqs);
+  } catch (err) {
+    console.error("Error fecthing FAQs:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export const updateFaqStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if(!["active", "inactive"].includes(status)){
+      return res.status(400).json({ message: "Invalid status"});
+    }
+
+    const faq = await Faq.findById(id);
+    if(!faq) return res.status(404).json({ message: "FAQ not found"});
+
+    faq.status = status;
+    await faq.save();
+
+    const safeFaq = faq.toObject();
+    delete safeFaq.__v;
+  res.json({ message: `FAQ ${status} successfully`, faq: safeFaq });
+  } catch (err) {
+    console.error("Error updating status:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateFaq = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { question, answer } = req.body;
+
+    if (!question && !answer) {
+      return res.status(400).json({ message: "No valid fields provided to update" });
+    }
+
+    const updates = {};
+    if (question) updates.question = question;
+    if (answer) updates.answer = answer;
+
+    const updatedFaq = await Faq.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true }
+    ).select("-__v");
+
+    if (!updatedFaq) {
+      return res.status(404).json({ message: "FAQ not found" });
+    }
+
+    res.json({
+      message: "FAQ updated successfully",
+      faq: updatedFaq
+    });
+  } catch (err) {
+    console.error("Admin update FAQ error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const deleteFaq = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const faq = await Faq.findById(id);
+    if (!faq) {
+      return res.status(404).json({ message: "FAQ not found" });
+    }
+
+    await Faq.findByIdAndDelete(id);
+
+    res.json({ message: "FAQ deleted successfully" });
+  } catch (err) {
+    console.error("Admin delete FAQ error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
