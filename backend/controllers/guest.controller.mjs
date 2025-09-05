@@ -1,4 +1,5 @@
 import ContactForm from "../models/ContactForm.mjs";
+import Faq from "../models/faq.mjs";
 
 export const sendMessage = async (req, res) => {
     try {
@@ -12,6 +13,20 @@ export const sendMessage = async (req, res) => {
         });
     } catch (err) {
         console.error("createContact error", err );
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const getAllFaq = async (req, res) => {
+    try {
+       const faqs = await Faq.find({ status: "active" }).sort({ createdAt: -1 });
+
+       return res.status(200).json({
+        message: "Active FAQs fetched successfully",
+        data: faqs
+       });
+    } catch (err) {
+        console.error("getAllFaq error", err);
         return res.status(500).json({ message: "Server error" });
     }
 };

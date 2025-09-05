@@ -22,6 +22,7 @@ import Spaces from "pages/public/spaces/page";
 import AboutUs from "pages/public/aboutus/page";
 import ContactUs from "pages/public/contactus/page";
 import Faqs from "pages/public/faq/page";
+import DetailPage from "pages/public/spaces/addetailpage/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -31,6 +32,7 @@ root.render(
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="/" element={<Public><Home/></Public>} />
         <Route path="/spaces" element={<Public><Spaces/></Public>} />
+        <Route path="/spaces/detail-page" element={<Public><DetailPage/></Public>} />
         <Route path="/about-us" element={<Public><AboutUs/></Public>} />
         <Route path="/contact-us" element={<Public><ContactUs/></Public>} />
         <Route path="/faq" element={<Public><Faqs/></Public>} />
