@@ -23,6 +23,9 @@ import AboutUs from "pages/public/aboutus/page";
 import ContactUs from "pages/public/contactus/page";
 import Faqs from "pages/public/faq/page";
 import DetailPage from "pages/public/spaces/addetailpage/page";
+import RoomWantedAd from "pages/user/room-wanted-post/page";
+import PostSpace from "pages/user/post-space/page";
+import PlaceWanted from "pages/public/placwanted/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -30,30 +33,33 @@ root.render(
     <AuthProvider>
       <Routes>
         <Route path="/admin/*" element={<AdminLayout />} />
-        <Route path="/" element={<Public><Home/></Public>} />
-        <Route path="/spaces" element={<Public><Spaces/></Public>} />
-        <Route path="/spaces/detail-page" element={<Public><DetailPage/></Public>} />
-        <Route path="/about-us" element={<Public><AboutUs/></Public>} />
-        <Route path="/contact-us" element={<Public><ContactUs/></Public>} />
-        <Route path="/faq" element={<Public><Faqs/></Public>} />
-        <Route path="/auth/verified" element={<Public><AuthVerified/></Public>} />
-        <Route element={<PrivateRoute/>}>
-          <Route path="/user" element={<Public><UserDashboard/></Public>} />
-          <Route path="/user/edit-my-details" element={<Public><EditMyDetails/></Public>} />
-          <Route path="/user/my-ads" element={<Public><MyAds/></Public>} />
-          <Route path="/user/saved-ads" element={<Public><SavedAds/></Public>} />
+        <Route path="/" element={<Public><Home /></Public>} />
+        <Route path="/spaces" element={<Public><Spaces /></Public>} />
+        <Route path="/spaces/detail-page" element={<Public><DetailPage /></Public>} />
+        <Route path="/place-wanted" element={<Public><PlaceWanted/></Public>} />
+        <Route path="/about-us" element={<Public><AboutUs /></Public>} />
+        <Route path="/contact-us" element={<Public><ContactUs /></Public>} />
+        <Route path="/faq" element={<Public><Faqs /></Public>} />
+        <Route path="/auth/verified" element={<Public><AuthVerified /></Public>} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/user" element={<Public><UserDashboard /></Public>} />
+          <Route path="/user/edit-my-details" element={<Public><EditMyDetails /></Public>} />
+          <Route path="/user/my-ads" element={<Public><MyAds /></Public>} />
+          <Route path="/user/saved-ads" element={<Public><SavedAds /></Public>} />
+          <Route path="/user/place-wanted-ad" element={<Public><RoomWantedAd /></Public>} />
+          <Route path="/user/post-an-space" element={<Public><PostSpace/></Public>} />
         </Route>
       </Routes>
-    <ToastContainer
-      position="bottom-right"
-      autoClose={3000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      pauseOnHover
-      draggable
-      theme="colored"
-    />
-     </AuthProvider>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+    </AuthProvider>
   </BrowserRouter>
 );

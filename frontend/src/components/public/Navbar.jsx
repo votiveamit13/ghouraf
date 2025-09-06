@@ -31,7 +31,6 @@ export default function Navbar() {
   const [activeField, setActiveField] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [active, setActive] = useState("spaces");
   const linkClass = "hover:text-[#A321A6]";
   const activeClass = "text-[#A321A6]";
   const [form, setForm] = useState({
@@ -140,16 +139,20 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex space-x-8">
-            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
-              <NavLink
-                key={item}
-              to={`/${item}`}
-                className={`font-semibold ${linkClass} ${active === item ? activeClass : "text-[#565ABF]"
-                  }`}
-              >
-                {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-              </NavLink>
-            ))}
+{["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
+  <NavLink
+    key={item}
+    to={`/${item}`}
+    className={({ isActive }) =>
+      `font-semibold ${linkClass} ${
+        isActive ? activeClass : "text-[#565ABF]"
+      }`
+    }
+  >
+    {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+  </NavLink>
+))}
+
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
