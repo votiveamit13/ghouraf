@@ -5,10 +5,13 @@ import { GoSync } from "react-icons/go";
 import { GrFavorite } from "react-icons/gr";
 import Loader from "components/common/Loader";
 import { Navigate, useNavigate } from "react-router-dom";
+import PostAdDialog from "components/common/PostAdDialog";
+import { useState } from "react";
 
 export default function UserDashboard() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   if (loading) return <Loader fullScreen />;
    if (!user) return <Navigate to="/" replace />;
@@ -37,7 +40,7 @@ export default function UserDashboard() {
             </div>
           </div>
         </button>
-        <button className="align-left text-left">
+        <button className="align-left text-left" onClick={() => setOpen(true)}>
           <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
@@ -52,6 +55,7 @@ export default function UserDashboard() {
             </div>
           </div>
         </button>
+          <PostAdDialog open={open} onClose={() => setOpen(false)} />
         <button className="align-left text-left" onClick={() => navigate("/user/my-ads")}>
           <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
             <div className="d-flex justify-between align-center">

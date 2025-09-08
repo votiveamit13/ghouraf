@@ -1,8 +1,10 @@
 import { FaArrowRight } from "react-icons/fa";
 import houseImg from "assets/img/ghouraf/houseImg.png";
 import propertyImg from "assets/img/ghouraf/propertyImg.png";
+import { useNavigate } from "react-router-dom";
 
 export default function LookingFor() {
+  const navigate = useNavigate();
   return (
     <section className="w-full bg-white py-16">
       <div className="flex flex-col md:flex-row justify-center items-center gap-8 px-4">
@@ -15,7 +17,9 @@ export default function LookingFor() {
             <p className="text-sm mb-3">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.
             </p>
-            <button className="bg-white text-black px-4 py-2 rounded-[12px] font-medium flex items-center gap-2 md:mx-0 shadow">
+            <button className="bg-white text-black px-4 py-2 rounded-[12px] font-medium flex items-center gap-2 md:mx-0 shadow"
+              onClick={() => navigate("/user/place-wanted-ad")}
+            >
               Get Started <FaArrowRight className="text-sm" />
             </button>
           </div>
@@ -34,7 +38,9 @@ export default function LookingFor() {
             <p className="text-sm mb-3">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.
             </p>
-            <button className="bg-white text-black px-4 py-2 rounded-[12px] font-medium flex items-center gap-2 md:mx-0 shadow">
+            <button className="bg-white text-black px-4 py-2 rounded-[12px] font-medium flex items-center gap-2 md:mx-0 shadow"
+              onClick={() => navigate("user/post-an-space")}
+            >
               Get Started <FaArrowRight className="text-sm" />
             </button>
           </div>

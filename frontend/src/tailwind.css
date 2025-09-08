@@ -5,3 +5,11 @@
 * {
   font-family: 'Poppins', sans-serif;
 }
+
+/* highlight the active thumbnail */
+.hs-carousel-pagination-item.hs-carousel-active img,
+.hs-carousel-pagination-item.active-thumb img {
+  border: 5px solid #2563eb !important;
+  transform: scale(1.03) !important;
+  transition: all 0.2s ease-in-out !important;
+}

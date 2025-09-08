@@ -16,14 +16,16 @@ import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import { GoSync } from "react-icons/go";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiPlusCircle } from "react-icons/fi";
 import { useAuth } from "context/AuthContext";
 import Loader from "components/common/Loader";
 import EmailVerification from "components/user/EmailVerification";
 import { getErrorMessage } from "utils/errorHandler";
+import PostAdDialog from "components/common/PostAdDialog";
 
 export default function Navbar() {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [loginDialog, setLoginDialog] = useState(false);
@@ -139,19 +141,18 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex space-x-8">
-{["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
-  <NavLink
-    key={item}
-    to={`/${item}`}
-    className={({ isActive }) =>
-      `font-semibold ${linkClass} ${
-        isActive ? activeClass : "text-[#565ABF]"
-      }`
-    }
-  >
-    {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-  </NavLink>
-))}
+            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
+              <NavLink
+                key={item}
+                to={`/${item}`}
+                className={({ isActive }) =>
+                  `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
+                  }`
+                }
+              >
+                {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              </NavLink>
+            ))}
 
           </div>
 
@@ -172,7 +173,7 @@ export default function Navbar() {
                   Login
                 </button>
 
-                <button className="flex items-center px-[12px] py-[12px] bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold">
+                <button className="flex items-center px-[12px] py-[12px] bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold" onClick={() => setOpen(true)}>
                   <IoIosAddCircleOutline className="text-2xl font-bold" />
                   <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
                 </button>
@@ -204,6 +205,16 @@ export default function Navbar() {
                     <div className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg py-2 z-50">
                       <a href="/user" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
                         <LuUserRound className="mr-2" /> My Account
+                      </a>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setOpen(true);
+                        }}
+                        className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                      >
+                        <FiPlusCircle className="mr-2" /> Post an Ad
                       </a>
                       <a href="/user/my-ads" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
                         <GoSync className="mr-2" /> My Ads
@@ -308,6 +319,17 @@ export default function Navbar() {
                   <a href="/user" className="flex items-center py-1 hover:text-[#565ABF]">
                     <LuUserRound className="mr-2" /> My Account
                   </a>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOpen(true);
+                    }}
+                    className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                  >
+                    <FiPlusCircle className="mr-2" /> Post an Ad
+                  </a>
+
                   <a href="/user/my-ads" className="flex items-center py-1 hover:text-[#565ABF]">
                     <GoSync className="mr-2" /> My Ads
                   </a>
@@ -352,8 +374,8 @@ export default function Navbar() {
                 <label className="text-sm font-medium text-gray-600">Email</label>
                 <div
                   className={`flex items-center mb-4 transition-all ${activeField === "email"
-                      ? "border-b-2 border-[#A321A6]"
-                      : "border-b border-gray-300"
+                    ? "border-b-2 border-[#A321A6]"
+                    : "border-b border-gray-300"
                     }`}
                 >
                   <span className="text-gray-500 mr-2">
@@ -372,8 +394,8 @@ export default function Navbar() {
                 <label className="text-sm font-medium text-gray-600">Password</label>
                 <div
                   className={`flex items-center mb-3 transition-all ${activeField === "password"
-                      ? "border-b-2 border-[#A321A6]"
-                      : "border-b border-gray-300"
+                    ? "border-b-2 border-[#A321A6]"
+                    : "border-b border-gray-300"
                     }`}
                 >
                   <span className="text-gray-500 mr-2">
@@ -746,7 +768,7 @@ export default function Navbar() {
           onClose={() => setShowEmailVerification(false)}
         />
       )}
-
+      <PostAdDialog open={open} onClose={() => setOpen(false)} />
     </nav>
   );
 }

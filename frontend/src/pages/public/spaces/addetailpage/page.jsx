@@ -17,33 +17,136 @@ import { BiCheckShield } from "react-icons/bi";
 import { BsFlag } from "react-icons/bs";
 
 export default function DetailPage() {
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            window.HSCarousel?.autoInit();
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  // ensure Preline initializes (if used)
+  window.HSCarousel?.autoInit();
 
-            const carousel = document.querySelector("[data-hs-carousel]");
-            if (!carousel) return;
+  const root = document.querySelector("[data-hs-carousel]");
+  if (!root) {
+    console.warn("No [data-hs-carousel] root found");
+    return;
+  }
 
-            const handleChange = () => {
-                const activeThumb = carousel.querySelector(
-                    ".hs-carousel-pagination-item .hs-carousel-active"
-                );
-                if (activeThumb) {
-                    activeThumb.scrollIntoView({
-                        behavior: "smooth",
-                        inline: "center",
-                        block: "nearest",
-                    });
-                }
-            };
+  const body = root.querySelector(".hs-carousel-body");
+  const viewport = body?.parentElement; // the overflow-hidden viewport
+  const slides = Array.from(root.querySelectorAll(".hs-carousel-slide"));
+  const pagination = root.querySelector(
+    "[data-hs-carousel-pagination], .hs-carousel-pagination"
+  );
+  const thumbs = pagination ? Array.from(pagination.children) : [];
 
-            carousel.addEventListener("carouselChange", handleChange);
+  if (!body || !viewport || slides.length === 0 || thumbs.length === 0) {
+    console.warn("Carousel elements missing", {
+      body: !!body,
+      viewport: !!viewport,
+      slidesCount: slides.length,
+      thumbsCount: thumbs.length,
+    });
+    return;
+  }
 
-            return () => {
-                carousel.removeEventListener("carouselChange", handleChange);
-            };
-        }
-    }, []);
+  // center a thumbnail in the thumbnails container
+  const centerThumb = (thumbEl) => {
+    if (!thumbEl) return;
+    const container = pagination;
+    const containerRect = container.getBoundingClientRect();
+    const elRect = thumbEl.getBoundingClientRect();
+
+    const delta =
+      (elRect.left + elRect.width / 2) -
+      (containerRect.left + containerRect.width / 2);
+
+    container.scrollTo({
+      left: Math.max(0, container.scrollLeft + delta),
+      behavior: "smooth",
+    });
+  };
+
+  let activeIndex = -1;
+  const setActiveIndex = (idx) => {
+    if (idx === activeIndex) return;
+    activeIndex = idx;
+
+    thumbs.forEach((t, i) => {
+      // keep using the hs-carousel-active modifier so existing CSS works
+      t.classList.toggle("hs-carousel-active", i === idx);
+      // also add a custom helper class you can style in CSS
+      t.classList.toggle("active-thumb", i === idx);
+    });
+
+    centerThumb(thumbs[idx]);
+  };
+
+  // Use IntersectionObserver to find the most visible slide in the viewport
+  const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
+  const io = new IntersectionObserver(
+    (entries) => {
+      // pick the entry with the highest intersectionRatio
+      let best = null;
+      for (const e of entries) {
+        if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+      }
+      if (!best) return;
+      const index = slides.indexOf(best.target);
+      if (index !== -1) setActiveIndex(index);
+    },
+    {
+      root: viewport,
+      threshold: thresholds,
+    }
+  );
+
+  slides.forEach((s) => io.observe(s));
+
+  // Fallback/resync: sometimes IO may miss a tick during animation, so also compute by overlap
+  const computeVisibleByOverlap = () => {
+    const vp = viewport.getBoundingClientRect();
+    let bestIdx = 0;
+    let bestArea = -1;
+    slides.forEach((s, i) => {
+      const r = s.getBoundingClientRect();
+      const overlapW = Math.max(
+        0,
+        Math.min(r.right, vp.right) - Math.max(r.left, vp.left)
+      );
+      const overlapH = Math.max(
+        0,
+        Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top)
+      );
+      const area = overlapW * overlapH;
+      if (area > bestArea) {
+        bestArea = area;
+        bestIdx = i;
+      }
+    });
+    setActiveIndex(bestIdx);
+  };
+
+  // initial sync after Preline has a moment to set up
+  setTimeout(() => {
+    computeVisibleByOverlap();
+  }, 120);
+
+  // also sync after arrow clicks / resize
+  const prev = root.querySelector(".hs-carousel-prev");
+  const next = root.querySelector(".hs-carousel-next");
+  const arrowHandler = () => setTimeout(computeVisibleByOverlap, 40);
+
+  prev?.addEventListener("click", arrowHandler);
+  next?.addEventListener("click", arrowHandler);
+  window.addEventListener("resize", computeVisibleByOverlap);
+
+  // cleanup
+  return () => {
+    io.disconnect();
+    prev?.removeEventListener("click", arrowHandler);
+    next?.removeEventListener("click", arrowHandler);
+    window.removeEventListener("resize", computeVisibleByOverlap);
+  };
+}, []);
+
+
 
 
     const images = [
@@ -62,13 +165,13 @@ export default function DetailPage() {
 
     return (
         <>
-            <div className="container px-4 mt-6">
+            <div className="container px-4 mt-5">
                 <button className="text-sm px-4 py-2 font-medium text-black flex items-center gap-2 border-[1px] border-[#AACCEE] rounded-[2px]">
                     <FaArrowLeftLong />  Back to Ads
                 </button>
             </div>
 
-            <div className="container px-4 mt-4 mb-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="col-span-3 space-y-6">
                     <div
                         data-hs-carousel='{
@@ -87,7 +190,7 @@ export default function DetailPage() {
                                                 <img
                                                     src={src}
                                                     alt={`Slide ${idx + 1}`}
-                                                    className="object-cover w-full h-fill"
+                                                    className="object-cover w-full h-full"
                                                 />
                                             </div>
                                         </div>
@@ -103,23 +206,23 @@ export default function DetailPage() {
                                     <MdKeyboardArrowLeft size={20} />
                                 </button>
 
-                                <div
-                                    className="flex mt-2 gap-2 overflow-x-auto w-full no-scrollbar"
-                                    data-hs-carousel-pagination
-                                >
-                                    {images.map((src, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="hs-carousel-pagination-item shrink-0 size-20 cursor-pointer rounded-md overflow-hidden"
-                                        >
-                                            <img
-                                                src={src}
-                                                alt={`Thumbnail ${idx + 1}`}
-                                                className="object-cover w-full h-full border border-gray-200 rounded-md transition-all hs-carousel-active:border-2 hs-carousel-active:border-blue-500"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
+<div
+  className="hs-carousel-pagination flex mt-2 gap-2 w-full overflow-hidden no-scrollbar scroll-smooth"
+>
+  {images.map((src, idx) => (
+    <div
+      key={idx}
+      className="hs-carousel-pagination-item shrink-0 size-20 cursor-pointer rounded-md overflow-hidden"
+    >
+      <img
+        src={src}
+        alt={`Thumbnail ${idx + 1}`}
+        className="object-cover w-full h-full border border-gray-200 rounded-md transition-all"
+      />
+    </div>
+  ))}
+</div>
+
 
                                 <button
                                     type="button"
@@ -225,7 +328,7 @@ Spacious and fully furnished 1-bedroom apartment located in the heart of the Upp
                         <img
                             src={agent1}
                             alt="user"
-                            className="w-20 h-20 rounded-full mx-auto"
+                            className="w-20 h-20 rounded-full mx-auto object-cover"
                         />
                         <h3 className="mt-2 font-semibold text-black mb-1">Jhon</h3>
                         <p className="text-sm text-black mb-1">live-out landlord</p>
