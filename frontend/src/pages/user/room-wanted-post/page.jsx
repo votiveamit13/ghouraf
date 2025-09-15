@@ -61,7 +61,7 @@ export default function RoomWantedAd() {
                 </h1>
             </div>
 
-            <div className="max-w-4xl mx-auto space-y-8 mt-6">
+            <div className="w-full container px-8 space-y-8 mt-6">
                 {isPreview ? (
                     <>
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
@@ -247,7 +247,7 @@ export default function RoomWantedAd() {
                                     </div>
                                     <div>
                                         <label className="block text-gray-700">
-                                            Period Accommodation Needed For
+                                            Duration of stay
                                         </label>
                                         <input
                                             type="text"

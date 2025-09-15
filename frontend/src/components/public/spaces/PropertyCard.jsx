@@ -20,7 +20,7 @@ export default function PropertyCard({ property }) {
 
                 <div className="flex items-center mt-2 gap-2">
                     <div>
-                        <img src={property.user.avatar} alt="avatar" className="w-12 h-12 rounded-full" />
+                        <img src={property.user.avatar} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
                     </div>
                     <div>
                         <p className="text-sm">{property.user.name}</p>

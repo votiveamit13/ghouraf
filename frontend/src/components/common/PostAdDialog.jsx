@@ -60,10 +60,10 @@ export default function PostAdDialog({ open, onClose }) {
             </h5>
             <img src={teamIcon} alt="Buy Icon" className="w-16 h-18"/>
             <button className="bg-black text-white px-4 py-3 rounded-[12px] flex items-center gap-2 hover:bg-gray-800"
-                // onClick={() => {
-                //   onClose();
-                //   navigate("/user/place-wanted-ad");
-                // }}
+                onClick={() => {
+                  onClose();
+                  navigate("/user/team-up-post");
+                }}
             >
               Post an Ad <span><BsArrowUpRight/></span>
             </button>

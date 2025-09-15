@@ -25,7 +25,9 @@ import Faqs from "pages/public/faq/page";
 import DetailPage from "pages/public/spaces/addetailpage/page";
 import RoomWantedAd from "pages/user/room-wanted-post/page";
 import PostSpace from "pages/user/post-space/page";
-import PlaceWanted from "pages/public/placwanted/page";
+import PlaceWanted from "pages/public/placewanted/page";
+import TeamUp from "pages/public/teamup/page";
+import TeamUpAd from "pages/user/team-up-post/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -37,6 +39,7 @@ root.render(
         <Route path="/spaces" element={<Public><Spaces /></Public>} />
         <Route path="/spaces/detail-page" element={<Public><DetailPage /></Public>} />
         <Route path="/place-wanted" element={<Public><PlaceWanted/></Public>} />
+        <Route path="/team-up" element={<Public><TeamUp/></Public>} />
         <Route path="/about-us" element={<Public><AboutUs /></Public>} />
         <Route path="/contact-us" element={<Public><ContactUs /></Public>} />
         <Route path="/faq" element={<Public><Faqs /></Public>} />
@@ -48,6 +51,7 @@ root.render(
           <Route path="/user/saved-ads" element={<Public><SavedAds /></Public>} />
           <Route path="/user/place-wanted-ad" element={<Public><RoomWantedAd /></Public>} />
           <Route path="/user/post-an-space" element={<Public><PostSpace/></Public>} />
+          <Route path="/user/team-up-post" element={<Public><TeamUpAd/></Public>} />
         </Route>
       </Routes>
       <ToastContainer

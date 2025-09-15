@@ -7,9 +7,10 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative h-auto bg-cover bg-center flex items-center justify-center"
+      className="relative bg-cover bg-center flex items-center justify-center"
       style={{
         backgroundImage: `url(${heroImage})`,
+        height: "800px",
       }}
     >
       <div className="absolute inset-0 bg-black/40"></div>
