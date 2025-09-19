@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const isAuthenticated = () => {
-    return localStorage.getItem("token");
+  return !!localStorage.getItem("token");
 };
 
-export default function PrivateRoute(){
-        if (!isAuthenticated()) {
-        toast.warning("Login first");
-        return <Navigate to="/" replace />;
-    }
+export default function PrivateRoute() {
+  const auth = isAuthenticated();
 
-    return <Outlet />;
+  useEffect(() => {
+    if (!auth) {
+      toast.warning("Login first");
+    }
+  }, [auth]);
+
+  if (!auth) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
 }

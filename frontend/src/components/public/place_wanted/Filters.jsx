@@ -9,7 +9,7 @@ export default function Filters() {
     priceType: "",
     minSize: "",
     maxSize: "",
-    sizeUnit: "Sq ft",
+    apartmentSize: "",
     propertyType: "all",
     smoking: "all",
     roommatePreference: "any",
@@ -154,27 +154,15 @@ export default function Filters() {
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Room Size</label>
         <div className="flex space-x-2 mt-2 mb-3">
-          <input
-            type="number"
-            placeholder="Min"
-            value={filters.minSize}
-            onChange={(e) => setFilters({ ...filters, minSize: e.target.value })}
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px]"
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            value={filters.maxSize}
-            onChange={(e) => setFilters({ ...filters, maxSize: e.target.value })}
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px]"
-          />
           <select
-            value={filters.sizeUnit}
-            onChange={(e) => setFilters({ ...filters, sizeUnit: e.target.value })}
+            value={filters.apartmentSize}
+            onChange={(e) => setFilters({ ...filters, apartmentSize: e.target.value })}
             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
           >
-            <option>Sq ft</option>
-            <option>Sq m</option>
+            <option>1RK</option>
+            <option>1BHK</option>
+                        <option>2BHK</option>
+                                    <option>3BHK</option>
           </select>
         </div>
       </div>

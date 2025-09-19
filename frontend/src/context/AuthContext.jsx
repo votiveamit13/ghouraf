@@ -38,11 +38,11 @@ const login = async (idToken) => {
   try {
     const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
 
-    if (res.data?.user) {
-      setUser(res.data.user);
-      setToken(idToken);
-      localStorage.setItem("idToken", idToken);
-    }
+if (res.data?.user) {
+  setUser(res.data.user);
+  setToken(idToken);
+  localStorage.setItem("token", idToken); 
+}
 
     return res.data;
   } catch (err) {
@@ -62,11 +62,11 @@ const login = async (idToken) => {
 };
 
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("token");
-  };
+const logout = () => {
+  setUser(null);
+  setToken(null);
+  localStorage.removeItem("token"); 
+};
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, loading, fetchProfile }}>

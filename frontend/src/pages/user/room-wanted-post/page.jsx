@@ -133,8 +133,10 @@ export default function RoomWantedAd() {
                                         value={formData.roomSize}
                                         onChange={handleChange}
                                     >
-                                        <option value="Small">Small</option>
-                                        <option value="Large">Large</option>
+ <option>1RK</option>
+                    <option>1BHK</option>
+                                        <option>2BHK</option>
+                                                            <option>3BHK</option>
                                     </select>
                                 </div>
                                 <div>

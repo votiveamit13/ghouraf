@@ -220,14 +220,17 @@ export default function PostSpace() {
 
                 <div className="col-md-6 mb-2">
                   <label className="form-label text-black">Size of Apartment</label>
-                  <input
-                    type="text"
+                  <select
                     className="form-control"
-                    placeholder="Sq ft"
-                    name="size"
+                    name="smoking"
                     value={formData.size}
                     onChange={handleChange}
-                  />
+                  >
+                    <option>1RK</option>
+                    <option>1BHK</option>
+                                        <option>2BHK</option>
+                                                            <option>3BHK</option>
+                  </select>
                 </div>
 
                 <div className="col-md-6 mb-2">
