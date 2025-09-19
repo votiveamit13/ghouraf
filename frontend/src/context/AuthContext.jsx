@@ -34,22 +34,33 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, [fetchProfile]);
 
-  const login = async (idToken) => {
-    try {
-      const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
+const login = async (idToken) => {
+  try {
+    const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
 
-      if (res.data?.user && res.data?.emailVerified) {
-        setUser(res.data.user);
-        setToken(idToken);
-        localStorage.setItem("token", idToken);
-      }
-
-      return res.data;
-    } catch (err) {
-      return err.response?.data || { message: err.message, emailVerified: false };
-
+    if (res.data?.user) {
+      setUser(res.data.user);
+      setToken(idToken);
+      localStorage.setItem("idToken", idToken);
     }
-  };
+
+    return res.data;
+  } catch (err) {
+    const status = err.response?.status;
+    const data = err.response?.data || {};
+
+    if (status === 403 && data.emailVerified === false) {
+      return { emailVerified: false, message: data.message };
+    }
+
+    if (status === 403 && data.inactive) {
+      return { inactive: true, message: data.message };
+    }
+
+    return { error: true, message: data.message || "Login failed. Try again later." };
+  }
+};
+
 
   const logout = () => {
     setUser(null);

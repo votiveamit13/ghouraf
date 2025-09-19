@@ -91,33 +91,48 @@ export default function Navbar() {
     }
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoginLoading(true);
-    try {
-      const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
-      const idToken = await userCred.user.getIdToken();
-      const res = await login(idToken);
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoginLoading(true);
 
-      if (res.emailVerified === false) {
-        setPendingEmail(form.email);
-        setShowEmailVerification(true);
-        return;
-      }
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, form.email, form.password);
+    const idToken = await userCred.user.getIdToken();
 
-      if (res.user) {
-        toast.success("Login Successful");
-        navigate("/user");
-        setLoginDialog(false);
-      } else {
-        toast.error(res.message || "Login Failed");
-      }
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setLoginLoading(false);
+    const res = await login(idToken);
+
+    if (res.emailVerified === false) {
+      setPendingEmail(form.email);
+      setShowEmailVerification(true);
+      return;
     }
-  };
+
+    if (res.inactive) {
+      toast.error(res.message || "Your account is inactive.");
+      return;
+    }
+
+    if (res.error) {
+      toast.error(res.message || "Something went wrong. Try again later.");
+      return;
+    }
+
+    if (res.user) {
+      toast.success("Login Successful");
+      navigate("/user");
+      setLoginDialog(false);
+      resetForm?.(); 
+      return;
+    }
+
+    toast.error("Unexpected login response");
+  } catch (err) {
+    toast.error(getErrorMessage(err));
+  } finally {
+    setLoginLoading(false);
+  }
+};
+
 
 
 
