@@ -117,13 +117,12 @@ const handleLogin = async (e) => {
       return;
     }
 
-    if (res.user) {
-      toast.success("Login Successful");
-      navigate("/user");
-      setLoginDialog(false);
-      resetForm?.(); 
-      return;
-    }
+if (res.user) {
+  toast.success("Login Successful");
+  navigate("/user");
+  setLoginDialog(false);
+  return;
+}
 
     toast.error("Unexpected login response");
   } catch (err) {
