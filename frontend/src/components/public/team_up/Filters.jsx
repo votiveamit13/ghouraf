@@ -11,7 +11,6 @@ export default function Filters() {
     maxSize: "",
     smoking: "all",
     roommatePreference: "any",
-    location: "",
     amenities: [],
     moveInDate: "",
   };
@@ -191,21 +190,6 @@ export default function Filters() {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Location</label>
-        <div className="space-y-1 mt-1 mb-3">
-          <input
-            type="text"
-            placeholder="Enter Location"
-            value={filters.location}
-            onChange={(e) =>
-              setFilters({ ...filters, location: e.target.value })
-            }
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          />
-          <button className="bg-[#565ABF] rounded-[5px] py-2 w-full text-white mt-3">Search</button>
-        </div>
-      </div>
 
 <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
       <label className="font-medium text-[18px]">Amenities</label>

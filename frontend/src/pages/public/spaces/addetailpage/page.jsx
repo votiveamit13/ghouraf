@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "preline/preline";
 import property1 from "../../../../assets/img/ghouraf/property1.png";
 import property2 from "../../../../assets/img/ghouraf/property2.png";
@@ -11,15 +11,15 @@ import property7 from "../../../../assets/img/ghouraf/property7.png";
 import property8 from "../../../../assets/img/ghouraf/property8.jpg";
 import agent1 from "../../../../assets/img/ghouraf/agent1.jpg";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { TfiEmail, TfiLocationPin } from "react-icons/tfi";
 import { BiCheckShield } from "react-icons/bi";
 import { BsFlag } from "react-icons/bs";
 
 export default function DetailPage() {
+  const [showTeamUp, setShowTeamUp] = useState(false);
 useEffect(() => {
   if (typeof window === "undefined") return;
-  // ensure Preline initializes (if used)
   window.HSCarousel?.autoInit();
 
   const root = document.querySelector("[data-hs-carousel]");
@@ -29,7 +29,7 @@ useEffect(() => {
   }
 
   const body = root.querySelector(".hs-carousel-body");
-  const viewport = body?.parentElement; // the overflow-hidden viewport
+  const viewport = body?.parentElement;
   const slides = Array.from(root.querySelectorAll(".hs-carousel-slide"));
   const pagination = root.querySelector(
     "[data-hs-carousel-pagination], .hs-carousel-pagination"
@@ -46,7 +46,6 @@ useEffect(() => {
     return;
   }
 
-  // center a thumbnail in the thumbnails container
   const centerThumb = (thumbEl) => {
     if (!thumbEl) return;
     const container = pagination;
@@ -69,20 +68,16 @@ useEffect(() => {
     activeIndex = idx;
 
     thumbs.forEach((t, i) => {
-      // keep using the hs-carousel-active modifier so existing CSS works
       t.classList.toggle("hs-carousel-active", i === idx);
-      // also add a custom helper class you can style in CSS
       t.classList.toggle("active-thumb", i === idx);
     });
 
     centerThumb(thumbs[idx]);
   };
 
-  // Use IntersectionObserver to find the most visible slide in the viewport
   const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
   const io = new IntersectionObserver(
     (entries) => {
-      // pick the entry with the highest intersectionRatio
       let best = null;
       for (const e of entries) {
         if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
@@ -99,7 +94,6 @@ useEffect(() => {
 
   slides.forEach((s) => io.observe(s));
 
-  // Fallback/resync: sometimes IO may miss a tick during animation, so also compute by overlap
   const computeVisibleByOverlap = () => {
     const vp = viewport.getBoundingClientRect();
     let bestIdx = 0;
@@ -123,12 +117,10 @@ useEffect(() => {
     setActiveIndex(bestIdx);
   };
 
-  // initial sync after Preline has a moment to set up
   setTimeout(() => {
     computeVisibleByOverlap();
   }, 120);
 
-  // also sync after arrow clicks / resize
   const prev = root.querySelector(".hs-carousel-prev");
   const next = root.querySelector(".hs-carousel-next");
   const arrowHandler = () => setTimeout(computeVisibleByOverlap, 40);
@@ -137,7 +129,6 @@ useEffect(() => {
   next?.addEventListener("click", arrowHandler);
   window.addEventListener("resize", computeVisibleByOverlap);
 
-  // cleanup
   return () => {
     io.disconnect();
     prev?.removeEventListener("click", arrowHandler);
@@ -146,7 +137,44 @@ useEffect(() => {
   };
 }, []);
 
-
+const interestedPeople = [
+    {
+      id: 1,
+      name: "Trish Hanson",
+      role: "Works in IT, looking for non-smoker",
+      avatar: agent1,
+    },
+    {
+      id: 2,
+      name: "Alex Martinez",
+      role: "Software engineer, tidy and easy-going, prefers quiet evenings.",
+      avatar: agent1,
+    },
+    {
+      id: 3,
+      name: "Emma Lewis",
+      role: "Works in hospitality, loves cooking, very social.",
+      avatar: agent1,
+    },
+        {
+      id: 4,
+      name: "Emma Lewis",
+      role: "Works in hospitality, loves cooking, very social.",
+      avatar: agent1,
+    },
+        {
+      id: 5,
+      name: "Emma Lewis",
+      role: "Works in hospitality, loves cooking, very social.",
+      avatar: agent1,
+    },
+        {
+      id: 6,
+      name: "Emma Lewis",
+      role: "Works in hospitality, loves cooking, very social.",
+      avatar: agent1,
+    },
+  ];
 
 
     const images = [
@@ -349,11 +377,72 @@ Spacious and fully furnished 1-bedroom apartment located in the heart of the Upp
                         </div>
                     </div>
 
-                    <button className="bg-[#565ABF] text-white font-semibold mt-5 py-3 px-4 rounded-[12px]">
-                        Request to Team Up
-                    </button>
+<button
+  className="bg-[#565ABF] text-white font-semibold mt-5 py-3 px-4 rounded-[12px]"
+  onClick={() => setShowTeamUp(true)}
+>
+  Request to Team Up
+</button>
+
                 </div>
             </div>
+
+{showTeamUp && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl relative">
+      <div className="flex relative justify-center items-center border-b px-5 py-3 bg-[#565ABF] rounded-t-lg">
+        <h2 className="text-white text-[20px] font-semibold text-center">Team Up for This Apartment</h2>
+        <button
+          onClick={() => setShowTeamUp(false)}
+          className="bg-black px-[6px] py-[0px] rounded-full text-white text-xl absolute right-[-10px] top-[-10px]"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="p-4 max-h-[70vh] overflow-y-auto">
+        <p className="text-gray-600 border-b pb-3 mb-4">
+          These people have shown interest in sharing this apartment.  <br/>
+          Connect and find your perfect match.
+        </p>
+
+        <ul className="space-y-4">
+          {interestedPeople.map((person) => (
+            <li
+              key={person.id}
+              className="flex justify-between items-center border-b pb-3"
+            >
+              <div className="flex items-center gap-3">
+                <img
+                  src={person.avatar}
+                  alt={person.name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <h4 className="font-medium text-black">{person.name}</h4>
+                  <p className="text-sm text-black">{person.role}</p>
+                </div>
+              </div>
+              <button className="flex items-center gap-2 bg-black text-white text-sm px-4 py-[12px] rounded-[5px]">
+                Message <FaArrowRightLong />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="p-4 border-t text-center">
+        <button
+          className="bg-[#008000] text-white px-4 py-2 rounded-[12px] font-medium"
+          onClick={() => setShowTeamUp(false)}
+        >
+          I’m Interested
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
         </>
 
     );

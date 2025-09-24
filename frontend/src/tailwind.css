@@ -13,3 +13,15 @@
   transform: scale(1.03) !important;
   transition: all 0.2s ease-in-out !important;
 }
+
+
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

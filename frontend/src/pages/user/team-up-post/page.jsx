@@ -225,7 +225,7 @@ export default function TeamUpAd() {
                                             name="budget"
                                             value={formData.budget}
                                             onChange={handleChange}
-                                            placeholder="total rental amount you can afford"
+                                            placeholder="Total budget range for the flat"
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         />
                                     </div>
@@ -393,14 +393,15 @@ export default function TeamUpAd() {
                                     <label className="block text-gray-700 mb-1">
                                         Your Preferred Language
                                     </label>
-                                    <input
+                                    <select
                                         type="text"
                                         name="languagePreference"
                                         value={formData.languagePreference}
                                         onChange={handleChange}
-                                        placeholder="Age"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    />
+                                    >
+                                        <option>English</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

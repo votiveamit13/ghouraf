@@ -10,6 +10,7 @@ import person4 from "../../../assets/img/ghouraf/person4.jpg";
 import person5 from "../../../assets/img/ghouraf/person5.jpg";
 import person6 from "../../../assets/img/ghouraf/person6.jpg";
 import person7 from "../../../assets/img/ghouraf/person7.jpg";
+import SearchBar from "components/public/SearchBar";
 
 export default function TeamUp() {
     const [page, setPage] = useState(1);
@@ -118,6 +119,7 @@ export default function TeamUp() {
     return (
         <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="col-span-1 space-y-4">
+                <SearchBar/>
                 <Filters />
             </div>
 

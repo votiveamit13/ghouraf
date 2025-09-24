@@ -220,17 +220,14 @@ export default function PostSpace() {
 
                 <div className="col-md-6 mb-2">
                   <label className="form-label text-black">Size of Apartment</label>
-                  <select
+                  <input
+                    type="text"
                     className="form-control"
-                    name="smoking"
+                    name="size"
+                    placeholder="m2"
                     value={formData.size}
                     onChange={handleChange}
-                  >
-                    <option>1RK</option>
-                    <option>1BHK</option>
-                                        <option>2BHK</option>
-                                                            <option>3BHK</option>
-                  </select>
+                  />
                 </div>
 
                 <div className="col-md-6 mb-2">
@@ -736,21 +733,7 @@ export default function PostSpace() {
 
             <div className="mt-6">
               {step === 3 ? (
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="saveContactInfo"
-                    />
-                    <label
-                      className="form-check-label text-muted"
-                      htmlFor="saveContactInfo"
-                    >
-                      Save my contact information for faster posting
-                    </label>
-                  </div>
-
+                <div className="d-flex justify-content-end align-items-center">
                   <div className="d-flex gap-3">
                     <button
                       onClick={prev}

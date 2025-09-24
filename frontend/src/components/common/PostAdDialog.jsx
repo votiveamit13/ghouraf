@@ -1,6 +1,6 @@
 
 import rentIcon from "assets/img/ghouraf/rent.png"; 
-import buyIcon from "assets/img/ghouraf/buy.png";
+import buyIcon from "assets/img/ghouraf/buy.jpg";
 import teamIcon from "assets/img/ghouraf/team.png"; 
 import { BsArrowUpRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";

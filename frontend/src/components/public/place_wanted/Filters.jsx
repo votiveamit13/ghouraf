@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Filters() {
-    const [showAmenities, setShowAmenities] = useState(false);
-    const dropdownRef = useRef(null);
+  const [showAmenities, setShowAmenities] = useState(false);
+  const dropdownRef = useRef(null);
   const defaultFilters = {
     minValue: 0,
     maxValue: 1300,
@@ -20,15 +20,15 @@ export default function Filters() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-      useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setShowAmenities(false);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowAmenities(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const min = 0;
   const max = 1300;
@@ -161,8 +161,8 @@ export default function Filters() {
           >
             <option>1RK</option>
             <option>1BHK</option>
-                        <option>2BHK</option>
-                                    <option>3BHK</option>
+            <option>2BHK</option>
+            <option>3BHK</option>
           </select>
         </div>
       </div>
@@ -226,75 +226,60 @@ export default function Filters() {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Location</label>
-        <div className="space-y-1 mt-1 mb-3">
-          <input
-            type="text"
-            placeholder="Enter Location"
-            value={filters.location}
-            onChange={(e) =>
-              setFilters({ ...filters, location: e.target.value })
-            }
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          />
-          <button className="bg-[#565ABF] rounded-[5px] py-2 w-full text-white mt-3">Search</button>
+
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
+        <label className="font-medium text-[18px]">Amenities</label>
+
+        <div className="mt-2 w-full">
+          <button
+            type="button"
+            className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
+            onClick={() => setShowAmenities(!showAmenities)}
+          >
+            {filters.amenities.length > 0
+              ? filters.amenities.join(", ")
+              : "Select amenities"}
+          </button>
+
+          {showAmenities && (
+            <ul
+              className="absolute z-50 w-full p-2 text-black bg-white border border-[#D7D7D7] rounded-[10px]"
+              style={{ maxHeight: "200px", overflowY: "auto" }}
+            >
+              {[
+                "Furnished",
+                "Shared living room",
+                "Washing Machine",
+                "Yard/patio",
+                "Balcony/roof terrace",
+                "Parking",
+                "Garage",
+                "Disabled Access",
+                "Internet",
+                "Private bathroom",
+              ].map((amenity) => (
+                <li key={amenity} className="flex items-center py-1">
+                  <input
+                    type="checkbox"
+                    className="form-check-input ml-1"
+                    id={amenity}
+                    checked={filters.amenities.includes(amenity)}
+                    onChange={() => {
+                      const selected = filters.amenities.includes(amenity)
+                        ? filters.amenities.filter((a) => a !== amenity)
+                        : [...filters.amenities, amenity];
+                      setFilters({ ...filters, amenities: selected });
+                    }}
+                  />
+                  <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
+                    {amenity}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
-
-<div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
-      <label className="font-medium text-[18px]">Amenities</label>
-
-      <div className="mt-2 w-full">
-        <button
-          type="button"
-          className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
-          onClick={() => setShowAmenities(!showAmenities)}
-        >
-          {filters.amenities.length > 0
-            ? filters.amenities.join(", ")
-            : "Select amenities"}
-        </button>
-
-        {showAmenities && (
-          <ul
-            className="absolute z-50 w-full p-2 text-black bg-white border border-[#D7D7D7] rounded-[10px]"
-            style={{ maxHeight: "200px", overflowY: "auto" }}
-          >
-            {[
-              "Furnished",
-              "Shared living room",
-              "Washing Machine",
-              "Yard/patio",
-              "Balcony/roof terrace",
-              "Parking",
-              "Garage",
-              "Disabled Access",
-              "Internet",
-              "Private bathroom",
-            ].map((amenity) => (
-              <li key={amenity} className="flex items-center py-1">
-                <input
-                  type="checkbox"
-                  className="form-check-input ml-1"
-                  id={amenity}
-                  checked={filters.amenities.includes(amenity)}
-                  onChange={() => {
-                    const selected = filters.amenities.includes(amenity)
-                      ? filters.amenities.filter((a) => a !== amenity)
-                      : [...filters.amenities, amenity];
-                    setFilters({ ...filters, amenities: selected });
-                  }}
-                />
-                <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
-                  {amenity}
-                </label>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
 
       <div className="mb-4 px-3 py-2 text-black">
         <label className="font-medium text-[18px]">Move-In date</label>

@@ -155,6 +155,27 @@ export default function Filters() {
         </div>
       </div>
 
+            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Property Type</label>
+        <div className="space-y-1 mt-1 mb-3">
+          {[
+            { val: "all", label: "All" },
+            { val: "apartment", label: "Whole Apartment" },
+            { val: "flatshare", label: "Flatshare" },
+          ].map((opt) => (
+            <label key={opt.val} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="propertyType"
+                checked={filters.propertyType === opt.val}
+                onChange={() => setFilters({ ...filters, propertyType: opt.val })}
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Furnishing</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -193,26 +214,7 @@ export default function Filters() {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Property Type</label>
-        <div className="space-y-1 mt-1 mb-3">
-          {[
-            { val: "all", label: "All" },
-            { val: "apartment", label: "Whole Apartment" },
-            { val: "flatshare", label: "Flatshare" },
-          ].map((opt) => (
-            <label key={opt.val} className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="propertyType"
-                checked={filters.propertyType === opt.val}
-                onChange={() => setFilters({ ...filters, propertyType: opt.val })}
-              />
-              <span>{opt.label}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Rooms Available For</label>

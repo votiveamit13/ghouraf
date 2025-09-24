@@ -24,6 +24,7 @@ export default function RoomWantedAd() {
         pets: "",
         language: "",
         roommatePref: "",
+        title: "",
         description: "",
         teamUp: false,
     });
@@ -57,7 +58,7 @@ export default function RoomWantedAd() {
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <div className="bg-gradient-to-r from-[#565ABF] to-[#A321A6] py-5">
                 <h1 className="text-center text-white text-2xl font-semibold">
-                    Post A Room Wanted Ad
+                    Post A Space Wanted Ad
                 </h1>
             </div>
 
@@ -208,7 +209,7 @@ export default function RoomWantedAd() {
                                             name="budget"
                                             value={formData.budget}
                                             onChange={handleChange}
-                                            placeholder="total rental amount you can afford"
+                                            placeholder="Total rental amount you can afford"
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         />
                                     </div>
@@ -371,14 +372,15 @@ export default function RoomWantedAd() {
                                     <label className="block text-gray-700 mb-1">
                                         Your Preferred Language
                                     </label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="language"
                                         value={formData.language}
                                         onChange={handleChange}
                                         placeholder="Age"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    />
+                                    >
+                                        <option>English</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Roommate Preference</label>
@@ -393,9 +395,24 @@ export default function RoomWantedAd() {
                                     </select>
                                 </div>
 
+                                                                <div className="md:col-span-2">
+                                    <label className="block text-gray-700 mb-1">
+                                        Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        value={formData.title}
+                                        onChange={handleChange}
+                                     
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                     
+                                    />
+                                </div>
+
                                 <div className="md:col-span-2">
                                     <label className="block text-gray-700 mb-1">
-                                        What exactly you are looking for
+                                        Description
                                     </label>
                                     <textarea
                                         name="description"

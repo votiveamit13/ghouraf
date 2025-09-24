@@ -25,8 +25,8 @@ export default function UserDashboard() {
         </span>
       </div>
       <div className="p-5 grid grid-cols-1 md:grid-cols-4 gap-5 mt-5 rounded-[12px] border border-[#D7D7D7] shadow-[0px_12px_48px_0px_#0022330F]">
-        <button className="align-left text-left">
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
+        <button className="align-left text-left" onClick={() => navigate("/user/messages")}>
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Messages</span>
@@ -41,7 +41,7 @@ export default function UserDashboard() {
           </div>
         </button>
         <button className="align-left text-left" onClick={() => setOpen(true)}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Post an Ad</span>
@@ -57,7 +57,7 @@ export default function UserDashboard() {
         </button>
           <PostAdDialog open={open} onClose={() => setOpen(false)} />
         <button className="align-left text-left" onClick={() => navigate("/user/my-ads")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>My ads</span>
@@ -72,7 +72,7 @@ export default function UserDashboard() {
           </div>
         </button>
         <button className="align-left text-left" onClick={() => navigate("/user/saved-ads")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Saved ads</span>
@@ -87,7 +87,7 @@ export default function UserDashboard() {
           </div>
         </button>
                 <button className="align-left text-left" onClick={() => navigate("/user/edit-my-details")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Edit my details</span>

@@ -1,7 +1,7 @@
 import UserPagination from "components/common/UserPagination";
 import Filters from "components/public/spaces/Filters";
 import PropertyList from "components/public/spaces/PropertyList";
-import SearchBar from "components/public/spaces/SearchBar";
+import SearchBar from "components/public/SearchBar";
 import { useState } from "react";
 import myAds1 from "../../../assets/img/ghouraf/myads1.jpg";
 import agent1 from "../../../assets/img/ghouraf/agent1.jpg";

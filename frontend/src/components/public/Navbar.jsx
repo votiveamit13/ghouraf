@@ -175,19 +175,19 @@ if (res.user) {
               <>
                 <button
                   onClick={() => setRegisterDialog(true)}
-                  className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF]"
+                  className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF] text-[15px]"
                 >
                   <LuUserPen size={30} className="mr-1" /> Register
                 </button>
                 <span className="text-[#565ABF] ml-1">/</span>
                 <button
                   onClick={() => setLoginDialog(true)}
-                  className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF] ml-1"
+                  className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF] ml-1 text-[15px]"
                 >
                   Login
                 </button>
 
-                <button className="flex items-center px-[12px] py-[12px] bg-[#A321A6] text-white rounded-lg hover:bg-[#565ABF] transition font-semibold" onClick={() => setOpen(true)}>
+                <button className="flex items-center px-[12px] py-[12px] bg-[#A321A6] text-white rounded-[10px] hover:bg-[#565ABF] transition font-semibold" onClick={() => setOpen(true)}>
                   <IoIosAddCircleOutline className="text-2xl font-bold" />
                   <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
                 </button>
@@ -236,7 +236,7 @@ if (res.user) {
                       <a href="/user/saved-ads" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
                         <GrFavorite className="mr-2" /> Saved Ads
                       </a>
-                      <a href="/user" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                      <a href="/user/messages" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
                         <LuMessageSquareText className="mr-2" /> Messages
                       </a>
                       <a href="/user/edit-my-details" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
@@ -350,7 +350,7 @@ if (res.user) {
                   <a href="/user/saved-ads" className="flex items-center py-1 hover:text-[#565ABF]">
                     <GrFavorite className="mr-2" /> Saved Ads
                   </a>
-                  <a href="/user" className="flex items-center py-1 hover:text-[#565ABF]">
+                  <a href="/user/messages" className="flex items-center py-1 hover:text-[#565ABF]">
                     <LuMessageSquareText className="mr-2" /> Messages
                   </a>
                   <a href="/user/edit-my-details" className="flex items-center py-1 hover:text-[#565ABF]">
