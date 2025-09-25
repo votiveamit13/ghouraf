@@ -134,7 +134,9 @@ export default function PostSpace() {
     featuredImage: "",
     photos: [],
   });
-
+const formPayload = new FormData();
+formPayload.append("furnishing", String(formData.furnishing));
+formPayload.append("smoking", String(formData.smoking));
   const countries = Country.getAllCountries();
   const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
   const cities = formData.state ? City.getCitiesOfState(formData.country, formData.state) : [];
@@ -218,6 +220,9 @@ export default function PostSpace() {
       console.log("Submitting form with data:", formData);
       console.log("Featured image:", featured ? featured.name : "None");
       console.log("Photos count:", photos.length);
+      console.log(typeof formData.furnishing, formData.furnishing);
+console.log(typeof formData.smoking, formData.smoking);
+
       Object.keys(formData).forEach((key) => {
         if (key === "amenities") {
           formData.amenities.forEach((a) => formPayload.append("amenities[]", a));
@@ -423,15 +428,19 @@ export default function PostSpace() {
                 <label className="form-label text-black">Furnishing</label>
                 <select
                   className={`form-control ${errors.furnishing ? 'border-red-500' : ''}`}
-                  value={formData.furnishing}
-                  onChange={(e) =>
-                    setFormData({ ...formData, furnishing: e.target.value === "true" })
-                  }
-                >
-                  <option value="">Select Furnishing</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
+                  name="furnishing"
+  value={formData.furnishing}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      furnishing: e.target.value === "true",
+    })
+  }
+>
+  <option value="">Select Furnishing</option>
+  <option value="true">Yes</option>
+  <option value="false">No</option>
+</select>
                 {errors.furnishing && <div className="text-red-500 text-sm mt-1">{errors.furnishing[0]}</div>}
               </div>
 
@@ -439,15 +448,19 @@ export default function PostSpace() {
                 <label className="form-label text-black">Smoking</label>
                 <select
                   className={`form-control ${errors.smoking ? 'border-red-500' : ''}`}
-                  value={formData.smoking}
-                  onChange={(e) =>
-                    setFormData({ ...formData, smoking: e.target.value === "true" })
-                  }
-                >
-                  <option value="">Select Option</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
+                  name="smoking"
+  value={formData.smoking}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      smoking: e.target.value === "true",
+    })
+  }
+>
+  <option value="">Smoking Allowed?</option>
+  <option value="true">Yes</option>
+  <option value="false">No</option>
+</select>
                 {errors.smoking && <div className="text-red-500 text-sm mt-1">{errors.smoking[0]}</div>}
               </div>
 

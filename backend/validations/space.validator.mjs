@@ -58,19 +58,8 @@ export const createSpaceSchema = Joi.object({
             "any.required": "Size is required",
         }),
 
-    furnishing: Joi.boolean()
-        .required()
-        .messages({
-            "boolean.base": "Furnishing must be true or false",
-            "any.required": "Furnishing is required",
-        }),
-
-    smoking: Joi.boolean()
-        .required()
-        .messages({
-            "boolean.base": "Smoking must be true or false",
-            "any.required": "Smoking is required",
-        }),
+furnishing: Joi.boolean().truthy("true").falsy("false").required(),
+  smoking: Joi.boolean().truthy("true").falsy("false").required(),
 
     roomsAvailableFor: Joi.string()
         .valid(...roomAvailableForType)
