@@ -121,9 +121,4 @@ export const createSpaceSchema = Joi.object({
             "any.required": "Amenities are required",
         }),
 
-    featuredImage: Joi.string()
-        .required()
-        .messages({
-            "string.empty": "Featured image is required",
-        }),
 });

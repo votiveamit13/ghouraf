@@ -80,7 +80,7 @@ const validateStep1 = (formData, errors) => {
   if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
   if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
   if (formData.smoking === "") stepErrors.smoking = ["Smoking preference is required"];
-  if (!formData.rooms) stepErrors.rooms = ["Rooms available for is required"];
+  if (!formData.roomsAvailableFor) stepErrors.roomsAvailableFor = ["Rooms available for is required"];
   if (!formData.bedrooms) stepErrors.bedrooms = ["Number of bedrooms is required"];
   if (!formData.country) stepErrors.country = ["Country is required"];
   if (!formData.state) stepErrors.state = ["State is required"];
@@ -89,7 +89,7 @@ const validateStep1 = (formData, errors) => {
   return { ...errors, ...stepErrors };
 };
 
-const validateStep2 = (formData, featured, photos, errors) => {
+const validateStep2 = (formData, featured, errors) => {
   const stepErrors = {};
 
   if (!formData.description?.trim() || formData.description.length < 5) {
@@ -100,9 +100,6 @@ const validateStep2 = (formData, featured, photos, errors) => {
   }
   if (!featured) {
     stepErrors.featuredImage = ["Featured image is required"];
-  }
-  if (!photos || photos.length === 0) {
-    stepErrors.photos = ["At least one photo is required"];
   }
 
   return { ...errors, ...stepErrors };
@@ -122,11 +119,11 @@ export default function PostSpace() {
     propertyType: "",
     budget: "",
     budgetType: "",
-    personalInfo: "Landlord",
+    personalInfo: "",
     size: "",
     furnishing: "",
     smoking: "",
-    rooms: "any gender",
+    roomsAvailableFor: "",
     bedrooms: "",
     country: "",
     state: "",
@@ -188,7 +185,7 @@ export default function PostSpace() {
         stepErrors = validateStep1(formData, errors);
         break;
       case 2:
-        stepErrors = validateStep2(formData, featured, photos, errors);
+        stepErrors = validateStep2(formData, featured, errors);
         break;
       default:
         break;
@@ -205,7 +202,6 @@ export default function PostSpace() {
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         errorElement.focus();
       }
-
       toast.error("Please fix the errors before proceeding");
     }
   };
@@ -219,7 +215,9 @@ export default function PostSpace() {
     setIsSubmitting(true);
     try {
       const formPayload = new FormData();
-
+      console.log("Submitting form with data:", formData);
+      console.log("Featured image:", featured ? featured.name : "None");
+      console.log("Photos count:", photos.length);
       Object.keys(formData).forEach((key) => {
         if (key === "amenities") {
           formData.amenities.forEach((a) => formPayload.append("amenities[]", a));
@@ -245,17 +243,16 @@ export default function PostSpace() {
 
       toast.success(res.data.message || "Space posted successfully!");
       setErrors({});
-
       setFormData({
         title: "",
         propertyType: "",
         budget: "",
         budgetType: "",
-        personalInfo: "Landlord",
+        personalInfo: "",
         size: "",
         furnishing: "",
         smoking: "",
-        rooms: "any gender",
+        roomsAvailableFor: "",
         bedrooms: "",
         country: "",
         state: "",
@@ -426,13 +423,14 @@ export default function PostSpace() {
                 <label className="form-label text-black">Furnishing</label>
                 <select
                   className={`form-control ${errors.furnishing ? 'border-red-500' : ''}`}
-                  name="furnishing"
                   value={formData.furnishing}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, furnishing: e.target.value === "true" })
+                  }
                 >
-                  <option value="">Select</option>
-                  <option value="1">Yes</option>
-                  <option value="0">No</option>
+                  <option value="">Select Furnishing</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
                 </select>
                 {errors.furnishing && <div className="text-red-500 text-sm mt-1">{errors.furnishing[0]}</div>}
               </div>
@@ -441,13 +439,14 @@ export default function PostSpace() {
                 <label className="form-label text-black">Smoking</label>
                 <select
                   className={`form-control ${errors.smoking ? 'border-red-500' : ''}`}
-                  name="smoking"
                   value={formData.smoking}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setFormData({ ...formData, smoking: e.target.value === "true" })
+                  }
                 >
-                  <option value="">Select</option>
-                  <option value="1">Allowed</option>
-                  <option value="0">Not Allowed</option>
+                  <option value="">Select Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
                 </select>
                 {errors.smoking && <div className="text-red-500 text-sm mt-1">{errors.smoking[0]}</div>}
               </div>
@@ -455,9 +454,9 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Rooms available for</label>
                 <select
-                  className={`form-control ${errors.rooms ? 'border-red-500' : ''}`}
-                  name="rooms"
-                  value={formData.rooms}
+                  className={`form-control ${errors.roomsAvailableFor ? 'border-red-500' : ''}`}
+                  name="roomsAvailableFor"
+                  value={formData.roomsAvailableFor}
                   onChange={handleChange}
                 >
                   <option value="">Select</option>
@@ -465,7 +464,7 @@ export default function PostSpace() {
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
-                {errors.rooms && <div className="text-red-500 text-sm mt-1">{errors.rooms[0]}</div>}
+                {errors.roomsAvailableFor && <div className="text-red-500 text-sm mt-1">{errors.roomsAvailableFor[0]}</div>}
               </div>
 
               <div className="col-md-6 mb-2">
@@ -725,7 +724,6 @@ export default function PostSpace() {
                     onChange={handlePhotoUpload}
                   />
                 </div>
-                {errors.photos && <div className="text-red-500 text-sm mt-1">{errors.photos[0]}</div>}
               </div>
             </div>
           )}
@@ -741,7 +739,7 @@ export default function PostSpace() {
               <div className="mb-2"><strong>Size:</strong> {formData.size} m²</div>
               <div className="mb-2"><strong>Furnishing:</strong> {formData.furnishing === "1" ? "Yes" : "No"}</div>
               <div className="mb-2"><strong>Smoking:</strong> {formData.smoking === "1" ? "Allowed" : "Not Allowed"}</div>
-              <div className="mb-2"><strong>Rooms available for:</strong> {formData.rooms}</div>
+              <div className="mb-2"><strong>Rooms available for:</strong> {formData.roomsAvailableFor}</div>
               <div className="mb-2"><strong>Bedrooms:</strong> {formData.bedrooms}</div>
               <div className="mb-2"><strong>Country:</strong> {countries.find(c => c.isoCode === formData.country)?.name}</div>
               <div className="mb-2"><strong>State:</strong> {states.find(s => s.isoCode === formData.state)?.name}</div>
