@@ -135,8 +135,9 @@ export default function PostSpace() {
     photos: [],
   });
 const formPayload = new FormData();
-formPayload.append("furnishing", String(formData.furnishing));
-formPayload.append("smoking", String(formData.smoking));
+formPayload.append("furnishing", formData.furnishing === "true");
+formPayload.append("smoking", formData.smoking === "true");
+
   const countries = Country.getAllCountries();
   const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
   const cities = formData.state ? City.getCitiesOfState(formData.country, formData.state) : [];
@@ -428,14 +429,9 @@ console.log(typeof formData.smoking, formData.smoking);
                 <label className="form-label text-black">Furnishing</label>
                 <select
                   className={`form-control ${errors.furnishing ? 'border-red-500' : ''}`}
-                  name="furnishing"
-  value={formData.furnishing}
-  onChange={(e) =>
-    setFormData({
-      ...formData,
-      furnishing: e.target.value === "true",
-    })
-  }
+                   name="furnishing"
+                  value={formData.furnishing}
+  onChange={handleChange}
 >
   <option value="">Select Furnishing</option>
   <option value="true">Yes</option>
@@ -448,14 +444,9 @@ console.log(typeof formData.smoking, formData.smoking);
                 <label className="form-label text-black">Smoking</label>
                 <select
                   className={`form-control ${errors.smoking ? 'border-red-500' : ''}`}
-                  name="smoking"
-  value={formData.smoking}
-  onChange={(e) =>
-    setFormData({
-      ...formData,
-      smoking: e.target.value === "true",
-    })
-  }
+                   name="smoking"
+                  value={formData.smoking}
+  onChange={handleChange}
 >
   <option value="">Smoking Allowed?</option>
   <option value="true">Yes</option>
