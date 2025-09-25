@@ -5,6 +5,7 @@ import cors from "cors";
 import adminRoutes from "./routes/admin.route.mjs";
 import userRoutes from "./routes/user.route.mjs";
 import guestRoutes from "./routes/guest.route.mjs";
+import postRoutes from "./routes/post.route.mjs";
 import dbConnection from "./config/db.connection.mjs";
 import User from "./models/User.mjs";
 import helmet from "helmet";
@@ -31,7 +32,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/admin", adminRoutes);
 
-app.use("/api", userRoutes, guestRoutes);
+app.use("/api", userRoutes, guestRoutes, postRoutes);
 
 dbConnection().then(async () => {
   const existingAdmin = await User.findOne({ email: "admin@example.com" });

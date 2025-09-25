@@ -71,10 +71,11 @@ function StepHeader({ step }) {
 
 const validateStep1 = (formData, errors) => {
   const stepErrors = {};
-  
+
   if (!formData.title?.trim()) stepErrors.title = ["Title is required"];
   if (!formData.propertyType) stepErrors.propertyType = ["Property Type is required"];
   if (!formData.budgetType) stepErrors.budgetType = ["Budget Type is required"];
+  if (!formData.budget) stepErrors.budget = ["Budget is required"];
   if (!formData.personalInfo) stepErrors.personalInfo = ["Personal Info is required"];
   if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
   if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
@@ -84,13 +85,13 @@ const validateStep1 = (formData, errors) => {
   if (!formData.country) stepErrors.country = ["Country is required"];
   if (!formData.state) stepErrors.state = ["State is required"];
   if (!formData.city) stepErrors.city = ["City is required"];
-  
+
   return { ...errors, ...stepErrors };
 };
 
 const validateStep2 = (formData, featured, photos, errors) => {
   const stepErrors = {};
-  
+
   if (!formData.description?.trim() || formData.description.length < 5) {
     stepErrors.description = ["Description must be at least 5 characters"];
   }
@@ -103,7 +104,7 @@ const validateStep2 = (formData, featured, photos, errors) => {
   if (!photos || photos.length === 0) {
     stepErrors.photos = ["At least one photo is required"];
   }
-  
+
   return { ...errors, ...stepErrors };
 };
 
@@ -141,7 +142,6 @@ export default function PostSpace() {
   const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
   const cities = formData.state ? City.getCitiesOfState(formData.country, formData.state) : [];
 
-  // Clear errors when form data changes
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       setErrors({});
@@ -153,9 +153,9 @@ export default function PostSpace() {
       setFormData((prev) => ({ ...prev, [eOrField]: maybeValue }));
     } else {
       const { name, value, type, checked } = eOrField.target;
-      setFormData((prev) => ({ 
-        ...prev, 
-        [name]: type === 'checkbox' ? checked : value 
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
       }));
     }
   };
@@ -182,7 +182,7 @@ export default function PostSpace() {
 
   const next = () => {
     let stepErrors = {};
-    
+
     switch (step) {
       case 1:
         stepErrors = validateStep1(formData, errors);
@@ -193,20 +193,19 @@ export default function PostSpace() {
       default:
         break;
     }
-    
+
     setErrors(stepErrors);
-    
+
     if (!hasErrors(stepErrors)) {
       setStep((s) => Math.min(3, s + 1));
     } else {
-      // Scroll to first error
       const firstErrorField = Object.keys(stepErrors)[0];
       const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
       if (errorElement) {
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         errorElement.focus();
       }
-      
+
       toast.error("Please fix the errors before proceeding");
     }
   };
@@ -221,7 +220,6 @@ export default function PostSpace() {
     try {
       const formPayload = new FormData();
 
-      // Append all form data
       Object.keys(formData).forEach((key) => {
         if (key === "amenities") {
           formData.amenities.forEach((a) => formPayload.append("amenities[]", a));
@@ -230,17 +228,15 @@ export default function PostSpace() {
         }
       });
 
-      // Append featured image
       if (featured) {
         formPayload.append("featuredImage", featured);
       }
 
-      // Append photos
       photos.forEach((photo) => {
         formPayload.append("photos", photo);
       });
 
-      const res = await axios.post(`${apiUrl}/createspaces`, formPayload, {
+      const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -249,8 +245,7 @@ export default function PostSpace() {
 
       toast.success(res.data.message || "Space posted successfully!");
       setErrors({});
-      
-      // Reset form after successful submission
+
       setFormData({
         title: "",
         propertyType: "",
@@ -272,20 +267,19 @@ export default function PostSpace() {
       setFeatured(null);
       setPhotos([]);
       setStep(1);
-      
+
     } catch (err) {
       if (err.response?.status === 422) {
         const backendErrors = err.response.data.errors || {};
         setErrors(backendErrors);
-        
-        // Scroll to first error
+
         const firstErrorField = Object.keys(backendErrors)[0];
         const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
         if (errorElement) {
           errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           errorElement.focus();
         }
-        
+
         toast.error("Please fix the validation errors!");
       } else {
         toast.error(err.response?.data?.message || "Server Error");
@@ -295,7 +289,6 @@ export default function PostSpace() {
     }
   };
 
-  // Helper function to get photo URL for preview
   const getPhotoUrl = (photo) => {
     return typeof photo === 'string' ? photo : URL.createObjectURL(photo);
   };
@@ -321,7 +314,7 @@ export default function PostSpace() {
           {step === 1 && (
             <div className="row g-4">
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Title *</label>
+                <label className="form-label text-black">Title</label>
                 <input
                   type="text"
                   className={`form-control ${errors.title ? 'border-red-500' : ''}`}
@@ -334,7 +327,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Property Type *</label>
+                <label className="form-label text-black">Property Type</label>
                 <select
                   className={`form-control ${errors.propertyType ? 'border-red-500' : ''}`}
                   name="propertyType"
@@ -351,7 +344,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <div className="flex gap-6 mb-2">
                   <div>
-                    <label className="form-label text-black">Budget *</label>
+                    <label className="form-label text-black">Budget</label>
                   </div>
                   <div className="flex items-end gap-6">
                     <label className="flex items-center gap-2 text-sm">
@@ -375,7 +368,9 @@ export default function PostSpace() {
                       Per Week
                     </label>
                   </div>
+
                 </div>
+                {errors.budgetType && <div className="text-red-500 text-sm mt-1">{errors.budgetType[0]}</div>}
                 <input
                   type="number"
                   className={`form-control ${errors.budget ? 'border-red-500' : ''}`}
@@ -383,19 +378,25 @@ export default function PostSpace() {
                   name="budget"
                   value={formData.budget}
                   onChange={handleChange}
+                  min="0"
+                  onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === 'Minus') {
+                      e.preventDefault();
+                    }
+                  }}
                 />
                 {errors.budget && <div className="text-red-500 text-sm mt-1">{errors.budget[0]}</div>}
-                {errors.budgetType && <div className="text-red-500 text-sm mt-1">{errors.budgetType[0]}</div>}
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Personal Info *</label>
+                <label className="form-label text-black">Personal Info</label>
                 <select
                   className={`form-control ${errors.personalInfo ? 'border-red-500' : ''}`}
                   name="personalInfo"
                   value={formData.personalInfo}
                   onChange={handleChange}
                 >
+                  <option value="">Select</option>
                   <option value="Landlord">Landlord</option>
                   <option value="Agent">Agent</option>
                 </select>
@@ -403,7 +404,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Size of Apartment *</label>
+                <label className="form-label text-black">Size of Apartment</label>
                 <input
                   type="number"
                   className={`form-control ${errors.size ? 'border-red-500' : ''}`}
@@ -411,12 +412,18 @@ export default function PostSpace() {
                   placeholder="m²"
                   value={formData.size}
                   onChange={handleChange}
+                  min="0"
+                  onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === 'Minus') {
+                      e.preventDefault();
+                    }
+                  }}
                 />
                 {errors.size && <div className="text-red-500 text-sm mt-1">{errors.size[0]}</div>}
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Furnishing *</label>
+                <label className="form-label text-black">Furnishing</label>
                 <select
                   className={`form-control ${errors.furnishing ? 'border-red-500' : ''}`}
                   name="furnishing"
@@ -431,7 +438,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Smoking *</label>
+                <label className="form-label text-black">Smoking</label>
                 <select
                   className={`form-control ${errors.smoking ? 'border-red-500' : ''}`}
                   name="smoking"
@@ -446,13 +453,14 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Rooms available for *</label>
+                <label className="form-label text-black">Rooms available for</label>
                 <select
                   className={`form-control ${errors.rooms ? 'border-red-500' : ''}`}
                   name="rooms"
                   value={formData.rooms}
                   onChange={handleChange}
                 >
+                  <option value="">Select</option>
                   <option value="any gender">Any Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -461,7 +469,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Number of bedrooms *</label>
+                <label className="form-label text-black">Number of bedrooms</label>
                 <select
                   className={`form-control ${errors.bedrooms ? 'border-red-500' : ''}`}
                   name="bedrooms"
@@ -479,7 +487,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Country *</label>
+                <label className="form-label text-black">Country</label>
                 <select
                   className={`form-control ${errors.country ? 'border-red-500' : ''}`}
                   name="country"
@@ -501,7 +509,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">State *</label>
+                <label className="form-label text-black">State</label>
                 <select
                   className={`form-control ${errors.state ? 'border-red-500' : ''}`}
                   name="state"
@@ -523,7 +531,7 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">City *</label>
+                <label className="form-label text-black">City</label>
                 <select
                   className={`form-control ${errors.city ? 'border-red-500' : ''}`}
                   name="city"
@@ -558,7 +566,7 @@ export default function PostSpace() {
           {step === 2 && (
             <div className="mb-5">
               <div className="mb-4">
-                <label className="form-label text-black">Description *</label>
+                <label className="form-label text-black">Description</label>
                 <textarea
                   className={`form-control ${errors.description ? 'border-red-500' : ''}`}
                   placeholder="Ad description"
@@ -571,7 +579,7 @@ export default function PostSpace() {
               </div>
 
               <div className="mb-4">
-                <label className="form-label text-black">Amenities *</label>
+                <label className="form-label text-black">Amenities</label>
                 <div className="d-flex flex-wrap gap-3 items-center">
                   {[
                     "Fully Furnished",
@@ -613,7 +621,7 @@ export default function PostSpace() {
               </div>
 
               <div className="mb-4">
-                <label className="form-label text-black">Upload Featured Image *</label>
+                <label className="form-label text-black">Upload Featured Image</label>
                 <div
                   className="border-2 border-dashed rounded d-flex align-items-center justify-content-center position-relative"
                   style={{ width: "120px", height: "120px", cursor: "pointer" }}
@@ -664,7 +672,7 @@ export default function PostSpace() {
               </div>
 
               <div className="mb-4">
-                <label className="form-label text-black">Upload Photos *</label>
+                <label className="form-label text-black">Upload Photos</label>
                 <div
                   className="border-2 border-dashed rounded d-flex flex-wrap align-items-center p-2"
                   style={{ minHeight: "120px" }}
