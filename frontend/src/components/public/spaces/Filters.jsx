@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Numbers } from "../../../constants/numbers";
 
 export default function Filters() {
   const defaultFilters = {
@@ -198,8 +199,8 @@ export default function Filters() {
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
-            { val: "no", label: "No Smoking" },
             { val: "allowed", label: "Allowed" },
+            { val: "no", label: "Not Allowed" },
           ].map((opt) => (
             <label key={opt.val} className="flex items-center space-x-2">
               <input
@@ -243,12 +244,14 @@ export default function Filters() {
           <select
             value={filters.bedrooms}
             onChange={(e) => setFilters({ ...filters, bedrooms: e.target.value })}
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+            className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
           >
-            <option>Any</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3+</option>
+            <option value="">Select</option>
+        {Numbers.map((num) => (
+          <option key={num.value} value={num.value}>
+            {num.label}
+          </option>
+        ))}
           </select>
         </div>
       </div>

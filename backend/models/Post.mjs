@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import POST_TYPES from "../constants/post.type.mjs"
-import roomType from '../constants/room.type.mjs'
+import roomType from '../constants/bedrooms.type.mjs'
 import leaseType from '../constants/lease.type.mjs'
 import furnishedType from '../constants/furnished.type.mjs'
 import durationType from '../constants/duration.type.mjs'
