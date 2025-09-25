@@ -214,83 +214,108 @@ formPayload.append("smoking", formData.smoking === "true");
     setErrors({});
   };
 
-  const handlePublish = async () => {
-    setIsSubmitting(true);
-    try {
-      const formPayload = new FormData();
-      console.log("Submitting form with data:", formData);
-      console.log("Featured image:", featured ? featured.name : "None");
-      console.log("Photos count:", photos.length);
-      console.log(typeof formData.furnishing, formData.furnishing);
-console.log(typeof formData.smoking, formData.smoking);
+const handlePublish = async () => {
+  setIsSubmitting(true);
+  try {
+    const formPayload = new FormData();
+    console.log("Submitting form with data:", formData);
+    console.log("Featured image:", featured ? featured.name : "None");
+    console.log("Photos count:", photos.length);
+    console.log(typeof formData.furnishing, formData.furnishing);
+    console.log(typeof formData.smoking, formData.smoking);
 
-      Object.keys(formData).forEach((key) => {
-        if (key === "amenities") {
-          formData.amenities.forEach((a) => formPayload.append("amenities[]", a));
-        } else if (!["photos", "featuredImage"].includes(key)) {
-          formPayload.append(key, formData[key]);
+    // Convert boolean fields properly
+    const processedData = {
+      ...formData,
+      furnishing: formData.furnishing === "true",
+      smoking: formData.smoking === "true",
+      bedrooms: parseInt(formData.bedrooms, 10), // Convert to number
+      budget: parseFloat(formData.budget), // Convert to number
+      size: parseFloat(formData.size) // Convert to number
+    };
+
+    console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
+
+Object.keys(processedData).forEach((key) => {
+      if (key === "amenities") {
+        processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
+      } else if (!["photos", "featuredImage"].includes(key)) {
+        // Ensure bedrooms is appended as a number, not string
+        if (key === "bedrooms" || key === "budget" || key === "size") {
+          formPayload.append(key, processedData[key].toString());
+        } else {
+          formPayload.append(key, processedData[key]);
         }
-      });
-
-      if (featured) {
-        formPayload.append("featuredImage", featured);
       }
+    });
 
-      photos.forEach((photo) => {
-        formPayload.append("photos", photo);
-      });
-
-      const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      toast.success(res.data.message || "Space posted successfully!");
-      setErrors({});
-      setFormData({
-        title: "",
-        propertyType: "",
-        budget: "",
-        budgetType: "",
-        personalInfo: "",
-        size: "",
-        furnishing: "",
-        smoking: "",
-        roomsAvailableFor: "",
-        bedrooms: "",
-        country: "",
-        state: "",
-        city: "",
-        location: "",
-        description: "",
-        amenities: [],
-      });
-      setFeatured(null);
-      setPhotos([]);
-      setStep(1);
-
-    } catch (err) {
-      if (err.response?.status === 422) {
-        const backendErrors = err.response.data.errors || {};
-        setErrors(backendErrors);
-
-        const firstErrorField = Object.keys(backendErrors)[0];
-        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-        if (errorElement) {
-          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          errorElement.focus();
-        }
-
-        toast.error("Please fix the validation errors!");
-      } else {
-        toast.error(err.response?.data?.message || "Server Error");
-      }
-    } finally {
-      setIsSubmitting(false);
+    if (featured) {
+      formPayload.append("featuredImage", featured);
     }
-  };
+
+    photos.forEach((photo) => {
+      formPayload.append("photos", photo);
+    });
+
+    // Debug: Log what's being sent
+    console.log("Processed data:", processedData);
+    for (let [key, value] of formPayload.entries()) {
+      console.log(key, value, typeof value);
+    }
+
+    const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    toast.success(res.data.message || "Space posted successfully!");
+    setErrors({});
+    setFormData({
+      title: "",
+      propertyType: "",
+      budget: "",
+      budgetType: "",
+      personalInfo: "",
+      size: "",
+      furnishing: "",
+      smoking: "",
+      roomsAvailableFor: "",
+      bedrooms: "",
+      country: "",
+      state: "",
+      city: "",
+      location: "",
+      description: "",
+      amenities: [],
+    });
+    setFeatured(null);
+    setPhotos([]);
+    setStep(1);
+
+  } catch (err) {
+    if (err.response?.status === 422) {
+      const backendErrors = err.response.data.errors || {};
+      setErrors(backendErrors);
+
+      const firstErrorField = Object.keys(backendErrors)[0];
+      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        errorElement.focus();
+      }
+
+      toast.error("Please fix the validation errors!");
+      console.error("Validation errors:", backendErrors);
+    } else {
+      toast.error(err.response?.data?.message || "Server Error");
+      console.error("Server error:", err.response?.data);
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const getPhotoUrl = (photo) => {
     return typeof photo === 'string' ? photo : URL.createObjectURL(photo);
@@ -741,8 +766,8 @@ console.log(typeof formData.smoking, formData.smoking);
               <div className="mb-2"><strong>Budget:</strong> {formData.budget} {formData.budgetType}</div>
               <div className="mb-2"><strong>Personal Info:</strong> {formData.personalInfo}</div>
               <div className="mb-2"><strong>Size:</strong> {formData.size} m²</div>
-              <div className="mb-2"><strong>Furnishing:</strong> {formData.furnishing === "1" ? "Yes" : "No"}</div>
-              <div className="mb-2"><strong>Smoking:</strong> {formData.smoking === "1" ? "Allowed" : "Not Allowed"}</div>
+              <div className="mb-2"><strong>Furnishing:</strong> {formData.furnishing === "true" ? "Yes" : "No"}</div>
+<div className="mb-2"><strong>Smoking:</strong> {formData.smoking === "true" ? "Allowed" : "Not Allowed"}</div>
               <div className="mb-2"><strong>Rooms available for:</strong> {formData.roomsAvailableFor}</div>
               <div className="mb-2"><strong>Bedrooms:</strong> {formData.bedrooms}</div>
               <div className="mb-2"><strong>Country:</strong> {countries.find(c => c.isoCode === formData.country)?.name}</div>
