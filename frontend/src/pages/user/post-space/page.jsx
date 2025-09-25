@@ -10,6 +10,7 @@ import { Country, State, City } from "country-state-city";
 import { Numbers } from "../../../constants/numbers";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function StepHeader({ step }) {
   const steps = [
@@ -106,6 +107,7 @@ const validateStep2 = (formData, featured, errors) => {
 };
 
 export default function PostSpace() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [photos, setPhotos] = useState([]);
   const [featured, setFeatured] = useState(null);
@@ -270,7 +272,14 @@ Object.keys(processedData).forEach((key) => {
       },
     });
 
-    toast.success(res.data.message || "Space posted successfully!");
+      navigate("/user/thank-you", { 
+      state: { 
+        title: "Your Space successfully published",
+        subtitle: "Your space listing has been created and is now live.",
+        goBackPath: "/",
+        viewAdsPath: "/my-spaces"
+      } 
+      });
     setErrors({});
     setFormData({
       title: "",
@@ -316,6 +325,8 @@ Object.keys(processedData).forEach((key) => {
     setIsSubmitting(false);
   }
 };
+
+
 
   const getPhotoUrl = (photo) => {
     return typeof photo === 'string' ? photo : URL.createObjectURL(photo);

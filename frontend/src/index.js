@@ -29,6 +29,7 @@ import PlaceWanted from "pages/public/placewanted/page";
 import TeamUp from "pages/public/teamup/page";
 import TeamUpAd from "pages/user/team-up-post/page";
 import Messages from "pages/user/messages/page";
+import ThankYouDialog from "components/common/ThankYouDialog";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -53,6 +54,7 @@ root.render(
           <Route path="/user/place-wanted-ad" element={<Public><RoomWantedAd /></Public>} />
           <Route path="/user/post-an-space" element={<Public><PostSpace/></Public>} />
           <Route path="/user/team-up-post" element={<Public><TeamUpAd/></Public>} />
+          <Route path="/user/thank-you" element={<Public><ThankYouDialog/></Public>} />
           <Route path="/user/messages" element={<Public><Messages/></Public>} />
         </Route>
       </Routes>
