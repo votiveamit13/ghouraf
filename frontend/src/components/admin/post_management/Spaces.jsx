@@ -59,7 +59,7 @@ export default function Spaces() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-700">
+            <table className="min-w-full text-sm text-gray-700 table-fixed">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-3 py-3 text-left font-semibold">S. No.</th>
