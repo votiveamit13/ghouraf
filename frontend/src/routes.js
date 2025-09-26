@@ -1,8 +1,6 @@
-import Posts from "pages/admin/post-management/page";
 import Users from "pages/admin/user-management/page";
 import LoginPage from "pages/admin/login/page";
 import AdminDashboard from "pages/admin/page";
-// import CreatePost from "pages/admin/post-management/create-post/page";
 import { BsPostcard } from "react-icons/bs";
 import Edit from "pages/admin/user-management/edit-details/page";
 import ViewDetails from "pages/admin/user-management/view-details/page";
@@ -12,7 +10,7 @@ import FaqManagement from "pages/admin/faq-management/page";
 import { FaQuestion } from "react-icons/fa6";
 import AddFaq from "components/admin/faq-management/AddFaq";
 import EditFaq from "components/admin/faq-management/EditFaq";
-// import { IoCreateOutline } from "react-icons/io5";
+import Spaces from "components/admin/post_management/Spaces";
 
 export const adminRoutes = [
   {
@@ -69,10 +67,10 @@ export const adminRoutes = [
       //   layout: "/admin",
       // },
       {
-        path: "/post-management",
-        name: "View Posts",
+        path: "/post-management/spaces",
+        name: "Spaces",
         icon: <BsPostcard className="text-[#565ABF]" />,
-        component: <Posts />,
+        component: <Spaces />,
         layout: "/admin",
       }
     ]

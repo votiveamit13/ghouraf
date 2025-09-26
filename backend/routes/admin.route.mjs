@@ -12,6 +12,7 @@ import {
     updateFaqStatus,
     updateFaq,
     deleteFaq,
+    getAllSpaces,
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -33,6 +34,7 @@ router.get("/faqs", adminAuth, getAllFaq);
 router.patch("/faq/:id/status", adminAuth, updateFaqStatus);
 router.patch("/faq/:id", adminAuth, validate(faqSchema), updateFaq);
 router.delete("/faq/:id", adminAuth, deleteFaq);
+router.get("/spaces", adminAuth, getAllSpaces);
 
 
 export default router;

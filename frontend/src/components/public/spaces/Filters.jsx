@@ -118,11 +118,11 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
         <div className="flex justify-center space-x-8 mt-3 mb-3">
           <label className="flex items-center space-x-2 cursor-pointer">
-            <input type="radio" name="priceType" checked={filters.priceType === "weekly"} onChange={() => handleFilterChange("priceType", "weekly")} />
+            <input type="radio" name="priceType" checked={filters.priceType === "Week"} onChange={() => handleFilterChange("priceType", "Week")} />
             <span className="text-black">Weekly</span>
           </label>
           <label className="flex items-center space-x-2 cursor-pointer">
-            <input type="radio" name="priceType" checked={filters.priceType === "monthly"} onChange={() => handleFilterChange("priceType", "monthly")} />
+            <input type="radio" name="priceType" checked={filters.priceType === "Month"} onChange={() => handleFilterChange("priceType", "Month")} />
             <span className="text-black">Monthly</span>
           </label>
         </div>

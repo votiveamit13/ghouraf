@@ -2,8 +2,10 @@ import React from "react";
 import { TfiLocationPin } from "react-icons/tfi";
 import { GrFavorite } from "react-icons/gr";
 import { GoShareAndroid } from "react-icons/go";
+import { getFullLocation } from "utils/locationHelper";
 
 export default function PropertyCard({ property }) {
+    const locationString = getFullLocation(property.city, property.state, property.country);
     return (
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
             <div className="w-[200px] h-[260px]">
@@ -16,13 +18,13 @@ export default function PropertyCard({ property }) {
 
             <div className="flex flex-col flex-grow w-[450px] text-[#000000]">
                 <h3 className="font-semibold text-[24px] text-black">{property.title}</h3>
-                <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{property.city}, {property.state}, {property.country}</p>
+                <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{locationString}</p>
                 <p className="text-[18px]">{property.propertyType} - <span className="text-[#565ABF]">Available</span></p>
                 <p className="text-[15px] mt-1">{property.description}</p>
 
                 <div className="flex items-center mt-2 gap-2">
                     <div>
-                        <img src={property.user.photo} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
+                        <img src={property.user.profile.photo} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
                     </div>
                     <div>
                         <p className="text-sm">{property.user.profile.firstName} {property.user.profile.lastName}</p>

@@ -6,6 +6,7 @@ import { fileHandler } from "../../utils/fileHandler.mjs";
 import ContactForm from "../../models/ContactForm.mjs";
 import Faq from "../../models/faq.mjs";
 import faq from "../../models/faq.mjs";
+import Space from "../../models/Space.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -329,6 +330,21 @@ export const deleteFaq = async (req, res) => {
   } catch (err) {
     console.error("Admin delete FAQ error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const getAllSpaces = async (req, res) => {
+  try {
+    const spaces = await Space.find()
+      .populate("user", "profile.firstName profile.lastName profile.photo")
+      .select(
+        "title propertyType budget budgetType user available status createdAt description size furnishing smoking amenities featuredImage photos"
+      );
+
+    res.json(spaces);
+  } catch (err) {
+    console.error("Error fetching spaces:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
