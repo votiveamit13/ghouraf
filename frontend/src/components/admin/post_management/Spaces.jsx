@@ -5,6 +5,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { RiDeleteBinLine } from "react-icons/ri";
 import SearchFilter from "components/common/SearchFilter";
 import axios from "axios";
+import PhotoSlider from "components/common/Slider";
 
 export default function Spaces() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -129,36 +130,71 @@ export default function Spaces() {
       </div>
 
       {selectedPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white w-[600px] max-h-[80vh] rounded-lg shadow-lg overflow-y-auto">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold">{selectedPost.title}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white w-[700px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
               <button
-                className="text-gray-500 hover:text-gray-800"
+                className="text-gray-400 hover:text-gray-700 text-xl"
                 onClick={() => setSelectedPost(null)}
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-4 space-y-4">
-              <p><strong>Property Type:</strong> {selectedPost.propertyType}</p>
-              <p><strong>Budget:</strong> ${selectedPost.budget} {selectedPost.budgetType}</p>
-              <p><strong>Posted By:</strong> {selectedPost.user?.profile?.firstName} {selectedPost.user?.profile?.lastName}</p>
-              <p><strong>Availability:</strong> {selectedPost.available ? "Available" : "Not Available"}</p>
-              <p><strong>Status:</strong> {selectedPost.status}</p>
-              <p><strong>Description:</strong> {selectedPost.description}</p>
-              <p><strong>Size:</strong> {selectedPost.size} sqft</p>
-              <p><strong>Furnishing:</strong> {selectedPost.furnishing ? "Yes" : "No"}</p>
-              <p><strong>Smoking:</strong> {selectedPost.smoking ? "Allowed" : "Not Allowed"}</p>
-              <p><strong>Amenities:</strong> {selectedPost.amenities?.join(", ")}</p>
-              {selectedPost.featuredImage && (
-                <img src={selectedPost.featuredImage} alt="Featured" className="rounded-lg" />
+            <div className="overflow-y-auto p-4 space-y-6">
+              {selectedPost.photos?.length > 0 ? (
+                <PhotoSlider
+                  featuredImage={selectedPost.featuredImage}
+                  photos={selectedPost.photos}
+                />
+              ) : null}
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <p><span className="text-black">Property Type:</span> {selectedPost.propertyType}</p>
+                <p><span className="text-black">Budget:</span> ${selectedPost.budget} {selectedPost.budgetType}</p>
+                <p><span className="text-black">Posted By:</span> {selectedPost.user?.profile?.firstName} {selectedPost.user?.profile?.lastName}</p>
+                <p>
+                  <span className="text-black">Availability:</span>{" "}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium text-black ${selectedPost.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    }`}>
+                    {selectedPost.available ? "Available" : "Not Available"}
+                  </span>
+                </p>
+                <p><span className=" text-black">Status:</span> {selectedPost.status}</p>
+                <p><span className=" text-black">Size:</span> {selectedPost.size} sqft</p>
+                <p><span className=" text-black">Furnishing:</span> {selectedPost.furnishing ? "Yes" : "No"}</p>
+                <p><span className=" text-black">Smoking:</span> {selectedPost.smoking ? "Allowed" : "Not Allowed"}</p>
+              </div>
+
+              {selectedPost.amenities?.length > 0 && (
+                <div>
+                  <h3 className=" mb-2 text-black">Amenities</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedPost.amenities.map((a, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedPost.description && (
+                <div>
+                  <h3 className=" mb-2 text-black">Description</h3>
+                  <p className="text-gray-600">{selectedPost.description}</p>
+                </div>
               )}
             </div>
           </div>
         </div>
       )}
+
+
     </>
   );
 }
