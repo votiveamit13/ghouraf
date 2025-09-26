@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 
 export default function Spaces() {
+    const apiUrl = process.env.REACT_APP_API_URL;
     const [page, setPage] = useState(1);
     const [spaces, setSpaces] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
@@ -45,7 +46,7 @@ export default function Spaces() {
                     }
                 });
 
-                const { data } = await axios.get("/api/spaces", { params });
+                const { data } = await axios.get(`${apiUrl}spaces`, { params });
                 setSpaces(data.data);
                 setTotalPages(data.pages);
             } catch (err) {

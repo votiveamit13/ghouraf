@@ -226,14 +226,13 @@ const handlePublish = async () => {
     console.log(typeof formData.furnishing, formData.furnishing);
     console.log(typeof formData.smoking, formData.smoking);
 
-    // Convert boolean fields properly
     const processedData = {
       ...formData,
       furnishing: formData.furnishing === "true",
       smoking: formData.smoking === "true",
-      bedrooms: parseInt(formData.bedrooms, 10), // Convert to number
-      budget: parseFloat(formData.budget), // Convert to number
-      size: parseFloat(formData.size) // Convert to number
+      bedrooms: parseInt(formData.bedrooms, 10),
+      budget: parseFloat(formData.budget),
+      size: parseFloat(formData.size)
     };
 
     console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
@@ -242,7 +241,6 @@ Object.keys(processedData).forEach((key) => {
       if (key === "amenities") {
         processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
       } else if (!["photos", "featuredImage"].includes(key)) {
-        // Ensure bedrooms is appended as a number, not string
         if (key === "bedrooms" || key === "budget" || key === "size") {
           formPayload.append(key, processedData[key].toString());
         } else {
@@ -259,7 +257,6 @@ Object.keys(processedData).forEach((key) => {
       formPayload.append("photos", photo);
     });
 
-    // Debug: Log what's being sent
     console.log("Processed data:", processedData);
     for (let [key, value] of formPayload.entries()) {
       console.log(key, value, typeof value);
