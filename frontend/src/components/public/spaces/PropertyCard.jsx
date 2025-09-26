@@ -6,7 +6,7 @@ import { GoShareAndroid } from "react-icons/go";
 export default function PropertyCard({ property }) {
     return (
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
-            <div className="w-[80%] h-[260px]">
+            <div className="w-[200px] h-[260px]">
                 <img
                     src={property.featuredImage}
                     alt={property.title}
