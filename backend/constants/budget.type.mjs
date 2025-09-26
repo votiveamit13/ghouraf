@@ -1,1 +1,1 @@
-export default ['Per Month', 'Per Week']
+export default ['Month', 'Week']

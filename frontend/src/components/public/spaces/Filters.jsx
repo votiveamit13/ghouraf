@@ -155,8 +155,8 @@ export default function Filters({ filters, setFilters, setPage }) {
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
-            { val: "apartment", label: "Whole Apartment" },
-            { val: "flatshare", label: "Flatshare" },
+            { val: "Apartment", label: "Apartment" },
+            { val: "Room", label: "Room" },
           ].map((opt) => (
             <label key={opt.val} className="flex items-center space-x-2">
               <input

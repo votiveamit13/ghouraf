@@ -387,7 +387,7 @@ Object.keys(processedData).forEach((key) => {
                       <input
                         type="radio"
                         name="budgetType"
-                        value="Per Month"
+                        value="Month"
                         checked={formData.budgetType === "Per Month"}
                         onChange={handleChange}
                       />
@@ -397,7 +397,7 @@ Object.keys(processedData).forEach((key) => {
                       <input
                         type="radio"
                         name="budgetType"
-                        value="Per Week"
+                        value="Week"
                         checked={formData.budgetType === "Per Week"}
                         onChange={handleChange}
                       />
