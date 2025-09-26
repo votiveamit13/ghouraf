@@ -2,138 +2,70 @@ import UserPagination from "components/common/UserPagination";
 import Filters from "components/public/spaces/Filters";
 import PropertyList from "components/public/spaces/PropertyList";
 import SearchBar from "components/public/SearchBar";
-import { useState } from "react";
-import myAds1 from "../../../assets/img/ghouraf/myads1.jpg";
-import agent1 from "../../../assets/img/ghouraf/agent1.jpg";
+import { useEffect, useState } from "react";
+import axios from 'axios';
 
 export default function Spaces() {
     const [page, setPage] = useState(1);
-
-    const properties = [
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2100,
-            image: `${myAds1}`,
-            user: { name: "Victor", role: "Landlord", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 980,
-            image: `${myAds1}`,
-            user: { name: "Jhon", role: "Current Flatmate", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 900,
-            image: `${myAds1}`,
-            user: { name: "Panther", role: "Landlord", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Landlord", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-        {
-            title: "1bed/1bath fully furnished UES",
-            location: "New York, USA",
-            type: "1 bed apartment",
-            available: "8 July",
-            description: "Spacious and fully furnished 1-bedroom apartment located in the heart of the Upper East Side. Bright living room with large windows, updated kitchen with modern appliances, and comfortable bedroom with ample closet space.",
-            price: 2300,
-            image: `${myAds1}`,
-            user: { name: "Alexander", role: "Agent", avatar: `${agent1}` }
-        },
-    ];
+    const [spaces, setSpaces] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [filters, setFilters] = useState({
+        minValue: 0,
+        maxValue: 100000,
+        priceType: "",
+        minSize: "",
+        maxSize: "",
+        furnishing: "all",
+        smoking: "all",
+        propertyType: "all",
+        roomAvailable: "any",
+        bedrooms: "Any",
+        moveInDate: "",
+    });
 
     const itemsPerPage = 10;
-    const totalPages = Math.ceil(properties.length / itemsPerPage);
+
+    useEffect(() => {
+        const fetchSpaces = async () => {
+            try {
+                const params = {
+                    page,
+                    limit: itemsPerPage,
+                    ...filters,
+                };
+
+                Object.keys(params).forEach((key) => {
+                    if (
+                        params[key] === "all" ||
+                        params[key] === "any" ||
+                        params[key] === "" ||
+                        params[key] === 0
+                    ) {
+                        delete params[key];
+                    }
+                });
+
+                const { data } = await axios.get("/api/spaces", { params });
+                setSpaces(data.data);
+                setTotalPages(data.pages);
+            } catch (err) {
+                console.error("Failed to fetch spaces:", err);
+            }
+        };
+
+        fetchSpaces();
+    }, [page, filters]);
+
     return (
         <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="col-span-1 space-y-4">
                 <SearchBar />
-                <Filters />
+                <Filters filters={filters} setFilters={setFilters} setPage={setPage} />
             </div>
 
             <div className="col-span-3">
                 <PropertyList
-                    properties={properties}
+                    properties={spaces}
                     page={page}
                     itemsPerPage={itemsPerPage}
                 />

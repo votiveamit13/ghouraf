@@ -1,5 +1,5 @@
 import express from "express";
-import { createSpace } from "../controllers/post.controller.mjs";
+import { createSpace, getSpaces } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
 import { createSpaceSchema } from "../validations/space.validator.mjs";
@@ -13,5 +13,6 @@ const uploadFields = upload.fields([
 ]);
 
 router.post("/createspaces", auth, uploadFields, validate(createSpaceSchema), createSpace);
+router.get("/spaces", getSpaces);
 
 export default router;

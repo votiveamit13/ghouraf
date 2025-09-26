@@ -81,3 +81,87 @@ export const createSpace = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+export const getSpaces = async (req, res) => {
+  try {
+const {
+      minValue,
+      maxValue,
+      priceType,
+      minSize,
+      maxSize,
+      furnishing,
+      smoking,
+      propertyType,
+      roomAvailable,
+      bedrooms,
+      moveInDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const query = {
+      status: "active",
+      available: true,
+      is_deleted: false,
+    };
+
+   if (minValue || maxValue) {
+      query.budget = {};
+      if (minValue) query.budget.$gte = Number(minValue);
+      if (maxValue) query.budget.$lte = Number(maxValue);
+    }
+
+    if (priceType) query.budgetType = priceType;
+
+    if (minSize || maxSize) {
+      query.size = {};
+      if (minSize) query.size.$gte = Number(minSize);
+      if (maxSize) query.size.$lte = Number(maxSize);
+    }
+
+    if (furnishing && furnishing !== "all") {
+      query.furnishing = furnishing === "furnished";
+    }
+
+    if (smoking && smoking !== "all") {
+      query.smoking = smoking === "allowed";
+    }
+
+    if (propertyType && propertyType !== "all") {
+      query.propertyType = propertyType;
+    }
+
+    if (roomAvailable && roomAvailable !== "any") {
+      query.roomsAvailableFor = roomAvailable;
+    }
+
+    if (bedrooms && bedrooms !== "Any") {
+      query.bedrooms = Number(bedrooms);
+    }
+
+    if (moveInDate) {
+      query.availableFrom = { $lte: new Date(moveInDate) };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const spaces = await Space.find(query)
+      .populate("user", "firstName lastName photo")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Space.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      data: spaces,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
