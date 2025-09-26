@@ -14,7 +14,7 @@ export default function PropertyCard({ property }) {
                 />
             </div>
 
-            <div className="flex flex-col flex-grow text-[#000000]">
+            <div className="flex flex-col flex-grow w-[450px] text-[#000000]">
                 <h3 className="font-semibold text-[24px] text-black">{property.title}</h3>
                 <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{property.city}, {property.state}, {property.country}</p>
                 <p className="text-[18px]">{property.propertyType} - <span className="text-[#565ABF]">Available</span></p>
@@ -25,7 +25,7 @@ export default function PropertyCard({ property }) {
                         <img src={property.user.photo} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
                     </div>
                     <div>
-                        <p className="text-sm">{property.user.firstName} {property.user.lastName}</p>
+                        <p className="text-sm">{property.user.profile.firstName} {property.user.profile.lastName}</p>
                         <p className="text-xs text-gray-400">{property.personalInfo}</p>
                     </div>
                 </div>

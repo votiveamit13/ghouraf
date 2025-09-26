@@ -147,7 +147,7 @@ const {
     const skip = (page - 1) * limit;
 
     const spaces = await Space.find(query)
-      .populate("user", "firstName lastName photo")
+      .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));

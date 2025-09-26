@@ -8,6 +8,10 @@ export default function PropertyList({ properties, page, itemsPerPage }) {
     startIndex + itemsPerPage
   );
 
+   if (!selectedProperties || selectedProperties.length === 0) {
+    return null;
+  }
+
   return (
     <div>
       {selectedProperties.map((property, idx) => (
