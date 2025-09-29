@@ -165,11 +165,7 @@ export default function Spaces() {
                   { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                setSpaces((prev) =>
-                  prev.map((p) =>
-                    p._id === spaceToDelete._id ? { ...p, is_deleted: true } : p
-                  )
-                );
+                setSpaces((prev) => prev.filter((p) => p._id !== spaceToDelete._id));
 
                 toast.success("Space deleted successfully");
               } catch (err) {

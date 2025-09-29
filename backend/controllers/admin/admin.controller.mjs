@@ -353,7 +353,7 @@ export const updateSpaceStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if(!["avtive", "inactive"].includes(status)) {
+    if(!["active", "inactive"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 

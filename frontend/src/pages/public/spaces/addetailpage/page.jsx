@@ -18,6 +18,7 @@ import { BsFlag } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import Loader from "components/common/Loader";
 import { getFullLocation } from "utils/locationHelper";
+import { Link } from "react-router-dom";
 
 export default function DetailPage() {
   const { id } = useParams();
@@ -210,9 +211,11 @@ export default function DetailPage() {
   return (
     <>
       <div className="container px-4 mt-5">
+        <Link to={`/spaces`}>
         <button className="text-sm px-4 py-2 font-medium text-black flex items-center gap-2 border-[1px] border-[#AACCEE] rounded-[2px]">
           <FaArrowLeftLong />  Back to Ads
         </button>
+        </Link>
       </div>
 
       <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">

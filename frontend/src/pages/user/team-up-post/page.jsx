@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaArrowRightLong, FaArrowLeftLong } from "react-icons/fa6";
 import { Country, State, City } from "country-state-city";
+import locales from "locale-codes";
 
 export default function TeamUpAd() {
     const [isPreview, setIsPreview] = useState(false);
@@ -19,7 +20,8 @@ export default function TeamUpAd() {
         lastName: "",
         age: "",
         gender: "",
-        ageRange: "",
+        minAge: "",
+        maxAge: "",
         occupationPreference: "",
         occupation: "",
         smoke: "",
@@ -32,6 +34,7 @@ export default function TeamUpAd() {
         buddyDescription: "",
     });
     const countries = Country.getAllCountries();
+    const [allLocales, setAllLocales] = useState([]);
 
     const states = useMemo(() => {
         if (!formData.country) return [];
@@ -42,6 +45,10 @@ export default function TeamUpAd() {
         if (!formData.state || !formData.country) return [];
         return City.getCitiesOfState(formData.country, formData.state);
     }, [formData.country, formData.state]);
+
+    useEffect(() => {
+        setAllLocales(locales.all);
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -268,13 +275,17 @@ export default function TeamUpAd() {
                                         <label className="block text-gray-700">
                                             Duration of stay
                                         </label>
-                                        <input
-                                            type="text"
+                                        <select
                                             name="period"
                                             value={formData.period}
                                             onChange={handleChange}
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        />
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="3 months">3 months</option>
+                                            <option value="6 months">6 months</option>
+                                            <option value="1 year">1 year</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -323,35 +334,56 @@ export default function TeamUpAd() {
                                         value={formData.gender}
                                         onChange={handleChange}
                                     >
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
+                                        <option value="">Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Age Range</label>
-                                    <select
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        name="ageRange"
-                                        value={formData.ageRange}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="12-18">12-18</option>
-                                        <option value="19-25">19-25</option>
-                                        <option value="26-32">26-32</option>
-                                        <option value="33-39">33-39</option>
-                                        <option value="40-47">40-47</option>
-                                        <option value="48-54">48-54</option>
-                                    </select>
+                                    <div className="flex space-x-2">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            placeholder="Min"
+                                            name="minAge"
+                                            value={formData.minAge}
+                                            onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === '-' || e.key === 'Minus') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+                                        />
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            placeholder="Max"
+                                            name="maxAge"
+                                            value={formData.maxAge}
+                                            onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === '-' || e.key === 'Minus') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Occupation Type</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="occupationPreference"
                                         value={formData.occupationPreference}
                                         onChange={handleChange}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    />
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Professionals">Professionals</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Smoking?</label>
@@ -361,6 +393,7 @@ export default function TeamUpAd() {
                                         value={formData.smoke}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
@@ -373,6 +406,7 @@ export default function TeamUpAd() {
                                         value={formData.petsPreference}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
@@ -385,6 +419,7 @@ export default function TeamUpAd() {
                                         value={formData.roommatePref}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
@@ -394,13 +429,17 @@ export default function TeamUpAd() {
                                         Your Preferred Language
                                     </label>
                                     <select
-                                        type="text"
                                         name="languagePreference"
                                         value={formData.languagePreference}
                                         onChange={handleChange}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     >
-                                        <option>English</option>
+                                        <option value="">Select Language</option>
+                                        {allLocales.map((locale) => (
+                                            <option key={locale.tag} value={locale.tag}>
+                                                {locale.name} ({locale.tag})
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>
@@ -441,6 +480,12 @@ export default function TeamUpAd() {
                                         value={formData.age}
                                         onChange={handleChange}
                                         placeholder="Age"
+                                        min="0"
+                                        onKeyDown={(e) => {
+                                            if (e.key === '-' || e.key === 'Minus') {
+                                                e.preventDefault();
+                                            }
+                                        }}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
                                 </div>
@@ -463,6 +508,7 @@ export default function TeamUpAd() {
                                         value={formData.pets}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
@@ -471,14 +517,19 @@ export default function TeamUpAd() {
                                     <label className="block text-gray-700 mb-1">
                                         Your Preferred Language
                                     </label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="language"
                                         value={formData.language}
                                         onChange={handleChange}
-                                        placeholder="Age"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    />
+                                    >
+                                        <option value="">Select Language</option>
+                                        {allLocales.map((locale) => (
+                                            <option key={locale.tag} value={locale.tag}>
+                                                {locale.name} ({locale.tag})
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
 
@@ -496,7 +547,7 @@ export default function TeamUpAd() {
 
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
-                                Ad details (optional)
+                                Ad details
                             </div>
                             <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-1 gap-4">
                                 <div>
