@@ -17,12 +17,14 @@ import { BiCheckShield } from "react-icons/bi";
 import { BsFlag } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import Loader from "components/common/Loader";
+import { getFullLocation } from "utils/locationHelper";
 
 export default function DetailPage() {
   const { id } = useParams();
   const apiUrl = process.env.REACT_APP_API_URL;
   const [space, setSpace] = useState(null);
   const [showTeamUp, setShowTeamUp] = useState(false);
+  const locationString = getFullLocation(space.city, space.state, space.country);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -125,7 +127,7 @@ export default function DetailPage() {
                     <div className="hs-carousel-slide" key={idx}>
                       <div className="flex justify-center h-full bg-gray-100">
                         <img
-                          src={`${apiUrl}${src}`}
+                          src={`${src}`}
                           alt={`Slide ${idx + 1}`}
                           className="object-cover w-full h-full"
                         />
@@ -152,7 +154,7 @@ export default function DetailPage() {
                       className="hs-carousel-pagination-item shrink-0 size-20 cursor-pointer rounded-md overflow-hidden"
                     >
                       <img
-                        src={`${apiUrl}${src}`}
+                        src={`${src}`}
                         alt={`Thumbnail ${idx + 1}`}
                         className="object-cover w-full h-full border border-gray-200 rounded-md transition-all"
                       />
@@ -176,7 +178,7 @@ export default function DetailPage() {
               {space.title}
             </h2>
             <p className="text-[18px] text-black font-semibold mt-0">${space.budget} / {space.budgetType}</p>
-            <p className="text-[16px] text-black flex items-center gap-2"><TfiLocationPin /> {space.city}, {space.state}, {space.country}</p>
+            <p className="text-[16px] text-black flex items-center gap-2"><TfiLocationPin /> {locationString}</p>
             <p className="text-black text-[16px]">
               {space.description}
             </p>
@@ -205,7 +207,7 @@ export default function DetailPage() {
                 <tbody>
                   <tr>
                     <td className="py-1 w-40 font-medium">Available</td>
-                    <td>Now</td>
+                    <td>Yes</td>
                   </tr>
                   {/* <tr>
                     <td className="py-1 w-40 font-medium">Minimum term</td>
@@ -239,7 +241,7 @@ export default function DetailPage() {
                   </tr> */}
                   <tr>
                     <td className="py-1 w-40 font-medium">Smoking</td>
-                    <td>{space.smoking === "true" ? "Allowed" : "Not Allowed"}</td>
+                   <td>{space.smoking ? "Allowed" : "Not Allowed"}</td>
                   </tr>
                   {/* <tr>
                     <td className="py-1 w-40 font-medium">Couples OK</td>
@@ -256,7 +258,7 @@ export default function DetailPage() {
             <img
               src={
                 space.user?.profile?.photo
-                  ? `${apiUrl}${space.user.profile.photo}`
+                  ? `${space.user.profile.photo}`
                   : agent1
               }
               alt="user"
@@ -264,7 +266,7 @@ export default function DetailPage() {
             />
             <h3 className="mt-2 font-semibold text-black mb-1">{space.user?.profile?.firstName} {space.user?.profile?.lastName}</h3>
             <p className="text-sm text-black mb-1">{space.personalInfo}</p>
-            <p className="text-sm text-black mb-1">Location: {space.city}, {space.state}, {space.country}</p>
+            <p className="text-sm text-black mb-1">Location: {locationString}</p>
             <p className="text-sm text-black mb-1">Member since: <span className="text-[#565ABF]">{new Date(space.user?.createdAt).toLocaleDateString("en-US", {
               month: "short",
               year: "numeric",
