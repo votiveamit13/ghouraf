@@ -6,6 +6,8 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import SearchFilter from "components/common/SearchFilter";
 import axios from "axios";
 import PhotoSlider from "components/common/Slider";
+import { toast } from "react-toastify";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function Spaces() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -13,6 +15,9 @@ export default function Spaces() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [spaceToDelete, setSpaceToDelete] = useState(null);
+
 
   useEffect(() => {
     const fetchSpaces = async () => {
@@ -27,7 +32,7 @@ export default function Spaces() {
       }
     };
     fetchSpaces();
-  }, []);
+  }, [apiUrl]);
 
   const filteredPosts = useMemo(() => {
     return spaces.filter(
@@ -91,8 +96,27 @@ export default function Spaces() {
                     <td className="px-3 py-3">
                       <select
                         value={post.status}
-                        onChange={(e) => {
-                          console.log("Update status", e.target.value);
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          try {
+                            const token = localStorage.getItem("authToken");
+                            await axios.patch(
+                              `${apiUrl}admin/spaces/${post._id}/status`,
+                              { status: newStatus },
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+
+                            setSpaces((prev) =>
+                              prev.map((p) =>
+                                p._id === post._id ? { ...p, status: newStatus } : p
+                              )
+                            );
+
+                            toast.success(`Space status updated to "${newStatus}"`);
+                          } catch (err) {
+                            console.error("Failed to update status:", err);
+                            toast.error("Failed to update status. Try again.");
+                          }
                         }}
                         className="border px-2 py-1 rounded"
                       >
@@ -111,13 +135,52 @@ export default function Spaces() {
                         size={20}
                         className="cursor-pointer"
                         color="red"
+                        onClick={() => {
+                          setSpaceToDelete(post);
+                          setShowConfirm(true);
+                        }}
                       />
+
+
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          <ConfirmationDialog
+            show={showConfirm}
+            title="Delete Space"
+            message="Are you sure you want to delete this space?"
+            onCancel={() => {
+              setShowConfirm(false);
+              setSpaceToDelete(null);
+            }}
+            onConfirm={async () => {
+              try {
+                const token = localStorage.getItem("authToken");
+                await axios.patch(
+                  `${apiUrl}admin/spaces/${spaceToDelete._id}/delete`,
+                  {},
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                setSpaces((prev) =>
+                  prev.map((p) =>
+                    p._id === spaceToDelete._id ? { ...p, is_deleted: true } : p
+                  )
+                );
+
+                toast.success("Space deleted successfully");
+              } catch (err) {
+                console.error("Failed to delete space:", err);
+                toast.error("Failed to delete space. Try again.");
+              } finally {
+                setShowConfirm(false);
+                setSpaceToDelete(null);
+              }
+            }}
+          />
 
           <div className="px-6 py-4 border-t border-gray-200">
             <PaginationComponent

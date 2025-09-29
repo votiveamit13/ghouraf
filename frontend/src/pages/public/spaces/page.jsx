@@ -60,7 +60,7 @@ const [loading, setLoading] = useState(false);
     };
 
     fetchSpaces();
-  }, [page, filters]);
+  }, [page, filters, apiUrl]);
 
     return (
         <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">

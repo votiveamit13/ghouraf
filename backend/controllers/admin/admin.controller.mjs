@@ -335,7 +335,7 @@ export const deleteFaq = async (req, res) => {
 
 export const getAllSpaces = async (req, res) => {
   try {
-    const spaces = await Space.find()
+    const spaces = await Space.find({ is_deleted: false })
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .select(
         "title propertyType budget budgetType user available status createdAt description size furnishing smoking amenities featuredImage photos"
@@ -348,3 +348,45 @@ export const getAllSpaces = async (req, res) => {
   }
 };
 
+export const updateSpaceStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if(!["avtive", "inactive"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const space = await Space.findById(id);
+    if(!space) return res.status(404).json({ message: "Space not found" });
+
+    space.status = status;
+    await space.save();
+
+    res.json({ message: `Space status updated to ${status}`, space });
+  } catch (err) {
+    console.error("Error updating space status:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteSpace = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const space = await Space.findById(id);
+    if(!space) return res.status(404).json({ message: "Space not found" });
+
+    if(space.is_deleted) {
+      return res.status(400).json({ message: "Space already deleted" });
+    }
+
+    space.is_deleted = true;
+    await space.save();
+
+    res.json({ message: "Space deleted successfully", space });
+  } catch (err) {
+    console.error("Error deleting space:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

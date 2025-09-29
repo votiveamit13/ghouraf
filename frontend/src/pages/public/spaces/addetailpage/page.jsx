@@ -49,6 +49,110 @@ export default function DetailPage() {
     fetchSpace();
   }, [id, apiUrl]);
 
+  useEffect(() => {
+  if (!space || typeof window === "undefined") return;
+
+  window.HSCarousel?.autoInit();
+
+  const root = document.querySelector("[data-hs-carousel]");
+  if (!root) return;
+
+  const body = root.querySelector(".hs-carousel-body");
+  const viewport = body?.parentElement;
+  const slides = Array.from(root.querySelectorAll(".hs-carousel-slide"));
+  const pagination = root.querySelector(
+    "[data-hs-carousel-pagination], .hs-carousel-pagination"
+  );
+  const thumbs = pagination ? Array.from(pagination.children) : [];
+
+  if (!body || !viewport || slides.length === 0 || thumbs.length === 0) return;
+
+  const centerThumb = (thumbEl) => {
+    if (!thumbEl) return;
+    const container = pagination;
+    const containerRect = container.getBoundingClientRect();
+    const elRect = thumbEl.getBoundingClientRect();
+
+    const delta =
+      elRect.left + elRect.width / 2 - (containerRect.left + containerRect.width / 2);
+
+    container.scrollTo({
+      left: Math.max(0, container.scrollLeft + delta),
+      behavior: "smooth",
+    });
+  };
+
+  let activeIndex = -1;
+  const setActiveIndex = (idx) => {
+    if (idx === activeIndex) return;
+    activeIndex = idx;
+
+    thumbs.forEach((t, i) => {
+      t.classList.toggle("hs-carousel-active", i === idx);
+      t.classList.toggle("active-thumb", i === idx);
+    });
+
+    centerThumb(thumbs[idx]);
+  };
+
+  const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
+  const io = new IntersectionObserver(
+    (entries) => {
+      let best = null;
+      for (const e of entries) {
+        if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+      }
+      if (!best) return;
+      const index = slides.indexOf(best.target);
+      if (index !== -1) setActiveIndex(index);
+    },
+    {
+      root: viewport,
+      threshold: thresholds,
+    }
+  );
+
+  slides.forEach((s) => io.observe(s));
+
+  const computeVisibleByOverlap = () => {
+    const vp = viewport.getBoundingClientRect();
+    let bestIdx = 0;
+    let bestArea = -1;
+    slides.forEach((s, i) => {
+      const r = s.getBoundingClientRect();
+      const overlapW = Math.max(0, Math.min(r.right, vp.right) - Math.max(r.left, vp.left));
+      const overlapH = Math.max(0, Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top));
+      const area = overlapW * overlapH;
+      if (area > bestArea) {
+        bestArea = area;
+        bestIdx = i;
+      }
+    });
+    setActiveIndex(bestIdx);
+  };
+
+  setTimeout(() => {
+    computeVisibleByOverlap();
+    body.classList.remove("opacity-0"); 
+  }, 120);
+
+  const prev = root.querySelector(".hs-carousel-prev");
+  const next = root.querySelector(".hs-carousel-next");
+  const arrowHandler = () => setTimeout(computeVisibleByOverlap, 40);
+
+  prev?.addEventListener("click", arrowHandler);
+  next?.addEventListener("click", arrowHandler);
+  window.addEventListener("resize", computeVisibleByOverlap);
+
+  return () => {
+    io.disconnect();
+    prev?.removeEventListener("click", arrowHandler);
+    next?.removeEventListener("click", arrowHandler);
+    window.removeEventListener("resize", computeVisibleByOverlap);
+  };
+}, [space]); 
+
+
   const interestedPeople = [
     {
       id: 1,

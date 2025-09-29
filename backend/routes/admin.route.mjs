@@ -1,18 +1,10 @@
 import express from "express";
 import {
     login,
-    getAllUsers,
-    updateUserStatus,
-    updateUserDetails,
-    deleteUser,
-    getAllMessage,
-    deleteMessage,
-    addFaq,
-    getAllFaq,
-    updateFaqStatus,
-    updateFaq,
-    deleteFaq,
-    getAllSpaces,
+    getAllUsers, updateUserStatus, updateUserDetails, deleteUser,
+    getAllMessage, deleteMessage,
+    addFaq, getAllFaq, updateFaqStatus, updateFaq, deleteFaq,
+    getAllSpaces, updateSpaceStatus, deleteSpace
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -35,6 +27,9 @@ router.patch("/faq/:id/status", adminAuth, updateFaqStatus);
 router.patch("/faq/:id", adminAuth, validate(faqSchema), updateFaq);
 router.delete("/faq/:id", adminAuth, deleteFaq);
 router.get("/spaces", adminAuth, getAllSpaces);
+router.patch("/spaces/:id/status", adminAuth, updateSpaceStatus);
+router.patch("/spaces/:id/delete", adminAuth, deleteSpace);
+
 
 
 export default router;
