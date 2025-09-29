@@ -24,7 +24,6 @@ export default function DetailPage() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [space, setSpace] = useState(null);
   const [showTeamUp, setShowTeamUp] = useState(false);
-  const locationString = getFullLocation(space.city, space.state, space.country);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -96,6 +95,8 @@ export default function DetailPage() {
   if (!space) {
     return <div className="container mt-10 text-center">No space found.</div>;
   }
+
+  const locationString = getFullLocation(space.city, space.state, space.country);
 
   const images = [
     space.featuredImage,

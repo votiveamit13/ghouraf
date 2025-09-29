@@ -143,12 +143,13 @@ export default function Spaces() {
             </div>
 
             <div className="overflow-y-auto p-4 space-y-6">
-              {selectedPost.photos?.length > 0 ? (
+              {(selectedPost.photos?.length > 0 || selectedPost.featuredImage) && (
                 <PhotoSlider
                   featuredImage={selectedPost.featuredImage}
-                  photos={selectedPost.photos}
+                  photos={selectedPost.photos || []}
                 />
-              ) : null}
+              )}
+
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <p><span className="text-black">Property Type:</span> {selectedPost.propertyType}</p>

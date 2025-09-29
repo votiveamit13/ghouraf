@@ -33,6 +33,7 @@
     "firebase": "^12.1.0",
     "i18n-iso-countries": "^7.14.0",
     "moment": "2.29.4",
+    "nanoid": "^5.1.6",
     "nouislider": "15.4.0",
     "preline": "^3.2.3",
     "react": "18.2.0",
