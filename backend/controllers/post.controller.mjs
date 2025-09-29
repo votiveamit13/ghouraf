@@ -147,6 +147,7 @@ const {
     const skip = (page - 1) * limit;
 
     const spaces = await Space.find(query)
+      .select("title postCategory propertyType budget budgetType personalInfo size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted")
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -160,6 +161,26 @@ const {
       page: Number(page),
       pages: Math.ceil(total / limit),
       data: spaces,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSpaceById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const space = await Space.findById(id)
+      .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
+
+    if (!space) {
+      return res.status(404).json({ success: false, message: "Space not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: space,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

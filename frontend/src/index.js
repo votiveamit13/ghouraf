@@ -39,7 +39,7 @@ root.render(
         <Route path="/admin/*" element={<AdminLayout />} />
         <Route path="/" element={<Public><Home /></Public>} />
         <Route path="/spaces" element={<Public><Spaces /></Public>} />
-        <Route path="/spaces/detail-page" element={<Public><DetailPage /></Public>} />
+        <Route path="/spaces/:id" element={<Public><DetailPage /></Public>} />
         <Route path="/place-wanted" element={<Public><PlaceWanted/></Public>} />
         <Route path="/team-up" element={<Public><TeamUp/></Public>} />
         <Route path="/about-us" element={<Public><AboutUs /></Public>} />

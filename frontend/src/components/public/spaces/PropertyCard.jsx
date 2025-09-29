@@ -3,10 +3,12 @@ import { TfiLocationPin } from "react-icons/tfi";
 import { GrFavorite } from "react-icons/gr";
 import { GoShareAndroid } from "react-icons/go";
 import { getFullLocation } from "utils/locationHelper";
+import { Link } from "react-router-dom";
 
 export default function PropertyCard({ property }) {
     const locationString = getFullLocation(property.city, property.state, property.country);
     return (
+        <Link to={`/spaces/${property._id}`} className="w-[200px] h-[260px]">
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
             <div className="w-[200px] h-[260px]">
                 <img
@@ -41,5 +43,6 @@ export default function PropertyCard({ property }) {
                 </div>
             </div>
         </div>
+        </Link>
     );
 }
