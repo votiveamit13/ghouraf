@@ -192,7 +192,7 @@ export default function TeamUps() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white w-[700px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
 
-                        <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+                        <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
                             <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
                             <button
                                 className="text-gray-400 hover:text-gray-700 text-xl"
@@ -203,10 +203,21 @@ export default function TeamUps() {
                         </div>
 
                         <div className="overflow-y-auto p-4 space-y-6">
-
-                            {selectedPost.photos?.length > 0 && (
-                                <PhotoSlider photos={selectedPost.photos} />
-                            )}
+                            <div className="flex items-center gap-2 w-full">
+                                <div className="w-1/2">
+                                    {selectedPost.photos?.length > 0 && (
+                                        <PhotoSlider photos={selectedPost.photos} />
+                                    )}
+                                </div>
+                                <div className="w-1/2">
+                                    {selectedPost.description && (
+                                        <div>
+                                            <h3 className="mb-2 text-black">Description</h3>
+                                            <p className="text-gray-600">{selectedPost.description}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <p><span className="text-black">Country:</span> {selectedPost.country}</p>
@@ -259,21 +270,12 @@ export default function TeamUps() {
                                     </div>
                                 </div>
                             )}
-
-                            {selectedPost.description && (
-                                <div>
-                                    <h3 className="mb-2 text-black">Description</h3>
-                                    <p className="text-gray-600">{selectedPost.description}</p>
-                                </div>
-                            )}
-
                             {selectedPost.buddyDescription && (
                                 <div>
                                     <h3 className="mb-2 text-black">Buddy Up Description</h3>
                                     <p className="text-gray-600">{selectedPost.buddyDescription}</p>
                                 </div>
                             )}
-
                         </div>
                     </div>
                 </div>

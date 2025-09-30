@@ -86,19 +86,37 @@ export default function TeamUpAd() {
         setAllLocales(locales.all);
     }, []);
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        if (type === "checkbox" && name === "amenities") {
-            setFormData((prev) => ({
-                ...prev,
-                amenities: checked
-                    ? [...prev.amenities, value]
-                    : prev.amenities.filter((a) => a !== value),
-            }));
-        } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
-        }
-    };
+const handleChange = (e) => {
+  const { name, value, type, checked } = e.target;
+
+  if (type === "checkbox" && name === "amenities") {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: checked
+        ? [...prev.amenities, value]
+        : prev.amenities.filter((a) => a !== value),
+    }));
+
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (checked && newErrors.amenities) {
+        delete newErrors.amenities;
+      }
+      return newErrors;
+    });
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (value && newErrors[name]) {
+        delete newErrors[name];
+      }
+      return newErrors;
+    });
+  }
+};
+
 
     const handleFileChange = (e) => {
         setSelectedFiles([...e.target.files]);
@@ -359,10 +377,16 @@ export default function TeamUpAd() {
                                     <div>
                                         <label className="block text-gray-700">Your Budget</label>
                                         <input
-                                            type="text"
+                                            type="number"
                                             name="budget"
                                             value={formData.budget}
                                             onChange={handleChange}
+                                            min="0"
+                                             onKeyDown={(e) => {
+                                                if (e.key === '-' || e.key === 'Minus') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                             placeholder="Total budget range for the flat"
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         />

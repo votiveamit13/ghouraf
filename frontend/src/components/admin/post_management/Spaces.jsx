@@ -191,7 +191,7 @@ export default function Spaces() {
       {selectedPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white w-[700px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-            <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+            <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
               <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
               <button
                 className="text-gray-400 hover:text-gray-700 text-xl"
