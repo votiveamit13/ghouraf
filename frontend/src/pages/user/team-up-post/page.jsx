@@ -44,6 +44,34 @@ export default function TeamUpAd() {
     const [allLocales, setAllLocales] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
 
+    const validateForm = () => {
+        let newErrors = {};
+
+        if (!formData.title.trim()) newErrors.title = "Title is required";
+        if (!formData.country) newErrors.country = "Country is required";
+        if (!formData.state) newErrors.state = "State is required";
+        if (!formData.city) newErrors.city = "City is required";
+        if (!formData.zip.trim()) newErrors.zip = "Zip code is required";
+        if (!formData.budget) newErrors.budget = "Budget is required";
+        if (!formData.budgetType) newErrors.budgetType = "Select budget type";
+        if (!formData.gender) newErrors.gender = "Gender is required";
+        if (!formData.age) newErrors.age = "Age is required";
+        if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+        if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+        if (!formData.amenities || formData.amenities.length === 0) {
+            newErrors.amenities = "Select at least one amenity";
+        }
+        if (!formData.smoke) newErrors.smoke = "Select smoking category";
+        if (!formData.pets) newErrors.pets = "Select pet category";
+        if (!formData.petsPreference) newErrors.petsPreference = "Select pet preference category";
+        if (!formData.roommatePref) newErrors.roommatePref = "Select roommate preference";
+        if (!formData.description) newErrors.description = "Description is required";
+        if (!selectedFiles || selectedFiles.length === 0) {
+            newErrors.photos = "Please upload at least one photo";
+        }
+        return newErrors;
+    };
+
     const states = useMemo(() => {
         if (!formData.country) return [];
         return State.getStatesOfCountry(formData.country);
@@ -73,76 +101,88 @@ export default function TeamUpAd() {
     };
 
     const handleFileChange = (e) => {
-  setSelectedFiles([...e.target.files]);
-};
+        setSelectedFiles([...e.target.files]);
+    };
 
-const handleSubmit = async () => {
-  setIsSubmitting(true);
-  try {
-    setErrors({});
+    const handlePreview = () => {
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            toast.error("Please fill all required fields before preview");
+            return;
+        }
+        setErrors({});
+        setIsPreview(true);
+    };
 
-    const formPayload = new FormData();
 
-    Object.keys(formData).forEach(key => {
-      if (Array.isArray(formData[key])) {
-        formData[key].forEach(value => formPayload.append(key, value));
-      } else {
-        formPayload.append(key, formData[key]);
-      }
-    });
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        try {
+            setErrors({});
 
-    selectedFiles.forEach(file => {
-      formPayload.append("photos", file);
-    });
+            const formPayload = new FormData();
 
-    // Log FormData values
-    console.log("Submitting FormData:");
-    for (let pair of formPayload.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+            Object.keys(formData).forEach(key => {
+                if (Array.isArray(formData[key])) {
+                    formData[key].forEach(value => formPayload.append(key, value));
+                } else {
+                    formPayload.append(key, formData[key]);
+                }
+            });
 
-    const res = await fetch(`${apiUrl}createteamup`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: formPayload,
-    });
+            selectedFiles.forEach(file => {
+                formPayload.append("photos", file);
+            });
 
-    let data;
-    try {
-      data = await res.json();
-    } catch (err) {
-      throw new Error("Server returned non-JSON response");
-    }
+            // Log FormData values
+            console.log("Submitting FormData:");
+            for (let pair of formPayload.entries()) {
+                console.log(pair[0], pair[1]);
+            }
 
-    if (!res.ok) {
-      console.log("Server Response Errors:", data);
-      if (data.errors) {
-        setErrors(data.errors);
-        console.log("Validation errors:", data.errors);
-      } else {
-        toast.error(data.message || "Something went wrong");
-      }
-    } else {
-      navigate("/user/thank-you", {
-        state: {
-          title: "Your Team Up successfully published",
-          subtitle: "Your Team Up listing has been created and is now live.",
-          goBackPath: "/user/team-up-post",
-          viewAdsPath: "/team-up",
-        },
-      });
-      setFormData({ ...initialFormData });
-      setSelectedFiles([]);
-    }
-  } catch (err) {
-    console.error("Submit error:", err);
-    toast.error(err.message || "Server error");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+            const res = await fetch(`${apiUrl}createteamup`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: formPayload,
+            });
+
+            let data;
+            try {
+                data = await res.json();
+            } catch (err) {
+                throw new Error("Server returned non-JSON response");
+            }
+
+            if (!res.ok) {
+                console.log("Server Response Errors:", data);
+                if (data.errors) {
+                    setErrors(data.errors);
+                    console.log("Validation errors:", data.errors);
+                } else {
+                    toast.error(data.message || "Something went wrong");
+                }
+            } else {
+                navigate("/user/thank-you", {
+                    state: {
+                        title: "Your Team Up successfully published",
+                        subtitle: "Your Team Up listing has been created and is now live.",
+                        goBackPath: "/user/team-up-post",
+                        viewAdsPath: "/team-up",
+                    },
+                });
+                setFormData({ ...initialFormData });
+                setSelectedFiles([]);
+            }
+        } catch (err) {
+            console.error("Submit error:", err);
+            toast.error(err.message || "Server error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
 
 
@@ -215,7 +255,7 @@ const handleSubmit = async () => {
                             >
                                 <FaArrowLeftLong /> Back to Edit
                             </button>
-                            <button 
+                            <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
                                 className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2">
@@ -660,7 +700,9 @@ const handleSubmit = async () => {
                                                 ? `${selectedFiles.length} file(s) selected`
                                                 : "No file chosen"}
                                         </span>
+
                                     </div>
+                                    {errors.photos && <p className="text-red-500 text-sm mt-1">{errors.photos}</p>}
                                 </div>
 
                             </div>
@@ -700,7 +742,7 @@ const handleSubmit = async () => {
                         <div className="flex justify-end mb-6">
                             <button
                                 className="bg-[#565ABF] text-white font-medium px-4 py-3 rounded-[6px] flex items-center gap-2"
-                                onClick={() => setIsPreview(true)}
+                                onClick={handlePreview}
                             >
                                 Preview & Publish <FaArrowRightLong />
                             </button>
