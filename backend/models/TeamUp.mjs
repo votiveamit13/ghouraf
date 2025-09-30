@@ -3,6 +3,8 @@ import budgetType from '../constants/budget.type.mjs'
 import roomAvailableForType from '../constants/roomAvailableFor.type.mjs';
 
 const TeamUpSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    postCategory: { type: String, default: "Teamup" },
     title: { type: String, required: true },
     country: { type: String, required: true },
     state: { type: String, required: true },

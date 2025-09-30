@@ -204,8 +204,9 @@ export const createTeamUp = async (req, res) => {
       });
     }
 
-    const TeampUpData = {
+    const teamUpData = {
       ...req.body,
+      user: req.user._id,
       photos: uploadedPhotos,
     };
 
@@ -228,4 +229,5 @@ export const createTeamUp = async (req, res) => {
     });
   }
 };
+
 

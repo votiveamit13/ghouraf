@@ -75,42 +75,55 @@ export default function TeamUpAd() {
   setSelectedFiles([...e.target.files]);
 };
 
-    const handleSubmit = async () => {
-        try {
-            setErrors({});
+const handleSubmit = async () => {
+  try {
+    setErrors({});
+    
+    const formPayload = new FormData();
 
-            const res = await fetch(`${apiUrl}createteamup`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
+    Object.keys(formData).forEach(key => {
+      if (Array.isArray(formData[key])) {
+        formData[key].forEach(value => formPayload.append(key, value));
+      } else {
+        formPayload.append(key, formData[key]);
+      }
+    });
 
-            const data = await res.json();
+    selectedFiles.forEach(file => {
+      formPayload.append("photos", file);
+    });
 
-            if (!res.ok) {
-                if (data.errors) {
-                    setErrors(data.errors);
-                } else {
-                    toast.error(data.message || "Something went wrong");
-                }
-            } else {
-                navigate("/user/thank-you", {
-                    state: {
-                        title: "Your Team Up successfully published",
-                        subtitle: "Your Team Up listing has been created and is now live.",
-                        goBackPath: "/user/team-up-post",
-                        viewAdsPath: "/team-up"
-                    }
-                });
-                setFormData({ ...initialFormData });
-            }
-        } catch (err) {
-            console.error("Submit error:", err);
-            toast.error("Server error");
-        }
-    };
+    const res = await fetch(`${apiUrl}createteamup`, {
+      method: "POST",
+      body: formPayload,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      if (data.errors) {
+        setErrors(data.errors);
+      } else {
+        toast.error(data.message || "Something went wrong");
+      }
+    } else {
+      navigate("/user/thank-you", {
+        state: {
+          title: "Your Team Up successfully published",
+          subtitle: "Your Team Up listing has been created and is now live.",
+          goBackPath: "/user/team-up-post",
+          viewAdsPath: "/team-up",
+        },
+      });
+      setFormData({ ...initialFormData });
+      setSelectedFiles([]);
+    }
+  } catch (err) {
+    console.error("Submit error:", err);
+    toast.error("Server error");
+  }
+};
+
 
 
     return (
@@ -652,7 +665,7 @@ export default function TeamUpAd() {
                                         name="buddyDescription"
                                         placeholder="Enter your description..."
                                         rows={5}
-                                        value={formData.description}
+                                        value={formData.buddyDescription}
                                         onChange={handleChange}
                                     />
                                 </div>
