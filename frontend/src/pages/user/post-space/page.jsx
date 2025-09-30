@@ -136,9 +136,9 @@ export default function PostSpace() {
     featuredImage: "",
     photos: [],
   });
-const formPayload = new FormData();
-formPayload.append("furnishing", formData.furnishing === "true");
-formPayload.append("smoking", formData.smoking === "true");
+  const formPayload = new FormData();
+  formPayload.append("furnishing", formData.furnishing === "true");
+  formPayload.append("smoking", formData.smoking === "true");
 
   const countries = Country.getAllCountries();
   const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
@@ -216,112 +216,112 @@ formPayload.append("smoking", formData.smoking === "true");
     setErrors({});
   };
 
-const handlePublish = async () => {
-  setIsSubmitting(true);
-  try {
-    const formPayload = new FormData();
-    console.log("Submitting form with data:", formData);
-    console.log("Featured image:", featured ? featured.name : "None");
-    console.log("Photos count:", photos.length);
-    console.log(typeof formData.furnishing, formData.furnishing);
-    console.log(typeof formData.smoking, formData.smoking);
+  const handlePublish = async () => {
+    setIsSubmitting(true);
+    try {
+      const formPayload = new FormData();
+      console.log("Submitting form with data:", formData);
+      console.log("Featured image:", featured ? featured.name : "None");
+      console.log("Photos count:", photos.length);
+      console.log(typeof formData.furnishing, formData.furnishing);
+      console.log(typeof formData.smoking, formData.smoking);
 
-    const processedData = {
-      ...formData,
-      furnishing: formData.furnishing === "true",
-      smoking: formData.smoking === "true",
-      bedrooms: parseInt(formData.bedrooms, 10),
-      budget: parseFloat(formData.budget),
-      size: parseFloat(formData.size)
-    };
+      const processedData = {
+        ...formData,
+        furnishing: formData.furnishing === "true",
+        smoking: formData.smoking === "true",
+        bedrooms: parseInt(formData.bedrooms, 10),
+        budget: parseFloat(formData.budget),
+        size: parseFloat(formData.size)
+      };
 
-    console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
+      console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
 
-Object.keys(processedData).forEach((key) => {
-      if (key === "amenities") {
-        processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
-      } else if (!["photos", "featuredImage"].includes(key)) {
-        if (key === "bedrooms" || key === "budget" || key === "size") {
-          formPayload.append(key, processedData[key].toString());
-        } else {
-          formPayload.append(key, processedData[key]);
+      Object.keys(processedData).forEach((key) => {
+        if (key === "amenities") {
+          processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
+        } else if (!["photos", "featuredImage"].includes(key)) {
+          if (key === "bedrooms" || key === "budget" || key === "size") {
+            formPayload.append(key, processedData[key].toString());
+          } else {
+            formPayload.append(key, processedData[key]);
+          }
         }
-      }
-    });
-
-    if (featured) {
-      formPayload.append("featuredImage", featured);
-    }
-
-    photos.forEach((photo) => {
-      formPayload.append("photos", photo);
-    });
-
-    console.log("Processed data:", processedData);
-    for (let [key, value] of formPayload.entries()) {
-      console.log(key, value, typeof value);
-    }
-
-    const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-      navigate("/user/thank-you", { 
-      state: { 
-        title: "Your Space successfully published",
-        subtitle: "Your space listing has been created and is now live.",
-        goBackPath: "/user/post-an-space",
-        viewAdsPath: "/my-spaces"
-      } 
       });
-    setErrors({});
-    setFormData({
-      title: "",
-      propertyType: "",
-      budget: "",
-      budgetType: "",
-      personalInfo: "",
-      size: "",
-      furnishing: "",
-      smoking: "",
-      roomsAvailableFor: "",
-      bedrooms: "",
-      country: "",
-      state: "",
-      city: "",
-      location: "",
-      description: "",
-      amenities: [],
-    });
-    setFeatured(null);
-    setPhotos([]);
-    setStep(1);
 
-  } catch (err) {
-    if (err.response?.status === 422) {
-      const backendErrors = err.response.data.errors || {};
-      setErrors(backendErrors);
-
-      const firstErrorField = Object.keys(backendErrors)[0];
-      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-      if (errorElement) {
-        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        errorElement.focus();
+      if (featured) {
+        formPayload.append("featuredImage", featured);
       }
 
-      toast.error("Please fix the validation errors!");
-      console.error("Validation errors:", backendErrors);
-    } else {
-      toast.error(err.response?.data?.message || "Server Error");
-      console.error("Server error:", err.response?.data);
+      photos.forEach((photo) => {
+        formPayload.append("photos", photo);
+      });
+
+      console.log("Processed data:", processedData);
+      for (let [key, value] of formPayload.entries()) {
+        console.log(key, value, typeof value);
+      }
+
+      const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      navigate("/user/thank-you", {
+        state: {
+          title: "Your Space successfully published",
+          subtitle: "Your space listing has been created and is now live.",
+          goBackPath: "/user/post-an-space",
+          viewAdsPath: "/my-spaces"
+        }
+      });
+      setErrors({});
+      setFormData({
+        title: "",
+        propertyType: "",
+        budget: "",
+        budgetType: "",
+        personalInfo: "",
+        size: "",
+        furnishing: "",
+        smoking: "",
+        roomsAvailableFor: "",
+        bedrooms: "",
+        country: "",
+        state: "",
+        city: "",
+        location: "",
+        description: "",
+        amenities: [],
+      });
+      setFeatured(null);
+      setPhotos([]);
+      setStep(1);
+
+    } catch (err) {
+      if (err.response?.status === 422) {
+        const backendErrors = err.response.data.errors || {};
+        setErrors(backendErrors);
+
+        const firstErrorField = Object.keys(backendErrors)[0];
+        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          errorElement.focus();
+        }
+
+        toast.error("Please fix the validation errors!");
+        console.error("Validation errors:", backendErrors);
+      } else {
+        toast.error(err.response?.data?.message || "Server Error");
+        console.error("Server error:", err.response?.data);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
 
 
@@ -462,14 +462,14 @@ Object.keys(processedData).forEach((key) => {
                 <label className="form-label text-black">Furnishing</label>
                 <select
                   className={`form-control ${errors.furnishing ? 'border-red-500' : ''}`}
-                   name="furnishing"
+                  name="furnishing"
                   value={formData.furnishing}
-  onChange={handleChange}
->
-  <option value="">Select Furnishing</option>
-  <option value="true">Yes</option>
-  <option value="false">No</option>
-</select>
+                  onChange={handleChange}
+                >
+                  <option value="">Select Furnishing</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
                 {errors.furnishing && <div className="text-red-500 text-sm mt-1">{errors.furnishing[0]}</div>}
               </div>
 
@@ -477,14 +477,14 @@ Object.keys(processedData).forEach((key) => {
                 <label className="form-label text-black">Smoking</label>
                 <select
                   className={`form-control ${errors.smoking ? 'border-red-500' : ''}`}
-                   name="smoking"
+                  name="smoking"
                   value={formData.smoking}
-  onChange={handleChange}
->
-  <option value="">Select</option>
-  <option value="true">Yes</option>
-  <option value="false">No</option>
-</select>
+                  onChange={handleChange}
+                >
+                  <option value="">Select</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
                 {errors.smoking && <div className="text-red-500 text-sm mt-1">{errors.smoking[0]}</div>}
               </div>
 
@@ -775,7 +775,7 @@ Object.keys(processedData).forEach((key) => {
               <div className="mb-2"><strong>Personal Info:</strong> {formData.personalInfo}</div>
               <div className="mb-2"><strong>Size:</strong> {formData.size} m²</div>
               <div className="mb-2"><strong>Furnishing:</strong> {formData.furnishing === "true" ? "Yes" : "No"}</div>
-<div className="mb-2"><strong>Smoking:</strong> {formData.smoking === "true" ? "Allowed" : "Not Allowed"}</div>
+              <div className="mb-2"><strong>Smoking:</strong> {formData.smoking === "true" ? "Allowed" : "Not Allowed"}</div>
               <div className="mb-2"><strong>Rooms available for:</strong> {formData.roomsAvailableFor}</div>
               <div className="mb-2"><strong>Bedrooms:</strong> {formData.bedrooms}</div>
               <div className="mb-2"><strong>Country:</strong> {countries.find(c => c.isoCode === formData.country)?.name}</div>

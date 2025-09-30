@@ -10,6 +10,7 @@ export default function TeamUpAd() {
     const navigate = useNavigate();
     const [isPreview, setIsPreview] = useState(false);
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const initialFormData = {
         title: "",
         country: "",
@@ -76,9 +77,10 @@ export default function TeamUpAd() {
 };
 
 const handleSubmit = async () => {
+  setIsSubmitting(true);
   try {
     setErrors({});
-    
+
     const formPayload = new FormData();
 
     Object.keys(formData).forEach(key => {
@@ -93,16 +95,32 @@ const handleSubmit = async () => {
       formPayload.append("photos", file);
     });
 
+    // Log FormData values
+    console.log("Submitting FormData:");
+    for (let pair of formPayload.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
     const res = await fetch(`${apiUrl}createteamup`, {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
       body: formPayload,
     });
 
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      throw new Error("Server returned non-JSON response");
+    }
 
     if (!res.ok) {
+      console.log("Server Response Errors:", data);
       if (data.errors) {
         setErrors(data.errors);
+        console.log("Validation errors:", data.errors);
       } else {
         toast.error(data.message || "Something went wrong");
       }
@@ -120,9 +138,13 @@ const handleSubmit = async () => {
     }
   } catch (err) {
     console.error("Submit error:", err);
-    toast.error("Server error");
+    toast.error(err.message || "Server error");
+  } finally {
+    setIsSubmitting(false);
   }
 };
+
+
 
 
 
@@ -161,10 +183,10 @@ const handleSubmit = async () => {
                                 <div>
                                     <h3 className="text-lg font-semibold mb-2 text-[#565ABF]">Lifestyle Preferences</h3>
                                     <p><strong>Gender:</strong> {formData.gender}</p>
-                                    <p><strong>Age Range:</strong> {formData.ageRange}</p>
+                                    <p><strong>Age Range:</strong> {formData.minAge} {formData.maxAge}</p>
                                     <p><strong>Occupation Type:</strong> {formData.occupationPreference}</p>
-                                    <p><strong>Smoking:</strong> {formData.smoke}</p>
-                                    <p><strong>Pets Allowed:</strong> {formData.petsPreference}</p>
+                                    <p><strong>Smoking:</strong> {formData.smoke === "true" ? "Yes" : "No"}</p>
+                                    <p><strong>Pets Allowed:</strong> {formData.petsPreference === "true" ? "Yes" : "No"}</p>
                                     <p><strong>Roommate Preference:</strong> {formData.roommatePref}</p>
                                     <p><strong>Preferred Language:</strong> {formData.languagePreference}</p>
                                 </div>
@@ -174,7 +196,7 @@ const handleSubmit = async () => {
                                     <p><strong>Full Name:</strong> {formData.firstName} {formData.lastName}</p>
                                     <p><strong>Age:</strong> {formData.age}</p>
                                     <p><strong>Occupation:</strong> {formData.occupation}</p>
-                                    <p><strong>Do you have pets?:</strong> {formData.pets}</p>
+                                    <p><strong>Do you have pets?:</strong> {formData.pets === "true" ? "Yes" : "No"}</p>
                                     <p><strong>Language:</strong> {formData.language}</p>
                                 </div>
 
@@ -193,8 +215,11 @@ const handleSubmit = async () => {
                             >
                                 <FaArrowLeftLong /> Back to Edit
                             </button>
-                            <button className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2">
-                                Publish <FaArrowRightLong />
+                            <button 
+                                onClick={handleSubmit}
+                                disabled={isSubmitting}
+                                className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2">
+                                {isSubmitting ? "Publishing..." : "Publish"} <FaArrowRightLong />
                             </button>
                         </div>
 
@@ -308,8 +333,8 @@ const handleSubmit = async () => {
                                             <input
                                                 type="radio"
                                                 name="budgetType"
-                                                value="Per Month"
-                                                checked={formData.budgetType === "Per Month"}
+                                                value="Month"
+                                                checked={formData.budgetType === "Month"}
                                                 onChange={handleChange}
                                             />
                                             Per Month
@@ -318,8 +343,8 @@ const handleSubmit = async () => {
                                             <input
                                                 type="radio"
                                                 name="budgetType"
-                                                value="Per Week"
-                                                checked={formData.budgetType === "Per Week"}
+                                                value="Week"
+                                                checked={formData.budgetType === "Week"}
                                                 onChange={handleChange}
                                             />
                                             Per Week
@@ -492,7 +517,7 @@ const handleSubmit = async () => {
                                         onChange={handleChange}
                                     >
                                         <option value="">Select</option>
-                                        <option value="any">Any Gender</option>
+                                        <option value="any gender">Any Gender</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
                                     </select>
@@ -675,7 +700,7 @@ const handleSubmit = async () => {
                         <div className="flex justify-end mb-6">
                             <button
                                 className="bg-[#565ABF] text-white font-medium px-4 py-3 rounded-[6px] flex items-center gap-2"
-                                onClick={handleSubmit}
+                                onClick={() => setIsPreview(true)}
                             >
                                 Preview & Publish <FaArrowRightLong />
                             </button>

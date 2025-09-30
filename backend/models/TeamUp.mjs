@@ -38,4 +38,4 @@ const TeamUpSchema = new mongoose.Schema({
 }, { timestamps: true }
 );
 
-export default mongoose.model("TeamUp", SpaceSchema);
+export default mongoose.model("TeamUp", TeamUpSchema);

@@ -7,6 +7,7 @@ import ContactForm from "../../models/ContactForm.mjs";
 import Faq from "../../models/faq.mjs";
 import faq from "../../models/faq.mjs";
 import Space from "../../models/Space.mjs";
+import TeamUp from "../../models/TeamUp.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -215,7 +216,6 @@ export const getAllMessage = async (req, res) => {
   }
 };
 
-
 export const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -387,6 +387,64 @@ export const deleteSpace = async (req, res) => {
     res.json({ message: "Space deleted successfully", space });
   } catch (err) {
     console.error("Error deleting space:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getAllTeamUps = async (req, res) => {
+  try {
+    const teamups = await TeamUp.find({ is_deleted: false })
+      .populate("user", "profile.firstName profile.lastName profile.photo")
+      .select(
+        "title country state city zip budget budgetType moveInDate period amenities firstName lastName age gender minAge maxAge occupationPreference occupation smoke pets petsPreference language languagePreference roommatePref description buddyDescription photos status available createdAt"
+      );
+
+      req.json(teamups);
+  } catch (err) {
+    console.error("Error fetching team-ups:", err);
+    re.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateTeamUpStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if(!["active", "inactive"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const teamup = await TeamUp.findById(id);
+    if(!teamup) return res.status(404).json({ message: "Team Up not found" });
+
+    teamup.status = status;
+    await teamup.save();
+
+    res.json({ message: `Team Up status updated to ${status}`, teamup });
+  } catch (err) {
+    console.error("Error updating team up status:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteTeamUp = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const teamup = await TeamUp.findById(id);
+    if(!teamup) return res.status(404).json({ message: "Team Up not found" });
+
+    if(teamup.is_deleted) {
+      return res.status(400).json({ message: "Team Up already deleted" });
+    }
+
+    teamup.is_deleted = true;
+    await teamup.save();
+
+    res.json({ message: "Team Up deleted successfully", teamup});
+  } catch (err) {
+    console.error("Error deleting team up:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

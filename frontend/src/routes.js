@@ -11,6 +11,7 @@ import { FaQuestion } from "react-icons/fa6";
 import AddFaq from "components/admin/faq-management/AddFaq";
 import EditFaq from "components/admin/faq-management/EditFaq";
 import Spaces from "components/admin/post_management/Spaces";
+import TeamUps from "components/admin/post_management/TeamUps";
 
 export const adminRoutes = [
   {
@@ -71,6 +72,13 @@ export const adminRoutes = [
         name: "Spaces",
         icon: <BsPostcard className="text-[#565ABF]" />,
         component: <Spaces />,
+        layout: "/admin",
+      },
+      {
+        path: "/post-management/team-ups",
+        name: "Team Ups",
+        icon: <BsPostcard className="text-[#565ABF]" />,
+        component: <TeamUps />,
         layout: "/admin",
       }
     ]
