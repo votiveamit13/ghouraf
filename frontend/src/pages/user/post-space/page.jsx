@@ -273,7 +273,7 @@ Object.keys(processedData).forEach((key) => {
       state: { 
         title: "Your Space successfully published",
         subtitle: "Your space listing has been created and is now live.",
-        goBackPath: "/",
+        goBackPath: "/user/post-an-space",
         viewAdsPath: "/my-spaces"
       } 
       });
@@ -481,7 +481,7 @@ Object.keys(processedData).forEach((key) => {
                   value={formData.smoking}
   onChange={handleChange}
 >
-  <option value="">Smoking Allowed?</option>
+  <option value="">Select</option>
   <option value="true">Yes</option>
   <option value="false">No</option>
 </select>

@@ -1,7 +1,9 @@
 import Space from "../models/Space.mjs";
 import { createSpaceSchema } from "../validations/space.validator.mjs";
 import { fileHandler } from "../utils/fileHandler.mjs";
+import TeamUp from "../models/TeamUp.mjs";
 
+//Spaces
 export const createSpace = async (req, res) => {
   try {
     const { error } = createSpaceSchema.validate(req.body, { abortEarly: false });
@@ -84,7 +86,7 @@ export const createSpace = async (req, res) => {
 
 export const getSpaces = async (req, res) => {
   try {
-const {
+    const {
       minValue,
       maxValue,
       priceType,
@@ -106,7 +108,7 @@ const {
       is_deleted: false,
     };
 
-   if (minValue || maxValue) {
+    if (minValue || maxValue) {
       query.budget = {};
       if (minValue) query.budget.$gte = Number(minValue);
       if (maxValue) query.budget.$lte = Number(maxValue);
@@ -186,3 +188,44 @@ export const getSpaceById = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+//TeampUp
+export const createTeamUp = async (req, res) => {
+  try {
+    let uploadedPhotos = [];
+    if (req.files && req.files.length > 0) {
+      uploadedPhotos = req.files.map((file) => {
+        fileHandler.validateExtension(file.originalname, "image");
+        const savedFile = fileHandler.saveFile(file, "teamup");
+        return {
+          id: savedFile.fileName,
+          url: savedFile.relativePath,
+        };
+      });
+    }
+
+    const TeampUpData = {
+      ...req.body,
+      photos: uploadedPhotos,
+    };
+
+    ["smoke", "pets", "petsPreference"].forEach((field) => {
+      if (teamUpData[field] === "true") teamUpData[field] = true;
+      if (teamUpData[field] === "false") teamUpData[field] = false;
+    });
+
+    const newPost = await TeamUp.create(teamUpData);
+
+    return res.status(201).json({
+      message: "TeamUp post created successfully",
+      data: newPost,
+    });
+  } catch (error) {
+    console.error("Create TeamUp error:", error);
+    return res.status(500).json({
+      message: "Failed to create TeamUp post",
+      error: error.message,
+    });
+  }
+};
+

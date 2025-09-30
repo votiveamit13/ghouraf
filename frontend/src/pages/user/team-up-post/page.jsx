@@ -2,10 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { FaArrowRightLong, FaArrowLeftLong } from "react-icons/fa6";
 import { Country, State, City } from "country-state-city";
 import locales from "locale-codes";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function TeamUpAd() {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const navigate = useNavigate();
     const [isPreview, setIsPreview] = useState(false);
-    const [formData, setFormData] = useState({
+    const [errors, setErrors] = useState({});
+    const initialFormData = {
         title: "",
         country: "",
         state: "",
@@ -32,9 +37,11 @@ export default function TeamUpAd() {
         roommatePref: "",
         description: "",
         buddyDescription: "",
-    });
+    };
+    const [formData, setFormData] = useState(initialFormData);
     const countries = Country.getAllCountries();
     const [allLocales, setAllLocales] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
     const states = useMemo(() => {
         if (!formData.country) return [];
@@ -61,6 +68,47 @@ export default function TeamUpAd() {
             }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleFileChange = (e) => {
+  setSelectedFiles([...e.target.files]);
+};
+
+    const handleSubmit = async () => {
+        try {
+            setErrors({});
+
+            const res = await fetch(`${apiUrl}createteamup`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                if (data.errors) {
+                    setErrors(data.errors);
+                } else {
+                    toast.error(data.message || "Something went wrong");
+                }
+            } else {
+                navigate("/user/thank-you", {
+                    state: {
+                        title: "Your Team Up successfully published",
+                        subtitle: "Your Team Up listing has been created and is now live.",
+                        goBackPath: "/user/team-up-post",
+                        viewAdsPath: "/team-up"
+                    }
+                });
+                setFormData({ ...initialFormData });
+            }
+        } catch (err) {
+            console.error("Submit error:", err);
+            toast.error("Server error");
         }
     };
 
@@ -149,12 +197,13 @@ export default function TeamUpAd() {
                                     <label className="block text-gray-700">Post Title</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g., “Looking for flatmate to share 2BHK in Pune city centre”"
+                                        placeholder="e.g., “Looking for flatmate to share 2BHK”"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] truncate form-control"
                                         name="title"
                                         value={formData.title}
                                         onChange={handleChange}
                                     />
+                                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">Country</label>
@@ -171,6 +220,7 @@ export default function TeamUpAd() {
                                             </option>
                                         ))}
                                     </select>
+                                    {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">State</label>
@@ -188,6 +238,7 @@ export default function TeamUpAd() {
                                             </option>
                                         ))}
                                     </select>
+                                    {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">City</label>
@@ -205,6 +256,7 @@ export default function TeamUpAd() {
                                             </option>
                                         ))}
                                     </select>
+                                    {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">Zip Code</label>
@@ -215,6 +267,7 @@ export default function TeamUpAd() {
                                         onChange={handleChange}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
+                                    {errors.zip && <p className="text-red-500 text-sm mt-1">{errors.zip}</p>}
                                 </div>
                             </div>
                         </div>
@@ -235,6 +288,7 @@ export default function TeamUpAd() {
                                             placeholder="Total budget range for the flat"
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         />
+                                        {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
                                     </div>
                                     <div className="flex items-end gap-6">
                                         <label className="flex items-center gap-2 text-sm">
@@ -257,6 +311,7 @@ export default function TeamUpAd() {
                                             />
                                             Per Week
                                         </label>
+                                        {errors.budgetType && <p className="text-red-500 text-sm mt-1">{errors.budgetType}</p>}
                                     </div>
                                 </div>
 
@@ -317,6 +372,7 @@ export default function TeamUpAd() {
                                         ))}
 
                                     </div>
+                                    {errors.amenities && <p className="text-red-500 text-sm mt-1">{errors.amenities}</p>}
                                 </div>
                             </div>
                         </div>
@@ -338,6 +394,7 @@ export default function TeamUpAd() {
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
                                     </select>
+                                    {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Age Range</label>
@@ -394,9 +451,10 @@ export default function TeamUpAd() {
                                         onChange={handleChange}
                                     >
                                         <option value="">Select</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
                                     </select>
+                                    {errors.smoke && <p className="text-red-500 text-sm mt-1">{errors.smoke}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Pets?</label>
@@ -407,9 +465,10 @@ export default function TeamUpAd() {
                                         onChange={handleChange}
                                     >
                                         <option value="">Select</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
                                     </select>
+                                    {errors.petsPreference && <p className="text-red-500 text-sm mt-1">{errors.petsPreference}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Roommate Preference</label>
@@ -420,9 +479,11 @@ export default function TeamUpAd() {
                                         onChange={handleChange}
                                     >
                                         <option value="">Select</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
+                                        <option value="any">Any Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
                                     </select>
+                                    {errors.roommatePref && <p className="text-red-500 text-sm mt-1">{errors.roommatePref}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">
@@ -460,6 +521,7 @@ export default function TeamUpAd() {
                                         placeholder="Enter your first name"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
+                                    {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Last Name</label>
@@ -471,6 +533,7 @@ export default function TeamUpAd() {
                                         placeholder="Enter your last name"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
+                                    {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Age</label>
@@ -509,13 +572,14 @@ export default function TeamUpAd() {
                                         onChange={handleChange}
                                     >
                                         <option value="">Select</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
                                     </select>
+                                    {errors.pets && <p className="text-red-500 text-sm mt-1">{errors.pets}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">
-                                        Your Preferred Language
+                                        Your Language
                                     </label>
                                     <select
                                         name="language"
@@ -535,13 +599,32 @@ export default function TeamUpAd() {
 
                                 <div className="md:col-span-2 mb-4">
                                     <label className="block text-gray-700 mb-1">Upload Photos</label>
-                                    <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-1/2 rounded-[14px]">
-                                        <button className="bg-black text-white px-4 py-3 rounded-lg">
+
+                                    <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-1/2 rounded-[14px] relative overflow-hidden">
+                                        <input
+                                            type="file"
+                                            name="photos"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={handleFileChange}
+                                            className="absolute inset-0 opacity-0 cursor-pointer"
+                                        />
+
+                                        <button
+                                            type="button"
+                                            className="bg-black text-white px-4 py-3 rounded-lg pointer-events-none"
+                                        >
                                             Choose file
                                         </button>
-                                        <span className="text-gray-500">No file chosen</span>
+
+                                        <span className="text-gray-500 truncate">
+                                            {selectedFiles.length > 0
+                                                ? `${selectedFiles.length} file(s) selected`
+                                                : "No file chosen"}
+                                        </span>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -560,6 +643,7 @@ export default function TeamUpAd() {
                                         value={formData.description}
                                         onChange={handleChange}
                                     />
+                                    {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Buddy Up (additional description)</label>
@@ -576,9 +660,13 @@ export default function TeamUpAd() {
                         </div>
 
                         <div className="flex justify-end mb-6">
-                            <button className="bg-[#565ABF] text-white font-medium px-4 py-3 rounded-[6px] flex items-center gap-2" onClick={() => setIsPreview(true)}>
+                            <button
+                                className="bg-[#565ABF] text-white font-medium px-4 py-3 rounded-[6px] flex items-center gap-2"
+                                onClick={handleSubmit}
+                            >
                                 Preview & Publish <FaArrowRightLong />
                             </button>
+
                         </div>
                     </>
                 )}
