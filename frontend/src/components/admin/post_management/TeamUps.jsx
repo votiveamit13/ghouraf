@@ -11,7 +11,7 @@ import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function TeamUps() {
     const apiUrl = process.env.REACT_APP_API_URL;
-    const [spaces, setSpaces] = useState([]);
+    const [teamup, setTeamUp] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedPost, setSelectedPost] = useState(null);
@@ -20,29 +20,29 @@ export default function TeamUps() {
 
 
     useEffect(() => {
-        const fetchSpaces = async () => {
+        const fetchTeamUp = async () => {
             try {
                 const token = localStorage.getItem("authToken");
                 const res = await axios.get(`${apiUrl}admin/teamups`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setSpaces(res.data);
+                setTeamUp(res.data);
             } catch (err) {
-                console.error("Error fetching spaces:", err);
+                console.error("Error fetching team up:", err);
             }
         };
-        fetchSpaces();
+        fetchTeamUp();
     }, [apiUrl]);
 
     const filteredPosts = useMemo(() => {
-        return spaces.filter(
+        return teamup.filter(
             (post) =>
                 post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 `${post.user?.profile?.firstName} ${post.user?.profile?.lastName}`
                     .toLowerCase()
                     .includes(searchTerm.toLowerCase())
         );
-    }, [searchTerm, spaces]);
+    }, [searchTerm, teamup]);
 
     const pageSize = 10;
     const totalPages = Math.ceil(filteredPosts.length / pageSize);
@@ -106,7 +106,7 @@ export default function TeamUps() {
                                                             { headers: { Authorization: `Bearer ${token}` } }
                                                         );
 
-                                                        setSpaces((prev) =>
+                                                        setTeamUp((prev) =>
                                                             prev.map((p) =>
                                                                 p._id === post._id ? { ...p, status: newStatus } : p
                                                             )
@@ -165,7 +165,7 @@ export default function TeamUps() {
                                     { headers: { Authorization: `Bearer ${token}` } }
                                 );
 
-                                setSpaces((prev) => prev.filter((p) => p._id !== spaceToDelete._id));
+                                setTeamUp((prev) => prev.filter((p) => p._id !== spaceToDelete._id));
 
                                 toast.success("Space deleted successfully");
                             } catch (err) {

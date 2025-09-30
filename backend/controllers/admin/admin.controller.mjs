@@ -399,10 +399,10 @@ export const getAllTeamUps = async (req, res) => {
         "title country state city zip budget budgetType moveInDate period amenities firstName lastName age gender minAge maxAge occupationPreference occupation smoke pets petsPreference language languagePreference roommatePref description buddyDescription photos status available createdAt"
       );
 
-      req.json(teamups);
+      res.json(teamups);
   } catch (err) {
     console.error("Error fetching team-ups:", err);
-    re.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 

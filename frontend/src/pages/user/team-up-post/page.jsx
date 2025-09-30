@@ -183,7 +183,7 @@ const handleSubmit = async () => {
                                 <div>
                                     <h3 className="text-lg font-semibold mb-2 text-[#565ABF]">Lifestyle Preferences</h3>
                                     <p><strong>Gender:</strong> {formData.gender}</p>
-                                    <p><strong>Age Range:</strong> {formData.minAge} {formData.maxAge}</p>
+                                    <p><strong>Age Range:</strong> {formData.minAge} - {formData.maxAge}</p>
                                     <p><strong>Occupation Type:</strong> {formData.occupationPreference}</p>
                                     <p><strong>Smoking:</strong> {formData.smoke === "true" ? "Yes" : "No"}</p>
                                     <p><strong>Pets Allowed:</strong> {formData.petsPreference === "true" ? "Yes" : "No"}</p>
