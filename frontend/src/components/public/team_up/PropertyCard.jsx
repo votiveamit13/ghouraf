@@ -9,12 +9,11 @@ export default function PropertyCard({ property }) {
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
             <div className="w-[200px] h-[260px]">
                 <img
-                    src={property.photos?.[0]}
+                    src={property.photos?.[0]?.url}
                     alt={property.title}
                     className="w-full h-full object-cover rounded-[10px]"
                 />
             </div>
-
 
             <div className="flex flex-col flex-grow w-[450px] text-[#000000]">
                 <h3 className="font-semibold text-[24px] text-black">{property.title} in {locationString}</h3>

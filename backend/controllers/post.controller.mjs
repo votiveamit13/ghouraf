@@ -279,7 +279,7 @@ export const getTeamUps = async (req, res) => {
 
     const teamUps = await TeamUp.find(query)
       .select(
-        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available"
+        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available is_deleted"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort({ createdAt: -1 })
