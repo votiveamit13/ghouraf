@@ -314,7 +314,7 @@ export const getTeamUpById = async (req, res) => {
 
       res.status(200).json({
         success: true,
-        data: space,
+        data: teamup,
       });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
