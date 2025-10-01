@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { MdLockOutline, MdOutlineMail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -60,8 +61,9 @@ const LoginPage = () => {
             )}
 
             <div className="mb-4">
-              <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
-                <i className="ni ni-email-83 text-gray-500 mr-2" />
+              <div className="flex items-center border border-gray-300 rounded-md px-2 py-2 bg-gray-50">
+                {/* <i className="ni ni-email-83 text-gray-500 mr-2" /> */}
+                <MdOutlineMail size={20} className="text-gray-500 mr-2" />
                 <input
                   type="email"
                   placeholder="Email"
@@ -74,8 +76,8 @@ const LoginPage = () => {
             </div>
 
             <div className="mb-4">
-              <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
-                <i className="ni ni-lock-circle-open text-gray-500 mr-2" />
+              <div className="flex items-center border border-gray-300 rounded-md px-2 py-2 bg-gray-50">
+                <MdLockOutline size={20} className="text-gray-500 mr-2" />
                 <input
                   type="password"
                   placeholder="Password"

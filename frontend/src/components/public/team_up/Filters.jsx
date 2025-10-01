@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-export default function Filters({ filters, setFilters, setPage}) {
+export default function Filters({ filters, setFilters, setPage }) {
   const [showAmenities, setShowAmenities] = useState(false);
   const dropdownRef = useRef(null);
   const defaultFilters = {
@@ -13,7 +13,7 @@ export default function Filters({ filters, setFilters, setPage}) {
     moveInDate: "",
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowAmenities(false);
@@ -41,7 +41,7 @@ export default function Filters({ filters, setFilters, setPage}) {
     setPage(1);
   };
 
-    const handleFilterChange = (key, value) => {
+  const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
     setPage(1);
   };
@@ -152,7 +152,7 @@ export default function Filters({ filters, setFilters, setPage}) {
                 type="radio"
                 name="smoking"
                 checked={filters.smoking === opt.val}
-                 onChange={() => handleFilterChange("smoking", opt.val)}
+                onChange={() => handleFilterChange("smoking", opt.val)}
               />
               <span>{opt.label}</span>
             </label>
@@ -182,58 +182,58 @@ export default function Filters({ filters, setFilters, setPage}) {
       </div>
 
 
-<div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
-      <label className="font-medium text-[18px]">Amenities</label>
-      <div className="mt-2 w-full">
-        <button
-          type="button"
-          className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
-          onClick={() => setShowAmenities(!showAmenities)}
-        >
-          {filters.amenities.length > 0
-            ? filters.amenities.join(", ")
-            : "Select amenities"}
-        </button>
-
-        {showAmenities && (
-          <ul
-            className="absolute z-50 w-full p-2 text-black bg-white border border-[#D7D7D7] rounded-[10px]"
-            style={{ maxHeight: "200px", overflowY: "auto" }}
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
+        <label className="font-medium text-[18px]">Amenities</label>
+        <div className="mt-2 w-full">
+          <button
+            type="button"
+            className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
+            onClick={() => setShowAmenities(!showAmenities)}
           >
-            {[
-              "Furnished",
-              "Shared living room",
-              "Washing Machine",
-              "Yard/patio",
-              "Balcony/roof terrace",
-              "Parking",
-              "Garage",
-              "Disabled Access",
-              "Internet",
-              "Private bathroom",
-            ].map((amenity) => (
-              <li key={amenity} className="flex items-center py-1">
-                <input
-                  type="checkbox"
-                  className="form-check-input ml-1"
-                  id={amenity}
-                  checked={filters.amenities.includes(amenity)}
-                  onChange={(e) => {
-                    const selected = filters.amenities.includes(amenity)
-                      ? filters.amenities.filter((a) => a !== amenity)
-                      : [...filters.amenities, amenity];
-                    handleFilterChange("amenities", e.target.value)}
-                  }
-                />
-                <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
-                  {amenity}
-                </label>
-              </li>
-            ))}
-          </ul>
-        )}
+            {filters.amenities.length > 0
+              ? filters.amenities.join(", ")
+              : "Select amenities"}
+          </button>
+
+          {showAmenities && (
+            <ul
+              className="absolute z-50 w-full p-2 text-black bg-white border border-[#D7D7D7] rounded-[10px]"
+              style={{ maxHeight: "200px", overflowY: "auto" }}
+            >
+              {[
+                "Furnished",
+                "Shared living room",
+                "Washing Machine",
+                "Yard/patio",
+                "Balcony/roof terrace",
+                "Parking",
+                "Garage",
+                "Disabled Access",
+                "Internet",
+                "Private bathroom",
+              ].map((amenity) => (
+                <li key={amenity} className="flex items-center py-1">
+                  <input
+                    type="checkbox"
+                    className="form-check-input ml-1"
+                    id={amenity}
+                    checked={filters.amenities.includes(amenity)}
+                    onChange={() => {
+                      const selected = filters.amenities.includes(amenity)
+                        ? filters.amenities.filter((a) => a !== amenity)
+                        : [...filters.amenities, amenity];
+                      handleFilterChange("amenities", selected);
+                    }}
+                  />
+                  <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
+                    {amenity}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
-    </div>
 
       <div className="mb-4 px-3 py-2 text-black">
         <label className="font-medium text-[18px]">Move-In date</label>

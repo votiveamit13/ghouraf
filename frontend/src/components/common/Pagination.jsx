@@ -1,4 +1,5 @@
 import React from "react";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
 
 const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
@@ -21,7 +22,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
               if (currentPage > 1) onPageChange(currentPage - 1);
             }}
           >
-            <i className="fas fa-angle-left" />
+           <MdKeyboardArrowLeft fill="grey" size={20} />
             <span className="sr-only">Previous</span>
           </PaginationLink>
         </PaginationItem>
@@ -48,7 +49,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
               if (currentPage < totalPages) onPageChange(currentPage + 1);
             }}
           >
-            <i className="fas fa-angle-right" />
+            <MdKeyboardArrowRight fill="grey" size={20} />
             <span className="sr-only">Next</span>
           </PaginationLink>
         </PaginationItem>

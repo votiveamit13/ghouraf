@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 import AdminNavbar from "components/admin/Navbars/AdminNavbar.js";

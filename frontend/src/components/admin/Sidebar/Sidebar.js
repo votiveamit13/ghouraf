@@ -80,7 +80,7 @@ const Sidebar = (props) => {
           <NavItem key={key}>
             <NavLink
               to={prop.layout + prop.path}
-              end={prop.path === ""}   // 👈 only Dashboard uses exact match
+              end={prop.path === ""} 
               tag={NavLinkRRD}
               className={({ isActive }) =>
                 isActive ? "active nav-link" : "nav-link"

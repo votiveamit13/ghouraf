@@ -23,44 +23,47 @@ export default function TeamUp() {
     const [loading, setLoading] = useState(false);
     const itemsPerPage = 10;
 
-useEffect(() => {
-  const fetchTeamups = async () => {
-    setLoading(true); // ✅ start loader
+    useEffect(() => {
+        const fetchTeamups = async () => {
+            setLoading(true);
 
-    try {
-      const params = {
-        page,
-        limit: itemsPerPage,
-        ...filters,
-      };
+            try {
+                const params = {
+                    page,
+                    limit: itemsPerPage,
+                    ...filters,
+                };
 
-      // remove unused filters
-      Object.keys(params).forEach((key) => {
-        if (
-          params[key] === "all" ||
-          params[key] === "any" ||
-          params[key] === "" ||
-          params[key] === 0
-        ) {
-          delete params[key];
-        }
-      });
+                Object.keys(params).forEach((key) => {
+                    if (params[key] === "all" || params[key] === "any" || params[key] === "" || params[key] === 0 || (Array.isArray(params[key]) && params[key].length === 0)) {
+                        delete params[key];
+                    }
+                });
 
-const res = await axios.get(`${apiUrl}teamups`, { params });
-console.log("TeamUp API response:", res.data);
-setTeamups(res.data.data || []); 
-setTotalPages(res.data.pages || 1);
-    } catch (err) {
-      console.error("Failed to fetch team-ups:", err);
-      setTeamups([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false); // ✅ end loader
-    }
-  };
+                const queryString = new URLSearchParams();
+                Object.entries(params).forEach(([key, value]) => {
+                    if (Array.isArray(value)) {
+                        value.forEach((v) => queryString.append(key, v));
+                    } else {
+                        queryString.append(key, value);
+                    }
+                });
 
-  fetchTeamups();
-}, [page, filters, apiUrl]);
+                const res = await axios.get(`${apiUrl}teamups?${queryString.toString()}`);
+                console.log("TeamUp API response:", res.data);
+                setTeamups(res.data.data || []);
+                setTotalPages(res.data.pages || 1);
+            } catch (err) {
+                console.error("Failed to fetch team-ups:", err);
+                setTeamups([]);
+                setTotalPages(1);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTeamups();
+    }, [page, filters, apiUrl]);
 
     return (
         <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">

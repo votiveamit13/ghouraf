@@ -301,4 +301,23 @@ export const getTeamUps = async (req, res) => {
   }
 };
 
+export const getTeamUpById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const teamup = await TeamUp.findById(id)
+      .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
+
+      if(!teamup) {
+        return res.status(404).json({ success: false, message: "Team Up not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: space,
+      });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 

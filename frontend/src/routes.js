@@ -1,17 +1,20 @@
 import Users from "pages/admin/user-management/page";
 import LoginPage from "pages/admin/login/page";
 import AdminDashboard from "pages/admin/page";
-import { BsPostcard } from "react-icons/bs";
+import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 import Edit from "pages/admin/user-management/edit-details/page";
 import ViewDetails from "pages/admin/user-management/view-details/page";
 import ContactForm from "pages/admin/contact-form/page";
-import { MdOutlineContactMail } from "react-icons/md";
+import { MdContactMail, MdOutlineBedroomParent } from "react-icons/md";
 import FaqManagement from "pages/admin/faq-management/page";
-import { FaQuestion } from "react-icons/fa6";
+import { FaQuestion, FaQuora, FaRegCircleUser } from "react-icons/fa6";
 import AddFaq from "components/admin/faq-management/AddFaq";
 import EditFaq from "components/admin/faq-management/EditFaq";
 import Spaces from "components/admin/post_management/Spaces";
 import TeamUps from "components/admin/post_management/TeamUps";
+import { AiFillDashboard } from "react-icons/ai";
+import { FaUserCog } from "react-icons/fa";
+import { RiTeamLine } from "react-icons/ri";
 
 export const adminRoutes = [
   {
@@ -25,7 +28,7 @@ export const adminRoutes = [
   {
     path: "",
     name: "Dashboard",
-    icon: "ni ni-tv-2 text-[#565ABF]",
+    icon: <AiFillDashboard size={20} className="text-[#565ABF]" />,
     component: <AdminDashboard />,
     layout: "/admin",
     showInSidebar: true
@@ -33,12 +36,12 @@ export const adminRoutes = [
   {
 
     name: "User Management",
-    icon: "ni ni-bullet-list-67 text-[#565ABF]",
+    icon: <FaUserCog size={20} className="text-[#565ABF]" />,
     subRoutes: [
       {
         path: "/user-management",
         name: "Users List",
-        icon: "ni ni-bullet-list-67 text-[#565ABF]",
+        icon: <FaRegCircleUser className="text-[#565ABF]" />,
         component: <Users />,
         layout: "/admin",
       },
@@ -58,7 +61,7 @@ export const adminRoutes = [
   },
   {
     name: "Post Management",
-    icon: "ni ni-single-02 text-[#565ABF]",
+    icon: <BsFillFileEarmarkPostFill size={20} className="text-[#565ABF]" />,
     subRoutes: [
       //       {
       //   path: "/post-management/create-post",
@@ -70,14 +73,14 @@ export const adminRoutes = [
       {
         path: "/post-management/spaces",
         name: "Spaces",
-        icon: <BsPostcard className="text-[#565ABF]" />,
+        icon: <MdOutlineBedroomParent className="text-[#565ABF]" />,
         component: <Spaces />,
         layout: "/admin",
       },
       {
         path: "/post-management/team-ups",
         name: "Team Ups",
-        icon: <BsPostcard className="text-[#565ABF]" />,
+        icon: <RiTeamLine className="text-[#565ABF]" />,
         component: <TeamUps />,
         layout: "/admin",
       }
@@ -86,7 +89,7 @@ export const adminRoutes = [
   {
 
     name: "FAQ Management",
-    icon: <FaQuestion className="text-[#565ABF]" />,
+    icon: <FaQuora size={20} className="text-[#565ABF]" />,
     subRoutes: [
       {
         path: "/faq-management",
@@ -112,7 +115,7 @@ export const adminRoutes = [
   {
     path: "/contact-forms",
     name: "Contact Forms",
-    icon: <MdOutlineContactMail className="text-[#565ABF]" />,
+    icon: <MdContactMail size={20} className="text-[#565ABF]" />,
     component: <ContactForm />,
     layout: "/admin",
   }
