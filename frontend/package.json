@@ -51,6 +51,7 @@
     "sass": "1.69.5"
   },
   "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^7.0.2",
     "@tailwindcss/postcss": "^4.1.11",
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",

@@ -230,4 +230,75 @@ export const createTeamUp = async (req, res) => {
   }
 };
 
+export const getTeamUps = async (req, res) => {
+  try {
+     const {
+      minValue,
+      maxValue,
+      priceType,
+      smoking,
+      roommatePref,
+      moveInDate,
+      amenities,
+      page = 1,
+      limit = 10,
+     } = req.query;
+
+     const query = {
+      status: "active",
+      available: true,
+      is_deleted: false,
+     };
+
+     if (minValue || maxValue) {
+      query.budget = {};
+      if (minValue) query.budget.$gte = Number(minValue);
+      if (maxValue) query.budget.$lte = Number(maxValue);
+     }
+
+     if (priceType) query.budgetType = priceType;
+
+     if (smoking && smoking !== "all") {
+      query.smoke = smoking === "allowed";
+     }
+
+     if (roommatePref && roommatePref !== "any") {
+      query.roommatePref = roommatePref;
+    }
+
+    if (moveInDate) {
+      query.moveInDate = { $lte: new Date(moveInDate) };
+    }
+
+    if (amenities) {
+      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
+      query.amenities = { $all: amenitiesArray };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const teamUps = await TeamUp.find(query)
+      .select(
+        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available"
+      )
+      .populate("user", "profile.firstName profile.lastName profile.photo")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await TeamUp.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      data: teamUps,
+    });
+  } catch (error) {
+    console.error("Get TeamUps error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
