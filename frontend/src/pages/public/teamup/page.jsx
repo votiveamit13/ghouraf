@@ -23,39 +23,45 @@ export default function TeamUp() {
     const [loading, setLoading] = useState(false);
     const itemsPerPage = 10;
 
-    useEffect(() => {
-        const fetchTeamups = async () => {
-            try {
-                const params = {
-                    page,
-                    limit: itemsPerPage,
-                    ...filters,
-                };
+useEffect(() => {
+  const fetchTeamups = async () => {
+    setLoading(true); // ✅ start loader
 
-                Object.keys(params).forEach((key) => {
-                    if (
-                        params[key] === "all" ||
-                        params[key] === "any" ||
-                        params[key] === "" ||
-                        params[key] === 0
-                    ) {
-                        delete params[key];
-                    }
-                });
+    try {
+      const params = {
+        page,
+        limit: itemsPerPage,
+        ...filters,
+      };
 
-                const { data } = await axios.get(`${apiUrl}teamups`, { params });
-                setTeamups(data.data);
-                setTotalPages(data.pages);
-            } catch (err) {
-                console.error("Failed to fetch team-ups:", err);
-                setTeamups([]);
-                setTotalPages(1);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchTeamups();
-    }, [page, filters, apiUrl]);
+      // remove unused filters
+      Object.keys(params).forEach((key) => {
+        if (
+          params[key] === "all" ||
+          params[key] === "any" ||
+          params[key] === "" ||
+          params[key] === 0
+        ) {
+          delete params[key];
+        }
+      });
+
+const res = await axios.get(`${apiUrl}teamups`, { params });
+console.log("TeamUp API response:", res.data);
+setTeamups(res.data.data || []); 
+setTotalPages(res.data.pages || 1);
+    } catch (err) {
+      console.error("Failed to fetch team-ups:", err);
+      setTeamups([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false); // ✅ end loader
+    }
+  };
+
+  fetchTeamups();
+}, [page, filters, apiUrl]);
+
     return (
         <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="col-span-1 space-y-4">

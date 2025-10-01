@@ -5,10 +5,10 @@ export default function Filters({ filters, setFilters, setPage}) {
   const dropdownRef = useRef(null);
   const defaultFilters = {
     minValue: 0,
-    maxValue: 1300,
+    maxValue: 100000,
     priceType: "",
-    smoking: "all",
-    roommatePref: "any",
+    smoking: "",
+    roommatePref: "",
     amenities: [],
     moveInDate: "",
   };

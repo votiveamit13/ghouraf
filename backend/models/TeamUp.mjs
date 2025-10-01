@@ -10,7 +10,7 @@ const TeamUpSchema = new mongoose.Schema({
     state: { type: String, required: true },
     city: { type: String, required: true },
     zip: { type: String, required: true },
-    budget: { type: String, required: true },
+    budget: { type: Number, required: true },
     budgetType: { type: String, enum: budgetType, required: true },
     moveInDate: { type: Date },
     period: { type: String },
