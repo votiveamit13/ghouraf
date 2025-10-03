@@ -20,7 +20,7 @@ router.put("/auth/profile", auth, upload.single("photo"), updateProfile);
 
 router.get("/auth/me", auth, getProfile);
 
-routet.get("/auth/:id", getUserById);
+router.get("/auth/:id", getUserById);
 
 router.use("/posts", postRoutes)
 
