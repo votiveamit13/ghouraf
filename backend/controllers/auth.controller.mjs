@@ -374,7 +374,7 @@ export const getUserById = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id).select(
-      "_id firstName lastName photo email createdAt"
+      "_id profile.firstName profile.lastName profile.photo email createdAt"
     );
 
     if(!user) {
