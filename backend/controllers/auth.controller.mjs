@@ -368,3 +368,22 @@ else if (section === "email") {
 export const getProfile = async (req, res) => {
   res.json(req.user);
 };
+
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id).select(
+      "_id firstName lastName photo email createdAt"
+    );
+
+    if(!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
