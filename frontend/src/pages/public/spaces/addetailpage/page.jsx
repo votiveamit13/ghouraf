@@ -14,6 +14,7 @@ import { getFullLocation } from "utils/locationHelper";
 import { Link } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { getChatId } from "utils/firebaseChatHelper";
+import { toast } from "react-toastify";
 
 export default function DetailPage({ targetUserId }) {
   const { id } = useParams();
@@ -207,6 +208,10 @@ export default function DetailPage({ targetUserId }) {
   ];
 
   const handleMessageClick = async () => {
+      if (!user) {
+    toast.warning("Login First");
+    return;
+  }
     if (!user || !space?.user?._id) return;
 
     if (user._id === space.user._id) return;
