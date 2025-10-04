@@ -54,6 +54,7 @@ root.render(
           <Route path="/user/team-up-post" element={<Public><TeamUpAd/></Public>} />
           <Route path="/user/thank-you" element={<Public><ThankYouDialog/></Public>} />
           <Route path="/user/messages" element={<Public><Messages/></Public>} />
+          <Route path="/user/messages/:chatId" element={<Public><Messages/></Public>} />
         </Route>
       </Routes>
       <ToastContainer

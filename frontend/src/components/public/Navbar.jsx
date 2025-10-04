@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiMenu, HiX, HiOutlineMail } from "react-icons/hi";
 import { Img } from "react-image";
@@ -52,6 +52,7 @@ export default function Navbar() {
   const [pendingEmail, setPendingEmail] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
+  const location = useLocation()
 
 
 
@@ -119,8 +120,10 @@ const handleLogin = async (e) => {
 
 if (res.user) {
   toast.success("Login Successful");
-  navigate("/user");
   setLoginDialog(false);
+  if (!location.pathname.startsWith("/spaces/")) {
+          navigate("/user");
+  }
   return;
 }
 

@@ -1,31 +1,29 @@
 "use client";
 import { useEffect, useState } from "react";
 import "preline/preline";
-// import property1 from "../../../../assets/img/ghouraf/property1.png";
-// import property2 from "../../../../assets/img/ghouraf/property2.png";
-// import property3 from "../../../../assets/img/ghouraf/property3.jpg";
-// import property4 from "../../../../assets/img/ghouraf/property4.jpg";
-// import property5 from "../../../../assets/img/ghouraf/property5.jpg";
-// import property6 from "../../../../assets/img/ghouraf/property6.jpg";
-// import property7 from "../../../../assets/img/ghouraf/property7.png";
-// import property8 from "../../../../assets/img/ghouraf/property8.jpg";
 import agent1 from "../../../../assets/img/ghouraf/agent1.jpg";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { TfiEmail, TfiLocationPin } from "react-icons/tfi";
 import { BiCheckShield } from "react-icons/bi";
 import { BsFlag } from "react-icons/bs";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loader from "components/common/Loader";
 import { getFullLocation } from "utils/locationHelper";
 import { Link } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
+import { getChatId } from "utils/firebaseChatHelper";
 
-export default function DetailPage() {
+export default function DetailPage({ targetUserId }) {
   const { id } = useParams();
   const apiUrl = process.env.REACT_APP_API_URL;
   const [space, setSpace] = useState(null);
   const [showTeamUp, setShowTeamUp] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [messageLoading, setMessageLoading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -51,107 +49,107 @@ export default function DetailPage() {
   }, [id, apiUrl]);
 
   useEffect(() => {
-  if (!space || typeof window === "undefined") return;
+    if (!space || typeof window === "undefined") return;
 
-  window.HSCarousel?.autoInit();
+    window.HSCarousel?.autoInit();
 
-  const root = document.querySelector("[data-hs-carousel]");
-  if (!root) return;
+    const root = document.querySelector("[data-hs-carousel]");
+    if (!root) return;
 
-  const body = root.querySelector(".hs-carousel-body");
-  const viewport = body?.parentElement;
-  const slides = Array.from(root.querySelectorAll(".hs-carousel-slide"));
-  const pagination = root.querySelector(
-    "[data-hs-carousel-pagination], .hs-carousel-pagination"
-  );
-  const thumbs = pagination ? Array.from(pagination.children) : [];
+    const body = root.querySelector(".hs-carousel-body");
+    const viewport = body?.parentElement;
+    const slides = Array.from(root.querySelectorAll(".hs-carousel-slide"));
+    const pagination = root.querySelector(
+      "[data-hs-carousel-pagination], .hs-carousel-pagination"
+    );
+    const thumbs = pagination ? Array.from(pagination.children) : [];
 
-  if (!body || !viewport || slides.length === 0 || thumbs.length === 0) return;
+    if (!body || !viewport || slides.length === 0 || thumbs.length === 0) return;
 
-  const centerThumb = (thumbEl) => {
-    if (!thumbEl) return;
-    const container = pagination;
-    const containerRect = container.getBoundingClientRect();
-    const elRect = thumbEl.getBoundingClientRect();
+    const centerThumb = (thumbEl) => {
+      if (!thumbEl) return;
+      const container = pagination;
+      const containerRect = container.getBoundingClientRect();
+      const elRect = thumbEl.getBoundingClientRect();
 
-    const delta =
-      elRect.left + elRect.width / 2 - (containerRect.left + containerRect.width / 2);
+      const delta =
+        elRect.left + elRect.width / 2 - (containerRect.left + containerRect.width / 2);
 
-    container.scrollTo({
-      left: Math.max(0, container.scrollLeft + delta),
-      behavior: "smooth",
-    });
-  };
+      container.scrollTo({
+        left: Math.max(0, container.scrollLeft + delta),
+        behavior: "smooth",
+      });
+    };
 
-  let activeIndex = -1;
-  const setActiveIndex = (idx) => {
-    if (idx === activeIndex) return;
-    activeIndex = idx;
+    let activeIndex = -1;
+    const setActiveIndex = (idx) => {
+      if (idx === activeIndex) return;
+      activeIndex = idx;
 
-    thumbs.forEach((t, i) => {
-      t.classList.toggle("hs-carousel-active", i === idx);
-      t.classList.toggle("active-thumb", i === idx);
-    });
+      thumbs.forEach((t, i) => {
+        t.classList.toggle("hs-carousel-active", i === idx);
+        t.classList.toggle("active-thumb", i === idx);
+      });
 
-    centerThumb(thumbs[idx]);
-  };
+      centerThumb(thumbs[idx]);
+    };
 
-  const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
-  const io = new IntersectionObserver(
-    (entries) => {
-      let best = null;
-      for (const e of entries) {
-        if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+    const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
+    const io = new IntersectionObserver(
+      (entries) => {
+        let best = null;
+        for (const e of entries) {
+          if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+        }
+        if (!best) return;
+        const index = slides.indexOf(best.target);
+        if (index !== -1) setActiveIndex(index);
+      },
+      {
+        root: viewport,
+        threshold: thresholds,
       }
-      if (!best) return;
-      const index = slides.indexOf(best.target);
-      if (index !== -1) setActiveIndex(index);
-    },
-    {
-      root: viewport,
-      threshold: thresholds,
-    }
-  );
+    );
 
-  slides.forEach((s) => io.observe(s));
+    slides.forEach((s) => io.observe(s));
 
-  const computeVisibleByOverlap = () => {
-    const vp = viewport.getBoundingClientRect();
-    let bestIdx = 0;
-    let bestArea = -1;
-    slides.forEach((s, i) => {
-      const r = s.getBoundingClientRect();
-      const overlapW = Math.max(0, Math.min(r.right, vp.right) - Math.max(r.left, vp.left));
-      const overlapH = Math.max(0, Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top));
-      const area = overlapW * overlapH;
-      if (area > bestArea) {
-        bestArea = area;
-        bestIdx = i;
-      }
-    });
-    setActiveIndex(bestIdx);
-  };
+    const computeVisibleByOverlap = () => {
+      const vp = viewport.getBoundingClientRect();
+      let bestIdx = 0;
+      let bestArea = -1;
+      slides.forEach((s, i) => {
+        const r = s.getBoundingClientRect();
+        const overlapW = Math.max(0, Math.min(r.right, vp.right) - Math.max(r.left, vp.left));
+        const overlapH = Math.max(0, Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top));
+        const area = overlapW * overlapH;
+        if (area > bestArea) {
+          bestArea = area;
+          bestIdx = i;
+        }
+      });
+      setActiveIndex(bestIdx);
+    };
 
-  setTimeout(() => {
-    computeVisibleByOverlap();
-    body.classList.remove("opacity-0"); 
-  }, 120);
+    setTimeout(() => {
+      computeVisibleByOverlap();
+      body.classList.remove("opacity-0");
+    }, 120);
 
-  const prev = root.querySelector(".hs-carousel-prev");
-  const next = root.querySelector(".hs-carousel-next");
-  const arrowHandler = () => setTimeout(computeVisibleByOverlap, 40);
+    const prev = root.querySelector(".hs-carousel-prev");
+    const next = root.querySelector(".hs-carousel-next");
+    const arrowHandler = () => setTimeout(computeVisibleByOverlap, 40);
 
-  prev?.addEventListener("click", arrowHandler);
-  next?.addEventListener("click", arrowHandler);
-  window.addEventListener("resize", computeVisibleByOverlap);
+    prev?.addEventListener("click", arrowHandler);
+    next?.addEventListener("click", arrowHandler);
+    window.addEventListener("resize", computeVisibleByOverlap);
 
-  return () => {
-    io.disconnect();
-    prev?.removeEventListener("click", arrowHandler);
-    next?.removeEventListener("click", arrowHandler);
-    window.removeEventListener("resize", computeVisibleByOverlap);
-  };
-}, [space]); 
+    return () => {
+      io.disconnect();
+      prev?.removeEventListener("click", arrowHandler);
+      next?.removeEventListener("click", arrowHandler);
+      window.removeEventListener("resize", computeVisibleByOverlap);
+    };
+  }, [space]);
 
 
   const interestedPeople = [
@@ -208,13 +206,31 @@ export default function DetailPage() {
     ...(space.photos?.map((p) => p.url) || []),
   ];
 
+  const handleMessageClick = async () => {
+    if (!user || !space?.user?._id) return;
+
+    if (user._id === space.user._id) return;
+
+    try {
+      setMessageLoading(true);
+      const chatId = await getChatId(user._id, space.user._id);
+      navigate(`/user/messages/${chatId}?receiverId=${space.user._id}`);
+    } catch (error) {
+      console.error("Error opening chat:", error);
+    } finally {
+      setMessageLoading(false);
+    }
+  };
+
+
+
   return (
     <>
       <div className="container px-4 mt-5">
         <Link to={`/spaces`}>
-        <button className="text-sm px-4 py-2 font-medium text-black flex items-center gap-2 border-[1px] border-[#AACCEE] rounded-[2px]">
-          <FaArrowLeftLong />  Back to Ads
-        </button>
+          <button className="text-sm px-4 py-2 font-medium text-black flex items-center gap-2 border-[1px] border-[#AACCEE] rounded-[2px]">
+            <FaArrowLeftLong />  Back to Ads
+          </button>
         </Link>
       </div>
 
@@ -349,7 +365,7 @@ export default function DetailPage() {
                   </tr> */}
                   <tr>
                     <td className="py-1 w-40 font-medium">Smoking</td>
-                   <td>{space.smoking ? "Allowed" : "Not Allowed"}</td>
+                    <td>{space.smoking ? "Allowed" : "Not Allowed"}</td>
                   </tr>
                   {/* <tr>
                     <td className="py-1 w-40 font-medium">Couples OK</td>
@@ -367,7 +383,7 @@ export default function DetailPage() {
               src={
                 space.user?.profile?.photo
                   ? `${space.user.profile.photo}`
-                  : agent1
+                  : defaultImage
               }
               alt="user"
               className="w-20 h-20 rounded-full mx-auto object-cover"
@@ -379,9 +395,21 @@ export default function DetailPage() {
               month: "short",
               year: "numeric",
             })}</span></p>
-            <button className="mt-3 w-full bg-[#565ABF] flex items-center justify-center gap-2 text-white py-2 rounded-[5px]">
-              <TfiEmail /> Message
+            <button
+              onClick={handleMessageClick}
+              disabled={user?._id === space.user?._id || messageLoading}
+              className={`mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-[5px] text-white 
+    ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed" : "bg-[#565ABF]"}
+  `}
+            >
+              {messageLoading ?
+                <div className="flex items-center justify-center w-6 h-6">
+                  <div className="transform scale-50">
+                    <Loader />
+                  </div>
+                </div> : <><TfiEmail /> Message</>}
             </button>
+
           </div>
 
           <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px]">

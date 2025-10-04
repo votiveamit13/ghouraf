@@ -1,10 +1,11 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { setUserOnlineStatus } from "utils/firebaseChatHelper";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -34,39 +35,43 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, [fetchProfile]);
 
-const login = async (idToken) => {
-  try {
-    const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
+  const login = async (idToken) => {
+    try {
+      const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
 
-if (res.data?.user) {
-  setUser(res.data.user);
-  setToken(idToken);
-  localStorage.setItem("token", idToken); 
-}
+      if (res.data?.user) {
+        setUser(res.data.user);
+        setToken(idToken);
+        localStorage.setItem("token", idToken);
+        setUserOnlineStatus(res.data.user._id, true);
+      }
 
-    return res.data;
-  } catch (err) {
-    const status = err.response?.status;
-    const data = err.response?.data || {};
+      return res.data;
+    } catch (err) {
+      const status = err.response?.status;
+      const data = err.response?.data || {};
 
-    if (status === 403 && data.emailVerified === false) {
-      return { emailVerified: false, message: data.message };
+      if (status === 403 && data.emailVerified === false) {
+        return { emailVerified: false, message: data.message };
+      }
+
+      if (status === 403 && data.inactive) {
+        return { inactive: true, message: data.message };
+      }
+
+      return { error: true, message: data.message || "Login failed. Try again later." };
     }
+  };
 
-    if (status === 403 && data.inactive) {
-      return { inactive: true, message: data.message };
+
+  const logout = () => {
+    if (user?._id) {
+      setUserOnlineStatus(user._id, false);
     }
-
-    return { error: true, message: data.message || "Login failed. Try again later." };
-  }
-};
-
-
-const logout = () => {
-  setUser(null);
-  setToken(null);
-  localStorage.removeItem("token"); 
-};
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
+  };
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, loading, fetchProfile }}>

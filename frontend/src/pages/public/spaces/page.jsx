@@ -29,6 +29,7 @@ const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchSpaces = async () => {
+          setLoading(true);
             try {
                 const params = {
                     page,

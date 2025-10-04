@@ -1,21 +1,28 @@
 import React, { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { toast } from "react-toastify";
-
-const isAuthenticated = () => {
-  return !!localStorage.getItem("token");
-};
+import { useAuth } from "context/AuthContext";
 
 export default function PrivateRoute() {
-  const auth = isAuthenticated();
+  const { user, token, loading } = useAuth();
 
   useEffect(() => {
-    if (!auth) {
-      toast.warning("Login first");
+    if (!loading) {
+      if (!token) {
+        toast.warning("Login first");
+      } else if (token && !user) {
+        toast.error("Session timeout");
+      }
     }
-  }, [auth]);
+  }, [token, user, loading]);
 
-  if (!auth) {
+  if (loading) return null;
+
+  if (token && !user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!token) {
     return <Navigate to="/" replace />;
   }
 

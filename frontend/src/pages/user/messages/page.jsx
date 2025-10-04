@@ -1,184 +1,398 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import { CiSearch } from "react-icons/ci";
 import { GoDotFill } from "react-icons/go";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { TbSend2 } from "react-icons/tb";
+import { useAuth } from "context/AuthContext";
+import {
+  listenChats,
+  listenMessages,
+  listenChatMeta,
+  sendMessage,
+  getChatId
+} from "utils/firebaseChatHelper";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
+import Loader from "components/common/Loader";
+import { MdAddAPhoto } from "react-icons/md";
+import { BiSolidVideoPlus } from "react-icons/bi";
+import { HiMiniDocumentPlus } from "react-icons/hi2";
+import { deleteChat } from "utils/firebaseChatHelper";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function Messages() {
-  const chats = [
-    { name: "Esther Howard", subtitle: "Microsoft", time: "1m" },
-    { name: "Devon Lane", subtitle: "New Mexico", time: "5m" },
-    { name: "Annette Black", subtitle: "2464 Royal Ln, Mesa...", time: "1h" },
-    { name: "Marvin McKinney", subtitle: "Amet minim mollit...", time: "2d" },
-    { name: "Theresa Webb", subtitle: "177", time: "1w" },
-    { name: "Dianne Russell", subtitle: "Women's White Handbag", time: "1w" },
-    { name: "Cameron Williamson", subtitle: "2 hours", time: "1m" },
-    { name: "Albert Flores", subtitle: "Okay Wilson. I'm okay...", time: "2h" },
-    { name: "Guy Hawkins", subtitle: "Marketing Officer", time: "2m" },
-  ];
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const { chatId: paramChatId } = useParams();
+  const [searchParams] = useSearchParams();
+  const receiverIdFromQuery = searchParams.get("receiverId");
+  const { user } = useAuth();
+  const [chats, setChats] = useState([]);
+  const [chatId, setChatId] = useState(paramChatId || null);
+  const [receiverId, setReceiverId] = useState(receiverIdFromQuery || null);
+  const [messages, setMessages] = useState([]);
+  const [chatMeta, setChatMeta] = useState({});
+  const [text, setText] = useState("");
+  const [userMap, setUserMap] = useState({});
+  const [loadingChats, setLoadingChats] = useState(true);
+  const [showAttach, setShowAttach] = useState(false);
+  const messagesEndRef = useRef(null);
+  const [userStatusMap, setUserStatusMap] = useState({});
+    const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedChatId, setSelectedChatId] = useState(null);
+
+  useEffect(() => {
+    // console.log("Messages: user value:", user);
+    // if (!user) {
+    //   // console.log("Messages: no user yet - not subscribing");
+    //   return;
+    // }
+    // console.log("Messages: subscribing listenChats for", user._id);
+
+    setLoadingChats(true);
+
+    const unsubscribe = listenChats(user._id, (fetchedChats) => {
+      // console.log("listenChats -> callback got", fetchedChats);
+      setChats(fetchedChats);
+      setLoadingChats(false);
+    });
+
+    return () => {
+      // console.log("Messages: unsubscribing listenChats");
+      unsubscribe && unsubscribe();
+    };
+  }, [user]);
+
+useEffect(() => {
+  if (!user || chats.length === 0) return;
+
+  const selectChat = async () => {
+    if (receiverIdFromQuery) {
+      // check if userMap for receiver exists
+      if (!userMap[receiverIdFromQuery]) return;
+
+      let existingChat = chats.find(chat =>
+        chat.participants.includes(receiverIdFromQuery)
+      );
+
+      if (!existingChat) {
+        const newChatId = await getChatId(user._id, receiverIdFromQuery);
+        setChatId(newChatId);
+        setReceiverId(receiverIdFromQuery);
+      } else {
+        handleSelectChat(existingChat);
+      }
+    }
+  };
+
+  selectChat();
+
+}, [chats, user, receiverIdFromQuery, userMap]);
+
+
+  useEffect(() => {
+    if (!chatId) return;
+    const unsubscribeMsgs = listenMessages(chatId, setMessages);
+    const unsubscribeMeta = listenChatMeta(chatId, setChatMeta);
+
+    return () => {
+      unsubscribeMsgs();
+      unsubscribeMeta();
+    };
+  }, [chatId]);
+
+useEffect(() => {
+  if (!chats || chats.length === 0) return;
+
+  const unsubscribes = chats.map(chat => {
+    if (!chat?.participants) return () => {}; 
+
+    const otherUserId = chat.participants.find(uid => uid !== user._id);
+    if (!otherUserId) return () => {}; 
+
+    const statusRef = doc(db, "userStatus", otherUserId);
+    return onSnapshot(statusRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setUserStatusMap(prev => ({
+          ...prev,
+          [otherUserId]: docSnap.data().online
+        }));
+      }
+    });
+  }).filter(Boolean);
+
+  return () => unsubscribes.forEach(u => u());
+}, [chats, user]);
+
+
+
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const idsToFetch = new Set();
+      chats.forEach(chat => {
+        chat.participants.forEach(uid => {
+          if (uid !== user._id && !userMap[uid]) idsToFetch.add(uid);
+        });
+      });
+
+      for (const uid of idsToFetch) {
+        try {
+          const res = await fetch(`${apiUrl}auth/${uid}`);
+          const data = await res.json();
+          if (data.success) {
+            setUserMap(prev => ({ ...prev, [uid]: data.user }));
+          }
+        } catch (err) {
+          console.error("Error fetching user from API:", err);
+        }
+      }
+    };
+
+    if (chats.length > 0) fetchUsers();
+  }, [chats, user, userMap, apiUrl]);
+
+  const handleSelectChat = (chat) => {
+    setChatId(chat.id);
+    const otherUser = chat.participants.find(uid => uid !== user._id);
+    setReceiverId(otherUser);
+  };
+
+  const handleSend = async () => {
+    if (!text.trim() || !chatId || !receiverId) return;
+    await sendMessage(chatId, user._id, receiverId, text);
+    setText("");
+  };
+
+  useEffect(() => {
+    if (!messagesEndRef.current) return;
+
+    messagesEndRef.current.scrollTo({
+      top: messagesEndRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages]);
+
+  const handleDeleteClick = (chatId) => {
+    setSelectedChatId(chatId);
+    setShowConfirm(true);
+  };
+
+const handleConfirmDelete = async () => {
+  if (!selectedChatId) return;
+
+  const success = await deleteChat(selectedChatId);
+  if (success) {
+    setChats(prev => prev.filter(chat => chat.id !== selectedChatId));
+
+    if (chatId === selectedChatId) {
+      setChatId(null);
+      setReceiverId(null);
+      setMessages([]);
+    }
+  }
+
+  setShowConfirm(false);
+  setSelectedChatId(null);
+};
+
+
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
+    setSelectedChatId(null);
+  };
 
   return (
     <div className="container">
-      <div className="mt-5 mb-8 h-[550px] w-full bg-white flex border rounded-lg shadow-sm">
-        <div className="w-1/4 border-r flex flex-col">
-          <div className="p-3 border-b">
-            <h1 className="mb-3 text-black font-semibold text-[20px]">Message</h1>
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Search"
-                className="w-full px-3 py-2 pr-10 rounded-[5px] border-[1px] border-[#A1A1A1] text-sm bg-white"
-              />
-              <CiSearch size={25} className="absolute right-3 top-1/2 -translate-y-1/2 text-black" />
+      {loadingChats ? (
+        <Loader fullScreen={true} />
+      ) : (
+        <div className="mt-5 mb-8 h-[550px] w-full bg-white flex border rounded-lg shadow-sm">
+          {/* Left panel */}
+          <div className="w-1/4 border-r flex flex-col">
+            <div className="p-3 border-b">
+              <h1 className="mb-3 text-black font-semibold text-[20px]">
+                Messages
+              </h1>
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="w-full px-3 py-2 pr-10 rounded-[5px] border-[1px] border-[#A1A1A1] text-sm bg-white"
+                />
+                <CiSearch
+                  size={25}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-black"
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto no-scrollbar">
+              {chats.map((chat) => {
+                const otherUserId = chat.participants.find(uid => uid !== user._id);
+                const unread = chat.unreadCount?.[user._id] || 0;
+                const otherUser = userMap[otherUserId];
+
+                return (
+                  <div
+                    key={chat.id}
+                    onClick={() => handleSelectChat(chat)}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer ${chat.id === chatId ? "bg-black" : ""}`}
+                  >
+                    <div className="relative">
+                      <img
+                        src={otherUser?.profile?.photo || defaultImage}
+                        alt={otherUser?.firstName || "User"}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <GoDotFill
+                        fill={userStatusMap[otherUserId] ? "#27C200" : "#A1A1A1"}
+                        className="absolute right-[-3px] bottom-[-4px]"
+                      />
+                    </div>
+                    <div className={`flex-1`}>
+                      <h4 className={`text-sm font-medium ${chat.id === chatId ? "text-white" : ""}`}>
+                        {otherUser?.profile?.firstName || "User"} {otherUser?.profile?.lastName || ""}
+                      </h4>
+                      <p className="text-xs truncate w-40 text-gray-500">{chat.lastMessage}</p>
+                    </div>
+                    <span className="text-xs text-gray-400">{unread > 0 ? unread : ""}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto no-scrollbar">
-            {chats.map((chat, idx) => (
-              <div
-                key={idx}
-                className={`flex items-center gap-3 px-4 py-3 cursor-pointer ${idx === 0 ? "bg-black text-white" : "hover:bg-gray-100"
-                  }`}
-              >
-                <div className="relative">
-                  <img
-                    src={`https://i.pravatar.cc/40?img=${idx + 1}`}
-                    alt={chat.name}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <GoDotFill fill="#27C200" className="absolute right-[-3px] bottom-[-4px]" />
+          {/* Right panel */}
+          <div className="flex-1 flex flex-col">
+            {chatId && receiverId ? (
+              <>
+                <div className="flex justify-between items-center px-3 border-b">
+                  <div className="flex items-center py-3">
+                    <img
+                      src={userMap[receiverId]?.profile?.photo || defaultImage}
+                      alt="Receiver"
+                      className="w-10 h-10 rounded-full mr-3"
+                    />
+                    <div>
+                      <h3 className="font-medium text-gray-800">
+                        {userMap[receiverId]?.profile?.firstName || "User"} {userMap[receiverId]?.profile?.lastName || ""}
+                      </h3>
+                      <p className="text-xs text-[#636A80] flex items-center gap-1">
+                        <GoDotFill
+                          size={20}
+                          fill={userStatusMap[receiverId] ? "#27C200" : "#A1A1A1"}
+                        />
+                        {userStatusMap[receiverId] ? "Active Now" : "Offline"}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <RiDeleteBinLine size={25} fill="black"
+                      className="text-red-500 cursor-pointer" 
+                      onClick={() => handleDeleteClick(chatId)} 
+                    />
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h4
-                    className={`text-sm font-medium ${idx === 0 ? "text-white" : "text-gray-800"
-                      }`}
-                  >
-                    {chat.name}
-                  </h4>
-                  <p
-                    className={`text-xs truncate w-40 ${idx === 0 ? "text-gray-300" : "text-gray-500"
-                      }`}
-                  >
-                    {chat.subtitle}
-                  </p>
-                </div>
-                <span
-                  className={`text-xs ${idx === 0 ? "text-gray-300" : "text-gray-400"
-                    }`}
+
+                <ConfirmationDialog
+                  show={showConfirm}
+                  title="Delete Chat"
+                  message="Are you sure you want to delete this chat?"
+                  onConfirm={handleConfirmDelete}
+                  onCancel={handleCancelDelete}
+                />
+
+                <div className="flex-1 overflow-y-auto no-scrollbar px-3 py-2 space-y-6 bg-gray-50"
+                  ref={messagesEndRef}
                 >
-                  {chat.time}
-                </span>
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex items-start gap-3 ${msg.senderId === user._id ? "justify-end" : ""}`}
+                    >
+                      {msg.senderId !== user._id && (
+                        <img
+                          src={userMap[msg.senderId]?.profile?.photo || defaultImage}
+                          alt="Sender"
+                          className="w-8 h-8 rounded-full"
+                        />
+                      )}
+                      <div className={msg.senderId === user._id ? "text-right" : ""}>
+                        <div className={`px-3 py-1 rounded-lg text-sm max-w-md ${msg.senderId === user._id ? "bg-[#F3F6FF] text-gray-800" : "bg-[#D7D7D740] text-gray-700"}`}>
+                          <p className="font-semibold">{msg.senderId === user._id ? "You" : userMap[msg.senderId]?.profile?.firstName || "User"}</p>
+                          <p className="leading-[20px]">{msg.text}</p>
+                        </div>
+                        <span className="text-xs text-gray-400">
+                          {msg.timestamp?.toDate
+                            ? msg.timestamp
+                              .toDate()
+                              .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
+                              .toUpperCase()
+                            : ""}
+                        </span>
+                      </div>
+                      {msg.senderId === user._id && (
+                        <img
+                          src={user.profile?.photo || defaultImage}
+                          alt="You"
+                          className="w-8 h-8 rounded-full"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSend();
+                  }}
+                  className="flex items-center border-t p-3 gap-2"
+                >
+                  <div className="relative flex-1">
+                    <AiOutlinePlus
+                      size={30}
+                      onClick={() => setShowAttach(!showAttach)}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+                    />
+
+                    {showAttach && (
+                      <div className="absolute bottom-12 left-0 bg-white shadow-md rounded-md p-2 z-10 w-40">
+                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"><MdAddAPhoto size={20} /> Photos</button>
+                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"><BiSolidVideoPlus size={20} /> Videos</button>
+                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"><HiMiniDocumentPlus size={20} /> Document</button>
+                      </div>
+                    )}
+
+                    <input
+                      type="text"
+                      placeholder="Type your message..."
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      className="w-full pl-[35px] pr-4 py-2 text-[15px]"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-black text-white px-3 py-2 rounded-[5px] flex items-center justify-center"
+                  >
+                    <TbSend2 size={28} />
+                  </button>
+                </form>
+
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-gray-500">
+                Select a chat to start messaging
               </div>
-            ))}
+            )}
           </div>
         </div>
+      )}
 
-        <div className="flex-1 flex flex-col">
-          <div className="flex justify-between items-center px-3 border-b">
-            <div className="flex items-center py-3">
-              <img
-                src="https://i.pravatar.cc/40?img=1"
-                alt="Esther"
-                className="w-10 h-10 rounded-full mr-3"
-              />
-              <div>
-                <h3 className="font-medium text-gray-800">Esther Howard</h3>
-                <p className="text-xs text-[#636A80] flex items-center gap-1"><GoDotFill size={20} fill="#27C200" /> Active Now</p>
-              </div>
-            </div>
-            <div>
-              <RiDeleteBinLine size={25} fill="black" />
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto no-scrollbar px-3 py-2 space-y-6 bg-gray-50">
-            <div className="flex items-start gap-3">
-              <img
-                src="https://i.pravatar.cc/35?img=1"
-                alt="Esther"
-                className="w-8 h-8 rounded-full"
-              />
-              <div>
-                <div className="bg-[#D7D7D740] px-4 py-2 rounded-lg text-sm text-gray-700 max-w-md">
-                  <p className="font-semibold">Esther Howard</p>
-                  <p className="leading-[20px]">Hello Jenny, I want to buy your property but it’s too much expensive.</p>
-                </div>
-                <span className="text-xs text-gray-400">3:10 PM</span>
-              </div>
-            </div>
-
-            <div className="flex items-start justify-end gap-2">
-              <div className="text-right">
-                <div className="bg-[#F3F6FF] px-4 py-2 rounded-lg text-sm text-gray-800 max-w-md">
-                  <p className="font-semibold">Jenny Wilson</p>
-                  <p className="leading-[20px] text-left">
-                    Hey Esther, Sorry I can’t lower the price. It’s already very
-                    low and right now I can’t lower it further.
-                  </p>
-                </div>
-                <span className="text-xs text-gray-400">3:14 PM</span>
-              </div>
-              <img
-                src="https://i.pravatar.cc/35?img=11"
-                alt="Jenny"
-                className="w-8 h-8 rounded-full"
-              />
-            </div>
-
-            <div className="flex items-start gap-2">
-              <img
-                src="https://i.pravatar.cc/35?img=1"
-                alt="Esther"
-                className="w-8 h-8 rounded-full"
-              />
-              <div>
-                <div className="bg-[#D7D7D740] px-4 py-2 rounded-lg text-sm text-gray-700 max-w-md">
-                  <p className="font-semibold">Esther Howard</p>
-                  <p className="leading-[20px]">
-                    Okay Wilson. I’m okay with price, can you tell me about your
-                    property specification and information?
-                  </p>
-                </div>
-                <span className="text-xs text-gray-400">3:15 PM</span>
-              </div>
-            </div>
-
-            <div className="flex items-start justify-end gap-2">
-              <div className="text-right">
-                <div className="bg-[#F3F6FF] px-4 py-2 rounded-lg text-sm text-gray-800 max-w-md">
-                  <p className="font-semibold">Jenny Wilson</p>
-                  <p className="leading-[20px] text-left">
-                    Sure Esther. The property includes [Insert specifications here,
-                    e.g., size, location, features].
-                  </p>
-                </div>
-                <span className="text-xs text-gray-400">3:16 PM</span>
-              </div>
-              <img
-                src="https://i.pravatar.cc/35?img=11"
-                alt="Jenny"
-                className="w-8 h-8 rounded-full"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center border-t p-3 gap-2">
-            <div className="relative flex-1">
-              <AiOutlinePlus size={30} className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Type your message..."
-                className="w-full pl-[35px] pr-4 py-2 text-[15px]"
-              />
-            </div>
-
-            <button className="bg-black text-white px-3 py-2 rounded-[5px] flex items-center justify-center">
-              <TbSend2 size={28} />
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

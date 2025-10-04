@@ -2,6 +2,7 @@ import React from "react";
 import { GrFavorite } from "react-icons/gr";
 import { GoShareAndroid } from "react-icons/go";
 import { getFullLocation } from "utils/locationHelper";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
 
 export default function PropertyCard({ property }) {
     const locationString = getFullLocation(property.city, property.state, property.country);
@@ -22,7 +23,7 @@ export default function PropertyCard({ property }) {
 
                 <div className="flex items-center mt-2 gap-2">
                     <div>
-                        <img src={property.user.profile.photo} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
+                        <img src={property.user.profile.photo || defaultImage} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
                     </div>
                     <div>
                         <p className="text-sm">{property.user.profile.firstName} {property.user.profile.lastName}</p>
