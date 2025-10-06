@@ -40,8 +40,11 @@ export default function Messages() {
   const [showAttach, setShowAttach] = useState(false);
   const messagesEndRef = useRef(null);
   const [userStatusMap, setUserStatusMap] = useState({});
-    const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState(null);
+  const photoInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+  const docInputRef = useRef(null);
 
   useEffect(() => {
     // console.log("Messages: user value:", user);
@@ -65,31 +68,30 @@ export default function Messages() {
     };
   }, [user]);
 
-useEffect(() => {
-  if (!user || chats.length === 0) return;
+  useEffect(() => {
+    if (!user || chats.length === 0) return;
 
-  const selectChat = async () => {
-    if (receiverIdFromQuery) {
-      // check if userMap for receiver exists
-      if (!userMap[receiverIdFromQuery]) return;
+    const selectChat = async () => {
+      if (receiverIdFromQuery) {
+        if (!userMap[receiverIdFromQuery]) return;
 
-      let existingChat = chats.find(chat =>
-        chat.participants.includes(receiverIdFromQuery)
-      );
+        let existingChat = chats.find(chat =>
+          chat.participants.includes(receiverIdFromQuery)
+        );
 
-      if (!existingChat) {
-        const newChatId = await getChatId(user._id, receiverIdFromQuery);
-        setChatId(newChatId);
-        setReceiverId(receiverIdFromQuery);
-      } else {
-        handleSelectChat(existingChat);
+        if (!existingChat) {
+          const newChatId = await getChatId(user._id, receiverIdFromQuery);
+          setChatId(newChatId);
+          setReceiverId(receiverIdFromQuery);
+        } else {
+          handleSelectChat(existingChat);
+        }
       }
-    }
-  };
+    };
 
-  selectChat();
+    selectChat();
 
-}, [chats, user, receiverIdFromQuery, userMap]);
+  }, [chats, user, receiverIdFromQuery, userMap]);
 
 
   useEffect(() => {
@@ -103,31 +105,28 @@ useEffect(() => {
     };
   }, [chatId]);
 
-useEffect(() => {
-  if (!chats || chats.length === 0) return;
+  useEffect(() => {
+    if (!chats || chats.length === 0) return;
 
-  const unsubscribes = chats.map(chat => {
-    if (!chat?.participants) return () => {}; 
+    const unsubscribes = chats.map(chat => {
+      if (!chat?.participants) return () => { };
 
-    const otherUserId = chat.participants.find(uid => uid !== user._id);
-    if (!otherUserId) return () => {}; 
+      const otherUserId = chat.participants.find(uid => uid !== user._id);
+      if (!otherUserId) return () => { };
 
-    const statusRef = doc(db, "userStatus", otherUserId);
-    return onSnapshot(statusRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setUserStatusMap(prev => ({
-          ...prev,
-          [otherUserId]: docSnap.data().online
-        }));
-      }
-    });
-  }).filter(Boolean);
+      const statusRef = doc(db, "userStatus", otherUserId);
+      return onSnapshot(statusRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setUserStatusMap(prev => ({
+            ...prev,
+            [otherUserId]: docSnap.data().online
+          }));
+        }
+      });
+    }).filter(Boolean);
 
-  return () => unsubscribes.forEach(u => u());
-}, [chats, user]);
-
-
-
+    return () => unsubscribes.forEach(u => u());
+  }, [chats, user]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -180,28 +179,36 @@ useEffect(() => {
     setShowConfirm(true);
   };
 
-const handleConfirmDelete = async () => {
-  if (!selectedChatId) return;
+  const handleConfirmDelete = async () => {
+    if (!selectedChatId || !user?._id) return;
 
-  const success = await deleteChat(selectedChatId);
-  if (success) {
-    setChats(prev => prev.filter(chat => chat.id !== selectedChatId));
+    const success = await deleteChat(selectedChatId, user._id);
 
-    if (chatId === selectedChatId) {
-      setChatId(null);
-      setReceiverId(null);
-      setMessages([]);
+    if (success) {
+      setChats(prev => prev.filter(chat => chat.id !== selectedChatId));
+
+      if (chatId === selectedChatId) {
+        setChatId(null);
+        setReceiverId(null);
+        setMessages([]);
+      }
     }
-  }
 
-  setShowConfirm(false);
-  setSelectedChatId(null);
-};
-
+    setShowConfirm(false);
+    setSelectedChatId(null);
+  };
 
   const handleCancelDelete = () => {
     setShowConfirm(false);
     setSelectedChatId(null);
+  };
+
+  const handleFileSelect = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file || !chatId || !receiverId) return;
+
+    await sendMessage(chatId, user._id, receiverId, "", file, type);
+    setShowAttach(false);
   };
 
   return (
@@ -291,8 +298,8 @@ const handleConfirmDelete = async () => {
                   </div>
                   <div>
                     <RiDeleteBinLine size={25} fill="black"
-                      className="text-red-500 cursor-pointer" 
-                      onClick={() => handleDeleteClick(chatId)} 
+                      className="text-red-500 cursor-pointer"
+                      onClick={() => handleDeleteClick(chatId)}
                     />
                   </div>
                 </div>
@@ -323,6 +330,22 @@ const handleConfirmDelete = async () => {
                       <div className={msg.senderId === user._id ? "text-right" : ""}>
                         <div className={`px-3 py-1 rounded-lg text-sm max-w-md ${msg.senderId === user._id ? "bg-[#F3F6FF] text-gray-800" : "bg-[#D7D7D740] text-gray-700"}`}>
                           <p className="font-semibold">{msg.senderId === user._id ? "You" : userMap[msg.senderId]?.profile?.firstName || "User"}</p>
+                          {msg.fileType === "image" && (
+                            <img src={msg.fileUrl} alt="Attachment" className="max-w-[250px] rounded-md mt-2" />
+                          )}
+                          {msg.fileType === "video" && (
+                            <video src={msg.fileUrl} controls className="max-w-[250px] rounded-md mt-2" />
+                          )}
+                          {msg.fileType === "document" && (
+                            <a
+                              href={msg.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline mt-2 inline-block"
+                            >
+                              View Document
+                            </a>
+                          )}
                           <p className="leading-[20px]">{msg.text}</p>
                         </div>
                         <span className="text-xs text-gray-400">
@@ -360,12 +383,52 @@ const handleConfirmDelete = async () => {
                     />
 
                     {showAttach && (
-                      <div className="absolute bottom-12 left-0 bg-white shadow-md rounded-md p-2 z-10 w-40">
-                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"><MdAddAPhoto size={20} /> Photos</button>
-                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"><BiSolidVideoPlus size={20} /> Videos</button>
-                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"><HiMiniDocumentPlus size={20} /> Document</button>
+                      <div className="absolute bottom-12 left-0 bg-white shadow-md rounded-md z-10 w-40">
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
+                          onClick={() => photoInputRef.current.click()}
+                        >
+                          <MdAddAPhoto size={20} />Photos
+                        </button>
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
+                          onClick={() => videoInputRef.current.click()}
+                        >
+                          <BiSolidVideoPlus size={20} />Videos
+                        </button>
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
+                          onClick={() => docInputRef.current.click()}
+                        >
+                          <HiMiniDocumentPlus size={20} />Document
+                        </button>
                       </div>
                     )}
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={photoInputRef}
+                      onChange={(e) => handleFileSelect(e, "image")}
+                      style={{ display: "none" }}
+                    />
+                    <input
+                      type="file"
+                      accept="video/*"
+                      ref={videoInputRef}
+                      onChange={(e) => handleFileSelect(e, "video")}
+                      style={{ display: "none" }}
+                    />
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+                      ref={docInputRef}
+                      onChange={(e) => handleFileSelect(e, "document")}
+                      style={{ display: "none" }}
+                    />
 
                     <input
                       type="text"

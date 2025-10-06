@@ -1,6 +1,5 @@
 import { GoArrowUpRight } from "react-icons/go";
 import { FaPhoneAlt } from "react-icons/fa";
-import { Img } from "react-image";
 import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
 import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
 import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
@@ -11,19 +10,19 @@ export default function WelcomeToGhouraf() {
       <div className="container mx-auto sm:px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center gap-12">
         <div className="flex md:flex-row items-center justify-center gap-6">
           <div className="flex w-full md:w-1/2 items-center justify-center">
-            <Img
+            <img
               src={flatmate1}
               alt="Flatmate 3"
               className="w-full md:w-[100%] lg:h-80 md:h-80 sm:h-50 object-fit rounded-xl shadow-md"
             />
           </div>
           <div className="flex flex-col gap-6 w-full md:w-1/2">
-            <Img
+            <img
               src={flatmate2}
               alt="Flatmate 1"
               className="w-full lg:h-64 md:h-64 sm:h-34 object-fit rounded-xl shadow-md"
             />
-            <Img
+            <img
               src={flatmate3}
               alt="Flatmate 2"
               className="w-full lg:h-64 md:h-64 sm:h-34 object-fit rounded-xl shadow-md"

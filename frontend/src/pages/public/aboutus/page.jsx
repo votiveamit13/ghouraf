@@ -2,7 +2,6 @@ import heroImage from "assets/img/ghouraf/hero-section.jpg";
 import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
 import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
 import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
-import { Img } from "react-image";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { MdOutlineApartment, MdRealEstateAgent, MdMeetingRoom } from "react-icons/md";
 import { AiOutlineFileSearch } from "react-icons/ai";
@@ -94,22 +93,22 @@ export default function AboutUs() {
 
                     <div className="w-full md:w-1/2">
                         <div className="grid grid-cols-2 gap-6 w-full">
-                            <Img
+                            <img
                                 src={flatmate1}
                                 alt="Flatmate 1"
                                 className="w-full md:h-[155px] h-55 object-cover rounded-xl shadow-md"
                             />
-                            <Img
+                            <img
                                 src={flatmate2}
                                 alt="Flatmate 2"
                                 className="w-full md:h-[155px] h-55 object-cover rounded-xl shadow-md"
                             />
-                            <Img
+                            <img
                                 src={flatmate3}
                                 alt="Flatmate 3"
                                 className="w-full md:h-[155px] h-55 object-cover rounded-xl shadow-md"
                             />
-                            <Img
+                            <img
                                 src={flatmate3}
                                 alt="Flatmate 4"
                                 className="w-full md:h-[155px] h-55 object-cover rounded-xl shadow-md"

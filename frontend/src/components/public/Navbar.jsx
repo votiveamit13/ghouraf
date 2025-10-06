@@ -2,7 +2,6 @@ import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiMenu, HiX, HiOutlineMail } from "react-icons/hi";
-import { Img } from "react-image";
 import { LuUserPen, LuUserRound, LuMessageSquareText, LuLogOut } from "react-icons/lu";
 import { TfiEmail } from "react-icons/tfi";
 import { GrLock, GrFavorite } from "react-icons/gr";
@@ -146,10 +145,10 @@ if (res.user) {
 
   return (
     <nav className="bg-white fixed top-0 left-0 w-full z-20 p-[5px] shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <NavLink to="/" className="flex items-center">
-            <Img
+            <img
               src={require("../../assets/img/theme/Ghouraf.png")}
               className="lg:w-40 md:w-40 sm:w-80 w-60"
               alt="Logo"

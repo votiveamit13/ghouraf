@@ -1,5 +1,6 @@
-import { db } from "../firebase";
-import { collection, query, where, addDoc, orderBy, onSnapshot, doc, setDoc, increment, updateDoc, serverTimestamp, getDocs, deleteDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { db, storage } from "../firebase";
+import { collection, query, where, addDoc, orderBy, onSnapshot, doc, setDoc, increment, updateDoc, serverTimestamp, getDocs, deleteDoc, getDoc, arrayUnion } from "firebase/firestore";
 
 export const getChatId = async (userId1, userId2) => {
   const chatsRef = collection(db, "chats");
@@ -28,22 +29,33 @@ export const getChatId = async (userId1, userId2) => {
   return newChat.id;
 };
 
-export const sendMessage = async (chatId, senderId, receiverId, text) => {
+export const sendMessage = async (chatId, senderId, receiverId, text, file = null, fileType = null) => {
+  let fileUrl = null;
+
+  if (file) {
+    const fileRef = ref(storage, `chats/${chatId}/${Date.now()}_${file.name}`);
+    await uploadBytes(fileRef, file);
+    fileUrl = await getDownloadURL(fileRef);
+  }
+
   const messagesRef = collection(db, "messages", chatId, "chatMessages");
   await addDoc(messagesRef, {
     senderId,
     receiverId,
-    text,
+    text: text || "",
     timestamp: serverTimestamp(),
-    read: false
+    read: false,
+    fileUrl: fileUrl || null,
+    fileType: fileType || null,
   });
 
   const chatRef = doc(db, "chats", chatId);
-await updateDoc(chatRef, {
-  lastMessage: text,
-  lastMessageTime: serverTimestamp(),
-  [`unreadCount.${receiverId}`]: increment(1),
-});
+  await updateDoc(chatRef, {
+    lastMessage: text || (fileType ? `${fileType} sent` : ""),
+    lastMessageTime: serverTimestamp(),
+    [`unreadCount.${receiverId}`]: increment(1),
+    deletedFor: [],
+  });
 };
 
 export const listenMessages = (chatId, callback) => {
@@ -74,7 +86,9 @@ export const listenChats = (userId, callback) => {
     q,
     (snapshot) => {
       // console.log("listenChats snapshot.size =", snapshot.size);
-      const chats = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const chats = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((chat) => !chat.deletedFor?.includes(userId));
       // console.log("listenChats docs:", chats);
       callback(chats);
     },
@@ -92,16 +106,44 @@ export const setUserOnlineStatus = async (userId, isOnline) => {
   }, { merge: true });
 };
 
-export const deleteChat = async (chatId) => {
+export const deleteChat = async (chatId, userId) => {
   try {
-    const messagesRef = collection(db, "chats", chatId, "messages");
-    const messagesSnapshot = await getDocs(messagesRef);
-    const deletePromises = messagesSnapshot.docs.map(msg => deleteDoc(doc(db, "chats", chatId, "messages", msg.id)));
-    await Promise.all(deletePromises);
+    const chatRef = doc(db, "chats", chatId);
+    const chatSnap = await getDoc(chatRef);
 
-    await deleteDoc(doc(db, "chats", chatId));
+    if (!chatSnap.exists()) {
+      console.warn("Chat not found");
+      return false;
+    }
 
-    console.log("Chat deleted successfully!");
+    const chatData = chatSnap.data();
+    const deletedFor = chatData.deletedFor || [];
+
+    if (deletedFor.includes(userId)) return true;
+
+    await updateDoc(chatRef, {
+      deletedFor: arrayUnion(userId),
+    });
+
+    const allDeleted = chatData.participants.every(u =>
+      [...deletedFor, userId].includes(u)
+    );
+
+    if (allDeleted) {
+      const messagesRef = collection(db, "messages", chatId, "chatMessages");
+      const messagesSnapshot = await getDocs(messagesRef);
+      const deletePromises = messagesSnapshot.docs.map(msg =>
+        deleteDoc(doc(db, "messages", chatId, "chatMessages", msg.id))
+      );
+      await Promise.all(deletePromises);
+
+      await deleteDoc(chatRef);
+
+      console.log("Chat & all messages permanently deleted!");
+    } else {
+      console.log("Chat hidden for current user only");
+    }
+
     return true;
   } catch (err) {
     console.error("Failed to delete chat:", err);

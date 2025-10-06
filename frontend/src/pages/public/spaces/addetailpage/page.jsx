@@ -232,11 +232,11 @@ export default function DetailPage({ targetUserId }) {
   return (
     <>
       <div className="container px-4 mt-5">
-        <Link to={`/spaces`}>
-          <button className="text-sm px-4 py-2 font-medium text-black flex items-center gap-2 border-[1px] border-[#AACCEE] rounded-[2px]">
-            <FaArrowLeftLong />  Back to Ads
+          <button className="text-sm px-4 py-2 font-medium text-black border-[1px] border-[#AACCEE] rounded-[2px]">
+            <Link to={`/spaces`} className="flex items-center gap-2">
+                <FaArrowLeftLong />  Back to Ads
+            </Link>
           </button>
-        </Link>
       </div>
 
       <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
