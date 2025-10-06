@@ -45,6 +45,17 @@ export default function Messages() {
   const photoInputRef = useRef(null);
   const videoInputRef = useRef(null);
   const docInputRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredChats = chats.filter(chat => {
+    const otherUserId = chat.participants.find(uid => uid !== user._id);
+    const otherUser = userMap[otherUserId];
+    if (!otherUser) return false;
+
+    const fullName = `${otherUser.profile?.firstName || ""} ${otherUser.profile?.lastName || ""}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
 
   useEffect(() => {
     // console.log("Messages: user value:", user);
@@ -228,6 +239,8 @@ export default function Messages() {
                   type="text"
                   placeholder="Search"
                   className="w-full px-3 py-2 pr-10 rounded-[5px] border-[1px] border-[#A1A1A1] text-sm bg-white"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <CiSearch
                   size={25}
@@ -237,7 +250,7 @@ export default function Messages() {
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar">
-              {chats.map((chat) => {
+              {filteredChats.map((chat) => {
                 const otherUserId = chat.participants.find(uid => uid !== user._id);
                 const unread = chat.unreadCount?.[user._id] || 0;
                 const otherUser = userMap[otherUserId];
@@ -270,6 +283,7 @@ export default function Messages() {
                 );
               })}
             </div>
+
           </div>
 
           {/* Right panel */}
