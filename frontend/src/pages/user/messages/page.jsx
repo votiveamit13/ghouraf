@@ -390,11 +390,11 @@ export default function Messages() {
                   className="flex items-center border-t p-3 gap-2"
                 >
                   <div className="relative flex-1">
-                    <AiOutlinePlus
+                    {/* <AiOutlinePlus
                       size={30}
                       onClick={() => setShowAttach(!showAttach)}
                       className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
-                    />
+                    /> */}
 
                     {showAttach && (
                       <div className="absolute bottom-12 left-0 bg-white shadow-md rounded-md z-10 w-40">

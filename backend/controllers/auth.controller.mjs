@@ -364,7 +364,6 @@ else if (section === "email") {
   }
 };
 
-
 export const getProfile = async (req, res) => {
   res.json(req.user);
 };
@@ -385,5 +384,36 @@ export const getUserById = async (req, res) => {
   } catch (err) {
     console.error("Error fetching user:", err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    const actionCodeSettings = {
+      url: `${process.env.FRONTEND_URL}/auth/reset-password`,
+      handleCodeInApp: false,
+    };
+
+    const resetLink = await authAdmin.generatePasswordResetLink(email, actionCodeSettings);
+
+    await sendEmail({
+      to: email,
+      subject: "Reset your password",
+      html: `<p>Click the link below to reset your password:</p>
+             <a href="${resetLink}">Reset Password</a>`,
+    });
+
+    res.json({ message: "Password reset email sent" });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Unable to send reset email", error: err.message });
   }
 };

@@ -1,5 +1,5 @@
 import express from "express";
-import { signup, login, updateProfile, getProfile, resendVerificationEmail, getUserById } from "../controllers/auth.controller.mjs";
+import { signup, login, updateProfile, getProfile, resendVerificationEmail, getUserById, forgotPassword } from "../controllers/auth.controller.mjs";
 
 import postRoutes from "./post.route.mjs";
 import { auth } from "../middleware/auth.mjs";
@@ -21,6 +21,8 @@ router.put("/auth/profile", auth, upload.single("photo"), updateProfile);
 router.get("/auth/me", auth, getProfile);
 
 router.get("/auth/:id", getUserById);
+
+router.post("/forgot-password", forgotPassword);
 
 router.use("/posts", postRoutes)
 

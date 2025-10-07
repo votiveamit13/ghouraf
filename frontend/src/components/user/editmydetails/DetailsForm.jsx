@@ -1,7 +1,9 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { toast } from "react-toastify";
 
-export default function DetailsForm({ title, fields, onSubmit }) {
+export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
   const [formData, setFormData] = useState(
     fields.reduce((acc, field) => {
       acc[field.name] = field.value || "";
@@ -53,6 +55,26 @@ export default function DetailsForm({ title, fields, onSubmit }) {
     }
   };
 
+  const handleForgotPassword = async () => {
+  const emailToUse = userEmail;
+  if (!emailToUse) {
+    toast.error("No email available for password reset");
+    return;
+  }
+  try {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    await axios.post(`${apiUrl}/forgot-password`, { email: emailToUse });
+    toast.success("Password reset link sent to your email");
+  } catch (err) {
+    if (err.response?.status === 404) {
+      toast.error("Email not found");
+    } else {
+      toast.error(err.response?.data?.message || "Failed to send reset email");
+    }
+  }
+};
+
+
   return (
     <div className="bg-white mb-5 shadow-xl rounded-[12px] border-[1px] border-[#D7D7D7]">
       <div className="bg-[#565ABF] px-4 py-3 text-white text-[20px] font-medium rounded-t-[12px]">
@@ -84,13 +106,15 @@ export default function DetailsForm({ title, fields, onSubmit }) {
             ))}
           </div>
 
-          {fields.some((f) => f.name.toLowerCase().includes("password")) && (
-            <div className="mt-2 text-[12px] text-[#565ABF]">
-              <a href="/" className="hover:text-[#565ABF]">
-                Forgot password?
-              </a>
-            </div>
-          )}
+{fields.some((f) => f.name.toLowerCase().includes("password")) && (
+  <div
+    className="mt-2 text-[12px] text-[#565ABF] cursor-pointer hover:text-[#A321A6]"
+    onClick={handleForgotPassword}
+  >
+    Forgot password?
+  </div>
+)}
+
 
           <button
             type="submit"

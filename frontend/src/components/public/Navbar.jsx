@@ -52,8 +52,9 @@ export default function Navbar() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
   const location = useLocation()
-
-
+const [forgotDialog, setForgotDialog] = useState(false);
+const [forgotEmail, setForgotEmail] = useState("");
+const [forgotLoading, setForgotLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -134,6 +135,27 @@ if (res.user) {
   }
 };
 
+const handleForgotPassword = async () => {
+  if (!forgotEmail) {
+    toast.error("Please enter your email");
+    return;
+  }
+  setForgotLoading(true);
+  try {
+    const res = await axios.post(`${apiUrl}/forgot-password`, { email: forgotEmail });
+    toast.success(res.data.message || "Password reset email sent");
+    setForgotDialog(false);
+    setForgotEmail("");
+  } catch (err) {
+    if (err.response?.status === 404) {
+      toast.error("Email not found");
+    } else {
+      toast.error(err.response?.data?.message || "Failed to send reset email");
+    }
+  } finally {
+    setForgotLoading(false);
+  }
+};
 
 
 
@@ -440,12 +462,14 @@ if (res.user) {
                     <input type="checkbox" className="w-4 h-4" />
                     <span>Remember me</span>
                   </label>
-                  <a
-                    href="/"
-                    className="text-sm text-[#1C1C1E] hover:text-[#A321A6]"
-                  >
-                    Forgot Password ?
-                  </a>
+                  <button
+  type="button"
+  className="text-sm text-[#1C1C1E] hover:text-[#A321A6]"
+  onClick={() => setForgotDialog(true)}
+>
+  Forgot Password?
+</button>
+
                 </div>
 
                 <button
@@ -492,6 +516,34 @@ if (res.user) {
           </div>
         </div>
       )}
+
+      {forgotDialog && (
+  <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
+    <div className="bg-white rounded-[17px] w-full max-w-md p-6 relative shadow-lg">
+      <button
+        className="absolute top-2 right-3 text-gray-600 hover:text-black text-xl"
+        onClick={() => setForgotDialog(false)}
+      >
+        ✕
+      </button>
+      <h3 className="text-2xl font-semibold mb-4">Reset Password</h3>
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={forgotEmail}
+        onChange={(e) => setForgotEmail(e.target.value)}
+        className="w-full border p-2 mb-4 rounded"
+      />
+      <button
+        onClick={handleForgotPassword}
+        disabled={forgotLoading}
+        className="w-full bg-[#565ABF] text-white py-2 rounded"
+      >
+        {forgotLoading ? "Sending..." : "Send Reset Link"}
+      </button>
+    </div>
+  </div>
+)}
 
 
       {registerDialog && (

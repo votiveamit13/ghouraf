@@ -70,6 +70,7 @@ const handleSaveProfile = async (data) => {
                             { label: "Your Password", name: "password", placeholder: "Your Password", type: "password" },
                         ]}
                         onSubmit={(data) => handleSave(data, "name")}
+                        userEmail={user.email}
                     />
                     <DetailsForm
                         title="Change Email Address"
@@ -79,6 +80,7 @@ const handleSaveProfile = async (data) => {
                             { label: "Your Password", name: "password", placeholder: "Your Password", type: "password" },
                         ]}
                         onSubmit={(data) => handleSave(data, "email")}
+                        userEmail={user.email}
                     />
                     <DetailsForm
                         title="Change Your Password"
@@ -88,6 +90,7 @@ const handleSaveProfile = async (data) => {
                             { label: "Confirm new password", name: "confirmPassword", placeholder: "Confirm New Password", type: "password" },
                         ]}
                         onSubmit={(data) => handleSave(data, "password")}
+                        userEmail={user.email}
                     />
                     <ProfileEdit initialData={initialProfile} onSave={handleSaveProfile} />
                 </div>
