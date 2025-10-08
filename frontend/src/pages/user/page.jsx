@@ -12,7 +12,6 @@ export default function UserDashboard() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
   if (loading) return <Loader fullScreen />;
    if (!user) return <Navigate to="/" replace />;
   return (

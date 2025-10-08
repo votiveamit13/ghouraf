@@ -13,7 +13,7 @@ export default function Filters({ filters, setFilters, setPage }) {
     propertyType: "",
     roomAvailable: "",
     bedrooms: "",
-    moveInDate: "",
+    // moveInDate: "",
   };
 
   const min = 0;
@@ -230,7 +230,7 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+      <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Number of bedrooms</label>
         <div className="space-y-1 mt-1 mb-3">
           <select
@@ -248,7 +248,7 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black">
+      {/* <div className="mb-4 px-3 py-2 text-black">
         <label className="font-medium text-[18px]">Move-In date</label>
         <div className="space-y-1 mt-1">
           <input
@@ -258,7 +258,7 @@ export default function Filters({ filters, setFilters, setPage }) {
             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -120,8 +120,10 @@
     if (res.user) {
       toast.success("Login Successful");
       setLoginDialog(false);
-      if (!location.pathname.startsWith("/spaces/")) {
-              navigate("/user");
+      const allowedPaths = ["/spaces", "/spaces/", "/team-up"];
+      const isAllowedPath = allowedPaths.some((path) => location.pathname.startsWith(path));
+      if (!isAllowedPath) {
+        navigate("/user");
       }
       return;
     }
@@ -162,26 +164,26 @@
       toast.info("Logout Successful");
     };
 
-const handleGoogleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, new GoogleAuthProvider());
-    const idToken = await result.user.getIdToken();
+    const handleGoogleLogin = async () => {
+      try {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        const idToken = await result.user.getIdToken();
 
-    const res = await login(idToken);
+        const res = await login(idToken);
 
-    if (res.user) {
-      toast.success("Login Successful");
-      setLoginDialog(false);
-      navigate("/user");
-    } else if (res.error) {
-      toast.error(res.message);
-      await auth.signOut();
-    }
-  } catch (err) {
-    toast.error(err.message || "Google login failed");
-    await auth.signOut();
-  }
-};
+        if (res.user) {
+          toast.success("Login Successful");
+          setLoginDialog(false);
+          navigate("/user");
+        } else if (res.error) {
+          toast.error(res.message);
+          await auth.signOut();
+        }
+      } catch (err) {
+        toast.error(err.message || "Google login failed");
+        await auth.signOut();
+      }
+    };
 
     return (
       <nav className="bg-white fixed top-0 left-0 w-full z-20 p-[5px] shadow-lg">
