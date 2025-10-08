@@ -124,7 +124,7 @@ export const signup = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { idToken } = req.body;
     if (!idToken) return res.status(400).json({ message: "idToken is required" });
@@ -165,13 +165,6 @@ const login = async (req, res) => {
         userByEmail.firebaseUid = decoded.uid;
 
         userByEmail.profile = userByEmail.profile || {};
-        
-        if (!userByEmail.profile.firstName && firebaseUser?.displayName) {
-          const nameParts = firebaseUser.displayName.split(" ");
-          userByEmail.profile.firstName = nameParts[0] || "";
-          userByEmail.profile.lastName = nameParts.slice(1).join(" ") || "";
-        }
-
         if (!userByEmail.profile.photo && firebaseUser?.photoURL)
           userByEmail.profile.photo = firebaseUser.photoURL;
 
@@ -200,12 +193,10 @@ const login = async (req, res) => {
     const hashedPassword = await bcrypt.hash(randomString(24), 10);
 
     const profile = {
-      firstName: firebaseUser?.displayName?.split(" ")[0] || "",
-      lastName: firebaseUser?.displayName?.split(" ").slice(1).join(" ") || "",
-      photo: firebaseUser?.photoURL || "",
-      dob: null,  
-      gender: "",
-      lifestyleTags: [],
+      firstName: "",
+      lastName: "",
+      photo: firebaseUser?.photoURL || decoded.picture || "",
+      dob: null,
     };
 
     const newUser = await User.create({
@@ -226,7 +217,6 @@ const login = async (req, res) => {
     return res.status(401).json({ message: "Invalid or expired token", error: err.message });
   }
 };
-
 
 
 export const resendVerificationEmail = async (req, res) => {

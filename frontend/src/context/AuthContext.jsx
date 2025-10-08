@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (idToken) => {
     try {
-      const res = await axios.post(`${apiUrl}/auth/login`, { idToken });
+      const res = await axios.post(`${apiUrl}auth/login`, { idToken });
 
       if (res.data?.user) {
         setUser(res.data.user);
