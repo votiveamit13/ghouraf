@@ -50,16 +50,25 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       const status = err.response?.status;
       const data = err.response?.data || {};
+      const message = data.message || "Login failed. Please try again.";
 
-      if (status === 403 && data.emailVerified === false) {
-        return { emailVerified: false, message: data.message };
+      if (status === 400 && message === "Email already exists") {
+        return { error: true, message: "Email already exists" };
       }
 
       if (status === 403 && data.inactive) {
         return { inactive: true, message: data.message };
       }
 
-      return { error: true, message: data.message || "Login failed. Try again later." };
+      if (status === 401) {
+        return { error: true, message: "Invalid or expired token" };
+      }
+
+      if (status === 403 && data.emailVerified === false) {
+        return { emailVerified: false, message: data.message };
+      }
+
+      return { error: true, message };
     }
   };
 

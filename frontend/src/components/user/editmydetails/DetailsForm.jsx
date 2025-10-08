@@ -1,9 +1,11 @@
 import axios from "axios";
+import { useAuth } from "context/AuthContext";
 import React, { useState } from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { toast } from "react-toastify";
 
 export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
+  const { logout } = useAuth();
   const [formData, setFormData] = useState(
     fields.reduce((acc, field) => {
       acc[field.name] = field.value || "";
@@ -12,6 +14,7 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
   );
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -56,23 +59,32 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
   };
 
   const handleForgotPassword = async () => {
-  const emailToUse = userEmail;
-  if (!emailToUse) {
-    toast.error("No email available for password reset");
-    return;
-  }
-  try {
-    const apiUrl = process.env.REACT_APP_API_URL;
-    await axios.post(`${apiUrl}/forgot-password`, { email: emailToUse });
-    toast.success("Password reset link sent to your email");
-  } catch (err) {
-    if (err.response?.status === 404) {
-      toast.error("Email not found");
-    } else {
-      toast.error(err.response?.data?.message || "Failed to send reset email");
+    const emailToUse = userEmail;
+    if (!emailToUse) {
+      toast.error("No email available for password reset");
+      return;
     }
-  }
-};
+
+    setIsSending(true);
+
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      await axios.post(`${apiUrl}forgot-password`, { email: emailToUse });
+      toast.success("Password reset link sent to your email");
+      // setTimeout(() => {
+      //   logout();
+      //   toast.info("Login Again");
+      // }, 1500);
+    } catch (err) {
+      if (err.response?.status === 404) {
+        toast.error("Email not found");
+      } else {
+        toast.error(err.response?.data?.message || "Failed to send reset email");
+      } 
+    } finally {
+      setIsSending(false); 
+    }
+  };
 
 
   return (
@@ -92,10 +104,9 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
                   placeholder={field.placeholder}
                   value={formData[field.name]}
                   onChange={handleChange}
-                  className={`form-control ${
-                    errors[field.name] ? "border-red-500" : ""
-                  }`}
-                   disabled={isSaving}
+                  className={`form-control ${errors[field.name] ? "border-red-500" : ""
+                    }`}
+                  disabled={isSaving}
                 />
                 {errors[field.name] && (
                   <div className="text-red-500 text-[12px] mt-1">
@@ -106,14 +117,14 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
             ))}
           </div>
 
-{fields.some((f) => f.name.toLowerCase().includes("password")) && (
-  <div
-    className="mt-2 text-[12px] text-[#565ABF] cursor-pointer hover:text-[#A321A6]"
-    onClick={handleForgotPassword}
-  >
-    Forgot password?
-  </div>
-)}
+          {fields.some((f) => f.name.toLowerCase().includes("password")) && (
+            <div
+              className="mt-2 text-[12px] text-[#565ABF] cursor-pointer hover:text-[#A321A6]"
+              onClick={handleForgotPassword}
+            >
+              {isSending ? "Sending..." : "Forgot password?"}
+            </div>
+          )}
 
 
           <button

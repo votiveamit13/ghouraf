@@ -12,6 +12,9 @@ const validationFormat = (error) => {
   }));
 };
 
+const randomString = (len = 32) =>
+  [...Array(len)].map(() => (Math.random() * 36 | 0).toString(36)).join("");
+
 export const signup = async (req, res) => {
   try {
     const { email, password, firstName, lastName, gender, dob, termsAccepted } = req.body;
@@ -127,27 +130,94 @@ export const login = async (req, res) => {
     if (!idToken) return res.status(400).json({ message: "idToken is required" });
 
     const decoded = await authAdmin.verifyIdToken(idToken);
-    const user = await User.findOne({ firebaseUid: decoded.uid });
+    const email = decoded.email;
+    if (!email) return res.status(400).json({ message: "No email in token" });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const firebaseUser = await authAdmin.getUser(decoded.uid).catch(() => null);
 
-    if(user.status === "inactive") {
-      return res.status(403).json({
-        message: "Your account is banned. Kindly contact support.",
-        inactive: true,
+    let isGoogleProvider = false;
+    if (firebaseUser && Array.isArray(firebaseUser.providerData)) {
+      isGoogleProvider = firebaseUser.providerData.some(
+        (p) => p.providerId === "google.com"
+      );
+    }
+
+    let user = await User.findOne({ firebaseUid: decoded.uid });
+
+    if (user) {
+      if (user.status === "inactive") {
+        return res.status(403).json({
+          message: "Your account is banned. Kindly contact support.",
+          inactive: true,
+        });
+      }
+      return res.json({
+        message: "Login success",
+        emailVerified: decoded.email_verified ?? false,
+        user,
       });
     }
 
-    if (!decoded.email_verified) {
-      return res.status(403).json({ message: "Please verify your email first", emailVerified: false });
+    const userByEmail = await User.findOne({ email: email.toLowerCase() });
+
+    if (userByEmail) {
+      if (isGoogleProvider) {
+        userByEmail.firebaseUid = decoded.uid;
+
+        userByEmail.profile = userByEmail.profile || {};
+        if (!userByEmail.profile.photo && firebaseUser?.photoURL)
+          userByEmail.profile.photo = firebaseUser.photoURL;
+
+        await userByEmail.save();
+
+        if (userByEmail.status === "inactive") {
+          return res.status(403).json({
+            message: "Your account is banned. Kindly contact support.",
+            inactive: true,
+          });
+        }
+
+        return res.json({
+          message: "Login success",
+          emailVerified: decoded.email_verified ?? false,
+          user: userByEmail,
+        });
+      } else {
+        return res.status(400).json({ message: "Email already exists" });
+      }
     }
 
-    res.json({ message: "Login success", emailVerified: true, user });
+    if (!isGoogleProvider)
+      return res.status(400).json({ message: "Provider must be Google" });
+
+    const hashedPassword = await bcrypt.hash(randomString(24), 10);
+
+    const profile = {
+      firstName: "",
+      lastName: "",
+      photo: firebaseUser?.photoURL || decoded.picture || "",
+      dob: null,
+    };
+
+    const newUser = await User.create({
+      firebaseUid: decoded.uid,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      termsAccepted: false,
+      profile,
+    });
+
+    return res.status(201).json({
+      message: "User created and logged in",
+      emailVerified: decoded.email_verified ?? false,
+      user: newUser,
+    });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(401).json({ message: "Invalid or expired token", error: err.message });
+    return res.status(401).json({ message: "Invalid or expired token", error: err.message });
   }
 };
+
 
 export const resendVerificationEmail = async (req, res) => {
   try {
@@ -398,7 +468,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     const actionCodeSettings = {
-      url: `${process.env.FRONTEND_URL}/auth/reset-password`,
+      url: `${process.env.FRONTEND_URL}`,
       handleCodeInApp: false,
     };
 
@@ -406,9 +476,52 @@ export const forgotPassword = async (req, res) => {
 
     await sendEmail({
       to: email,
-      subject: "Reset your password",
-      html: `<p>Click the link below to reset your password:</p>
-             <a href="${resetLink}">Reset Password</a>`,
+        subject: "Reset your password",
+        html: `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+      <title>Reset your password</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f4;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4">
+        <tr>
+          <td align="center" style="padding:40px 0;">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+              <tr>
+                <td align="center" bgcolor="#A321A6" style="padding:20px;">
+                  <h1 style="color:#ffffff; margin:0; font-size:24px;">Welcome to Ghouraf</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:30px; color:#333333; font-size:16px; line-height:1.5;">
+                  <p>Hi <b>${firstName}</b>,</p>
+                  <table border="0" cellspacing="0" cellpadding="0" style="margin:30px auto;">
+                    <tr>
+                      <td align="center" bgcolor="#A321A6" style="border-radius:6px;">
+                        <a href="${resetLink}" target="_blank" style="display:inline-block; padding:12px 25px; font-size:16px; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:6px;">
+                          Password reset link
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+                  <p style="word-break:break-all; color:#A321A6;"><a href="${resetLink}" target="_blank" style="color:#A321A6;">${resetLink}</a></p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" bgcolor="#f4f4f4" style="padding:15px; font-size:12px; color:#666;">
+                  Ghouraf. All rights reserved.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `
     });
 
     res.json({ message: "Password reset email sent" });
