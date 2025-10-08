@@ -98,7 +98,7 @@ export default function SavedAds() {
                             >
                                 <div className="relative">
                                     <img
-                                        src={post?.images?.[0] || "/fallback.jpg"}
+                                        src={post?.photo?.[0]}
                                         alt={post?.title}
                                         className="w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
                                     />

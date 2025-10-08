@@ -361,7 +361,8 @@ export const toggleSavePost = async (req, res) => {
                 available: post.available,
                 budget: post.budget,
                 budgetType: post.budgetType,
-                description: post.description
+                description: post.description,
+                photo: post.featuredImage
             };
         } else if (postCategory === "Teamup") {
             snapshot = {
@@ -372,7 +373,8 @@ export const toggleSavePost = async (req, res) => {
                 roommatePref: post.roommatePref,
                 budget: post.budget,
                 budgetType: post.budgetType,
-                description: post.description
+                description: post.description,
+                photo: post.photos
             };
         } else {
             snapshot = { title: post.title, description: post.description };
