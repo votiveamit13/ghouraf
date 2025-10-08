@@ -341,8 +341,8 @@ export const toggleSavePost = async (req, res) => {
         let Model;
         switch (postCategory) {
             case "Space": Model = Space; break;
-            case "TeamUp": Model = TeamUp; break;
-            case "SpaceWanted": Model = SpaceWanted; break;
+            case "Teamup": Model = TeamUp; break;
+            case "Spacewanted": Model = SpaceWanted; break;
             default: return res.status(400).json({ message: "Invalid postCategory" });
         }
 
@@ -363,7 +363,7 @@ export const toggleSavePost = async (req, res) => {
                 budgetType: post.budgetType,
                 description: post.description
             };
-        } else if (postCategory === "TeamUp") {
+        } else if (postCategory === "Teamup") {
             snapshot = {
                 title: post.title,
                 country: post.country,
