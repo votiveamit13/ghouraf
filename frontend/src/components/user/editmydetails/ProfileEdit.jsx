@@ -121,13 +121,16 @@ const handleSave = async () => {
         <div className="flex items-center gap-4 text-[16px] text-black mb-2">
           <label className="font-medium w-32">Gender:</label>
           {editMode ? (
-            <input
-              type="text"
+            <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
               className="form-control"
-            />
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
           ) : (
             <span>{formData.gender}</span>
           )}

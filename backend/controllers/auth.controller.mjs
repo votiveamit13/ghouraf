@@ -205,8 +205,6 @@ export const login = async (req, res) => {
     const profile = {
       firstName,
       lastName,
-      gender: null,
-      dob: null, 
       photo,
     };
 
@@ -477,6 +475,8 @@ export const forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Email not found" });
     }
+
+    const firstName = user.firstName || "User";
 
     const actionCodeSettings = {
       url: `${process.env.FRONTEND_URL}`,
