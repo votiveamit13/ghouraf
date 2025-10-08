@@ -2,6 +2,7 @@ import Space from "../models/Space.mjs";
 import { createSpaceSchema } from "../validations/space.validator.mjs";
 import { fileHandler } from "../utils/fileHandler.mjs";
 import TeamUp from "../models/TeamUp.mjs";
+import SavedPost from "../models/SavedPost.mjs";
 
 //Spaces
 export const createSpace = async (req, res) => {
@@ -321,3 +322,84 @@ export const getTeamUpById = async (req, res) => {
   }
 };
 
+//SavedPost
+export const toggleSavePost = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { postId, postCategory } = req.body;
+
+        if (!postId || !postCategory) {
+            return res.status(400).json({ message: "postId and postCategory are required" });
+        }
+
+        const existing = await SavedPost.findOne({ user: userId, postId, postCategory });
+        if (existing) {
+            await existing.deleteOne();
+            return res.status(200).json({ message: "Removed from saved", saved: false });
+        }
+
+        let Model;
+        switch (postCategory) {
+            case "Space": Model = Space; break;
+            case "TeamUp": Model = TeamUp; break;
+            case "SpaceWanted": Model = SpaceWanted; break;
+            default: return res.status(400).json({ message: "Invalid postCategory" });
+        }
+
+        const post = await Model.findById(postId);
+        if (!post) return res.status(404).json({ message: "Post not found" });
+
+        let snapshot;
+        if (postCategory === "Space") {
+            snapshot = {
+                title: post.title,
+                country: post.country,
+                state: post.state,
+                city: post.city,
+                bedrooms: post.bedrooms,
+                propertyType: post.propertyType,
+                available: post.available,
+                budget: post.budget,
+                budgetType: post.budgetType,
+                description: post.description
+            };
+        } else if (postCategory === "TeamUp") {
+            snapshot = {
+                title: post.title,
+                country: post.country,
+                state: post.state,
+                city: post.city,
+                roommatePref: post.roommatePref,
+                budget: post.budget,
+                budgetType: post.budgetType,
+                description: post.description
+            };
+        } else {
+            snapshot = { title: post.title, description: post.description };
+        }
+
+        const savedPost = new SavedPost({ user: userId, postCategory, postId, snapshot });
+        await savedPost.save();
+
+        return res.status(201).json({ message: "Saved successfully", saved: true });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const getSavedPosts = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { postCategory } = req.query;
+
+        const query = { user: userId };
+        if (postCategory) query.postCategory = postCategory;
+
+        const savedPosts = await SavedPost.find(query).sort({ createdAt: -1 });
+        return res.status(200).json({ data: savedPosts });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error" });
+    }
+};

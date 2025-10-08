@@ -1,7 +1,8 @@
 import express from "express";
 import { 
   createSpace, getSpaces, getSpaceById,
-  createTeamUp, getTeamUps, getTeamUpById
+  createTeamUp, getTeamUps, getTeamUpById,
+  toggleSavePost, getSavedPosts
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
@@ -22,5 +23,7 @@ router.get("/spaces/:id", getSpaceById);
 router.post("/createteamup", auth, upload.array("photos"), validate(createTeamUpSchema), createTeamUp);
 router.get("/teamups", getTeamUps);
 router.get("/teamup/:id", getTeamUpById);
+router.post("/save", auth, toggleSavePost);
+router.get("/save/list", auth, getSavedPosts);
 
 export default router;

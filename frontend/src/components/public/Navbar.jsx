@@ -507,7 +507,10 @@ const handleGoogleLogin = async () => {
                   </button>
 
                   <div className="flex gap-4 mb-4 flex-col sm:flex-row">
-                    <button onClick={handleGoogleLogin} className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
+                    <button
+                      type="button"
+                      onClick={handleGoogleLogin} 
+                      className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                       <img src={google} alt="Google" className="w-5 h-5" />
                       Google
                     </button>

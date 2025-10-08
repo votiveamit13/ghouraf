@@ -48,7 +48,7 @@ const adsData = [
         type: "Team Up",
         title: "Seeking Roommate for 2BHK",
         location: "location",
-        available: "Available now",
+        roommatePreferece: "male",
         price: "$1200 / month",
         desc: "Looking for a roommate to share a spacious 2BHK in Brooklyn.",
         img: `${property3}`
@@ -88,7 +88,7 @@ const adsData = [
         type: "Team Up",
         title: "Seeking Roommate for 2BHK",
         location: "location",
-        available: "Available now",
+        roommatePreferece: "female",
         price: "$1200 / month",
         desc: "Looking for a roommate to share a spacious 2BHK in Brooklyn.",
         img: `${property7}`
@@ -98,7 +98,7 @@ const adsData = [
         type: "Team Up",
         title: "Seeking Roommate for 2BHK",
         location: "location",
-        available: "Available now",
+        roommatePreferece: "male",
         price: "$1200 / month",
         desc: "Looking for a roommate to share a spacious 2BHK in Brooklyn.",
         img: `${property8}`
@@ -108,7 +108,7 @@ const adsData = [
         type: "Team Up",
         title: "Seeking Roommate for 2BHK",
         location: "location",
-        available: "Available now",
+        roommatePreferece: "male",
         price: "$1200 / month",
         desc: "Looking for a roommate to share a spacious 2BHK in Brooklyn.",
         img: `${property8}`
