@@ -163,46 +163,25 @@
     };
 
 const handleGoogleLogin = async () => {
-  const provider = new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, new GoogleAuthProvider());
     const idToken = await result.user.getIdToken();
+
     const res = await login(idToken);
 
     if (res.user) {
       toast.success("Login Successful");
       setLoginDialog(false);
       navigate("/user");
-      return;
+    } else if (res.error) {
+      toast.error(res.message);
+      await auth.signOut();
     }
-
-    if (res.message && (res.message.toLowerCase().includes("created") || res.user)) {
-      toast.success("Login Successful");
-      setLoginDialog(false);
-      navigate("/user");
-      return;
-    }
-
-    toast.error(res.message || "Unexpected login response");
-  } catch (error) {
-    const serverMessage = error?.response?.data?.message;
-    if (serverMessage === "Email already exists") {
-      toast.error("Email already exists. Please login with email & password.");
-      try { await auth.signOut(); } catch(e) { }
-      return;
-    }
-
-    if (error?.code === "auth/account-exists-with-different-credential") {
-      toast.error("This email is already registered with a different sign-in method.");
-      return;
-    }
-
-    toast.error(error?.message || "Google login failed");
-    try { await auth.signOut(); } catch(e) { }
+  } catch (err) {
+    toast.error(err.message || "Google login failed");
+    await auth.signOut();
   }
 };
-
-
 
     return (
       <nav className="bg-white fixed top-0 left-0 w-full z-20 p-[5px] shadow-lg">

@@ -134,16 +134,16 @@ export const login = async (req, res) => {
     if (!email) return res.status(400).json({ message: "No email in token" });
 
     const firebaseUser = await authAdmin.getUser(decoded.uid).catch(() => null);
+    const isGoogleProvider =
+      firebaseUser?.providerData?.some(p => p.providerId === "google.com") || false;
 
-    let isGoogleProvider = false;
-    if (firebaseUser && Array.isArray(firebaseUser.providerData)) {
-      isGoogleProvider = firebaseUser.providerData.some(
-        (p) => p.providerId === "google.com"
-      );
-    }
+    const displayName = decoded.name || firebaseUser?.displayName || "";
+    const nameParts = displayName.trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+    const photo = firebaseUser?.photoURL || decoded.picture || "";
 
     let user = await User.findOne({ firebaseUid: decoded.uid });
-
     if (user) {
       if (user.status === "inactive") {
         return res.status(403).json({
@@ -151,6 +151,15 @@ export const login = async (req, res) => {
           inactive: true,
         });
       }
+
+      user.profile = {
+        ...user.profile,
+        firstName: user.profile.firstName || firstName,
+        lastName: user.profile.lastName || lastName,
+        photo: user.profile.photo || photo,
+      };
+      await user.save();
+
       return res.json({
         message: "Login success",
         emailVerified: decoded.email_verified ?? false,
@@ -159,14 +168,16 @@ export const login = async (req, res) => {
     }
 
     const userByEmail = await User.findOne({ email: email.toLowerCase() });
-
     if (userByEmail) {
       if (isGoogleProvider) {
         userByEmail.firebaseUid = decoded.uid;
 
-        userByEmail.profile = userByEmail.profile || {};
-        if (!userByEmail.profile.photo && firebaseUser?.photoURL)
-          userByEmail.profile.photo = firebaseUser.photoURL;
+        userByEmail.profile = {
+          ...userByEmail.profile,
+          firstName: userByEmail.profile.firstName || firstName,
+          lastName: userByEmail.profile.lastName || lastName,
+          photo: userByEmail.profile.photo || photo,
+        };
 
         await userByEmail.save();
 
@@ -191,12 +202,12 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Provider must be Google" });
 
     const hashedPassword = await bcrypt.hash(randomString(24), 10);
-
     const profile = {
-      firstName: "",
-      lastName: "",
-      photo: firebaseUser?.photoURL || decoded.picture || "",
-      dob: null,
+      firstName,
+      lastName,
+      gender: null,
+      dob: null, 
+      photo,
     };
 
     const newUser = await User.create({
@@ -212,12 +223,12 @@ export const login = async (req, res) => {
       emailVerified: decoded.email_verified ?? false,
       user: newUser,
     });
+
   } catch (err) {
     console.error("Login error:", err);
     return res.status(401).json({ message: "Invalid or expired token", error: err.message });
   }
 };
-
 
 export const resendVerificationEmail = async (req, res) => {
   try {
