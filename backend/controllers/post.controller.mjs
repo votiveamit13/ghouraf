@@ -110,15 +110,10 @@ export const getSpaces = async (req, res) => {
       is_deleted: false,
     };
 
-        if (location && location.trim()) {
-      const regex = new RegExp(location.trim(), "i");
-      query.$or = [
-        { city: regex },
-        { state: regex },
-        { country: regex },
-        { location: regex },
-      ];
-    }
+    if (req.query.city) query.city = req.query.city;
+    if (req.query.state) query.state = req.query.state;
+    if (req.query.country) query.country = req.query.country;
+
 
     if (minValue || maxValue) {
       query.budget = {};
@@ -244,7 +239,7 @@ export const createTeamUp = async (req, res) => {
 
 export const getTeamUps = async (req, res) => {
   try {
-     const {
+    const {
       minValue,
       maxValue,
       priceType,
@@ -255,36 +250,32 @@ export const getTeamUps = async (req, res) => {
       location,
       page = 1,
       limit = 10,
-     } = req.query;
+    } = req.query;
 
-     const query = {
+    const query = {
       status: "active",
       available: true,
       is_deleted: false,
-     };
+    };
 
-         if (location && location.trim()) {
-      const regex = new RegExp(location.trim(), "i");
-      query.$or = [
-        { city: regex },
-        { state: regex },
-        { country: regex },
-      ];
-    }
+    if (req.query.city) query.city = req.query.city;
+    if (req.query.state) query.state = req.query.state;
+    if (req.query.country) query.country = req.query.country;
 
-     if (minValue || maxValue) {
+
+    if (minValue || maxValue) {
       query.budget = {};
       if (minValue) query.budget.$gte = Number(minValue);
       if (maxValue) query.budget.$lte = Number(maxValue);
-     }
+    }
 
-     if (priceType) query.budgetType = priceType;
+    if (priceType) query.budgetType = priceType;
 
-     if (smoking && smoking !== "all") {
+    if (smoking && smoking !== "all") {
       query.smoke = smoking === "allowed";
-     }
+    }
 
-     if (roommatePref && roommatePref !== "any") {
+    if (roommatePref && roommatePref !== "any") {
       query.roommatePref = roommatePref;
     }
 
@@ -330,14 +321,14 @@ export const getTeamUpById = async (req, res) => {
     const teamup = await TeamUp.findById(id)
       .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
 
-      if(!teamup) {
-        return res.status(404).json({ success: false, message: "Team Up not found" });
-      }
+    if (!teamup) {
+      return res.status(404).json({ success: false, message: "Team Up not found" });
+    }
 
-      res.status(200).json({
-        success: true,
-        data: teamup,
-      });
+    res.status(200).json({
+      success: true,
+      data: teamup,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -345,84 +336,84 @@ export const getTeamUpById = async (req, res) => {
 
 //SavedPost
 export const toggleSavePost = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { postId, postCategory } = req.body;
+  try {
+    const userId = req.user._id;
+    const { postId, postCategory } = req.body;
 
-        if (!postId || !postCategory) {
-            return res.status(400).json({ message: "postId and postCategory are required" });
-        }
-
-        const existing = await SavedPost.findOne({ user: userId, postId, postCategory });
-        if (existing) {
-            await existing.deleteOne();
-            return res.status(200).json({ message: "Removed from saved", saved: false });
-        }
-
-        let Model;
-        switch (postCategory) {
-            case "Space": Model = Space; break;
-            case "Teamup": Model = TeamUp; break;
-            case "Spacewanted": Model = SpaceWanted; break;
-            default: return res.status(400).json({ message: "Invalid postCategory" });
-        }
-
-        const post = await Model.findById(postId);
-        if (!post) return res.status(404).json({ message: "Post not found" });
-
-        let snapshot;
-        if (postCategory === "Space") {
-            snapshot = {
-                title: post.title,
-                country: post.country,
-                state: post.state,
-                city: post.city,
-                bedrooms: post.bedrooms,
-                propertyType: post.propertyType,
-                available: post.available,
-                budget: post.budget,
-                budgetType: post.budgetType,
-                description: post.description,
-                photo: post.featuredImage
-            };
-        } else if (postCategory === "Teamup") {
-            snapshot = {
-                title: post.title,
-                country: post.country,
-                state: post.state,
-                city: post.city,
-                roommatePref: post.roommatePref,
-                budget: post.budget,
-                budgetType: post.budgetType,
-                description: post.description,
-                photo: post.photos
-            };
-        } else {
-            snapshot = { title: post.title, description: post.description };
-        }
-
-        const savedPost = new SavedPost({ user: userId, postCategory, postId, snapshot });
-        await savedPost.save();
-
-        return res.status(201).json({ message: "Saved successfully", saved: true });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Server error" });
+    if (!postId || !postCategory) {
+      return res.status(400).json({ message: "postId and postCategory are required" });
     }
+
+    const existing = await SavedPost.findOne({ user: userId, postId, postCategory });
+    if (existing) {
+      await existing.deleteOne();
+      return res.status(200).json({ message: "Removed from saved", saved: false });
+    }
+
+    let Model;
+    switch (postCategory) {
+      case "Space": Model = Space; break;
+      case "Teamup": Model = TeamUp; break;
+      case "Spacewanted": Model = SpaceWanted; break;
+      default: return res.status(400).json({ message: "Invalid postCategory" });
+    }
+
+    const post = await Model.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    let snapshot;
+    if (postCategory === "Space") {
+      snapshot = {
+        title: post.title,
+        country: post.country,
+        state: post.state,
+        city: post.city,
+        bedrooms: post.bedrooms,
+        propertyType: post.propertyType,
+        available: post.available,
+        budget: post.budget,
+        budgetType: post.budgetType,
+        description: post.description,
+        photo: post.featuredImage
+      };
+    } else if (postCategory === "Teamup") {
+      snapshot = {
+        title: post.title,
+        country: post.country,
+        state: post.state,
+        city: post.city,
+        roommatePref: post.roommatePref,
+        budget: post.budget,
+        budgetType: post.budgetType,
+        description: post.description,
+        photo: post.photos
+      };
+    } else {
+      snapshot = { title: post.title, description: post.description };
+    }
+
+    const savedPost = new SavedPost({ user: userId, postCategory, postId, snapshot });
+    await savedPost.save();
+
+    return res.status(201).json({ message: "Saved successfully", saved: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const getSavedPosts = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { postCategory } = req.query;
+  try {
+    const userId = req.user._id;
+    const { postCategory } = req.query;
 
-        const query = { user: userId };
-        if (postCategory) query.postCategory = postCategory;
+    const query = { user: userId };
+    if (postCategory) query.postCategory = postCategory;
 
-        const savedPosts = await SavedPost.find(query).sort({ createdAt: -1 });
-        return res.status(200).json({ data: savedPosts });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Server error" });
-    }
+    const savedPosts = await SavedPost.find(query).sort({ createdAt: -1 });
+    return res.status(200).json({ data: savedPosts });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
 };

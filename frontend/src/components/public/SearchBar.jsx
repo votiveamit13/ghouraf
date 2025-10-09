@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getFullLocation } from "utils/locationHelper";
@@ -12,6 +11,11 @@ export default function SearchBar() {
   const [searchInput, setSearchInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState({
+  city: "",
+  stateCode: "",
+  countryCode: "",
+});
 
   useEffect(() => {
     if (location.pathname === "/spaces") {
@@ -69,6 +73,7 @@ const fetchLocations = async (query) => {
 const handleSelectSuggestion = (item) => {
   const fullLocation = getFullLocation(item.city, item.stateCode, item.countryCode);
   setSearchInput(fullLocation);
+  setSelectedLocation(item);
   setShowDropdown(false);
 };
 
@@ -76,11 +81,13 @@ const handleSelectSuggestion = (item) => {
   const handleSearch = () => {
     if (!searchInput.trim()) return;
     if (selected === "spaces") {
-      navigate(`/spaces?location=${encodeURIComponent(searchInput)}`);
+      navigate(
+      `/spaces?city=${selectedLocation.city}&state=${selectedLocation.stateCode}&country=${selectedLocation.countryCode}`
+    );
     } else if (selected === "placewanted") {
-      navigate(`/place-wanted?location=${encodeURIComponent(searchInput)}`);
+      navigate(`/place-wanted?city=${selectedLocation.city}&state=${selectedLocation.stateCode}&country=${selectedLocation.countryCode}`);
     } else if (selected === "teamup") {
-      navigate(`/team-up?location=${encodeURIComponent(searchInput)}`);
+      navigate(`/team-up?city=${selectedLocation.city}&state=${selectedLocation.stateCode}&country=${selectedLocation.countryCode}`);
     }
   };
 
