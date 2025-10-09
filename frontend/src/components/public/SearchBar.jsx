@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getFullLocation } from "utils/locationHelper";
+import { Country, State, City } from "country-state-city";
 
 export default function SearchBar() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -28,21 +30,35 @@ export default function SearchBar() {
     navigate(path);
   };
 
-  const fetchLocations = async (query) => {
-    if (!query || query.trim().length < 2) {
-      setSuggestions([]);
-      return;
-    }
-    try {
-      const { data } = await axios.get(`${apiUrl}locations`, {
-        params: { query },
-      });
-      setSuggestions(data.data || []);
-      setShowDropdown(true);
-    } catch (err) {
-      console.error("Location search failed:", err);
-    }
-  };
+const fetchLocations = async (query) => {
+  if (!query || query.trim().length < 2) {
+    setSuggestions([]);
+    return;
+  }
+
+  try {
+    const lower = query.toLowerCase();
+    const matchedCities = City.getAllCities()
+      .filter(
+        (c) =>
+          c.name.toLowerCase().includes(lower) ||
+          c.stateCode?.toLowerCase().includes(lower) ||
+          c.countryCode?.toLowerCase().includes(lower)
+      )
+      .slice(0, 10);
+
+    const formatted = matchedCities.map((c) => ({
+      city: c.name,
+      stateCode: c.stateCode,
+      countryCode: c.countryCode,
+    }));
+
+    setSuggestions(formatted);
+    setShowDropdown(true);
+  } catch (err) {
+    console.error("Location search failed:", err);
+  }
+};
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -50,11 +66,12 @@ export default function SearchBar() {
     fetchLocations(value);
   };
 
-  const handleSelectSuggestion = (item) => {
-    const fullLocation = `${item.city ? item.city + ", " : ""}${item.state ? item.state + ", " : ""}${item.country || ""}`;
-    setSearchInput(fullLocation);
-    setShowDropdown(false);
-  };
+const handleSelectSuggestion = (item) => {
+  const fullLocation = getFullLocation(item.city, item.stateCode, item.countryCode);
+  setSearchInput(fullLocation);
+  setShowDropdown(false);
+};
+
 
   const handleSearch = () => {
     if (!searchInput.trim()) return;
@@ -125,18 +142,19 @@ export default function SearchBar() {
 
           {showDropdown && suggestions.length > 0 && (
             <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-md w-full max-h-[200px] overflow-y-auto mt-1">
-              {suggestions.map((item, idx) => (
-                <li
-                  key={idx}
-                  onMouseDown={() => handleSelectSuggestion(item)}
-                  className="px-3 py-2 cursor-pointer hover:bg-gray-100"
-                >
-                  {item.city && <>{item.city}, </>}
-                  {item.state && <>{item.state}, </>}
-                  {item.country}
-                </li>
-              ))}
-            </ul>
+    {suggestions.map((item, idx) => {
+      const fullName = getFullLocation(item.city, item.stateCode, item.countryCode);
+      return (
+        <li
+          key={idx}
+          onMouseDown={() => handleSelectSuggestion(item)}
+          className="px-3 py-2 cursor-pointer hover:bg-gray-100"
+        >
+          {fullName}
+        </li>
+      );
+    })}
+  </ul>
           )}
         </div>
 

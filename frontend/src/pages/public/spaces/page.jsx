@@ -5,12 +5,15 @@ import SearchBar from "components/public/SearchBar";
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import Loader from "components/common/Loader";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 export default function Spaces() {
     const apiUrl = process.env.REACT_APP_API_URL;
     const [page, setPage] = useState(1);
     const [spaces, setSpaces] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
+    const locationHook = useLocation();
     const [filters, setFilters] = useState({
         minValue: 0,
         maxValue: 100000,
@@ -23,6 +26,7 @@ export default function Spaces() {
         roomAvailable: "any",
         bedrooms: "Any",
         moveInDate: "",
+        location: ""
     });
 const [loading, setLoading] = useState(false);
     const itemsPerPage = 10;
@@ -62,6 +66,16 @@ const [loading, setLoading] = useState(false);
 
     fetchSpaces();
   }, [page, filters, apiUrl]);
+
+  useEffect(() => {
+  const parsed = queryString.parse(locationHook.search);
+  if (parsed.location) {
+    setFilters((prev) => ({
+      ...prev,
+      location: parsed.location,
+    }));
+  }
+}, [locationHook.search]);
 
     return (
         <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">

@@ -99,6 +99,7 @@ export const getSpaces = async (req, res) => {
       roomAvailable,
       bedrooms,
       moveInDate,
+      location,
       page = 1,
       limit = 10,
     } = req.query;
@@ -108,6 +109,16 @@ export const getSpaces = async (req, res) => {
       available: true,
       is_deleted: false,
     };
+
+        if (location && location.trim()) {
+      const regex = new RegExp(location.trim(), "i");
+      query.$or = [
+        { city: regex },
+        { state: regex },
+        { country: regex },
+        { location: regex },
+      ];
+    }
 
     if (minValue || maxValue) {
       query.budget = {};
@@ -241,6 +252,7 @@ export const getTeamUps = async (req, res) => {
       roommatePref,
       moveInDate,
       amenities,
+      location,
       page = 1,
       limit = 10,
      } = req.query;
@@ -250,6 +262,15 @@ export const getTeamUps = async (req, res) => {
       available: true,
       is_deleted: false,
      };
+
+         if (location && location.trim()) {
+      const regex = new RegExp(location.trim(), "i");
+      query.$or = [
+        { city: regex },
+        { state: regex },
+        { country: regex },
+      ];
+    }
 
      if (minValue || maxValue) {
       query.budget = {};
