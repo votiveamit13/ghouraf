@@ -448,16 +448,16 @@ export const getMyAds = async (req, res) => {
     else if (sort === "Newest First") sortOption = { createdAt: -1 };
 
     if (category !== "All Category") {
-      if (category === "Spaces" || category === "Space Wanted") {
+      if (category === "Space" || category === "Spacewanted") {
         spaceFilter.postCategory = category;
         teamUpFilter._skip = true; 
-      } else if (category === "Team Up") {
+      } else if (category === "Teamup") {
         teamUpFilter.postCategory = category;
         spaceFilter._skip = true; 
       }
     }
 
-    console.log("🧩 Final Filters:");
+    console.log("Final Filters:");
     console.log("Space Filter:", JSON.stringify(spaceFilter, null, 2));
     console.log("TeamUp Filter:", JSON.stringify(teamUpFilter, null, 2));
 
