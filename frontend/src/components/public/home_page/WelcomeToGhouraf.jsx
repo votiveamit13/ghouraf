@@ -3,8 +3,10 @@ import { FaPhoneAlt } from "react-icons/fa";
 import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
 import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
 import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
+import { useNavigate } from "react-router-dom";
 
 export default function WelcomeToGhouraf() {
+  const navigate = useNavigate();
   return (
     <section className="w-full bg-white py-16">
       <div className="container mx-auto sm:px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center gap-12">
@@ -47,7 +49,9 @@ export default function WelcomeToGhouraf() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <button className="px-5 py-3 bg-black text-white rounded-[12px] flex items-center gap-2 hover:bg-gray-900 transition w-full sm:w-auto justify-center">
+            <button 
+              onClick={() => navigate("/about-us")}
+              className="px-5 py-3 bg-black text-white rounded-[12px] flex items-center gap-2 hover:bg-gray-900 transition w-full sm:w-auto justify-center">
               Read More
               <span>
                 <GoArrowUpRight size={25} />

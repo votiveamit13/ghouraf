@@ -1,10 +1,15 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SearchBar() {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
   const [selected, setSelected] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     if (location.pathname === "/spaces") {
@@ -19,8 +24,47 @@ export default function SearchBar() {
   }, [location.pathname]);
 
   const handleChange = (path, value) => {
-    setSelected(value); 
+    setSelected(value);
     navigate(path);
+  };
+
+  const fetchLocations = async (query) => {
+    if (!query || query.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const { data } = await axios.get(`${apiUrl}locations`, {
+        params: { query },
+      });
+      setSuggestions(data.data || []);
+      setShowDropdown(true);
+    } catch (err) {
+      console.error("Location search failed:", err);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    fetchLocations(value);
+  };
+
+  const handleSelectSuggestion = (item) => {
+    const fullLocation = `${item.city ? item.city + ", " : ""}${item.state ? item.state + ", " : ""}${item.country || ""}`;
+    setSearchInput(fullLocation);
+    setShowDropdown(false);
+  };
+
+  const handleSearch = () => {
+    if (!searchInput.trim()) return;
+    if (selected === "spaces") {
+      navigate(`/spaces?location=${encodeURIComponent(searchInput)}`);
+    } else if (selected === "placewanted") {
+      navigate(`/place-wanted?location=${encodeURIComponent(searchInput)}`);
+    } else if (selected === "teamup") {
+      navigate(`/team-up?location=${encodeURIComponent(searchInput)}`);
+    }
   };
 
   return (
@@ -68,12 +112,38 @@ export default function SearchBar() {
         </div>
 
         <label className="text-[16px] text-black mb-0">Search Location</label>
-        <input
-          type="text"
-          placeholder="Enter Search Location"
-          className="w-full border rounded-[5px] px-3 py-2"
-        />
-        <button className="bg-[#565ABF] text-white py-2 rounded-[5px] mb-3 text-[14px] font-semibold">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Enter Search Location"
+            value={searchInput}
+            onChange={handleInputChange}
+            className="w-full border rounded-[5px] px-3 py-2"
+            onFocus={() => setShowDropdown(suggestions.length > 0)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+          />
+
+          {showDropdown && suggestions.length > 0 && (
+            <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-md w-full max-h-[200px] overflow-y-auto mt-1">
+              {suggestions.map((item, idx) => (
+                <li
+                  key={idx}
+                  onMouseDown={() => handleSelectSuggestion(item)}
+                  className="px-3 py-2 cursor-pointer hover:bg-gray-100"
+                >
+                  {item.city && <>{item.city}, </>}
+                  {item.state && <>{item.state}, </>}
+                  {item.country}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <button
+          onClick={handleSearch}
+          className="bg-[#565ABF] text-white py-2 rounded-[5px] mb-3 text-[14px] font-semibold"
+        >
           Search
         </button>
       </div>

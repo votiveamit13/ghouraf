@@ -36,7 +36,7 @@ export default function PropertyCard({ property }) {
             }
         };
         checkSaved();
-    }, [property._id, apiUrl, userId]);
+    }, [property._id, apiUrl, userId, token]);
 
     const handleSaveToggle = async (e) => {
         e.preventDefault();
@@ -63,7 +63,6 @@ export default function PropertyCard({ property }) {
             toast.error("Failed to save post");
         }
     };
-
 
     return (
         <Link to={`/spaces/${property._id}`} className="w-[200px] h-[260px]">

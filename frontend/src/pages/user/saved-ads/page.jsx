@@ -5,6 +5,7 @@ import { TfiLocationPin } from "react-icons/tfi";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Loader from "components/common/Loader";
+import { getFullLocation } from "utils/locationHelper";
 
 export default function SavedAds() {
     const [ads, setAds] = useState([]);
@@ -91,6 +92,7 @@ export default function SavedAds() {
                 <div className="flex flex-wrap gap-6 justify-start">
                     {displayedAds.map((ad) => {
                         const post = ad.snapshot;
+                        const locationString = getFullLocation(post.city, post.state, post.country);
                         return (
                             <div
                                 key={ad._id}
@@ -111,12 +113,12 @@ export default function SavedAds() {
                                         {post?.title}
                                     </h3>
                                     <p className="text-[15px] sm:text-[18px] flex items-center gap-1">
-                                        <TfiLocationPin /> {post?.city || "Unknown"}
+                                        <TfiLocationPin /> {locationString}
                                     </p>
                                     <p className="font-semibold text-[15px] sm:text-[18px]">
                                         ₹{post?.budget} / {post?.budgetType}
                                     </p>
-                                    <p className="text-[15px] sm:text-[18px]">{post?.description}</p>
+                                    <p className="text-[15px] sm:text-[18px] leading-[1.7rem]">{post?.description}</p>
                                 </div>
                             </div>
                         );
