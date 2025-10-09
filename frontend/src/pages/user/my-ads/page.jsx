@@ -32,8 +32,6 @@ export default function MyAds() {
                 params.category = filter;
             }
 
-            console.log("🔍 Fetching My Ads with params:", params);
-
             const response = await axios.get(`${apiUrl}my-ads`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params,
@@ -42,7 +40,7 @@ export default function MyAds() {
             setAds(response.data.data || []);
             setTotalPages(response.data.totalPages || 1);
         } catch (error) {
-            console.error("❌ Error fetching ads:", error.response?.data || error.message);
+            console.error("Error fetching ads:", error.response?.data || error.message);
         } finally {
             setLoading(false);
         }

@@ -430,7 +430,6 @@ export const getMyAds = async (req, res) => {
       search = "",
       sort = "Recently posted",
     } = req.query;
-    console.log("Query Params:", { page, limit, category, search, sort });
 
     const skip = (page - 1) * limit;
 
@@ -457,16 +456,10 @@ export const getMyAds = async (req, res) => {
       }
     }
 
-    console.log("Final Filters:");
-    console.log("Space Filter:", JSON.stringify(spaceFilter, null, 2));
-    console.log("TeamUp Filter:", JSON.stringify(teamUpFilter, null, 2));
-
     const [spaces, teamUps] = await Promise.all([
       spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
       teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
     ]);
-
-    console.log(`Found ${spaces.length} Spaces, ${teamUps.length} TeamUps`);
 
     const combined = [...spaces, ...teamUps].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -483,7 +476,6 @@ export const getMyAds = async (req, res) => {
       totalPages,
     });
   } catch (error) {
-    console.error("getMyAds Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
