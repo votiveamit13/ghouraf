@@ -16,29 +16,39 @@ export default function MyAds() {
   const [loading, setLoading] = useState(false);
   const adsPerPage = 9;
 
-  const fetchAds = async () => {
-    try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
+const fetchAds = async () => {
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("token");
 
-        const response = await axios.get(`${apiUrl}my-ads`, {
-            headers: { Authorization: `Bearer ${token }`},
-            params: {
-               page: currentPage,
-          limit: adsPerPage,
-          category: filter,
-          search,
-          sort,
-        },
-      });
-        setAds(response.data.data || []);
-        setTotalPages(response.data.totalPages || 1);
-    } catch (error) {
-        console.error("Error fetching ads:", error);
-    } finally {
-        setLoading(false);
+    const params = {
+      page: currentPage,
+      limit: adsPerPage,
+      search,
+      sort,
+    };
+
+    if (filter !== "All Category") {
+      params.category = filter;
     }
-  };
+
+    console.log("🔍 Fetching My Ads with params:", params);
+
+    const response = await axios.get(`${apiUrl}my-ads`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params,
+    });
+
+    setAds(response.data.data || []);
+    setTotalPages(response.data.totalPages || 1);
+  } catch (error) {
+    console.error("❌ Error fetching ads:", error.response?.data || error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
     useEffect(() => {
     fetchAds();

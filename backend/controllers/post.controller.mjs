@@ -421,61 +421,69 @@ export const getSavedPosts = async (req, res) => {
 //MyAds
 export const getMyAds = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const { page = 1, limit = 9, category = "All Category", search = "", sort = "recent" } = req.query;
+    const userId = req.user?._id;
 
-    const skip = (page-1)*limit;
+    const {
+      page = 1,
+      limit = 9,
+      category = "All Category",
+      search = "",
+      sort = "Recently posted",
+    } = req.query;
+    console.log("Query Params:", { page, limit, category, search, sort });
+
+    const skip = (page - 1) * limit;
 
     const spaceFilter = { user: userId, is_deleted: false };
     const teamUpFilter = { user: userId, is_deleted: false };
 
-    if(category && category !== "All Category") {
-     if (category === "Spaces" || category === "Space Wanted") {
-                spaceFilter.postCategory = category;
-            } else if (category === "Team Up") {
-                teamUpFilter.postCategory = category;
-            }
-        }
-
-        if (search) {
-            const searchRegex = new RegExp(search, "i"); 
-            spaceFilter.$or = [{ title: searchRegex }, { location: searchRegex }];
-            teamUpFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
-        }
-
-        let sortOption = { createdAt: -1 }; 
-        if (sort === "Oldest First") sortOption = { createdAt: 1 };
-        else if (sort === "Newest First") sortOption = { createdAt: -1 };
-
-        let spaces = [];
-        let teamUps = [];
-
-        if (!category || category === "Spaces" || category === "Space Wanted") {
-            spaces = await Space.find(spaceFilter)
-                .sort(sortOption)
-                .skip(Number(skip))
-                .limit(Number(limit));
-        }
-
-        if (!category || category === "Team Up") {
-            teamUps = await TeamUp.find(teamUpFilter)
-                .sort(sortOption)
-                .skip(Number(skip))
-                .limit(Number(limit));
-        }
-
-        const combined = [...spaces, ...teamUps];
-        const totalCount = combined.length;
-
-        res.status(200).json({
-            success: true,
-            data: combined,
-            totalCount,
-            currentPage: Number(page),
-            totalPages: Math.ceil(totalCount / limit),
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Server Error" });
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      spaceFilter.$or = [{ title: searchRegex }, { location: searchRegex }];
+      teamUpFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
     }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === "Oldest First") sortOption = { createdAt: 1 };
+    else if (sort === "Newest First") sortOption = { createdAt: -1 };
+
+    if (category !== "All Category") {
+      if (category === "Spaces" || category === "Space Wanted") {
+        spaceFilter.postCategory = category;
+        teamUpFilter._skip = true; 
+      } else if (category === "Team Up") {
+        teamUpFilter.postCategory = category;
+        spaceFilter._skip = true; 
+      }
+    }
+
+    console.log("🧩 Final Filters:");
+    console.log("Space Filter:", JSON.stringify(spaceFilter, null, 2));
+    console.log("TeamUp Filter:", JSON.stringify(teamUpFilter, null, 2));
+
+    const [spaces, teamUps] = await Promise.all([
+      spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
+      teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
+    ]);
+
+    console.log(`Found ${spaces.length} Spaces, ${teamUps.length} TeamUps`);
+
+    const combined = [...spaces, ...teamUps].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    const totalCount = combined.length;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.status(200).json({
+      success: true,
+      data: combined,
+      totalCount,
+      currentPage: Number(page),
+      totalPages,
+    });
+  } catch (error) {
+    console.error("getMyAds Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
