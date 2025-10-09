@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 import SearchBar from "components/public/SearchBar";
 import axios from "axios";
 import Loader from "components/common/Loader";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 export default function TeamUp() {
-    const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const locationHook = useLocation();
     const [page, setPage] = useState(1);
     const [teamups, setTeamups] = useState([]);
     const [totalPages, setTotalPages] = useState(1)
@@ -19,9 +22,23 @@ export default function TeamUp() {
         roommatePref: "any",
         amenities: [],
         moveInDate: "",
+        location: "",
     });
     const [loading, setLoading] = useState(false);
     const itemsPerPage = 10;
+
+    useEffect(() => {
+      const parsed = queryString.parse(locationHook.search);
+    
+      setFilters((prev) => ({
+        ...prev,
+        city: parsed.city || "",
+        state: parsed.state || "",
+        country: parsed.country || "",
+      }));
+    
+      setPage(1);
+    }, [locationHook.search]);
 
     useEffect(() => {
         const fetchTeamups = async () => {

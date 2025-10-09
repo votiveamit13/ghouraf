@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getFullLocation } from "utils/locationHelper";
-import { Country, State, City } from "country-state-city";
+import { City } from "country-state-city";
 
 export default function SearchBar() {
   const apiUrl = process.env.REACT_APP_API_URL;
