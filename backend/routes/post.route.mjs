@@ -2,7 +2,7 @@ import express from "express";
 import { 
   createSpace, getSpaces, getSpaceById,
   createTeamUp, getTeamUps, getTeamUpById,
-  toggleSavePost, getSavedPosts
+  toggleSavePost, getSavedPosts, getMyAds
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
@@ -25,5 +25,6 @@ router.get("/teamups", getTeamUps);
 router.get("/teamup/:id", getTeamUpById);
 router.post("/save", auth, toggleSavePost);
 router.get("/save/list", auth, getSavedPosts);
+router.get("/my-ads", auth, getMyAds);
 
 export default router;

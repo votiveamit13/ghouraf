@@ -417,3 +417,65 @@ export const getSavedPosts = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+//MyAds
+export const getMyAds = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { page = 1, limit = 9, category = "All Category", search = "", sort = "recent" } = req.query;
+
+    const skip = (page-1)*limit;
+
+    const spaceFilter = { user: userId, is_deleted: false };
+    const teamUpFilter = { user: userId, is_deleted: false };
+
+    if(category && category !== "All Category") {
+     if (category === "Spaces" || category === "Space Wanted") {
+                spaceFilter.postCategory = category;
+            } else if (category === "Team Up") {
+                teamUpFilter.postCategory = category;
+            }
+        }
+
+        if (search) {
+            const searchRegex = new RegExp(search, "i"); 
+            spaceFilter.$or = [{ title: searchRegex }, { location: searchRegex }];
+            teamUpFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
+        }
+
+        let sortOption = { createdAt: -1 }; 
+        if (sort === "Oldest First") sortOption = { createdAt: 1 };
+        else if (sort === "Newest First") sortOption = { createdAt: -1 };
+
+        let spaces = [];
+        let teamUps = [];
+
+        if (!category || category === "Spaces" || category === "Space Wanted") {
+            spaces = await Space.find(spaceFilter)
+                .sort(sortOption)
+                .skip(Number(skip))
+                .limit(Number(limit));
+        }
+
+        if (!category || category === "Team Up") {
+            teamUps = await TeamUp.find(teamUpFilter)
+                .sort(sortOption)
+                .skip(Number(skip))
+                .limit(Number(limit));
+        }
+
+        const combined = [...spaces, ...teamUps];
+        const totalCount = combined.length;
+
+        res.status(200).json({
+            success: true,
+            data: combined,
+            totalCount,
+            currentPage: Number(page),
+            totalPages: Math.ceil(totalCount / limit),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};

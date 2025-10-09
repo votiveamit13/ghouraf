@@ -108,7 +108,7 @@ export default function HeroSection() {
     <div className="flex items-center bg-white rounded-full overflow-hidden shadow-lg w-full">
       <input
         type="text"
-        placeholder="Enter Location, Area or Postcode"
+        placeholder="Enter Location: City, State, Country"
         className="flex-grow px-4 text-[#A321A6] placeholder-[#A321A6] outline-none text-sm sm:text-base"
         value={searchInput}
         onChange={handleInputChange}
