@@ -155,10 +155,10 @@ export const getSpaces = async (req, res) => {
       query.personalInfo = adPostedBy;
     }
 
-if (req.query.amenities) {
-  const amenities = req.query.amenities.split(',');
-  query.amenities = { $all: amenities };
-}
+    if (req.query.amenities) {
+      const amenities = req.query.amenities.split(',');
+      query.amenities = { $all: amenities };
+    }
 
 
     // if (moveInDate) {

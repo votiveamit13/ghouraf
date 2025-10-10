@@ -58,7 +58,8 @@ useEffect(() => {
         const params = {
           page,
           limit: itemsPerPage,
-          ...filters
+          ...filters,
+          amenities: filters.amenities.join(','),
         };
 
         Object.keys(params).forEach((key) => {

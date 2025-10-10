@@ -286,7 +286,7 @@ export default function Filters({ filters, setFilters, setPage }) {
             onClick={() => setShowAmenities(!showAmenities)}
           >
             {filters.amenities.length > 0
-              ? filters.amenities.join(", ")
+              ? filters?.amenities?.join(", ")
               : "Select amenities"}
           </button>
 
@@ -309,7 +309,7 @@ export default function Filters({ filters, setFilters, setPage }) {
                     type="checkbox"
                     className="form-check-input ml-1"
                     id={amenity}
-                    checked={filters.amenities.includes(amenity)}
+                    checked={filters?.amenities?.includes(amenity)}
                     onChange={() => {
                       const selected = filters.amenities.includes(amenity)
                         ? filters.amenities.filter((a) => a !== amenity)
