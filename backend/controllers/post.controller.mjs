@@ -155,10 +155,11 @@ export const getSpaces = async (req, res) => {
       query.personalInfo = adPostedBy;
     }
 
-    if (amenities) {
-      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
-      query.amenities = { $all: amenitiesArray };
-    }
+if (req.query.amenities) {
+  const amenities = req.query.amenities.split(',');
+  query.amenities = { $all: amenities };
+}
+
 
     // if (moveInDate) {
     //   query.availableFrom = { $lte: new Date(moveInDate) };

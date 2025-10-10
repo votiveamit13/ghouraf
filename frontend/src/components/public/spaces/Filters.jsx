@@ -183,11 +183,11 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
             <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Add Posted By</label>
+        <label className="font-medium text-[18px]">Ad Posted By</label>
         <div className="space-y-1 mt-1 mb-3">
           <select
             value={filters.adPostedBy}
-            onChange={(e) => handleFilterChange("bedrooms", e.target.value)}
+            onChange={(e) => handleFilterChange("adPostedBy", e.target.value)}
             className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
           >
             <option value="all">All</option>
@@ -285,7 +285,7 @@ export default function Filters({ filters, setFilters, setPage }) {
             className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
             onClick={() => setShowAmenities(!showAmenities)}
           >
-            {filters?.amenities?.length > 0
+            {filters.amenities.length > 0
               ? filters.amenities.join(", ")
               : "Select amenities"}
           </button>
@@ -296,23 +296,20 @@ export default function Filters({ filters, setFilters, setPage }) {
               style={{ maxHeight: "200px", overflowY: "auto" }}
             >
               {[
-                "Furnished",
-                "Shared living room",
-                "Washing Machine",
-                "Yard/patio",
-                "Balcony/roof terrace",
+                "Fully Furnished",
+                "High-Speed Wi-Fi",
+                "Air Conditioning & Heating",
+                "In-unit Washing Machine",
+                "24/7 Security & Doorman",
                 "Parking",
-                "Garage",
-                "Disabled Access",
-                "Internet",
-                "Private bathroom",
+                "Living room",
               ].map((amenity) => (
                 <li key={amenity} className="flex items-center py-1">
                   <input
                     type="checkbox"
                     className="form-check-input ml-1"
                     id={amenity}
-                    checked={filters?.amenities?.includes(amenity)}
+                    checked={filters.amenities.includes(amenity)}
                     onChange={() => {
                       const selected = filters.amenities.includes(amenity)
                         ? filters.amenities.filter((a) => a !== amenity)

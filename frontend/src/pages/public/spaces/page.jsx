@@ -29,7 +29,9 @@ export default function Spaces() {
     roomAvailable: "any",
     bedrooms: "Any",
     moveInDate: "",
-    location: ""
+    location: "",
+    adPostedBy: "",
+    amenities: [],
   });
 
   const itemsPerPage = 10;
