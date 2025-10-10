@@ -100,6 +100,8 @@ export const getSpaces = async (req, res) => {
       bedrooms,
       moveInDate,
       location,
+      adPostedBy,
+      amenities,
       page = 1,
       limit = 10,
     } = req.query;
@@ -149,14 +151,23 @@ export const getSpaces = async (req, res) => {
       query.bedrooms = Number(bedrooms);
     }
 
-    if (moveInDate) {
-      query.availableFrom = { $lte: new Date(moveInDate) };
+    if (adPostedBy && adPostedBy !== "all") {
+      query.personalInfo = adPostedBy;
     }
+
+    if (amenities) {
+      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
+      query.amenities = { $all: amenitiesArray };
+    }
+
+    // if (moveInDate) {
+    //   query.availableFrom = { $lte: new Date(moveInDate) };
+    // }
 
     const skip = (page - 1) * limit;
 
     const spaces = await Space.find(query)
-      .select("title postCategory propertyType budget budgetType personalInfo size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted")
+      .select("title postCategory propertyType budget budgetType personalInfo amenities size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted")
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort({ createdAt: -1 })
       .skip(skip)

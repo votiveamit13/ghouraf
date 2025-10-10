@@ -7,7 +7,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 export default function Footer() {
   return (
     <footer className="bg-black text-gray-300 pt-12 pb-3">
-      <div className="max-w-7xl mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="container mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
         <div>
           <h3 className="text-white font-semibold mb-4">Office Address</h3>
           <p className="text-sm mb-1">Head office:</p>

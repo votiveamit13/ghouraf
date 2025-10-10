@@ -220,11 +220,11 @@ export default function PostSpace() {
     setIsSubmitting(true);
     try {
       const formPayload = new FormData();
-      console.log("Submitting form with data:", formData);
-      console.log("Featured image:", featured ? featured.name : "None");
-      console.log("Photos count:", photos.length);
-      console.log(typeof formData.furnishing, formData.furnishing);
-      console.log(typeof formData.smoking, formData.smoking);
+      // console.log("Submitting form with data:", formData);
+      // console.log("Featured image:", featured ? featured.name : "None");
+      // console.log("Photos count:", photos.length);
+      // console.log(typeof formData.furnishing, formData.furnishing);
+      // console.log(typeof formData.smoking, formData.smoking);
 
       const processedData = {
         ...formData,
@@ -235,7 +235,7 @@ export default function PostSpace() {
         size: parseFloat(formData.size)
       };
 
-      console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
+      // console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
 
       Object.keys(processedData).forEach((key) => {
         if (key === "amenities") {
@@ -257,7 +257,7 @@ export default function PostSpace() {
         formPayload.append("photos", photo);
       });
 
-      console.log("Processed data:", processedData);
+      // console.log("Processed data:", processedData);
       for (let [key, value] of formPayload.entries()) {
         console.log(key, value, typeof value);
       }
@@ -271,8 +271,8 @@ export default function PostSpace() {
 
       navigate("/user/thank-you", {
         state: {
-          title: "Your Space successfully published",
-          subtitle: "Your space listing has been created and is now live.",
+          title: "Your ad was successfully submitted",
+          subtitle: "This post will undergo a review process and will be published once approved.",
           goBackPath: "/user/post-an-space",
           viewAdsPath: "/my-spaces"
         }

@@ -28,6 +28,8 @@ import TeamUp from "pages/public/teamup/page";
 import TeamUpAd from "pages/user/team-up-post/page";
 import Messages from "pages/user/messages/page";
 import ThankYouDialog from "components/common/ThankYouDialog";
+import SpaceWantedDetailPage from "pages/public/placewanted/detail-page/page";
+import TeamUpDetailPage from "pages/public/teamup/detail-page/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -39,7 +41,9 @@ root.render(
         <Route path="/spaces" element={<Public><Spaces /></Public>} />
         <Route path="/spaces/:id" element={<Public><DetailPage /></Public>} />
         <Route path="/place-wanted" element={<Public><PlaceWanted/></Public>} />
+        <Route path="/place-wanted/detail-page" element={<Public><SpaceWantedDetailPage /></Public>} />
         <Route path="/team-up" element={<Public><TeamUp/></Public>} />
+        <Route path="/team-up/detail-page" element={<Public><TeamUpDetailPage/></Public>} />
         <Route path="/about-us" element={<Public><AboutUs /></Public>} />
         <Route path="/contact-us" element={<Public><ContactUs /></Public>} />
         <Route path="/faq" element={<Public><Faqs /></Public>} />

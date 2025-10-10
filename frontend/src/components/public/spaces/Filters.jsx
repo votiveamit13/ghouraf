@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Numbers } from "../../../constants/numbers";
 
 export default function Filters({ filters, setFilters, setPage }) {
+  const [showAmenities, setShowAmenities] = useState(false);
+    const dropdownRef = useRef(null);
   const defaultFilters = {
     minValue: 0,
     maxValue: 100000,
@@ -13,8 +15,20 @@ export default function Filters({ filters, setFilters, setPage }) {
     propertyType: "",
     roomAvailable: "",
     bedrooms: "",
+    adPostedBy: "",
+    amenities: [],
     // moveInDate: "",
   };
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setShowAmenities(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
   const min = 0;
   const max = 100000;
@@ -150,6 +164,39 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
+            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Number of bedrooms</label>
+        <div className="space-y-1 mt-1 mb-3">
+          <select
+            value={filters.bedrooms}
+            onChange={(e) => handleFilterChange("bedrooms", e.target.value)}
+            className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
+          >
+            <option value="">Select</option>
+            {Numbers.map((num) => (
+              <option key={num.value} value={num.value}>
+                {num.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Add Posted By</label>
+        <div className="space-y-1 mt-1 mb-3">
+          <select
+            value={filters.adPostedBy}
+            onChange={(e) => handleFilterChange("bedrooms", e.target.value)}
+            className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
+          >
+            <option value="all">All</option>
+            <option value="Landlord">Landlord</option>
+            <option value="Agent">Agent</option>
+          </select>
+        </div>
+      </div>
+
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Property Type</label>
         <div className="space-y-1 mt-1 mb-3">
@@ -230,21 +277,56 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Number of bedrooms</label>
-        <div className="space-y-1 mt-1 mb-3">
-          <select
-            value={filters.bedrooms}
-            onChange={(e) => handleFilterChange("bedrooms", e.target.value)}
-            className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
+      <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7] relative" ref={dropdownRef}>
+        <label className="font-medium text-[18px]">Amenities</label>
+        <div className="mt-2 w-full">
+          <button
+            type="button"
+            className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
+            onClick={() => setShowAmenities(!showAmenities)}
           >
-            <option value="">Select</option>
-            {Numbers.map((num) => (
-              <option key={num.value} value={num.value}>
-                {num.label}
-              </option>
-            ))}
-          </select>
+            {filters?.amenities?.length > 0
+              ? filters.amenities.join(", ")
+              : "Select amenities"}
+          </button>
+
+          {showAmenities && (
+            <ul
+              className="absolute z-50 w-full p-2 text-black bg-white border border-[#D7D7D7] rounded-[10px]"
+              style={{ maxHeight: "200px", overflowY: "auto" }}
+            >
+              {[
+                "Furnished",
+                "Shared living room",
+                "Washing Machine",
+                "Yard/patio",
+                "Balcony/roof terrace",
+                "Parking",
+                "Garage",
+                "Disabled Access",
+                "Internet",
+                "Private bathroom",
+              ].map((amenity) => (
+                <li key={amenity} className="flex items-center py-1">
+                  <input
+                    type="checkbox"
+                    className="form-check-input ml-1"
+                    id={amenity}
+                    checked={filters?.amenities?.includes(amenity)}
+                    onChange={() => {
+                      const selected = filters.amenities.includes(amenity)
+                        ? filters.amenities.filter((a) => a !== amenity)
+                        : [...filters.amenities, amenity];
+                      handleFilterChange("amenities", selected);
+                    }}
+                  />
+                  <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
+                    {amenity}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 

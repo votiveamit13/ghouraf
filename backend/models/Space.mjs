@@ -26,7 +26,7 @@ const SpaceSchema = new mongoose.Schema(
         amenities: { type: [String], required: true },
         featuredImage: { type: String, required: true },
         photos: [{ id: String, url: String }], 
-        status: { type: String, enum: ["active", "inactive"], default: "active" },
+        status: { type: String, enum: ["active", "inactive"], default: "inactive" },
         available: { type: Boolean, default: true },
         is_deleted: { type: Boolean, default: false },
         reportsCount: { type: Number, default: 0 },

@@ -139,7 +139,7 @@ const handleSelectSuggestion = (item) => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Enter Search Location"
+            placeholder="Search by City"
             value={searchInput}
             onChange={handleInputChange}
             className="w-full border rounded-[5px] px-3 py-2"
