@@ -255,11 +255,15 @@ export const getTeamUps = async (req, res) => {
       minValue,
       maxValue,
       priceType,
+      period,
       smoking,
       roommatePref,
-      moveInDate,
+      occupationPreference,
+      minAge,
+      maxAge,
       amenities,
       location,
+      sortBy,
       page = 1,
       limit = 10,
     } = req.query;
@@ -270,44 +274,67 @@ export const getTeamUps = async (req, res) => {
       is_deleted: false,
     };
 
+    // Location
     if (req.query.city) query.city = req.query.city;
     if (req.query.state) query.state = req.query.state;
     if (req.query.country) query.country = req.query.country;
 
-
+    // Budget range
     if (minValue || maxValue) {
       query.budget = {};
       if (minValue) query.budget.$gte = Number(minValue);
       if (maxValue) query.budget.$lte = Number(maxValue);
     }
 
+    // Budget type (Week / Month)
     if (priceType) query.budgetType = priceType;
 
+    // Smoking
     if (smoking && smoking !== "all") {
       query.smoke = smoking === "allowed";
     }
 
+    // Roommate Preference
     if (roommatePref && roommatePref !== "any") {
       query.roommatePref = roommatePref;
     }
 
-    if (moveInDate) {
-      query.moveInDate = { $lte: new Date(moveInDate) };
+    // Period
+    if (period) {
+      query.period = period;
     }
 
+    // Occupation Preference
+    if (occupationPreference && occupationPreference !== "all") {
+      query.occupationPreference = occupationPreference;
+    }
+
+    // Age range
+    if (minAge || maxAge) {
+      query.age = {};
+      if (minAge) query.age.$gte = Number(minAge);
+      if (maxAge) query.age.$lte = Number(maxAge);
+    }
+
+    // Amenities
     if (amenities) {
       const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
       query.amenities = { $all: amenitiesArray };
     }
 
+    // Sorting
+    let sortOption = { createdAt: -1 }; // Default
+    if (sortBy === "Lowest First") sortOption = { budget: 1 };
+    if (sortBy === "Highest First") sortOption = { budget: -1 };
+
     const skip = (page - 1) * limit;
 
     const teamUps = await TeamUp.find(query)
       .select(
-        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available is_deleted"
+        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available is_deleted occupation"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
-      .sort({ createdAt: -1 })
+      .sort(sortOption)
       .skip(skip)
       .limit(Number(limit));
 
@@ -325,6 +352,7 @@ export const getTeamUps = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 export const getTeamUpById = async (req, res) => {
   try {

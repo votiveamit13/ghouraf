@@ -32,7 +32,7 @@ const TeamUpSchema = new mongoose.Schema({
     description: { type: String, required: true },
     buddyDescription: { type: String },
     photos: [{ id: String, url: String }],
-    status: { type: String, enum: ["active", "inactive"], default: "active" },
+    status: { type: String, enum: ["active", "inactive"], default: "inactive" },
     available: { type: Boolean, default: true },
     is_deleted: { type: Boolean, default: false },
 }, { timestamps: true }

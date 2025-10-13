@@ -7,10 +7,13 @@ export default function Filters({ filters, setFilters, setPage }) {
     minValue: 0,
     maxValue: 100000,
     priceType: "",
+    period: "",
     smoking: "",
     roommatePref: "",
     amenities: [],
-    moveInDate: "",
+    occupationPreference: "",
+    minAge: "",
+    maxAge: "",
   };
 
   useEffect(() => {
@@ -140,23 +143,20 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Smoking</label>
+        <label className="font-medium text-[18px]">Duration of Stay</label>
         <div className="space-y-1 mt-1 mb-3">
-          {[
-            { val: "all", label: "All" },
-            { val: "allowed", label: "Allowed" },
-            { val: "no", label: "Not Allowed" },
-          ].map((opt) => (
-            <label key={opt.val} className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="smoking"
-                checked={filters.smoking === opt.val}
-                onChange={() => handleFilterChange("smoking", opt.val)}
-              />
-              <span>{opt.label}</span>
-            </label>
-          ))}
+          <select
+            name="period"
+            value={filters.period}
+            onChange={(e) => handleFilterChange("period", e.target.value)}
+            className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
+          >
+            <option value="">Select</option>
+            <option value="3 months">3 months</option>
+            <option value="6 months">6 months</option>
+            <option value="1 year">1 year</option>
+          </select>
+
         </div>
       </div>
 
@@ -181,8 +181,72 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Smoking</label>
+        <div className="space-y-1 mt-1 mb-3">
+          {[
+            { val: "all", label: "All" },
+            { val: "allowed", label: "Allowed" },
+            { val: "no", label: "Not Allowed" },
+          ].map((opt) => (
+            <label key={opt.val} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="smoking"
+                checked={filters.smoking === opt.val}
+                onChange={() => handleFilterChange("smoking", opt.val)}
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Occupation</label>
+        <div className="space-y-1 mt-1 mb-3">
+          {[
+            { val: "all", label: "All" },
+            { val: "students", label: "Students" },
+            { val: "professionals", label: "Professionals" },
+          ].map((opt) => (
+            <label key={opt.val} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="occupationPreference"
+                checked={filters.occupationPreference === opt.val}
+                onChange={() => handleFilterChange("occupationPreference", opt.val)}
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Age Range</label>
+        <div className="flex space-x-2 mt-2 mb-3">
+          <input
+            type="number"
+            min="0"
+            value={filters.minAge || ""}
+            onChange={(e) => handleFilterChange("minAge", e.target.value)}
+            placeholder="Min"
+            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+          />
+          <input
+            type="number"
+            min="0"
+            value={filters.maxAge || ""}
+            onChange={(e) => handleFilterChange("maxAge", e.target.value)}
+            placeholder="Max"
+            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+          />
+        </div>
+      </div>
+
+
+      <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7] relative" ref={dropdownRef}>
         <label className="font-medium text-[18px]">Amenities</label>
         <div className="mt-2 w-full">
           <button
@@ -232,18 +296,6 @@ export default function Filters({ filters, setFilters, setPage }) {
               ))}
             </ul>
           )}
-        </div>
-      </div>
-
-      <div className="mb-4 px-3 py-2 text-black">
-        <label className="font-medium text-[18px]">Move-In date</label>
-        <div className="space-y-1 mt-1">
-          <input
-            type="date"
-            value={filters.moveInDate}
-            onChange={(e) => handleFilterChange("moveInDate", e.target.value)}
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          />
         </div>
       </div>
     </div>
