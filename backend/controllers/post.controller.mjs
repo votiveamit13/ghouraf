@@ -4,7 +4,7 @@ import { fileHandler } from "../utils/fileHandler.mjs";
 import TeamUp from "../models/TeamUp.mjs";
 import SavedPost from "../models/SavedPost.mjs";
 import { createSpaceWantedSchema } from "../validations/spacewanted.validator.mjs";
-import SpaceWanted from "../models/SpaceWanted";
+import SpaceWanted from "../models/SpaceWanted.mjs";
 
 //Spaces
 export const createSpace = async (req, res) => {
