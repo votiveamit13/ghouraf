@@ -519,3 +519,51 @@ export const getMyAds = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+//Space Wanted
+export const createSpaceWanted = async (req, res) => {
+  try {
+    const { error } = createSpaceWantedSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+      return res.status(400).json({ success: false, errors });
+    }
+
+    const { user } = req;
+    const data = req.body;
+
+    let photos = [];
+    if (req.files && req.files.length > 0) {
+      photos = req.files.map((file) => {
+        try {
+          fileHandler.validateExtension(file.originalname, "image");
+          const saved = fileHandler.saveFile(file, "spacewanted");
+          return { id: Date.now().toString(), url: saved.relativePath };
+        } catch (err) {
+          throw new Error(`File upload failed: ${err.message}`);
+        }
+      });
+    }
+
+    const newPost = new SpaceWanted({
+      ...data,
+      user: user?._id,
+      photos,
+    });
+
+    await newPost.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "SpaceWanted post created successfully",
+      data: newPost,
+    });
+  } catch (err) {
+    console.error("❌ Error creating SpaceWanted:", err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+

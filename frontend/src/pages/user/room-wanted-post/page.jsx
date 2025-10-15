@@ -1,15 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaArrowRightLong, FaArrowLeftLong } from "react-icons/fa6";
 import { Country, State, City } from "country-state-city";
+import locales from "locale-codes";
 
 export default function RoomWantedAd() {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const [allLocales, setAllLocales] = useState([]);
     const [isPreview, setIsPreview] = useState(false);
     const [formData, setFormData] = useState({
         propertyType: "",
         roomSize: "",
         country: "",
+        state: "",
         city: "",
-        landmark: "",
         zip: "",
         budget: "",
         budgetType: "",
@@ -28,6 +31,7 @@ export default function RoomWantedAd() {
         description: "",
         teamUp: false,
     });
+    const [images, setImages] = useState([]);
     const countries = Country.getAllCountries();
     const cities = useMemo(() => {
         if (!formData.country) return [];
@@ -53,6 +57,50 @@ export default function RoomWantedAd() {
         }
     };
 
+    useEffect(() => {
+        setAllLocales(locales.all);
+    }, []);
+
+    const handleImageChange = (e) => {
+        setImages(Array.from(e.target.files));
+    };
+
+    const handleSubmit = async () => {
+
+        const formDataToSend = new FormData();
+
+        Object.entries(formData).forEach(([key, value]) => {
+            if (Array.isArray(value)) {
+                value.forEach((v) => formDataToSend.append(`${key}[]`, v));
+            } else {
+                formDataToSend.append(key, value);
+            }
+        });
+
+        images.forEach((file) => formDataToSend.append("photos", file));
+
+
+        try {
+            const res = await fetch(`${apiUrl}createspacewanted`, {
+                method: "POST",
+                body: formDataToSend,
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Ad posted successfully!");
+                console.log("Response:", data);
+            } else {
+                alert("Error: " + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong.");
+        }
+    };
+
+
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -73,7 +121,7 @@ export default function RoomWantedAd() {
                                 <p><strong>Property Type:</strong> {formData.propertyType}</p>
                                 <p><strong>Room Size:</strong> {formData.roomSize}</p>
                                 <p className="md:col-span-2">
-                                    <strong>Location:</strong> {formData.city}, {formData.country} ({formData.zip})
+                                    <strong>Location:</strong> {formData.city}, {formData.state}, {formData.country} ({formData.zip})
                                 </p>
                                 <p><strong>Budget:</strong> {formData.budget} ({formData.budgetType})</p>
                                 <p><strong>Move-in Date:</strong> {formData.moveInDate}</p>
@@ -102,9 +150,13 @@ export default function RoomWantedAd() {
                             >
                                 <FaArrowLeftLong /> Back to Edit
                             </button>
-                            <button className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2">
+                            <button
+                                onClick={handleSubmit}
+                                className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2"
+                            >
                                 Publish <FaArrowRightLong />
                             </button>
+
                         </div>
                     </>
                 ) : (
@@ -122,6 +174,7 @@ export default function RoomWantedAd() {
                                         value={formData.propertyType}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Room">Room</option>
                                         <option value="Apartment">Apartment</option>
                                     </select>
@@ -134,10 +187,11 @@ export default function RoomWantedAd() {
                                         value={formData.roomSize}
                                         onChange={handleChange}
                                     >
- <option>1RK</option>
-                    <option>1BHK</option>
+                                        <option value="">Select</option>
+                                        <option>1RK</option>
+                                        <option>1BHK</option>
                                         <option>2BHK</option>
-                                                            <option>3BHK</option>
+                                        <option>3BHK</option>
                                     </select>
                                 </div>
                                 <div>
@@ -157,12 +211,29 @@ export default function RoomWantedAd() {
                                     </select>
                                 </div>
                                 <div>
+                                    <label className="block text-gray-700">State</label>
+                                    <select
+                                        name="city"
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        disabled={!formData.country}
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                    >
+                                        <option value="">Select State</option>
+                                        {cities.map((state) => (
+                                            <option key={state.name} value={state.name}>
+                                                {state.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
                                     <label className="block text-gray-700">Preferred City</label>
                                     <select
                                         name="city"
                                         value={formData.city}
                                         onChange={handleChange}
-                                        disabled={!formData.country}
+                                        disabled={!formData.state}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     >
                                         <option value="">Select City</option>
@@ -173,16 +244,7 @@ export default function RoomWantedAd() {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="block text-gray-700">Nearby Landmarks</label>
-                                    <input
-                                        type="text"
-                                        name="landmark"
-                                        value={formData.landmark}
-                                        onChange={handleChange}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    />
-                                </div>
+
                                 <div>
                                     <label className="block text-gray-700">Zip Code</label>
                                     <input
@@ -252,13 +314,17 @@ export default function RoomWantedAd() {
                                         <label className="block text-gray-700">
                                             Duration of stay
                                         </label>
-                                        <input
-                                            type="text"
+                                        <select
                                             name="period"
                                             value={formData.period}
                                             onChange={handleChange}
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        />
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="3 months">3 months</option>
+                                            <option value="6 months">6 months</option>
+                                            <option value="1 year">1 year</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -330,19 +396,23 @@ export default function RoomWantedAd() {
                                         value={formData.gender}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Occupation</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="occupation"
                                         value={formData.occupation}
                                         onChange={handleChange}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    />
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Professionals">Professionals</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Do You Smoke?</label>
@@ -352,6 +422,7 @@ export default function RoomWantedAd() {
                                         value={formData.smoke}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
@@ -364,6 +435,7 @@ export default function RoomWantedAd() {
                                         value={formData.pets}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
@@ -379,7 +451,12 @@ export default function RoomWantedAd() {
                                         placeholder="Age"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     >
-                                        <option>English</option>
+                                        <option value="">Select Language</option>
+                                        {allLocales.map((locale) => (
+                                            <option key={locale.tag} value={locale.tag}>
+                                                {locale.name} ({locale.tag})
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>
@@ -390,12 +467,13 @@ export default function RoomWantedAd() {
                                         value={formData.roommatePref}
                                         onChange={handleChange}
                                     >
+                                        <option value="">Select</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
 
-                                                                <div className="md:col-span-2">
+                                <div className="md:col-span-2">
                                     <label className="block text-gray-700 mb-1">
                                         Title
                                     </label>
@@ -404,9 +482,9 @@ export default function RoomWantedAd() {
                                         name="title"
                                         value={formData.title}
                                         onChange={handleChange}
-                                     
+
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                     
+
                                     />
                                 </div>
 
@@ -426,13 +504,48 @@ export default function RoomWantedAd() {
 
                                 <div className="md:col-span-2 mb-4">
                                     <label className="block text-gray-700 mb-1">Upload Photos</label>
-                                    <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-1/2 rounded-[14px]">
-                                        <button className="bg-black text-white px-4 py-3 rounded-lg">
+
+                                    <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-1/2 rounded-[14px] relative overflow-hidden">
+                                        {/* Hidden input (real file picker) */}
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                        />
+
+                                        {/* Fake button UI (styled same as your original) */}
+                                        <button
+                                            type="button"
+                                            className="bg-black text-white px-4 py-3 rounded-lg pointer-events-none"
+                                        >
                                             Choose file
                                         </button>
-                                        <span className="text-gray-500">No file chosen</span>
+
+                                        {/* Show selected file count or placeholder text */}
+                                        <span className="text-gray-500 truncate">
+                                            {images.length > 0
+                                                ? `${images.length} file${images.length > 1 ? "s" : ""} selected`
+                                                : "No file chosen"}
+                                        </span>
                                     </div>
+
+                                    {/* Image previews */}
+                                    {images.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                            {images.map((img, i) => (
+                                                <img
+                                                    key={i}
+                                                    src={URL.createObjectURL(img)}
+                                                    alt="preview"
+                                                    className="w-20 h-20 object-cover rounded-md border"
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
+
                             </div>
                         </div>
 

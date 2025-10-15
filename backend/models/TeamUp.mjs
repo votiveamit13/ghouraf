@@ -35,6 +35,7 @@ const TeamUpSchema = new mongoose.Schema({
     status: { type: String, enum: ["active", "inactive"], default: "inactive" },
     available: { type: Boolean, default: true },
     is_deleted: { type: Boolean, default: false },
+    reportsCount: { type: Number, default: 0 },
 }, { timestamps: true }
 );
 
