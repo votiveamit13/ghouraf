@@ -6,7 +6,7 @@ const SpaceWantedSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     propertyType: { type: String, required: true },
-    roomSize: { type: String, required: trueg },
+    roomSize: { type: String, required: true },
     country: { type: String, required: true },
     state: { type: String, required: true },
     city: { type: String, required: true },
