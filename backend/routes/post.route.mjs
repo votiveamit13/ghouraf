@@ -2,7 +2,8 @@ import express from "express";
 import { 
   createSpace, getSpaces, getSpaceById,
   createTeamUp, getTeamUps, getTeamUpById,
-  toggleSavePost, getSavedPosts, getMyAds
+  toggleSavePost, getSavedPosts, getMyAds,
+  createSpaceWanted
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
