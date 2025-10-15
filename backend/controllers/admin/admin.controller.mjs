@@ -455,7 +455,7 @@ export const getAllSpaceWanted = async (req, res) => {
     const spacewanted = await SpaceWanted.find({ is_deleted: false })
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .select(
-        "title country state city zip budget budgetType propertyType roomSize moveInDate period amenities firstName lastName name age gender occupation smoke pets language roommatePref description photos status available createdAt"
+        "title country state city zip budget budgetType propertyType roomSize moveInDate period amenities firstName lastName name age gender occupation smoke pets language roommatePref description photos teamUp status available createdAt"
       );
 
       res.json(spacewanted);

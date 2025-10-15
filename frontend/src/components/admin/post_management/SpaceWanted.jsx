@@ -35,14 +35,14 @@ export default function SpaceWanted() {
     }, [apiUrl]);
 
     const filteredPosts = useMemo(() => {
-        return spacewanted.filter(
+        return spaceWanted.filter(
             (post) =>
                 post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 `${post.user?.profile?.firstName} ${post.user?.profile?.lastName}`
                     .toLowerCase()
                     .includes(searchTerm.toLowerCase())
         );
-    }, [searchTerm, spacewanted]);
+    }, [searchTerm, spaceWanted]);
 
     const pageSize = 10;
     const totalPages = Math.ceil(filteredPosts.length / pageSize);
@@ -106,7 +106,7 @@ export default function SpaceWanted() {
                                                             { headers: { Authorization: `Bearer ${token}` } }
                                                         );
 
-                                                        setTeamUp((prev) =>
+                                                        setSpaceWanted((prev) =>
                                                             prev.map((p) =>
                                                                 p._id === post._id ? { ...p, status: newStatus } : p
                                                             )
@@ -163,7 +163,7 @@ export default function SpaceWanted() {
                                     { headers: { Authorization: `Bearer ${token}` } }
                                 );
 
-                                setTeamUp((prev) => prev.filter((p) => p._id !== spaceToDelete._id));
+                                setSpaceWanted((prev) => prev.filter((p) => p._id !== spaceToDelete._id));
 
                                 toast.success("Space Wanted deleted successfully");
                             } catch (err) {
@@ -186,114 +186,99 @@ export default function SpaceWanted() {
                 </div>
             </div>
 
-{selectedPost && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white w-[700px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            {selectedPost && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white w-[700px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
 
-      <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
-        <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
-        <button
-          className="text-gray-400 hover:text-gray-700 text-xl"
-          onClick={() => setSelectedPost(null)}
-        >
-          ✕
-        </button>
-      </div>
+                        <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
+                            <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
+                            <button
+                                className="text-gray-400 hover:text-gray-700 text-xl"
+                                onClick={() => setSelectedPost(null)}
+                            >
+                                ✕
+                            </button>
+                        </div>
 
-      <div className="overflow-y-auto p-4 space-y-6">
-        <div className="flex items-start gap-4 w-full">
-          <div className="w-1/2">
-            {selectedPost.photos?.length > 0 && (
-              <PhotoSlider photos={selectedPost.photos} />
+                        <div className="overflow-y-auto p-4 space-y-6">
+                            <div className="flex items-start gap-4 w-full">
+                                <div className="w-1/2">
+                                    {selectedPost.photos?.length > 0 && (
+                                        <PhotoSlider photos={selectedPost.photos} />
+                                    )}
+                                </div>
+                                <div className="w-1/2">
+                                    <h3 className="mb-2 text-black">Description</h3>
+                                    <p className="text-gray-600">
+                                        {selectedPost.description || "No description provided"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <p><span className="text-black">Country:</span> {selectedPost.country}</p>
+                                <p><span className="text-black">State:</span> {selectedPost.state}</p>
+                                <p><span className="text-black">City:</span> {selectedPost.city}</p>
+                                <p><span className="text-black">Zip:</span> {selectedPost.zip}</p>
+                                <p><span className="text-black">Property Type:</span> {selectedPost.propertyType}</p>
+                                <p><span className="text-black">Room Size:</span> {selectedPost.roomSize}</p>
+                                <p>
+                                    <span className="text-black">Budget:</span> ${selectedPost.budget} {selectedPost.budgetType}
+                                </p>
+                                <p>
+                                    <span className="text-black">Move-in Date:</span>{" "}
+                                    {selectedPost.moveInDate ? new Date(selectedPost.moveInDate).toLocaleDateString() : "N/A"}
+                                </p>
+                                <p><span className="text-black">Period:</span> {selectedPost.period}</p>
+                                <p>
+                                    <span className="text-black">Availability:</span>{" "}
+                                    <span
+                                        className={`px-2 py-1 rounded-full text-xs font-medium ${selectedPost.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                                            }`}
+                                    >
+                                        {selectedPost.available ? "Available" : "Not Available"}
+                                    </span>
+                                </p>
+                                <p><span className="text-black">Status:</span> {selectedPost.status}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <p><span className="text-black">Name:</span> {selectedPost.name}</p>
+                                <p><span className="text-black">Age:</span> {selectedPost.age}</p>
+                                <p><span className="text-black">Gender:</span> {selectedPost.gender}</p>
+                                <p><span className="text-black">Occupation:</span> {selectedPost.occupation}</p>
+                                <p><span className="text-black">Smokes:</span> {selectedPost.smoke || "N/A"}</p>
+                                <p><span className="text-black">Pets:</span> {selectedPost.pets || "N/A"}</p>
+                                <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p>
+                                <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p>
+                            </div>
+
+                            {selectedPost.amenities?.length > 0 && (
+                                <div>
+                                    <h3 className="mb-2 text-black">Amenities</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedPost.amenities.map((a, i) => (
+                                            <span
+                                                key={i}
+                                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                                            >
+                                                {a}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <p>
+                                    <span className="text-black">Buddy Up:</span>{" "}
+                                    {selectedPost.teamUp ? "Yes" : "No"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
-          </div>
-          <div className="w-1/2">
-            <h3 className="mb-2 text-black">Description</h3>
-            <p className="text-gray-600">
-              {selectedPost.description || "No description provided"}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <p><span className="text-black">Country:</span> {selectedPost.country}</p>
-          <p><span className="text-black">State:</span> {selectedPost.state}</p>
-          <p><span className="text-black">City:</span> {selectedPost.city}</p>
-          <p><span className="text-black">Zip:</span> {selectedPost.zip}</p>
-          <p><span className="text-black">Property Type:</span> {selectedPost.propertyType}</p>
-          <p><span className="text-black">Room Size:</span> {selectedPost.roomSize}</p>
-          <p>
-            <span className="text-black">Budget:</span> ${selectedPost.budget} {selectedPost.budgetType}
-          </p>
-          <p>
-            <span className="text-black">Move-in Date:</span>{" "}
-            {selectedPost.moveInDate ? new Date(selectedPost.moveInDate).toLocaleDateString() : "N/A"}
-          </p>
-          <p><span className="text-black">Period:</span> {selectedPost.period}</p>
-          <p>
-            <span className="text-black">Availability:</span>{" "}
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                selectedPost.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-              }`}
-            >
-              {selectedPost.available ? "Available" : "Not Available"}
-            </span>
-          </p>
-          <p><span className="text-black">Status:</span> {selectedPost.status}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <p><span className="text-black">Name:</span> {selectedPost.name}</p>
-          <p><span className="text-black">Age:</span> {selectedPost.age}</p>
-          <p><span className="text-black">Gender:</span> {selectedPost.gender}</p>
-          <p><span className="text-black">Occupation:</span> {selectedPost.occupation}</p>
-          <p><span className="text-black">Smokes:</span> {selectedPost.smoke || "N/A"}</p>
-          <p><span className="text-black">Pets:</span> {selectedPost.pets || "N/A"}</p>
-          <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p>
-          <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p>
-        </div>
-
-        {selectedPost.amenities?.length > 0 && (
-          <div>
-            <h3 className="mb-2 text-black">Amenities</h3>
-            <div className="flex flex-wrap gap-2">
-              {selectedPost.amenities.map((a, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                >
-                  {a}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <p>
-            <span className="text-black">Buddy Up:</span>{" "}
-            {selectedPost.teamUp ? "Yes" : "No"}
-          </p>
-        </div>
-
-        <div className="text-sm text-gray-500">
-          <p>
-            <span className="text-black">Post Category:</span> {selectedPost.postCategory}
-          </p>
-          <p>
-            <span className="text-black">Created:</span>{" "}
-            {new Date(selectedPost.createdAt).toLocaleString()}
-          </p>
-          <p>
-            <span className="text-black">Last Updated:</span>{" "}
-            {new Date(selectedPost.updatedAt).toLocaleString()}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
 
         </>
     );
