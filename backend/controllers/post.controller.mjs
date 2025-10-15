@@ -3,6 +3,7 @@ import { createSpaceSchema } from "../validations/space.validator.mjs";
 import { fileHandler } from "../utils/fileHandler.mjs";
 import TeamUp from "../models/TeamUp.mjs";
 import SavedPost from "../models/SavedPost.mjs";
+import { createSpaceWantedSchema } from "../validations/spacewanted.validator.mjs";
 
 //Spaces
 export const createSpace = async (req, res) => {

@@ -212,20 +212,23 @@ export default function RoomWantedAd() {
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">State</label>
-                                    <select
-                                        name="city"
-                                        value={formData.state}
-                                        onChange={handleChange}
-                                        disabled={!formData.country}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    >
-                                        <option value="">Select State</option>
-                                        {cities.map((state) => (
-                                            <option key={state.name} value={state.name}>
-                                                {state.name}
-                                            </option>
-                                        ))}
-                                    </select>
+    <select
+        name="state"
+        value={formData.state}
+        onChange={(e) => {
+            handleChange(e);
+            setFormData(prev => ({ ...prev, city: "" })); 
+        }}
+        disabled={!formData.country}
+        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+    >
+        <option value="">Select State</option>
+        {State.getStatesOfCountry(formData.country).map((s) => (
+            <option key={s.isoCode} value={s.isoCode}>
+                {s.name}
+            </option>
+        ))}
+    </select>
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">Preferred City</label>
@@ -236,12 +239,12 @@ export default function RoomWantedAd() {
                                         disabled={!formData.state}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     >
-                                        <option value="">Select City</option>
-                                        {cities.map((city) => (
-                                            <option key={city.name} value={city.name}>
-                                                {city.name}
-                                            </option>
-                                        ))}
+ <option value="">Select City</option>
+        {City.getCitiesOfState(formData.country, formData.state).map((c) => (
+            <option key={c.name} value={c.name}>
+                {c.name}
+            </option>
+        ))}
                                     </select>
                                 </div>
 
