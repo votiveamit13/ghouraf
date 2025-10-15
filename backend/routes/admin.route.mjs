@@ -5,7 +5,10 @@ import {
     getAllMessage, deleteMessage,
     addFaq, getAllFaq, updateFaqStatus, updateFaq, deleteFaq,
     getAllSpaces, updateSpaceStatus, deleteSpace,
-    getAllTeamUps, updateTeamUpStatus, deleteTeamUp
+    getAllTeamUps, updateTeamUpStatus, deleteTeamUp,
+    getAllSpaceWanted,
+    updateSpaceWantedStatus,
+    deleteSpaceWanted
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -33,6 +36,9 @@ router.patch("/spaces/:id/delete", adminAuth, deleteSpace);
 router.get("/teamups", adminAuth, getAllTeamUps);
 router.patch("/teamup/:id/status", adminAuth, updateTeamUpStatus);
 router.patch("/teamup/:id/delete", adminAuth, deleteTeamUp);
+router.get("/spacewanted", adminAuth, getAllSpaceWanted);
+router.patch("/spacewanted/:id/status", adminAuth, updateSpaceWantedStatus);
+router.patch("/spacewanted/:id/delete", adminAuth, deleteSpaceWanted);
 
 
 export default router;

@@ -8,6 +8,7 @@ import Faq from "../../models/faq.mjs";
 import faq from "../../models/faq.mjs";
 import Space from "../../models/Space.mjs";
 import TeamUp from "../../models/TeamUp.mjs";
+import SpaceWanted from "../../models/SpaceWanted.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -445,6 +446,64 @@ export const deleteTeamUp = async (req, res) => {
     res.json({ message: "Team Up deleted successfully", teamup});
   } catch (err) {
     console.error("Error deleting team up:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getAllSpaceWanted = async (req, res) => {
+  try {
+    const spacewanted = await SpaceWanted.find({ is_deleted: false })
+      .populate("user", "profile.firstName profile.lastName profile.photo")
+      .select(
+        "title country state city zip budget budgetType propertyType roomSize moveInDate period amenities firstName lastName name age gender occupation smoke pets language roommatePref description photos status available createdAt"
+      );
+
+      res.json(spacewanted);
+  } catch (err) {
+    console.error("Error fetching team-ups:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateSpaceWantedStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if(!["active", "inactive"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const spacewanted = await SpaceWanted.findById(id);
+    if(!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
+
+    spacewanted.status = status;
+    await spacewanted.save();
+
+    res.json({ message: `Space Wanted status updated to ${status}`, spacewanted });
+  } catch (err) {
+    console.error("Error updating space wanted status:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteSpaceWanted = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const spacewanted = await SpaceWanted.findById(id);
+    if(!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
+
+    if(spacewanted.is_deleted) {
+      return res.status(400).json({ message: "Space Wanted already deleted" });
+    }
+
+    spacewanted.is_deleted = true;
+    await spacewanted.save();
+
+    res.json({ message: "Space Wanted deleted successfully", spacewanted});
+  } catch (err) {
+    console.error("Error deleting space wanted:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -15,6 +15,7 @@ import TeamUps from "components/admin/post_management/TeamUps";
 import { AiFillDashboard } from "react-icons/ai";
 import { FaUserCog } from "react-icons/fa";
 import { RiTeamLine } from "react-icons/ri";
+import SpaceWanted from "components/admin/post_management/SpaceWanted";
 
 export const adminRoutes = [
   {
@@ -78,6 +79,13 @@ export const adminRoutes = [
         layout: "/admin",
       },
       {
+        path: "/post-management/sapce-wanted",
+        name: "Space Wanted",
+        icon: <RiTeamLine className="text-[#565ABF]" />,
+        component: <SpaceWanted />,
+        layout: "/admin",
+      },
+      {
         path: "/post-management/team-ups",
         name: "Team Ups",
         icon: <RiTeamLine className="text-[#565ABF]" />,
@@ -108,7 +116,7 @@ export const adminRoutes = [
   },
   {
     path: "/faq-management/edit",
-    component: <EditFaq/>,
+    component: <EditFaq />,
     layout: "/admin",
     showInSidebar: false
   },
