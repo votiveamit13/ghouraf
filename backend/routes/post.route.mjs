@@ -27,6 +27,6 @@ router.get("/teamup/:id", getTeamUpById);
 router.post("/save", auth, toggleSavePost);
 router.get("/save/list", auth, getSavedPosts);
 router.get("/my-ads", auth, getMyAds);
-router.post("/createspacewanted", upload.array("photos"), createSpaceWanted);
+router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 
 export default router;

@@ -549,7 +549,7 @@ export const createSpaceWanted = async (req, res) => {
 
     const newPost = new SpaceWanted({
       ...data,
-      user: user?._id,
+      user: req.user._id,
       photos,
     });
 

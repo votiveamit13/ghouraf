@@ -116,8 +116,12 @@ export default function RoomWantedAd() {
         images.forEach((file) => formDataToSend.append("photos", file));
 
         try {
+            const token = localStorage.getItem("token");
             const res = await fetch(`${apiUrl}createspacewanted`, {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 body: formDataToSend,
             });
 
@@ -138,8 +142,7 @@ export default function RoomWantedAd() {
     };
 
     const getInputClass = (field) =>
-        `w-full border-[1px] rounded-[14px] form-control ${
-            errors[field] ? "border-red-500" : "border-[#D7D7D7]"
+        `w-full border-[1px] rounded-[14px] form-control ${errors[field] ? "border-red-500" : "border-[#D7D7D7]"
         }`;
 
     return (
