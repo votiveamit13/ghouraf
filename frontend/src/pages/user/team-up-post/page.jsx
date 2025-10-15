@@ -185,8 +185,9 @@ const handleChange = (e) => {
             } else {
                 navigate("/user/thank-you", {
                     state: {
-                        title: "Your Team Up successfully published",
-                        subtitle: "Your Team Up listing has been created and is now live.",
+                        title: "Your ad was successfully submitted",
+                        subtitle:
+                            "This post will undergo a review process and will be published once approved.",
                         goBackPath: "/user/team-up-post",
                         viewAdsPath: "/team-up",
                     },

@@ -3,9 +3,12 @@ import { FaArrowRightLong, FaArrowLeftLong } from "react-icons/fa6";
 import { Country, State, City } from "country-state-city";
 import locales from "locale-codes";
 import { toast } from "react-toastify";
+import { FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function RoomWantedAd() {
     const apiUrl = process.env.REACT_APP_API_URL;
+    const navigate = useNavigate();
     const [allLocales, setAllLocales] = useState([]);
     const [isPreview, setIsPreview] = useState(false);
     const [formData, setFormData] = useState({
@@ -65,7 +68,12 @@ export default function RoomWantedAd() {
     };
 
     const handleImageChange = (e) => {
-        setImages(Array.from(e.target.files));
+        const newFiles = Array.from(e.target.files);
+        setImages((prev) => [...prev, ...newFiles]); 
+    };
+
+    const handleRemoveImage = (index) => {
+        setImages((prev) => prev.filter((_, i) => i !== index));
     };
 
     const validateForm = () => {
@@ -128,6 +136,15 @@ export default function RoomWantedAd() {
             const data = await res.json();
             if (res.ok) {
                 toast.success("Ad posted successfully!");
+                navigate("/user/thank-you", {
+                    state: {
+                        title: "Your ad was successfully submitted",
+                        subtitle:
+                            "This post will undergo a review process and will be published once approved.",
+                        goBackPath: "/user/place-wanted-ad",
+                        viewAdsPath: "/",
+                    },
+                });
             } else {
                 if (data.errors && Array.isArray(data.errors)) {
                     data.errors.forEach((err) => toast.error(err));
@@ -599,17 +616,25 @@ export default function RoomWantedAd() {
                                         </span>
                                     </div>
                                     {images.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            {images.map((img, i) => (
-                                                <img
-                                                    key={i}
-                                                    src={URL.createObjectURL(img)}
-                                                    alt="preview"
-                                                    className="w-20 h-20 object-cover rounded-md border"
-                                                />
-                                            ))}
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    {images.map((img, i) => (
+                                        <div key={i} className="relative">
+                                            <img
+                                                src={URL.createObjectURL(img)}
+                                                alt="preview"
+                                                className="w-20 h-20 object-cover rounded-md border"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveImage(i)}
+                                                className="absolute -top-2 -right-2 bg-black text-white rounded-full p-1 text-xs"
+                                            >
+                                                <FaTimes />
+                                            </button>
                                         </div>
-                                    )}
+                                    ))}
+                                </div>
+                            )}
                                 </div>
                             </div>
                         </div>
