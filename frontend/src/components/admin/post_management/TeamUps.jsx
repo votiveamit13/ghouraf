@@ -34,15 +34,22 @@ export default function TeamUps() {
         fetchTeamUp();
     }, [apiUrl]);
 
-    const filteredPosts = useMemo(() => {
-        return teamup.filter(
-            (post) =>
-                post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                `${post.user?.profile?.firstName} ${post.user?.profile?.lastName}`
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-        );
-    }, [searchTerm, teamup]);
+const filteredPosts = useMemo(() => {
+  return teamup.filter((post) => {
+    const title = post.title || "";
+    
+    const posterName =
+      post.user?.profile
+        ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
+        : post.name || "";
+
+    return (
+      title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      posterName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+}, [searchTerm, teamup]);
+
 
     const pageSize = 10;
     const totalPages = Math.ceil(filteredPosts.length / pageSize);

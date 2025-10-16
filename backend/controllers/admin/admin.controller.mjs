@@ -406,7 +406,7 @@ export const getAllTeamUps = async (req, res) => {
     })
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .select(
-        "propertyType country state city zip budget budgetType moveInDate roomSize furnishing gender description photos status createdAt"
+        "propertyType country state city zip budget budgetType title roommatePref moveInDate roomSize furnishing gender description photos status available createdAt"
       );
 
     const merged = [...teamups, ...spaceWantedTeamUps];
