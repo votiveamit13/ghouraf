@@ -6,7 +6,7 @@ import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import { getFullLocation } from "utils/locationHelper";
 
 export default function PropertyCard({ property }) {
-    const locationString = getFullLocation(property.city, property.state, property.country);
+  const locationString = getFullLocation(property.city, property.state, property.country);
   const image = property.photos?.[0]?.url || defaultImage;
   const name = `${property.user?.profile?.firstName || ""} ${property.user?.profile?.lastName || ""}`;
   const avatar = property.user?.profile?.photo || defaultImage;
@@ -23,7 +23,7 @@ export default function PropertyCard({ property }) {
 
             <div className="flex flex-col flex-grow text-[#000000]">
                 <h3 className="font-semibold text-[24px] text-black">{property.title}</h3>
-                <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{property.location}</p>
+                <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{locationString}</p>
                 <p className="text-[18px]">{property.propertyType}</p>
                 <p className="text-[15px] mt-1">{property.description}</p>
 
@@ -32,7 +32,7 @@ export default function PropertyCard({ property }) {
                         <img src={avatar} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
                     </div>
                     <div>
-                        <p className="text-sm">{property.name}</p>
+                        <p className="text-sm">{name}</p>
                         <p className="text-xs text-gray-400">{property.occupation}</p>
                     </div>
                 </div>

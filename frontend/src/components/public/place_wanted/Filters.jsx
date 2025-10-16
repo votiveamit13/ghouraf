@@ -154,7 +154,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
             <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Property Type</label>
         <div className="space-y-1 mt-1 mb-3">
-          {["all", "room", "apartment"].map((val) => (
+          {["all", "Room", "Apartment"].map((val) => (
             <label key={val} className="flex items-center space-x-2">
               <input
                 type="radio"
@@ -212,16 +212,17 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
         <label className="font-medium text-[18px]">Roommate Preference</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
-            { val: "any", label: "Any Gender" },
+            { val: "any gender", label: "Any Gender" },
             { val: "male", label: "Male" },
             { val: "female", label: "Female" },
           ].map((opt) => (
             <label key={opt.val} className="flex items-center space-x-2">
               <input
                 type="radio"
-                name="roomAvailable"
-                checked={filters.roomAvailable === opt.val}
-                onChange={() => setFilters({ ...filters, roomAvailable: opt.val })}
+                name="roommatePref"
+                checked={filters.roommatePref === opt.val}
+onChange={() => handleFilterChange("roommatePref", opt.val)}
+
               />
               <span>{opt.label}</span>
             </label>
