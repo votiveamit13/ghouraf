@@ -314,7 +314,7 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
                       const selected = filters.amenities.includes(amenity)
                         ? filters.amenities.filter((a) => a !== amenity)
                         : [...filters.amenities, amenity];
-                      setFilters({ ...filters, amenities: selected });
+                      handleFilterChange("amenities", selected);
                     }}
                   />
                   <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>

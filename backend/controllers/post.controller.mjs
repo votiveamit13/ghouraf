@@ -629,19 +629,10 @@ export const getSpaceWanted = async (req, res) => {
       if (maxAge) query.age.$lte = Number(maxAge);
     }
 
-if (amenities) {
-  let amenitiesArray = [];
-
-  if (Array.isArray(amenities)) {
-    amenitiesArray = amenities;
-  } else if (typeof amenities === "string") {
-    amenitiesArray = amenities.split(",").map(a => a.trim()).filter(Boolean);
-  }
-
-  if (amenitiesArray.length > 0) {
-    query.amenities = { $all: amenitiesArray };
-  }
-}
+    if (amenities) {
+      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
+      query.amenities = { $all: amenitiesArray };
+    }
 
 
     let sortOption = { createdAt: -1 }; 
