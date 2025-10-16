@@ -1,24 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
 
-export default function Filters() {
+export default function Filters({ setFilters: setParentFilters, setPage }) {
   const [showAmenities, setShowAmenities] = useState(false);
   const dropdownRef = useRef(null);
   const defaultFilters = {
     minValue: 0,
-    maxValue: 1300,
+    maxValue: 100000,
     priceType: "",
+    propertyType:"all",
+    period: "",
     minSize: "",
     maxSize: "",
-    apartmentSize: "",
-    propertyType: "all",
-    smoking: "all",
-    roommatePreference: "any",
+    roommatePref: "any",
+    occupation: "all",
+    minAge: "",
+    maxAge: "",
     location: "",
     amenities: [],
-    moveInDate: "",
   };
 
   const [filters, setFilters] = useState(defaultFilters);
+
+    useEffect(() => {
+    setParentFilters(filters);
+  }, [filters]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,20 +36,26 @@ export default function Filters() {
   }, []);
 
   const min = 0;
-  const max = 1300;
+  const max = 100000;
 
   const handleMinChange = (e) => {
-    const value = Math.min(Number(e.target.value), filters.maxValue - 10);
-    setFilters({ ...filters, minValue: value });
+    const value = Math.max(min, Number(e.target.value));
+    handleFilterChange("minValue", Math.min(value, filters.maxValue));
   };
 
   const handleMaxChange = (e) => {
-    const value = Math.max(Number(e.target.value), filters.minValue + 10);
-    setFilters({ ...filters, maxValue: value });
+    const value = Math.max(min, Number(e.target.value));
+    handleFilterChange("maxValue", Math.max(value, filters.minValue));
   };
 
   const handleReset = () => {
     setFilters(defaultFilters);
+    // setPage(1);
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters({ ...filters, [key]: value });
+    // setPage(1);
   };
 
   return (
@@ -62,10 +73,10 @@ export default function Filters() {
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Budget</label>
-        <div className="ml-5 border-[1px] border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-4 py-2 mt-2 text-sm">
-          <span>${filters.minValue}</span>
-          <span>-</span>
-          <span>${filters.maxValue}</span>
+        <div className="ml-5 border border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-2 py-2 mt-2 text-sm">
+          <input type="number" min={min} max={filters.maxValue} value={filters.minValue} onChange={handleMinChange} className="w-16 outline-none text-start" />
+          <span>-</span>&nbsp;&nbsp;
+          <input type="number" min={filters.minValue} max={max} value={filters.maxValue} onChange={handleMaxChange} className="w-16 outline-none text-start" />
         </div>
 
         <div className="flex justify-between text-sm text-[#333333] mt-3">
@@ -87,7 +98,7 @@ export default function Filters() {
             min={min}
             max={max}
             value={filters.minValue}
-            onChange={handleMinChange}
+            onChange={(e) => handleFilterChange("minValue", Number(e.target.value))}
             className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none"
           />
           <input
@@ -95,7 +106,7 @@ export default function Filters() {
             min={min}
             max={max}
             value={filters.maxValue}
-            onChange={handleMaxChange}
+            onChange={(e) => handleFilterChange("maxValue", Number(e.target.value))}
             className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none"
           />
 
@@ -128,46 +139,19 @@ export default function Filters() {
             }
           `}</style>
         </div>
-
         <div className="flex justify-center space-x-8 mt-3 mb-3">
           <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="radio"
-              name="priceType"
-              checked={filters.priceType === "weekly"}
-              onChange={() => setFilters({ ...filters, priceType: "weekly" })}
-            />
+            <input type="radio" name="priceType" checked={filters.priceType === "Week"} onChange={() => handleFilterChange("priceType", "Week")} />
             <span className="text-black">Weekly</span>
           </label>
           <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="radio"
-              name="priceType"
-              checked={filters.priceType === "monthly"}
-              onChange={() => setFilters({ ...filters, priceType: "monthly" })}
-            />
+            <input type="radio" name="priceType" checked={filters.priceType === "Month"} onChange={() => handleFilterChange("priceType", "Month")} />
             <span className="text-black">Monthly</span>
           </label>
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Room Size</label>
-        <div className="flex space-x-2 mt-2 mb-3">
-          <select
-            value={filters.apartmentSize}
-            onChange={(e) => setFilters({ ...filters, apartmentSize: e.target.value })}
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          >
-            <option>1RK</option>
-            <option>1BHK</option>
-            <option>2BHK</option>
-            <option>3BHK</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Property Type</label>
         <div className="space-y-1 mt-1 mb-3">
           {["all", "room", "apartment"].map((val) => (
@@ -184,28 +168,47 @@ export default function Filters() {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Smoking</label>
+            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Duration of Stay</label>
         <div className="space-y-1 mt-1 mb-3">
-          {[
-            { val: "all", label: "All" },
-            { val: "no", label: "No Smoking" },
-            { val: "allowed", label: "Allowed" },
-          ].map((opt) => (
-            <label key={opt.val} className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="smoking"
-                checked={filters.smoking === opt.val}
-                onChange={() => setFilters({ ...filters, smoking: opt.val })}
-              />
-              <span>{opt.label}</span>
-            </label>
-          ))}
+          <select
+            name="period"
+            value={filters.period}
+            onChange={(e) => handleFilterChange("period", e.target.value)}
+            className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
+          >
+            <option value="">Select</option>
+            <option value="3 months">3 months</option>
+            <option value="6 months">6 months</option>
+            <option value="1 year">1 year</option>
+          </select>
+
         </div>
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Room Size</label>
+        <div className="flex space-x-2 mt-2 mb-3">
+          <input
+            type="number"
+            min="0"
+            value={filters.minSize || ""}
+            onChange={(e) => handleFilterChange("minSize", e.target.value)}
+            placeholder="Min m²"
+            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+          />
+          <input
+            type="number"
+            min="0"
+            value={filters.maxSize || ""}
+            onChange={(e) => handleFilterChange("maxSize", e.target.value)}
+            placeholder="Max m²"
+            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+          />
+        </div>
+      </div>
+
+            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Roommate Preference</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
@@ -226,8 +229,50 @@ export default function Filters() {
         </div>
       </div>
 
+                <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Occupation</label>
+        <div className="space-y-1 mt-1 mb-3">
+          {[
+            { val: "all", label: "All" },
+            { val: "students", label: "Students" },
+            { val: "professionals", label: "Professionals" },
+          ].map((opt) => (
+            <label key={opt.val} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="occupationPreference"
+                checked={filters.occupation === opt.val}
+                onChange={() => handleFilterChange("occupation", opt.val)}
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7] relative" ref={dropdownRef}>
+                <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+        <label className="font-medium text-[18px]">Age Range</label>
+        <div className="flex space-x-2 mt-2 mb-3">
+          <input
+            type="number"
+            min="0"
+            value={filters.minAge || ""}
+            onChange={(e) => handleFilterChange("minAge", e.target.value)}
+            placeholder="Min"
+            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+          />
+          <input
+            type="number"
+            min="0"
+            value={filters.maxAge || ""}
+            onChange={(e) => handleFilterChange("maxAge", e.target.value)}
+            placeholder="Max"
+            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+          />
+        </div>
+      </div>
+
+      <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7] relative" ref={dropdownRef}>
         <label className="font-medium text-[18px]">Amenities</label>
 
         <div className="mt-2 w-full">
@@ -281,19 +326,6 @@ export default function Filters() {
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black">
-        <label className="font-medium text-[18px]">Move-In date</label>
-        <div className="space-y-1 mt-1">
-          <input
-            type="date"
-            value={filters.moveInDate}
-            onChange={(e) =>
-              setFilters({ ...filters, moveInDate: e.target.value })
-            }
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          />
-        </div>
-      </div>
     </div>
   );
 }

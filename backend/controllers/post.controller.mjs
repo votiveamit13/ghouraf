@@ -355,7 +355,6 @@ export const getTeamUps = async (req, res) => {
   }
 };
 
-
 export const getTeamUpById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -568,4 +567,109 @@ export const createSpaceWanted = async (req, res) => {
     });
   }
 };
+
+export const getSpaceWanted = async (req, res) => {
+  try {
+    const {
+      minValue,
+      maxValue,
+      priceType,
+      propertyType,
+      period,
+      minSize,
+      maxSize,
+      roommatePref,
+      occupation,
+      minAge,
+      maxAge,
+      amenities,
+      location,
+      sortBy,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const query = {
+      status: "active",
+      available: true,
+      is_deleted: false,
+    };
+
+    if (req.query.city) query.city = req.query.city;
+    if (req.query.state) query.state = req.query.state;
+    if (req.query.country) query.country = req.query.country;
+
+    if (minValue || maxValue) {
+      query.budget = {};
+      if (minValue) query.budget.$gte = Number(minValue);
+      if (maxValue) query.budget.$lte = Number(maxValue);
+    }
+
+    if (priceType) query.budgetType = priceType;
+
+    if (propertyType && propertyType !== "all") {
+      query.propertyType = propertyType;
+    }
+
+    if (period) {
+      query.period = period;
+    }
+
+    if (minSize || maxSize) {
+      query.roomSize = {};
+      if (minSize) query.roomSize.$gte = Number(minSize);
+      if (maxSize) query.roomSize.$lte = Number(maxSize);
+    }
+
+    if (roommatePref && roommatePref !== "any") {
+      query.roommatePref = roommatePref;
+    }
+
+    if (occupation && occupation !== "all") {
+      query.occupation = occupation;
+    }
+
+    if (minAge || maxAge) {
+      query.age = {};
+      if (minAge) query.age.$gte = Number(minAge);
+      if (maxAge) query.age.$lte = Number(maxAge);
+    }
+
+    if (amenities) {
+      const amenitiesArray = Array.isArray(amenities)
+        ? amenities
+        : [amenities];
+      query.amenities = { $all: amenitiesArray };
+    }
+
+    let sortOption = { createdAt: -1 }; 
+    if (sortBy === "Lowest First") sortOption = { budget: 1 };
+    if (sortBy === "Highest First") sortOption = { budget: -1 };
+
+    const skip = (page - 1) * limit;
+
+    const spaceWanted = await SpaceWanted.find(query)
+      .select(
+        "title postCategory budget budgetType propertyType description amenities roomSize roommatePref occupation age period country state city photos status available is_deleted"
+      )
+      .populate("user", "profile.firstName profile.lastName profile.photo")
+      .sort(sortOption)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await SpaceWanted.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      data: spaceWanted,
+    });
+  } catch (error) {
+    console.error("Get SpaceWanted error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
