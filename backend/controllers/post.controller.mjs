@@ -334,14 +334,37 @@ export const getTeamUps = async (req, res) => {
       .skip(skip)
       .limit(Number(limit));
 
-    const total = await TeamUp.countDocuments(query);
+        const spaceWantedTeamUps = await SpaceWanted.find({
+      ...query,
+      teamUp: true,
+    })
+
+    .select(
+        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available is_deleted occupation"
+      )
+      .populate("user", "profile.firstName profile.lastName profile.photo");
+
+    let allTeamUps = [...teamUps, ...spaceWantedTeamUps];
+
+        if (sortBy === "Lowest First") {
+      allTeamUps.sort((a, b) => a.budget - b.budget);
+    } else if (sortBy === "Highest First") {
+      allTeamUps.sort((a, b) => b.budget - a.budget);
+    } else {
+      allTeamUps.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+    }
+
+    const total = allTeamUps.length;
+    const paginated = allTeamUps.slice(skip, skip + Number(limit));
 
     res.status(200).json({
       success: true,
       total,
       page: Number(page),
       pages: Math.ceil(total / limit),
-      data: teamUps,
+      data: paginated,
     });
   } catch (error) {
     console.error("Get TeamUps error:", error);

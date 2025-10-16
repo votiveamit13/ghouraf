@@ -34,22 +34,21 @@ export default function PlaceWanted() {
             };
 
             const queryString = new URLSearchParams({
-  ...filters,
-  page,
-  limit: itemsPerPage,
-  sortBy,
-}).toString();
+                ...filters,
+                page,
+                limit: itemsPerPage,
+                sortBy,
+            }).toString();
 
-// Append amenities manually (if any)
-let finalUrl = `${apiUrl}spacewanted?${queryString}`;
-if (filters.amenities && filters.amenities.length > 0) {
-  const amenitiesQuery = filters.amenities
-    .map(a => `amenities=${encodeURIComponent(a)}`)
-    .join("&");
-  finalUrl += `&${amenitiesQuery}`;
-}
+            let finalUrl = `${apiUrl}spacewanted?${queryString}`;
+            if (filters.amenities && filters.amenities.length > 0) {
+                const amenitiesQuery = filters.amenities
+                    .map(a => `amenities=${encodeURIComponent(a)}`)
+                    .join("&");
+                finalUrl += `&${amenitiesQuery}`;
+            }
 
-const { data } = await axios.get(finalUrl);
+            const { data } = await axios.get(finalUrl);
 
             if (data.success) {
                 setProperties(data.data || []);
