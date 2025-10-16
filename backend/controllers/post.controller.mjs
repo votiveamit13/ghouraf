@@ -630,13 +630,17 @@ export const getSpaceWanted = async (req, res) => {
     }
 
 if (amenities) {
-  let amenitiesArray;
+  let amenitiesArray = [];
+
   if (Array.isArray(amenities)) {
     amenitiesArray = amenities;
   } else if (typeof amenities === "string") {
-    amenitiesArray = amenities.split(",");
+    amenitiesArray = amenities.split(",").map(a => a.trim()).filter(Boolean);
   }
-  query.amenities = { $all: amenitiesArray };
+
+  if (amenitiesArray.length > 0) {
+    query.amenities = { $all: amenitiesArray };
+  }
 }
 
 
