@@ -50,12 +50,12 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
 
   const handleReset = () => {
     setFilters(defaultFilters);
-    // setPage(1);
+    setPage(1);
   };
 
   const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
-    // setPage(1);
+    setPage(1);
   };
 
   return (
@@ -212,7 +212,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
         <label className="font-medium text-[18px]">Roommate Preference</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
-            { val: "any gender", label: "Any Gender" },
+            { val: "any", label: "Any Gender" },
             { val: "male", label: "Male" },
             { val: "female", label: "Female" },
           ].map((opt) => (
@@ -235,8 +235,8 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
-            { val: "students", label: "Students" },
-            { val: "professionals", label: "Professionals" },
+            { val: "Student", label: "Students" },
+            { val: "Professionals", label: "Professionals" },
           ].map((opt) => (
             <label key={opt.val} className="flex items-center space-x-2">
               <input

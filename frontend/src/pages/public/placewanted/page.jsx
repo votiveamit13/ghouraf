@@ -30,6 +30,7 @@ export default function PlaceWanted() {
                 limit: itemsPerPage,
                 sortBy,
                 ...filters,
+                amenities: filters.amenities,
             };
 
             const { data } = await axios.get(`${apiUrl}spacewanted`, { params });

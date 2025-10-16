@@ -104,6 +104,7 @@ export const getSpaces = async (req, res) => {
       location,
       adPostedBy,
       amenities,
+      sortBy,
       page = 1,
       limit = 10,
     } = req.query;
@@ -162,6 +163,9 @@ export const getSpaces = async (req, res) => {
       query.amenities = { $all: amenities };
     }
 
+        let sortOption = { createdAt: -1 }; 
+    if (sortBy === "Lowest First") sortOption = { budget: 1 };
+    if (sortBy === "Highest First") sortOption = { budget: -1 };
 
     // if (moveInDate) {
     //   query.availableFrom = { $lte: new Date(moveInDate) };
@@ -172,7 +176,7 @@ export const getSpaces = async (req, res) => {
     const spaces = await Space.find(query)
       .select("title postCategory propertyType budget budgetType personalInfo amenities size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted")
       .populate("user", "profile.firstName profile.lastName profile.photo")
-      .sort({ createdAt: -1 })
+      .sort(sortOption)
       .skip(skip)
       .limit(Number(limit));
 
@@ -276,56 +280,46 @@ export const getTeamUps = async (req, res) => {
       is_deleted: false,
     };
 
-    // Location
     if (req.query.city) query.city = req.query.city;
     if (req.query.state) query.state = req.query.state;
     if (req.query.country) query.country = req.query.country;
 
-    // Budget range
     if (minValue || maxValue) {
       query.budget = {};
       if (minValue) query.budget.$gte = Number(minValue);
       if (maxValue) query.budget.$lte = Number(maxValue);
     }
 
-    // Budget type (Week / Month)
     if (priceType) query.budgetType = priceType;
 
-    // Smoking
     if (smoking && smoking !== "all") {
       query.smoke = smoking === "allowed";
     }
 
-    // Roommate Preference
     if (roommatePref && roommatePref !== "any") {
       query.roommatePref = roommatePref;
     }
 
-    // Period
     if (period) {
       query.period = period;
     }
 
-    // Occupation Preference
     if (occupationPreference && occupationPreference !== "all") {
       query.occupationPreference = occupationPreference;
     }
 
-    // Age range
     if (minAge || maxAge) {
       query.age = {};
       if (minAge) query.age.$gte = Number(minAge);
       if (maxAge) query.age.$lte = Number(maxAge);
     }
 
-    // Amenities
     if (amenities) {
       const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
       query.amenities = { $all: amenitiesArray };
     }
 
-    // Sorting
-    let sortOption = { createdAt: -1 }; // Default
+    let sortOption = { createdAt: -1 };
     if (sortBy === "Lowest First") sortOption = { budget: 1 };
     if (sortBy === "Highest First") sortOption = { budget: -1 };
 
@@ -635,12 +629,16 @@ export const getSpaceWanted = async (req, res) => {
       if (maxAge) query.age.$lte = Number(maxAge);
     }
 
-    if (amenities) {
-      const amenitiesArray = Array.isArray(amenities)
-        ? amenities
-        : [amenities];
-      query.amenities = { $all: amenitiesArray };
-    }
+if (amenities) {
+  let amenitiesArray;
+  if (Array.isArray(amenities)) {
+    amenitiesArray = amenities;
+  } else if (typeof amenities === "string") {
+    amenitiesArray = amenities.split(",");
+  }
+  query.amenities = { $all: amenitiesArray };
+}
+
 
     let sortOption = { createdAt: -1 }; 
     if (sortBy === "Lowest First") sortOption = { budget: 1 };
