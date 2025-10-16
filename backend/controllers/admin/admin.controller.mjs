@@ -400,7 +400,18 @@ export const getAllTeamUps = async (req, res) => {
         "title country state city zip budget budgetType moveInDate period amenities firstName lastName age gender minAge maxAge occupationPreference occupation smoke pets petsPreference language languagePreference roommatePref description buddyDescription photos status available createdAt"
       );
 
-      res.json(teamups);
+    const spaceWantedTeamUps = await SpaceWanted.find({
+      is_deleted: false,
+      teamUp: true,
+    })
+      .populate("user", "profile.firstName profile.lastName profile.photo")
+      .select(
+        "propertyType country state city zip budget budgetType moveInDate roomSize furnishing gender description photos status createdAt"
+      );
+
+    const merged = [...teamups, ...spaceWantedTeamUps];
+
+    res.json(merged);
   } catch (err) {
     console.error("Error fetching team-ups:", err);
     res.status(500).json({ message: "Server error" });
@@ -412,17 +423,25 @@ export const updateTeamUpStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if(!["active", "inactive"].includes(status)) {
+    if (!["active", "inactive"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    const teamup = await TeamUp.findById(id);
-    if(!teamup) return res.status(404).json({ message: "Team Up not found" });
+    let teamup = await TeamUp.findById(id);
+    if (teamup) {
+      teamup.status = status;
+      await teamup.save();
+      return res.json({ message: `Team Up status updated to ${status}`, teamup });
+    }
 
-    teamup.status = status;
-    await teamup.save();
+    let spaceWanted = await SpaceWanted.findById(id);
+    if (spaceWanted && spaceWanted.teamUp) {
+      spaceWanted.status = status;
+      await spaceWanted.save();
+      return res.json({ message: `Team Up (SpaceWanted) status updated to ${status}`, spaceWanted });
+    }
 
-    res.json({ message: `Team Up status updated to ${status}`, teamup });
+    return res.status(404).json({ message: "Team Up not found" });
   } catch (err) {
     console.error("Error updating team up status:", err);
     res.status(500).json({ message: "Server error" });
@@ -433,17 +452,27 @@ export const deleteTeamUp = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const teamup = await TeamUp.findById(id);
-    if(!teamup) return res.status(404).json({ message: "Team Up not found" });
+    let teamup = await TeamUp.findById(id);
+    if (teamup) {
+      if (teamup.is_deleted)
+        return res.status(400).json({ message: "Team Up already deleted" });
 
-    if(teamup.is_deleted) {
-      return res.status(400).json({ message: "Team Up already deleted" });
+      teamup.is_deleted = true;
+      await teamup.save();
+      return res.json({ message: "Team Up deleted successfully", teamup });
     }
 
-    teamup.is_deleted = true;
-    await teamup.save();
+    let spaceWanted = await SpaceWanted.findById(id);
+    if (spaceWanted && spaceWanted.teamUp) {
+      if (spaceWanted.is_deleted)
+        return res.status(400).json({ message: "Team Up already deleted" });
 
-    res.json({ message: "Team Up deleted successfully", teamup});
+      spaceWanted.is_deleted = true;
+      await spaceWanted.save();
+      return res.json({ message: "Team Up (SpaceWanted) deleted successfully", spaceWanted });
+    }
+
+    res.status(404).json({ message: "Team Up not found" });
   } catch (err) {
     console.error("Error deleting team up:", err);
     res.status(500).json({ message: "Server error" });
