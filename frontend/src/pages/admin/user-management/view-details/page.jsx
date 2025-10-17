@@ -1,6 +1,7 @@
 import Header from "../../../../components/admin/Headers/Header";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate, useLocation } from "react-router-dom";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
 
 export default function ViewDetails() {
     const { state } = useLocation();
@@ -11,7 +12,11 @@ export default function ViewDetails() {
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
-        return new Date(dateString).toISOString().split("T")[0];
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
     };
 
     return (
@@ -32,7 +37,7 @@ export default function ViewDetails() {
                     <div className="row g-3 p-4">
                         <div className="col-md-12 text-center mb-4">
                             <img
-                                src={user?.profile?.photo || ""}
+                                src={user?.profile?.photo || defaultImage}
                                 alt="Profile"
                                 className="w-24 h-24 rounded-circle object-cover border shadow-sm"
                             />

@@ -52,7 +52,13 @@ export default function TeamUpAd() {
         if (!formData.state) newErrors.state = "State is required";
         if (!formData.city) newErrors.city = "City is required";
         if (!formData.zip.trim()) newErrors.zip = "Zip code is required";
-        if (!formData.budget) newErrors.budget = "Budget is required";
+        if (!formData.budget) {
+            newErrors.budget = "Budget is required";
+        } else if (Number(formData.budget) <= 0) {
+            newErrors.budget = "Budget must be greater than 0";
+        } else if (Number(formData.budget) > 100000) {
+            newErrors.budget = "Budget cannot exceed 1,00,000";
+        }
         if (!formData.budgetType) newErrors.budgetType = "Select budget type";
         if (!formData.gender) newErrors.gender = "Gender is required";
         if (!formData.age) newErrors.age = "Age is required";
@@ -86,36 +92,31 @@ export default function TeamUpAd() {
         setAllLocales(locales.all);
     }, []);
 
-const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
 
-  if (type === "checkbox" && name === "amenities") {
-    setFormData((prev) => ({
-      ...prev,
-      amenities: checked
-        ? [...prev.amenities, value]
-        : prev.amenities.filter((a) => a !== value),
-    }));
+        setFormData((prev) => {
+            let newValue;
 
-    setErrors((prev) => {
-      const newErrors = { ...prev };
-      if (checked && newErrors.amenities) {
-        delete newErrors.amenities;
-      }
-      return newErrors;
-    });
-  } else {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+            if (type === "checkbox" && name === "amenities") {
+                newValue = checked
+                    ? [...prev.amenities, value]
+                    : prev.amenities.filter((a) => a !== value);
+            } else if (
+                (name === "minAge" || name === "maxAge" || name === "age" || name === "budget") &&
+                type === "text"
+            ) {
+                newValue = value.replace(/[^0-9]/g, "");
+            } else {
+                newValue = value;
+            }
 
-    setErrors((prev) => {
-      const newErrors = { ...prev };
-      if (value && newErrors[name]) {
-        delete newErrors[name];
-      }
-      return newErrors;
-    });
-  }
-};
+            return { ...prev, [name]: newValue };
+        });
+
+        setErrors((prev) => ({ ...prev, [name]: undefined }));
+    };
+
 
 
     const handleFileChange = (e) => {
@@ -126,7 +127,6 @@ const handleChange = (e) => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            toast.error("Please fill all required fields before preview");
             return;
         }
         setErrors({});
@@ -378,16 +378,10 @@ const handleChange = (e) => {
                                     <div>
                                         <label className="block text-gray-700">Your Budget</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             name="budget"
                                             value={formData.budget}
                                             onChange={handleChange}
-                                            min="0"
-                                             onKeyDown={(e) => {
-                                                if (e.key === '-' || e.key === 'Minus') {
-                                                    e.preventDefault();
-                                                }
-                                            }}
                                             placeholder="Total budget range for the flat"
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         />
@@ -503,31 +497,19 @@ const handleChange = (e) => {
                                     <label className="block text-gray-700 mb-1">Age Range</label>
                                     <div className="flex space-x-2">
                                         <input
-                                            type="number"
-                                            min="0"
+                                            type="text"
                                             placeholder="Min"
                                             name="minAge"
                                             value={formData.minAge}
                                             onChange={handleChange}
-                                            onKeyDown={(e) => {
-                                                if (e.key === '-' || e.key === 'Minus') {
-                                                    e.preventDefault();
-                                                }
-                                            }}
                                             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
                                         />
                                         <input
-                                            type="number"
-                                            min="0"
+                                            type="text"
                                             placeholder="Max"
                                             name="maxAge"
                                             value={formData.maxAge}
                                             onChange={handleChange}
-                                            onKeyDown={(e) => {
-                                                if (e.key === '-' || e.key === 'Minus') {
-                                                    e.preventDefault();
-                                                }
-                                            }}
                                             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
                                         />
                                     </div>
@@ -641,17 +623,11 @@ const handleChange = (e) => {
                                 <div>
                                     <label className="block text-gray-700 mb-1">Age</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="age"
                                         value={formData.age}
                                         onChange={handleChange}
                                         placeholder="Age"
-                                        min="0"
-                                        onKeyDown={(e) => {
-                                            if (e.key === '-' || e.key === 'Minus') {
-                                                e.preventDefault();
-                                            }
-                                        }}
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
                                 </div>

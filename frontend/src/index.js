@@ -30,13 +30,26 @@ import Messages from "pages/user/messages/page";
 import ThankYouDialog from "components/common/ThankYouDialog";
 import SpaceWantedDetailPage from "pages/public/placewanted/detail-page/page";
 import TeamUpDetailPage from "pages/public/teamup/detail-page/page";
+import { AdminAuthProvider } from "context/AdminAuthContext";
+import AdminPrivateRoute from "components/auth/AdminPrivateRoute";
+import LoginPage from "pages/admin/login/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
     <AuthProvider>
+      <AdminAuthProvider>
       <Routes>
-        <Route path="/admin/*" element={<AdminLayout />} />
+          <Route path="/admin/login" element={<LoginPage />} />
+          <Route
+            path="/admin/*"
+            element={
+              <AdminPrivateRoute>
+                <AdminLayout />
+              </AdminPrivateRoute>
+            }
+          />
+
         <Route path="/" element={<Public><Home /></Public>} />
         <Route path="/spaces" element={<Public><Spaces /></Public>} />
         <Route path="/spaces/:id" element={<Public><DetailPage /></Public>} />
@@ -71,6 +84,7 @@ root.render(
         draggable
         theme="colored"
       />
+      </AdminAuthProvider>
     </AuthProvider>
   </BrowserRouter>
 );

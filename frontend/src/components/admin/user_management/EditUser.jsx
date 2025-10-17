@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
 
 export default function EditUser() {
   const { state } = useLocation();
@@ -125,7 +126,7 @@ export default function EditUser() {
             <div className="row g-3">
               <div className="col-md-12 relative mb-4">
                 <img
-                  src={photo ? URL.createObjectURL(photo) : user?.profile?.photo || ""}
+                  src={photo ? URL.createObjectURL(photo) : user?.profile?.photo || defaultImage}
                   alt="Profile"
                   className="w-20 h-20 rounded-full object-cover border"
                 />

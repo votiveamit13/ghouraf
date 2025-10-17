@@ -5,7 +5,7 @@ export const profileValidator = Joi.object({
   firstName: Joi.string().min(3).max(50),
   lastName: Joi.string().min(3).max(50),
   age: Joi.number().integer().min(18).max(100),
-  mobile: Joi.string().pattern(/^[0-9]{10,15}$/),
+  mobile: Joi.string().pattern(/^[0-9]{10}$/),
   dob: Joi.date(),
   gender: Joi.string().valid("male", "female", "other"),
   occupation: Joi.string().max(100),
@@ -14,5 +14,5 @@ export const profileValidator = Joi.object({
   state: Joi.string().max(50),
   country: Joi.string().max(50),
   lifestyleTags: Joi.array().items(Joi.string().max(30)),
-  photo: Joi.string().uri(),
+  photo: Joi.any().optional(),
 });

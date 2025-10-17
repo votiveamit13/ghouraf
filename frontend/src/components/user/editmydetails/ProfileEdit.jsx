@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { FiEdit } from "react-icons/fi";
 import { FaArrowRightLong } from "react-icons/fa6";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
 
 export default function ProfileEdit({ initialData, onSave }) {
   const [editMode, setEditMode] = useState(false);
@@ -60,25 +61,35 @@ export default function ProfileEdit({ initialData, onSave }) {
 
     if (!formData.mobile) {
       newErrors.mobile = "Mobile number is required";
-    } else if (!/^\+?[0-9]{10,15}$/.test(formData.mobile)) {
-      newErrors.mobile =
-        "Enter a valid mobile number (10–15 digits, optional +)";
+    } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
+      newErrors.mobile = "Enter a valid 10-digit mobile number";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSave = async () => {
-  if (!validate()) return;
-  setIsSaving(true);
-  try {
-    await onSave(formData);
-    setEditMode(false);
-  } finally {
-    setIsSaving(false);
-  }
-};
+
+  const handleSave = async () => {
+    if (!validate()) return;
+    setIsSaving(true);
+    try {
+      await onSave(formData);
+      setEditMode(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  function formatDisplayDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 
   return (
     <div className="bg-white mb-5 shadow-xl rounded-[12px] border-[1px] border-[#D7D7D7]">
@@ -90,7 +101,7 @@ const handleSave = async () => {
         <div className="flex items-center gap-4 mb-3 relative">
           <div className="relative">
             <img
-              src={previewImage}
+              src={previewImage || defaultImage}
               alt="Profile"
               className="w-20 h-20 rounded-full object-cover border"
             />
@@ -159,10 +170,16 @@ const handleSave = async () => {
                 type="text"
                 name="mobile"
                 value={formData.mobile}
-                onChange={handleChange}
-                className={`form-control ${
-                  errors.mobile ? "border-red-500" : ""
-                }`}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  const validValue = value.replace(/[^0-9]/g, "");
+
+                  setFormData({ ...formData, mobile: validValue });
+                  setErrors({ ...errors, mobile: "" });
+                }}
+                className={`form-control ${errors.mobile ? "border-red-500" : ""}`}
+                maxLength={10}
               />
             ) : (
               <span>{formData.mobile}</span>
@@ -186,44 +203,44 @@ const handleSave = async () => {
               className="form-control"
             />
           ) : (
-            <span>{formData.dob}</span>
+            <span>{formatDisplayDate(formData.dob)}</span>
           )}
         </div>
 
         <div className="mt-3">
-{editMode ? (
-  <div className="flex gap-2">
-    <button
-      onClick={handleSave}
-      disabled={isSaving}
-      className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2 disabled:opacity-70"
-    >
-      {isSaving ? (
-        <>
-          Saving...
-        </>
-      ) : (
-        <>
-          Save <FaArrowRightLong />
-        </>
-      )}
-    </button>
-    <button
-      onClick={() => setEditMode(false)}
-      disabled={isSaving}
-      className="bg-gray-400 text-white px-4 py-2 rounded-[12px]"
-    >
-      Cancel
-    </button>
-  </div>
-) : (
-  <button
-    onClick={() => setEditMode(true)}
-    className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
-  >
-    Edit Details <FaArrowRightLong />
-  </button>
-)}
+          {editMode ? (
+            <div className="flex gap-2">
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2 disabled:opacity-70"
+              >
+                {isSaving ? (
+                  <>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    Save <FaArrowRightLong />
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setEditMode(false)}
+                disabled={isSaving}
+                className="bg-gray-400 text-white px-4 py-2 rounded-[12px]"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setEditMode(true)}
+              className="bg-[#565ABF] text-white px-4 py-2 rounded-[12px] flex items-center gap-2"
+            >
+              Edit Details <FaArrowRightLong />
+            </button>
+          )}
 
         </div>
       </div>

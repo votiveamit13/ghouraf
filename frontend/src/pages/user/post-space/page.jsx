@@ -73,10 +73,17 @@ function StepHeader({ step }) {
 const validateStep1 = (formData, errors) => {
   const stepErrors = {};
 
-  if (!formData.title?.trim()) stepErrors.title = ["Title is required"];
+  if (!formData.title) stepErrors.title = ["Title is required"];
   if (!formData.propertyType) stepErrors.propertyType = ["Property Type is required"];
   if (!formData.budgetType) stepErrors.budgetType = ["Budget Type is required"];
-  if (!formData.budget) stepErrors.budget = ["Budget is required"];
+  if (!formData.budget) {
+    stepErrors.budget = ["Budget is required"];
+  } else if (Number(formData.budget) <= 0) {
+    stepErrors.budget = ["Budget must be greater than 0"];
+  } else if (Number(formData.budget) > 100000) {
+    stepErrors.budget = ["Budget cannot exceed 1,00,000"];
+  }
+
   if (!formData.personalInfo) stepErrors.personalInfo = ["Personal Info is required"];
   if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
   if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
@@ -150,17 +157,30 @@ export default function PostSpace() {
     }
   }, [formData, featured, photos]);
 
-  const handleChange = (eOrField, maybeValue) => {
-    if (typeof eOrField === "string") {
-      setFormData((prev) => ({ ...prev, [eOrField]: maybeValue }));
-    } else {
-      const { name, value, type, checked } = eOrField.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
-    }
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => {
+      let newValue;
+
+      if ((name === "size" || name === "budget") && type === "text") {
+        newValue = value.replace(/[^0-9]/g, "");
+      } else if (type === "checkbox" && name === "amenities") {
+        newValue = checked
+          ? [...prev.amenities, value]
+          : prev.amenities.filter((a) => a !== value);
+      } else if (type === "checkbox") {
+        newValue = checked;
+      } else {
+        newValue = value;
+      }
+
+      return { ...prev, [name]: newValue };
+    });
+
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
+
 
   const handleFeaturedUpload = (e) => {
     const file = e.target.files[0];
@@ -207,7 +227,6 @@ export default function PostSpace() {
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         errorElement.focus();
       }
-      toast.error("Please fix the errors before proceeding");
     }
   };
 
@@ -311,8 +330,6 @@ export default function PostSpace() {
           errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           errorElement.focus();
         }
-
-        toast.error("Please fix the validation errors!");
         console.error("Validation errors:", backendErrors);
       } else {
         toast.error(err.response?.data?.message || "Server Error");
@@ -353,7 +370,7 @@ export default function PostSpace() {
                 <label className="form-label text-black">Title</label>
                 <input
                   type="text"
-                  className={`form-control ${errors.title ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   placeholder="Ad name"
                   name="title"
                   value={formData.title}
@@ -365,7 +382,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Property Type</label>
                 <select
-                  className={`form-control ${errors.propertyType ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="propertyType"
                   value={formData.propertyType}
                   onChange={handleChange}
@@ -408,26 +425,21 @@ export default function PostSpace() {
                 </div>
                 {errors.budgetType && <div className="text-red-500 text-sm mt-1">{errors.budgetType[0]}</div>}
                 <input
-                  type="number"
-                  className={`form-control ${errors.budget ? 'border-red-500' : ''}`}
-                  placeholder="Enter your budget"
+                  type="text"
                   name="budget"
+                  placeholder="Enter your budget"
+                  className={`form-control`}
                   value={formData.budget}
                   onChange={handleChange}
-                  min="0"
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'Minus') {
-                      e.preventDefault();
-                    }
-                  }}
                 />
-                {errors.budget && <div className="text-red-500 text-sm mt-1">{errors.budget[0]}</div>}
+                {errors.budget && <small className="text-danger">{errors.budget[0]}</small>}
+
               </div>
 
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Personal Info</label>
                 <select
-                  className={`form-control ${errors.personalInfo ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="personalInfo"
                   value={formData.personalInfo}
                   onChange={handleChange}
@@ -442,18 +454,12 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Size of Apartment</label>
                 <input
-                  type="number"
-                  className={`form-control ${errors.size ? 'border-red-500' : ''}`}
-                  name="size"
+                  type="text"
+                  className={`form-control`}
                   placeholder="m²"
+                  name="size"
                   value={formData.size}
                   onChange={handleChange}
-                  min="0"
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'Minus') {
-                      e.preventDefault();
-                    }
-                  }}
                 />
                 {errors.size && <div className="text-red-500 text-sm mt-1">{errors.size[0]}</div>}
               </div>
@@ -461,7 +467,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Furnishing</label>
                 <select
-                  className={`form-control ${errors.furnishing ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="furnishing"
                   value={formData.furnishing}
                   onChange={handleChange}
@@ -476,7 +482,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Smoking</label>
                 <select
-                  className={`form-control ${errors.smoking ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="smoking"
                   value={formData.smoking}
                   onChange={handleChange}
@@ -491,7 +497,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Rooms available for</label>
                 <select
-                  className={`form-control ${errors.roomsAvailableFor ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="roomsAvailableFor"
                   value={formData.roomsAvailableFor}
                   onChange={handleChange}
@@ -507,7 +513,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Number of bedrooms</label>
                 <select
-                  className={`form-control ${errors.bedrooms ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="bedrooms"
                   value={formData.bedrooms}
                   onChange={handleChange}
@@ -525,7 +531,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">Country</label>
                 <select
-                  className={`form-control ${errors.country ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="country"
                   value={formData.country}
                   onChange={(e) => {
@@ -547,7 +553,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">State</label>
                 <select
-                  className={`form-control ${errors.state ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="state"
                   value={formData.state}
                   onChange={(e) => {
@@ -569,7 +575,7 @@ export default function PostSpace() {
               <div className="col-md-6 mb-2">
                 <label className="form-label text-black">City</label>
                 <select
-                  className={`form-control ${errors.city ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   name="city"
                   value={formData.city}
                   onChange={(e) => handleChange("city", e.target.value)}
@@ -604,7 +610,7 @@ export default function PostSpace() {
               <div className="mb-4">
                 <label className="form-label text-black">Description</label>
                 <textarea
-                  className={`form-control ${errors.description ? 'border-red-500' : ''}`}
+                  className={`form-control`}
                   placeholder="Ad description"
                   rows={4}
                   name="description"

@@ -53,23 +53,33 @@ export default function RoomWantedAd() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        if (type === "checkbox" && name === "amenities") {
-            setFormData((prev) => ({
-                ...prev,
-                amenities: checked
+
+        setFormData((prev) => {
+            let newValue;
+
+            if ((name === "age" || name === "budget") && type === "text") {
+                newValue = value.replace(/[^0-9]/g, "");
+            } else if (type === "checkbox" && name === "amenities") {
+                newValue = checked
                     ? [...prev.amenities, value]
-                    : prev.amenities.filter((a) => a !== value),
-            }));
-        } else if (type === "checkbox") {
-            setFormData((prev) => ({ ...prev, [name]: checked }));
-        } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
-        }
+                    : prev.amenities.filter((a) => a !== value);
+            } else if (type === "checkbox") {
+                newValue = checked;
+            } else {
+                newValue = value;
+            }
+
+            return { ...prev, [name]: newValue };
+        });
+
+        setErrors((prev) => ({ ...prev, [name]: undefined }));
     };
+
+
 
     const handleImageChange = (e) => {
         const newFiles = Array.from(e.target.files);
-        setImages((prev) => [...prev, ...newFiles]); 
+        setImages((prev) => [...prev, ...newFiles]);
     };
 
     const handleRemoveImage = (index) => {
@@ -78,32 +88,85 @@ export default function RoomWantedAd() {
 
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.propertyType) newErrors.propertyType = "Property type is required";
-        if (!formData.roomSize) newErrors.roomSize = "Room size is required";
+
+        if (!formData.title?.trim()) {
+            newErrors.title = "Title is required";
+        } else if (formData.title.length < 3) {
+            newErrors.title = "Title should be at least 3 characters";
+        } else if (formData.title.length > 100) {
+            newErrors.title = "Title cannot exceed 100 characters";
+        }
+
+        if (!formData.description?.trim()) {
+            newErrors.description = "Description is required";
+        } else if (formData.description.length < 5) {
+            newErrors.description = "Description must be at least 5 characters";
+        }
+
+        if (!formData.propertyType) newErrors.propertyType = "Property Type is required";
+        if (!formData.roomSize) newErrors.roomSize = "Room Size is required";
+
         if (!formData.country) newErrors.country = "Country is required";
         if (!formData.state) newErrors.state = "State is required";
         if (!formData.city) newErrors.city = "City is required";
-        if (!formData.budget) newErrors.budget = "Budget is required";
-        if (!formData.budgetType) newErrors.budgetType = "Budget type is required";
-        if (!formData.moveInDate) newErrors.moveInDate = "Move-in date is required";
-        if (!formData.name) newErrors.name = "Name is required";
-        if (!formData.age) newErrors.age = "Age is required";
-        if (!formData.gender) newErrors.gender = "Gender is required";
-        if (!formData.occupation) newErrors.occupation = "Occupation is required";
-        if (!formData.smoke) newErrors.smoke = "Smoking preference is required";
-        if (!formData.pets) newErrors.pets = "Pets preference is required";
-        if (!formData.roommatePref) newErrors.roommatePref = "Roommate preference is required";
-        if (!formData.title) newErrors.title = "Title is required";
-        if (!formData.description) newErrors.description = "Description is required";
+        if (!formData.zip) newErrors.zip = "ZIP code is required";
+
+        if (!formData.budget) {
+            newErrors.budget = "Budget is required";
+        } else if (Number(formData.budget) <= 0) {
+            newErrors.budget = "Budget must be greater than 0";
+        } else if (Number(formData.budget) > 100000) {
+            newErrors.budget = "Budget cannot exceed 1,00,000";
+        }
+
+        if (!formData.budgetType) newErrors.budgetType = "Budget Type is required";
+        if (!formData.period) newErrors.period = "Duration of stay is required";
+
+        if (!formData.amenities?.length) newErrors.amenities = "At least one amenity is required";
+
+        if (!formData.name?.trim()) newErrors.name = "Name is required";
+        if (!formData.age) {
+            newErrors.age = "Age is required";
+        } else if (formData.age < 18) {
+            newErrors.age = "Age must be at least 18";
+        } else if (formData.age > 100) {
+            newErrors.age = "Age cannot exceed 100";
+        }
+        if (!["Male", "Female"].includes(formData.gender)) {
+            newErrors.gender = "Gender must be either 'Male' or 'Female'";
+        }
+        if (!["Student", "Professionals"].includes(formData.occupation)) {
+            newErrors.occupation = "Occupation must be 'Student' or 'Professionals'";
+        }
+
+        if (!["Yes", "No"].includes(formData.smoke)) {
+            newErrors.smoke = "Smoke must be 'Yes' or 'No'";
+        }
+        if (!["Yes", "No"].includes(formData.pets)) {
+            newErrors.pets = "Pets must be 'Yes' or 'No'";
+        }
+
+        const allowedRoommatePrefs = ["any gender", "male", "female"];
+        if (!allowedRoommatePrefs.includes(formData.roommatePref)) {
+            newErrors.roommatePref = `Roommate Preference must be one of: ${allowedRoommatePrefs.join(", ")}`;
+        }
+
+        if (images.length) {
+            images.forEach((img, i) => {
+                if (!img.name) {
+                    newErrors[`photos_${i}`] = "Photo file is required";
+                }
+            });
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
+
     const handlePreview = () => {
         if (validateForm()) {
             setIsPreview(true);
-        } else {
-            toast.error("Please fix the errors in the form");
         }
     };
 
@@ -159,8 +222,7 @@ export default function RoomWantedAd() {
     };
 
     const getInputClass = (field) =>
-        `w-full border-[1px] rounded-[14px] form-control ${errors[field] ? "border-red-500" : "border-[#D7D7D7]"
-        }`;
+        `w-full border-[1px] rounded-[14px] form-control`;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -337,8 +399,9 @@ export default function RoomWantedAd() {
                                         name="zip"
                                         value={formData.zip}
                                         onChange={handleChange}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        className={getInputClass("zip")}
                                     />
+                                    {errors.zip && <p className="text-red-500 text-sm mt-1">{errors.zip}</p>}
                                 </div>
                             </div>
                         </div>
@@ -352,12 +415,12 @@ export default function RoomWantedAd() {
                                 <div>
                                     <label className="block text-gray-700">Budget</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="budget"
                                         value={formData.budget}
                                         onChange={handleChange}
-                                        min="0"
                                         className={getInputClass("budget")}
+                                        placeholder="Enter budget"
                                     />
                                     {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
                                 </div>
@@ -404,13 +467,14 @@ export default function RoomWantedAd() {
                                         name="period"
                                         value={formData.period}
                                         onChange={handleChange}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        className={getInputClass("period")}
                                     >
                                         <option value="">Select</option>
                                         <option value="3 months">3 months</option>
                                         <option value="6 months">6 months</option>
                                         <option value="1 year">1 year</option>
                                     </select>
+                                    {errors.period && <p className="text-red-500 text-sm mt-1">{errors.period}</p>}
                                 </div>
                             </div>
 
@@ -441,6 +505,7 @@ export default function RoomWantedAd() {
                                         </label>
                                     ))}
                                 </div>
+                                {errors.amenities && <p className="text-red-500 text-sm mt-1">{errors.amenities}</p>}
                             </div>
                         </div>
 
@@ -466,11 +531,12 @@ export default function RoomWantedAd() {
                                 <div>
                                     <label className="block text-gray-700 mb-1">Age</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="age"
                                         value={formData.age}
                                         onChange={handleChange}
                                         className={getInputClass("age")}
+                                        placeholder="Enter age"
                                     />
                                     {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
                                 </div>
@@ -616,25 +682,25 @@ export default function RoomWantedAd() {
                                         </span>
                                     </div>
                                     {images.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    {images.map((img, i) => (
-                                        <div key={i} className="relative">
-                                            <img
-                                                src={URL.createObjectURL(img)}
-                                                alt="preview"
-                                                className="w-20 h-20 object-cover rounded-md border"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveImage(i)}
-                                                className="absolute -top-2 -right-2 bg-black text-white rounded-full p-1 text-xs"
-                                            >
-                                                <FaTimes />
-                                            </button>
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                            {images.map((img, i) => (
+                                                <div key={i} className="relative">
+                                                    <img
+                                                        src={URL.createObjectURL(img)}
+                                                        alt="preview"
+                                                        className="w-20 h-20 object-cover rounded-md border"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveImage(i)}
+                                                        className="absolute -top-2 -right-2 bg-black text-white rounded-full p-1 text-xs"
+                                                    >
+                                                        <FaTimes />
+                                                    </button>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
-                            )}
+                                    )}
                                 </div>
                             </div>
                         </div>
