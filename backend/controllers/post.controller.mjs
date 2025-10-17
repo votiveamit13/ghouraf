@@ -503,11 +503,13 @@ export const getMyAds = async (req, res) => {
 
     const spaceFilter = { user: userId, is_deleted: false };
     const teamUpFilter = { user: userId, is_deleted: false };
+    const spaceWantedFilter = { user: userId, is_deleted: false };
 
     if (search) {
       const searchRegex = new RegExp(search, "i");
-      spaceFilter.$or = [{ title: searchRegex }, { location: searchRegex }];
+      spaceFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
       teamUpFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
+      spaceWantedFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
     }
 
     let sortOption = { createdAt: -1 };
@@ -524,12 +526,13 @@ export const getMyAds = async (req, res) => {
       }
     }
 
-    const [spaces, teamUps] = await Promise.all([
+    const [spaces, teamUps, spaceWanteds] = await Promise.all([
       spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
       teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
+      spaceWantedFilter._skip ? [] : SpaceWanted.find(spaceWantedFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
     ]);
 
-    const combined = [...spaces, ...teamUps].sort(
+    const combined = [...spaces, ...teamUps, ...spaceWanteds].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
