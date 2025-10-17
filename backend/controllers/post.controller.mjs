@@ -447,7 +447,17 @@ export const toggleSavePost = async (req, res) => {
         photo: post.photos
       };
     } else {
-      snapshot = { title: post.title, description: post.description };
+      snapshot = {
+        title: post.title,
+        country: post.country,
+        state: post.state,
+        city: post.city,
+        roommatePref: post.roommatePref,
+        budget: post.budget,
+        budgetType: post.budgetType,
+        description: post.description,
+        photo: post.photos
+      };
     }
 
     const savedPost = new SavedPost({ user: userId, postCategory, postId, snapshot });
