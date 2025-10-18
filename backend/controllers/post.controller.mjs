@@ -374,35 +374,29 @@ export const getTeamUps = async (req, res) => {
 
 export const getTeamUpById = async (req, res) => {
   try {
-    const { id, type } = req.params;
+    const { id } = req.params;
 
-    let data;
+    let data = await TeamUp.findById(id)
+      .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
 
-    if (type === "teamup") {
-      data = await TeamUp.findById(id)
-        .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
-    } else if (type === "spacewanted") {
+    if (!data) {
       data = await SpaceWanted.findById(id)
         .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
-    } else {
-      return res.status(400).json({ success: false, message: "Invalid type parameter" });
     }
 
     if (!data) {
-      return res.status(404).json({ success: false, message: `${type} not found` });
+      return res.status(404).json({ success: false, message: "Record not found" });
     }
 
     res.status(200).json({
       success: true,
-      type,
       data,
     });
   } catch (error) {
-    console.error("Get TeamUpById error:", error);
+    console.error("Error fetching TeamUp:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 
 //SavedPost
 export const toggleSavePost = async (req, res) => {
