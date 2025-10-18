@@ -374,23 +374,35 @@ export const getTeamUps = async (req, res) => {
 
 export const getTeamUpById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, type } = req.params;
 
-    const teamup = await TeamUp.findById(id)
-      .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
+    let data;
 
-    if (!teamup) {
-      return res.status(404).json({ success: false, message: "Team Up not found" });
+    if (type === "teamup") {
+      data = await TeamUp.findById(id)
+        .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
+    } else if (type === "spacewanted") {
+      data = await SpaceWanted.findById(id)
+        .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid type parameter" });
+    }
+
+    if (!data) {
+      return res.status(404).json({ success: false, message: `${type} not found` });
     }
 
     res.status(200).json({
       success: true,
-      data: teamup,
+      type,
+      data,
     });
   } catch (error) {
+    console.error("Get TeamUpById error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 //SavedPost
 export const toggleSavePost = async (req, res) => {
@@ -697,6 +709,26 @@ export const getSpaceWanted = async (req, res) => {
     });
   } catch (error) {
     console.error("Get SpaceWanted error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSpaceWantedById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const spacewanted = await SpaceWanted.findById(id)
+      .populate("user", "profile.firstName profile.lastName profile.photo createdAt");
+
+    if (!spacewanted) {
+      return res.status(404).json({ success: false, message: "Space Wanted not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: spacewanted,
+    });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

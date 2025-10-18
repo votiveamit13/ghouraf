@@ -56,7 +56,7 @@ root.render(
         <Route path="/place-wanted" element={<Public><PlaceWanted/></Public>} />
         <Route path="/place-wanted/detail-page" element={<Public><SpaceWantedDetailPage /></Public>} />
         <Route path="/team-up" element={<Public><TeamUp/></Public>} />
-        <Route path="/team-up/detail-page" element={<Public><TeamUpDetailPage/></Public>} />
+        <Route path="/team-up/:id" element={<Public><TeamUpDetailPage/></Public>} />
         <Route path="/about-us" element={<Public><AboutUs /></Public>} />
         <Route path="/contact-us" element={<Public><ContactUs /></Public>} />
         <Route path="/faq" element={<Public><Faqs /></Public>} />

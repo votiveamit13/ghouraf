@@ -3,7 +3,7 @@ import {
   createSpace, getSpaces, getSpaceById,
   createTeamUp, getTeamUps, getTeamUpById,
   toggleSavePost, getSavedPosts, getMyAds,
-  createSpaceWanted, getSpaceWanted
+  createSpaceWanted, getSpaceWanted, getSpaceWantedById
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
@@ -29,5 +29,6 @@ router.get("/save/list", auth, getSavedPosts);
 router.get("/my-ads", auth, getMyAds);
 router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 router.get("/spacewanted", getSpaceWanted);
+router.get("/spacewanted/:id", getSpaceWantedById);
 
 export default router;

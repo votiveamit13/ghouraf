@@ -6,6 +6,7 @@ import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import { useAuth } from "context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 export default function PropertyCard({ property }) {
     const locationString = getFullLocation(property.city, property.state, property.country);
@@ -64,16 +65,19 @@ export default function PropertyCard({ property }) {
 
     return (
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
-            <div className="w-[200px] h-[260px]">
-                <img
-                    src={property.photos?.[0]?.url}
-                    alt={property.title}
-                    className="w-full h-full object-cover rounded-[10px]"
-                />
-            </div>
-
+            <Link to={`/team-up/${property._id}`}>
+                <div className="w-[200px] h-[260px]">
+                    <img
+                        src={property.photos?.[0]?.url}
+                        alt={property.title}
+                        className="w-full h-full object-cover rounded-[10px]"
+                    />
+                </div>
+            </Link>
             <div className="flex flex-col flex-grow w-[450px] text-[#000000]">
-                <h3 className="font-semibold text-[24px] text-black">{property.title} in {locationString}</h3>
+                <Link to={`/team-up/${property._id}`}>
+                    <h3 className="font-semibold text-[24px] text-black">{property.title} in {locationString}</h3>
+                </Link>
                 <p className="text-[18px]">Roommate preference - <span className="text-[#565ABF]"> {property.roommatePref.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</span></p>
                 <p className="text-[15px] mt-1">{property.description}</p>
 
