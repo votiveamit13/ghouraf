@@ -7,6 +7,7 @@ import { getFullLocation } from "utils/locationHelper";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function PropertyCard({ property }) {
     const locationString = getFullLocation(property.city, property.state, property.country);
@@ -68,6 +69,7 @@ export default function PropertyCard({ property }) {
 
     return (
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
+            <Link to={`/place-wanted/${property._id}`}>
             <div className="w-[200px] h-[260px]">
                 <img
                     src={image}
@@ -75,10 +77,13 @@ export default function PropertyCard({ property }) {
                     className="w-full h-full object-cover rounded-[10px]"
                 />
             </div>
+            </Link>
 
 
             <div className="flex flex-col flex-grow text-[#000000]">
+                <Link to={`/place-wanted/${property._id}`}>
                 <h3 className="font-semibold text-[24px] text-black">{property.title}</h3>
+                </Link>
                 <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{locationString}</p>
                 <p className="text-[18px]">{property.propertyType}</p>
                 <p className="text-[15px] mt-1">{property.description}</p>

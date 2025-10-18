@@ -1,28 +1,58 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "preline/preline";
-import profile1 from "../../../../assets/img/ghouraf/profile1.jpg";
-import profile2 from "../../../../assets/img/ghouraf/profile2.jpg";
-import profile3 from "../../../../assets/img/ghouraf/profile3.jpg";
-import profile4 from "../../../../assets/img/ghouraf/profile4.jpg";
+import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { TfiEmail } from "react-icons/tfi";
 import { BiCheckShield } from "react-icons/bi";
 import { BsFlag } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
+import { toast } from "react-toastify";
+import { getFullLocation } from "utils/locationHelper";
+import { getChatId } from "utils/firebaseChatHelper";
+import Loader from "components/common/Loader";
 
 export default function SpaceWantedDetailPage() {
+    const { id } = useParams();
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const [spacewanted, setSpacewanted] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const [messageLoading, setMessageLoading] = useState(false);
 
     useEffect(() => {
-        if (typeof window === "undefined") return;
+        if (!id) return;
+
+        const fetchSpaceWanted = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${apiUrl}spacewanted/${id}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    setSpacewanted(data.data);
+                } else {
+                    console.error("Space Wanted not found");
+                }
+            } catch (err) {
+                console.error("Error fetching space wanted:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSpaceWanted();
+    }, [id, apiUrl]);
+
+    useEffect(() => {
+        if (!spacewanted || typeof window === "undefined") return;
+
         window.HSCarousel?.autoInit();
 
         const root = document.querySelector("[data-hs-carousel]");
-        if (!root) {
-            console.warn("No [data-hs-carousel] root found");
-            return;
-        }
+        if (!root) return;
 
         const body = root.querySelector(".hs-carousel-body");
         const viewport = body?.parentElement;
@@ -32,15 +62,7 @@ export default function SpaceWantedDetailPage() {
         );
         const thumbs = pagination ? Array.from(pagination.children) : [];
 
-        if (!body || !viewport || slides.length === 0 || thumbs.length === 0) {
-            console.warn("Carousel elements missing", {
-                body: !!body,
-                viewport: !!viewport,
-                slidesCount: slides.length,
-                thumbsCount: thumbs.length,
-            });
-            return;
-        }
+        if (!body || !viewport || slides.length === 0 || thumbs.length === 0) return;
 
         const centerThumb = (thumbEl) => {
             if (!thumbEl) return;
@@ -49,8 +71,7 @@ export default function SpaceWantedDetailPage() {
             const elRect = thumbEl.getBoundingClientRect();
 
             const delta =
-                (elRect.left + elRect.width / 2) -
-                (containerRect.left + containerRect.width / 2);
+                elRect.left + elRect.width / 2 - (containerRect.left + containerRect.width / 2);
 
             container.scrollTo({
                 left: Math.max(0, container.scrollLeft + delta),
@@ -96,14 +117,8 @@ export default function SpaceWantedDetailPage() {
             let bestArea = -1;
             slides.forEach((s, i) => {
                 const r = s.getBoundingClientRect();
-                const overlapW = Math.max(
-                    0,
-                    Math.min(r.right, vp.right) - Math.max(r.left, vp.left)
-                );
-                const overlapH = Math.max(
-                    0,
-                    Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top)
-                );
+                const overlapW = Math.max(0, Math.min(r.right, vp.right) - Math.max(r.left, vp.left));
+                const overlapH = Math.max(0, Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top));
                 const area = overlapW * overlapH;
                 if (area > bestArea) {
                     bestArea = area;
@@ -115,6 +130,7 @@ export default function SpaceWantedDetailPage() {
 
         setTimeout(() => {
             computeVisibleByOverlap();
+            body.classList.remove("opacity-0");
         }, 120);
 
         const prev = root.querySelector(".hs-carousel-prev");
@@ -131,15 +147,42 @@ export default function SpaceWantedDetailPage() {
             next?.removeEventListener("click", arrowHandler);
             window.removeEventListener("resize", computeVisibleByOverlap);
         };
-    }, []);
+    }, [spacewanted]);
 
+    if (loading) {
+        return <Loader fullScreen />;
+    }
+
+    if (!spacewanted) {
+        return <div className="container mt-10 text-center">No space wanted found.</div>;
+    }
+
+    const locationString = getFullLocation(spacewanted.city, spacewanted.state, spacewanted.country);
 
     const images = [
-        profile1,
-        profile2,
-        profile3,
-        profile4,
+        spacewanted.featuredImage,
+        ...(spacewanted.photos?.map((p) => p.url) || []),
     ];
+
+    const handleMessageClick = async () => {
+        if (!user) {
+            toast.warning("Login First");
+            return;
+        }
+        if (!user || !spacewanted?.user?._id) return;
+
+        if (user._id === spacewanted.user._id) return;
+
+        try {
+            setMessageLoading(true);
+            const chatId = await getChatId(user._id, spacewanted.user._id);
+            navigate(`/user/messages/${chatId}?receiverId=${spacewanted.user._id}`);
+        } catch (error) {
+            console.error("Error opening chat:", error);
+        } finally {
+            setMessageLoading(false);
+        }
+    };
 
     return (
         <>
@@ -154,7 +197,7 @@ export default function SpaceWantedDetailPage() {
             <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="col-span-3 space-y-6">
                     <h2 className="text-[20px] text-black font-semibold">
-                        Apartment Wanted
+                        {spacewanted.title}
                     </h2>
                     <div className="flex gap-4">
                         <div
@@ -166,7 +209,7 @@ export default function SpaceWantedDetailPage() {
                             className="relative"
                         >
                             <div className="hs-carousel flex flex-col gap-2">
-                                <div className="relative grow overflow-hidden min-h-96 bg-white rounded-[10px]">
+                                <div className="relative grow overflow-hidden w-[592px] min-h-96 bg-white rounded-[10px]">
                                     <div className="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
                                         {images.map((src, idx) => (
                                             <div className="hs-carousel-slide" key={idx}>
@@ -219,14 +262,14 @@ export default function SpaceWantedDetailPage() {
                         </div>
                         <div>
                             <p className="text-black text-[16px]">
-                                Hi I’m John I’m 22 and graduated this year from MMU. I decided to stay in Manchester and am working full time as a TA at a primary school. I’m a tidy fun friendly person, loves to chill but also go for a drink and do activities together Just looking for a place where can make friends rather than just live in same place. Currently living in a house share how ever it’s fallen through and I really need to find somewhere by November Only requirement really is somewhere with parking Happy to go for a coffee or get a drink and talk more and make friends
+                                {spacewanted.description}
                             </p>
                         </div>
                     </div>
                     <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[15px] p-4 space-y-3">
-                        <h4 className="text-[18px] text-black font-semibold mt-0">John</h4>
-                        <h5 className="text-[16px] text-black flex items-center gap-2">25, Male</h5>
-                        <p>Total budget: $750 / Month</p>
+                        <h4 className="text-[18px] text-black font-semibold mt-0">{spacewanted.name}</h4>
+                        <h5 className="text-[16px] text-black flex items-center gap-2">{spacewanted.age}, {spacewanted.gender}</h5>
+                        <p>Total budget: ${spacewanted.budget} / {spacewanted.budgetType}</p>
                     </div>
 
                     <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
@@ -238,62 +281,34 @@ export default function SpaceWantedDetailPage() {
                                         <td className="py-1 w-40 font-medium">Available</td>
                                         <td>Now</td>
                                     </tr>
-                                    <tr>
+                                    {/* <tr>
                                         <td className="py-1 w-40 font-medium">Minimum term</td>
                                         <td>None</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Maximum term</td>
                                         <td>8 Months</td>
-                                    </tr>
+                                    </tr> */}
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
-                        <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">Looking in</h3>
-                        <div className="flex flex-wrap gap-6 text-sm p-4">
-                            {[
-                                "Brixton",
-                                "Chelsea & Fulham",
-                                "Clapham, Battersea & Wandsworth",
-                                "In-unit Washing Machine",
-                                "Docklands",
-                                "Hackney & Clapton",
-                                "Tooting & Streatham",
-                            ].map((amenity, idx) => (
-                                <span
-                                    key={idx}
-                                    className="text-black"
-                                >
-                                    <span className="text-[#198754] text-[22px]">.</span> {amenity}
-                                </span>
-                            ))}
+                    {spacewanted.amenities?.length > 0 && (
+                        <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
+                            <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">
+                                Amenities Required
+                            </h3>
+                            <div className="flex flex-wrap gap-6 text-sm p-4">
+                                {spacewanted.amenities.map((amenity, idx) => (
+                                    <span key={idx} className="text-black">
+                                        <span className="text-[#198754] text-[22px]">✔</span>{" "}
+                                        {amenity}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
-                        <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">Amenities required</h3>
-                        <div className="flex flex-wrap gap-6 text-sm p-4">
-                            {[
-                                "Fully furnished",
-                                "High-speed Wi-Fi",
-                                "Air Conditioning & Heating",
-                                "In-unit Washing Machine",
-                                "24/7 Security & Doorman",
-                                "Parking",
-                                "Living room",
-                            ].map((amenity, idx) => (
-                                <span
-                                    key={idx}
-                                    className="text-black"
-                                >
-                                    <span className="text-[#198754] text-[22px]">✔</span> {amenity}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                    )}
 
                     <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
                         <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">About Me</h3>
@@ -302,35 +317,27 @@ export default function SpaceWantedDetailPage() {
                                 <tbody>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Age</td>
-                                        <td>33</td>
+                                        <td>{spacewanted.age}</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Smoker?</td>
-                                        <td>No</td>
+                                        <td>{spacewanted.smoke ? "Yes" : "No"}</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Occupation</td>
-                                        <td>No preference</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1 w-40 font-medium">Smoking</td>
-                                        <td>No</td>
+                                        <td>{spacewanted.occuptaion}</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Any pets?</td>
-                                        <td>Yes</td>
+                                        <td>{spacewanted.pets ? "Yes" : " No"}</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Language</td>
-                                        <td>English</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1 w-40 font-medium">Occupation</td>
-                                        <td>Professional</td>
+                                        <td>{spacewanted.language}</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Gender</td>
-                                        <td>Male</td>
+                                        <td>{spacewanted.gender}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -351,16 +358,8 @@ export default function SpaceWantedDetailPage() {
                                         <td>Yes</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-1 w-40 font-medium">Occupation</td>
-                                        <td>Professionals</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1 w-40 font-medium">Age Range</td>
-                                        <td>20-29</td>
-                                    </tr>
-                                    <tr>
                                         <td className="py-1 w-40 font-medium">Gender</td>
-                                        <td>Female</td>
+                                        <td>{spacewanted.roommatePref}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -371,15 +370,30 @@ export default function SpaceWantedDetailPage() {
                 <div className="col-span-1 space-y-4">
                     <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px] p-5 text-center">
                         <img
-                            src={profile1}
+                             src={spacewanted.user?.profile?.photo
+                                ? `${spacewanted.user.profile.photo}`
+                                : defaultImage}
                             alt="user"
                             className="w-20 h-20 rounded-full mx-auto object-cover"
                         />
-                        <h3 className="mt-2 font-semibold text-black mb-1">Jhon</h3>
-                        <p className="text-sm text-black mb-1">Location:</p>
-                        <p className="text-sm text-black mb-1">Member since: <span className="text-[#565ABF]">Jan 2025</span></p>
-                        <button className="mt-3 w-full bg-[#565ABF] flex items-center justify-center gap-2 text-white py-2 rounded-[5px]">
-                            <TfiEmail /> Message
+                        <h3 className="mt-2 font-semibold text-black mb-1">{spacewanted.name}</h3>
+                        <p className="text-sm text-black mb-1">Location: {locationString}</p>
+                        <p className="text-sm text-black mb-1">Member since: <span className="text-[#565ABF]">{new Date(spacewanted.user?.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                        })}</span></p>
+                        <button onClick={handleMessageClick}
+                            disabled={user?._id === spacewanted.user?._id || messageLoading}
+                            className={`mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-[5px] text-white 
+    ${user?._id === spacewanted.user?._id ? "bg-gray-400 cursor-not-allowed" : "bg-[#565ABF]"}
+  `}
+                        >
+                            {messageLoading ?
+                                <div className="flex items-center justify-center w-6 h-6">
+                                    <div className="transform scale-50">
+                                        <Loader />
+                                    </div>
+                                </div> : <><TfiEmail /> Message</>}
                         </button>
                     </div>
 

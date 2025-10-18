@@ -209,7 +209,7 @@ export default function TeamUpDetailPage() {
                             className="relative"
                         >
                             <div className="hs-carousel flex flex-col gap-2">
-                                <div className="relative grow overflow-hidden min-h-96 bg-white rounded-[10px]">
+                                <div className="relative grow overflow-hidden w-[592px] min-h-96 bg-white rounded-[10px]">
                                     <div className="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
                                         {images.map((src, idx) => (
                                             <div className="hs-carousel-slide" key={idx}>
@@ -267,7 +267,7 @@ export default function TeamUpDetailPage() {
                         </div>
                     </div>
                     <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[15px] p-4 space-y-3">
-                        <h4 className="text-[18px] text-black font-semibold mt-0">{teamup.firstName} {teamup.lastName}</h4>
+                        <h4 className="text-[18px] text-black font-semibold mt-0">{teamup.firstName || teamup.user?.profile?.firstName} {teamup.lastName || teamup.user?.profile?.lastName}</h4>
                         <h5 className="text-[16px] text-black flex items-center gap-2">{teamup.age}, {teamup.gender}</h5>
                         <p>Total budget: ${teamup.budget} / {teamup.budgetType}</p>
                     </div>
@@ -353,14 +353,18 @@ export default function TeamUpDetailPage() {
                                         <td className="py-1 w-40 font-medium">Pets Ok?</td>
                                         <td>{teamup.petsPreference ? "Yes" : "No"}</td>
                                     </tr>
-                                    <tr>
-                                        <td className="py-1 w-40 font-medium">Occupation</td>
-                                        <td>{teamup.occupationPreference}</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-1 w-40 font-medium">Age Range</td>
-                                        <td>{teamup.minAge}-{teamup.maxAge}</td>
-                                    </tr>
+                                    {teamup.occupationPreference !== undefined && (
+                                        <tr>
+                                            <td className="py-1 w-40 font-medium">Occupation</td>
+                                            <td>{teamup.occupationPreference}</td>
+                                        </tr>
+                                    )}
+                                    {teamup.minAge !== undefined && (
+                                        <tr>
+                                            <td className="py-1 w-40 font-medium">Age Range</td>
+                                            <td>{teamup.minAge}-{teamup.maxAge}</td>
+                                        </tr>
+                                    )}
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Gender</td>
                                         <td>{teamup.roommatePref}</td>
@@ -380,7 +384,7 @@ export default function TeamUpDetailPage() {
                             alt="user"
                             className="w-20 h-20 rounded-full mx-auto object-cover"
                         />
-                        <h3 className="mt-2 font-semibold text-black mb-1">{teamup.firstName}</h3>
+                        <h3 className="mt-2 font-semibold text-black mb-1">{teamup.firstName || teamup.user?.profile?.firstName}</h3>
                         <p className="text-sm text-black mb-1">Location: {locationString}</p>
                         <p className="text-sm text-black mb-1">Member since: <span className="text-[#565ABF]">{new Date(teamup.user?.createdAt).toLocaleDateString("en-US", {
                             month: "short",
