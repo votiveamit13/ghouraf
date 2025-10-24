@@ -5,6 +5,7 @@ import TeamUp from "../models/TeamUp.mjs";
 import SavedPost from "../models/SavedPost.mjs";
 import { createSpaceWantedSchema } from "../validations/spacewanted.validator.mjs";
 import SpaceWanted from "../models/SpaceWanted.mjs";
+import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
 
 //Spaces
 export const createSpace = async (req, res) => {
@@ -211,6 +212,36 @@ export const getSpaceById = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const requestTeamUp = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    let existing = await SpaceTeamUps.findOne({ postId: id, userId });
+    if (existing)
+      return res.status(400).json({ success: false, message: "You have already requested to team up." });
+
+    const teamUp = await SpaceTeamUps.create({ postId: id, userId, interested: true });
+    res.json({ success: true, data: teamUp });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export const getSpaceTeamUps = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const teamUps = await SpaceTeamUps.find({ postId: id, interested: true })
+      .populate("userId", "profile email");
+
+    res.json({ success: true, data: teamUps });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 

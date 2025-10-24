@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import "preline/preline";
-import agent1 from "../../../../assets/img/ghouraf/agent1.jpg";
 import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
@@ -25,6 +24,7 @@ export default function DetailPage({ targetUserId }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [messageLoading, setMessageLoading] = useState(false);
+  const [teamUps, setTeamUps] = useState([]);
 
   useEffect(() => {
     if (!id) return;
@@ -152,52 +152,54 @@ export default function DetailPage({ targetUserId }) {
     };
   }, [space]);
 
+  useEffect(() => {
+  if (!id) return;
 
-  const interestedPeople = [
-    {
-      id: 1,
-      name: "Trish Hanson",
-      role: "Works in IT, looking for non-smoker",
-      avatar: agent1,
-    },
-    {
-      id: 2,
-      name: "Alex Martinez",
-      role: "Software engineer, tidy and easy-going, prefers quiet evenings.",
-      avatar: agent1,
-    },
-    {
-      id: 3,
-      name: "Emma Lewis",
-      role: "Works in hospitality, loves cooking, very social.",
-      avatar: agent1,
-    },
-    {
-      id: 4,
-      name: "Emma Lewis",
-      role: "Works in hospitality, loves cooking, very social.",
-      avatar: agent1,
-    },
-    {
-      id: 5,
-      name: "Emma Lewis",
-      role: "Works in hospitality, loves cooking, very social.",
-      avatar: agent1,
-    },
-    {
-      id: 6,
-      name: "Emma Lewis",
-      role: "Works in hospitality, loves cooking, very social.",
-      avatar: agent1,
-    },
-  ];
+  const fetchTeamUps = async () => {
+    try {
+      const res = await fetch(`${apiUrl}space/${id}/teamups`);
+      const data = await res.json();
+      if (data.success) setTeamUps(data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchTeamUps();
+}, [id, apiUrl]);
+
+const handleTeamUpRequest = async () => {
+  if (!user) {
+    toast.warning("Login First");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${apiUrl}space/${id}/teamup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      toast.success("Added in Team Up list!");
+      setTeamUps(prev => [...prev, data.data]);
+    } else {
+      toast.error(data.message || "Failed to request");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Server error");
+  }
+};
 
   if (loading) {
     return <Loader fullScreen />;
   }
 
   if (!space) {
-    return <div className="container mt-10 text-center">No space found.</div>;
+    return <div className="container mt-10 mb-10 text-center">No space found.</div>;
   }
 
   const locationString = getFullLocation(space.city, space.state, space.country);
@@ -456,35 +458,33 @@ export default function DetailPage({ targetUserId }) {
                 Connect and find your perfect match.
               </p>
 
-              <ul className="space-y-4">
-                {interestedPeople.map((person) => (
-                  <li
-                    key={person.id}
-                    className="flex justify-between items-center border-b pb-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={person.avatar}
-                        alt={person.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <h4 className="font-medium text-black">{person.name}</h4>
-                        <p className="text-sm text-black">{person.role}</p>
-                      </div>
-                    </div>
-                    <button className="flex items-center gap-2 bg-black text-white text-sm px-4 py-[12px] rounded-[5px]">
-                      Message <FaArrowRightLong />
-                    </button>
-                  </li>
-                ))}
-              </ul>
+<ul className="space-y-4">
+  {teamUps.map((person) => (
+    <li key={person._id} className="flex justify-between items-center border-b pb-3">
+      <div className="flex items-center gap-3">
+        <img
+          src={person.userId.profile?.photo || defaultImage}
+          alt={person.userId.profile?.firstName}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        <div>
+          <h4 className="font-medium text-black">{person.userId.profile?.firstName} {person.userId.profile?.lastName}</h4>
+          <p className="text-sm text-black">{person.userId.profile?.role || "No role info"}</p>
+        </div>
+      </div>
+      <button className="flex items-center gap-2 bg-black text-white text-sm px-4 py-[12px] rounded-[5px]">
+        Message <FaArrowRightLong />
+      </button>
+    </li>
+  ))}
+</ul>
+
             </div>
 
             <div className="p-4 border-t text-center">
               <button
                 className="bg-[#008000] text-white px-4 py-2 rounded-[12px] font-medium"
-                onClick={() => setShowTeamUp(false)}
+                onClick={handleTeamUpRequest}
               >
                 I’m Interested
               </button>

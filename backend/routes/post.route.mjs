@@ -3,7 +3,9 @@ import {
   createSpace, getSpaces, getSpaceById,
   createTeamUp, getTeamUps, getTeamUpById,
   toggleSavePost, getSavedPosts, getMyAds,
-  createSpaceWanted, getSpaceWanted, getSpaceWantedById
+  createSpaceWanted, getSpaceWanted, getSpaceWantedById,
+  requestTeamUp,
+  getSpaceTeamUps
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
@@ -21,6 +23,8 @@ const uploadFields = upload.fields([
 router.post("/createspaces", auth, uploadFields, validate(createSpaceSchema), createSpace);
 router.get("/spaces", getSpaces);
 router.get("/spaces/:id", getSpaceById);
+router.post("/space/:id/teamup", requestTeamUp);
+router.get("/space/:id/teamups", getSpaceTeamUps);
 router.post("/createteamup", auth, upload.array("photos"), validate(createTeamUpSchema), createTeamUp);
 router.get("/teamups", getTeamUps);
 router.get("/teamup/:id", getTeamUpById);
