@@ -529,31 +529,35 @@ export const getMyAds = async (req, res) => {
       spaceWantedFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
     }
 
-    let sortOption = { createdAt: -1 };
+ let sortOption = { createdAt: -1 };
     if (sort === "Oldest First") sortOption = { createdAt: 1 };
     else if (sort === "Newest First") sortOption = { createdAt: -1 };
 
-    if (category !== "All Category") {
-      if (category === "Space" || category === "Spacewanted") {
-        spaceFilter.postCategory = category;
-        teamUpFilter._skip = true; 
+   if (category !== "All Category") {
+      if (category === "Space") {
+        spaceFilter.postCategory = "Space";
+        teamUpFilter._skip = true;
+        spaceWantedFilter._skip = true;
+      } else if (category === "Spacewanted") {
+        spaceWantedFilter.postCategory = "Spacewanted";
+        spaceFilter._skip = true;
+        teamUpFilter._skip = true;
       } else if (category === "Teamup") {
-        teamUpFilter.postCategory = category;
-        spaceFilter._skip = true; 
+        teamUpFilter.postCategory = "Teamup";
+        spaceFilter._skip = true;
+        spaceWantedFilter._skip = true;
       }
     }
 
-    const [spaces, teamUps, spaceWanteds] = await Promise.all([
+const [spaces, teamUps, spaceWanteds] = await Promise.all([
       spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
       teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
       spaceWantedFilter._skip ? [] : SpaceWanted.find(spaceWantedFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
     ]);
 
-    const combined = [...spaces, ...teamUps, ...spaceWanteds].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
+    const combined = [...spaces, ...teamUps, ...spaceWanteds];
 
-    const totalCount = combined.length;
+      const totalCount = combined.length;
     const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({
