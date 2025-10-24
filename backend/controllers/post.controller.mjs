@@ -402,17 +402,23 @@ export const getTeamUpById = async (req, res) => {
 export const toggleSavePost = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { postId, postCategory } = req.body;
+    let { postId, postCategory, listingPage } = req.body; 
 
-    if (!postId || !postCategory) {
-      return res.status(400).json({ message: "postId and postCategory are required" });
+    if (!postId || !postCategory || !listingPage) {
+      return res.status(400).json({ message: "postId, postCategory and listingPage are required" });
     }
 
     let Model;
     switch (postCategory) {
-      case "Space": Model = Space; break;
-      case "Teamup": Model = TeamUp; break;
-      case "Spacewanted": Model = SpaceWanted; break;
+      case "Space":
+        Model = Space;
+        break;
+      case "Teamup":
+        Model = TeamUp;
+        break;
+      case "Spacewanted":
+        Model = SpaceWanted;
+        break;
       default:
         return res.status(400).json({ message: "Invalid postCategory" });
     }
@@ -420,9 +426,8 @@ export const toggleSavePost = async (req, res) => {
     const post = await Model.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    let effectiveCategory = postCategory;
-
-    if (postCategory === "Spacewanted" && post.teamUp === true) {
+    let effectiveCategory = listingPage; 
+    if (listingPage === "Teamup" && postCategory === "Spacewanted" && post.teamUp === true) {
       effectiveCategory = "Teamup";
     }
 
@@ -481,7 +486,6 @@ export const toggleSavePost = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const getSavedPosts = async (req, res) => {
   try {
