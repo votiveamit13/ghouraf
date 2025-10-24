@@ -24,8 +24,9 @@ export default function DetailPage({ targetUserId }) {
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const [messageLoading, setMessageLoading] = useState(false);
+  const [teamUpMessageLoading, setTeamUpMessageLoading] = useState(false);
   const [teamUps, setTeamUps] = useState([]);
-      const userId = user?._id;
+  const userId = user?._id;
 
   useEffect(() => {
     if (!id) return;
@@ -154,47 +155,59 @@ export default function DetailPage({ targetUserId }) {
   }, [space]);
 
   useEffect(() => {
-  if (!id) return;
+    if (!id) return;
 
-  const fetchTeamUps = async () => {
-    try {
-      const res = await fetch(`${apiUrl}space/${id}/teamups`);
-      const data = await res.json();
-      if (data.success) setTeamUps(data.data);
-    } catch (err) {
-      console.error(err);
+    const fetchTeamUps = async () => {
+      try {
+        const res = await fetch(`${apiUrl}space/${id}/teamups`);
+        const data = await res.json();
+        if (data.success) setTeamUps(data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchTeamUps();
+  }, [id, apiUrl]);
+
+  const handleTeamUpRequest = async () => {
+    if (!userId) {
+      toast.warning("Please login first.");
+      setShowTeamUp(false);
+      return;
     }
-  };
 
-  fetchTeamUps();
-}, [id, apiUrl]);
+    const isInterested = teamUps.some((t) => t.userId._id === userId);
+    const method = isInterested ? "DELETE" : "POST";
 
-const handleTeamUpRequest = async () => {
-        if (!userId) {
-            toast.info("Please login first.");
-            return;
-        }
-
-  try {
-    const res = await fetch(`${apiUrl}space/${id}/teamup`, {
-      method: "POST",
+    try {
+      const res = await fetch(`${apiUrl}space/${id}/teamup`, {
+        method,
         headers: {
           Authorization: `Bearer ${token}`,
         },
-    });
-    const data = await res.json();
+      });
 
-    if (data.success) {
-      toast.success("Added in Team Up list!");
-      setTeamUps(prev => [...prev, data.data]);
-    } else {
-      toast.error(data.message || "Failed to request");
+      const data = await res.json();
+
+      if (data.success) {
+        if (isInterested) {
+          setTeamUps((prev) => prev.filter((t) => t.userId._id !== userId));
+          toast.info("Removed your request.");
+        } else {
+          toast.success("Added in Team Up list!");
+          const refetch = await fetch(`${apiUrl}space/${id}/teamups`);
+          const refetchData = await refetch.json();
+          if (refetchData.success) setTeamUps(refetchData.data);
+        }
+      } else {
+        toast.error(data.message || "Failed to process request");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error");
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Server error");
-  }
-};
+  };
 
   if (loading) {
     return <Loader fullScreen />;
@@ -212,10 +225,10 @@ const handleTeamUpRequest = async () => {
   ];
 
   const handleMessageClick = async () => {
-      if (!user) {
-    toast.warning("Login First");
-    return;
-  }
+    if (!user) {
+      toast.warning("Login First");
+      return;
+    }
     if (!user || !space?.user?._id) return;
 
     if (user._id === space.user._id) return;
@@ -236,11 +249,11 @@ const handleTeamUpRequest = async () => {
   return (
     <>
       <div className="container px-4 mt-5">
-          <button className="text-sm px-4 py-2 font-medium text-black border-[1px] border-[#AACCEE] rounded-[2px]">
-            <Link to={`/spaces`} className="flex items-center gap-2">
-                <FaArrowLeftLong />  Back to Ads
-            </Link>
-          </button>
+        <button className="text-sm px-4 py-2 font-medium text-black border-[1px] border-[#AACCEE] rounded-[2px]">
+          <Link to={`/spaces`} className="flex items-center gap-2">
+            <FaArrowLeftLong />  Back to Ads
+          </Link>
+        </button>
       </div>
 
       <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -455,40 +468,90 @@ const handleTeamUpRequest = async () => {
             </div>
 
             <div className="p-4 max-h-[70vh] overflow-y-auto">
-              <p className="text-gray-600 border-b pb-3 mb-4">
-                These people have shown interest in sharing this apartment.  <br />
-                Connect and find your perfect match.
-              </p>
+              {teamUps.length > 0 ? (
+                <>
+                  <p className="text-gray-600 border-b pb-3 mb-4">
+                    These people have shown interest in sharing this apartment. <br />
+                    Connect and find your perfect match.
+                  </p>
 
-<ul className="space-y-4">
-  {teamUps.map((person) => (
-    <li key={person._id} className="flex justify-between items-center border-b pb-3">
-      <div className="flex items-center gap-3">
-        <img
-          src={person.userId.profile?.photo || defaultImage}
-          alt={person.userId.profile?.firstName}
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <div>
-          <h4 className="font-medium text-black">{person.userId.profile?.firstName} {person.userId.profile?.lastName}</h4>
-          <p className="text-sm text-black">{person.userId.profile?.role || "No role info"}</p>
-        </div>
-      </div>
-      <button className="flex items-center gap-2 bg-black text-white text-sm px-4 py-[12px] rounded-[5px]">
-        Message <FaArrowRightLong />
-      </button>
-    </li>
-  ))}
-</ul>
-
+                  <ul className="space-y-4">
+                    {teamUps.map((person) => (
+                      <li
+                        key={person._id}
+                        className="flex justify-between items-center border-b pb-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={person.userId.profile?.photo || defaultImage}
+                            alt={person.userId.profile?.firstName}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div>
+                            <h4 className="font-medium text-black">
+                              {person.userId.profile?.firstName}{" "}
+                              {person.userId.profile?.lastName}
+                            </h4>
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            if (!user) return toast.warning("Login First");
+                            if (person.userId._id === userId) return;
+                            try {
+                              setTeamUpMessageLoading(person.userId._id);
+                              const chatId = await getChatId(user._id, person.userId._id);
+                              navigate(
+                                `/user/messages/${chatId}?receiverId=${person.userId._id}`
+                              );
+                            } catch (err) {
+                              console.error(err);
+                            } finally {
+                              setTeamUpMessageLoading(null);
+                            }
+                          }}
+                          disabled={
+                            !userId ||
+                            teamUpMessageLoading === person.userId._id ||
+                            person.userId._id === userId
+                          }
+                          className={`flex items-center gap-2 text-white text-sm px-4 py-[12px] rounded-[5px] ${person.userId._id === userId
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-[#565ABF]"
+                            }`}
+                        >
+                          {teamUpMessageLoading === person.userId._id ? (
+                            <div className="flex items-center justify-center w-6 h-6">
+                              <div className="transform scale-50">
+                                <Loader />
+                              </div>
+                            </div>
+                          ) : (
+                            <>Message <FaArrowRightLong /></>
+                          )}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p className="text-gray-500 text-center py-6">
+                  No one interested yet.
+                </p>
+              )}
             </div>
 
             <div className="p-4 border-t text-center">
               <button
-                className="bg-[#008000] text-white px-4 py-2 rounded-[12px] font-medium"
+                className={`${teamUps.some((t) => t.userId._id === userId)
+                  ? "bg-[#FF0000]"
+                  : "bg-[#008000]"
+                  } text-white px-4 py-3 rounded-[12px] font-medium`}
                 onClick={handleTeamUpRequest}
               >
-                I’m Interested
+                {teamUps.some((t) => t.userId._id === userId)
+                  ? "Remove Request"
+                  : "I’m Interested"}
               </button>
             </div>
           </div>

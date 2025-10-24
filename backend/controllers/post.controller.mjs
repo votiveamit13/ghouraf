@@ -245,6 +245,30 @@ export const getSpaceTeamUps = async (req, res) => {
   }
 };
 
+export const removeTeamUp = async (req,res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const removed = await SpaceTeamUps.findOneAndDelete({ postId: id, userId });
+
+    if(!removed) {
+      return res.status(404).json({
+        success: false,
+        message: "You have not requested to team up on this post.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Removed successfully.",
+    });
+  } catch (err) {
+    console.error("Error removing team up:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 //TeampUp
 export const createTeamUp = async (req, res) => {
   try {
