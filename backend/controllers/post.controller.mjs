@@ -408,7 +408,7 @@ export const toggleSavePost = async (req, res) => {
       return res.status(400).json({ message: "postId and postCategory are required" });
     }
 
-        let Model;
+    let Model;
     switch (postCategory) {
       case "Space": Model = Space; break;
       case "Teamup": Model = TeamUp; break;
@@ -420,6 +420,11 @@ export const toggleSavePost = async (req, res) => {
     const post = await Model.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
+    let effectiveCategory = postCategory;
+    if (postCategory === "Spacewanted" && post.teamUp === true) {
+      effectiveCategory = "Teamup";
+    }
+
     const existing = await SavedPost.findOne({ user: userId, postId, postCategory: effectiveCategory });
     if (existing) {
       await existing.deleteOne();
@@ -427,7 +432,7 @@ export const toggleSavePost = async (req, res) => {
     }
 
     let snapshot;
-    if (postCategory === "Space") {
+    if (effectiveCategory === "Space") {
       snapshot = {
         title: post.title,
         country: post.country,
@@ -439,7 +444,7 @@ export const toggleSavePost = async (req, res) => {
         budget: post.budget,
         budgetType: post.budgetType,
         description: post.description,
-        photo: post.featuredImage
+        photo: post.featuredImage,
       };
     } else {
       snapshot = {
@@ -464,11 +469,13 @@ export const toggleSavePost = async (req, res) => {
 
     await savedPost.save();
     return res.status(201).json({ message: "Saved successfully", saved: true });
+
   } catch (err) {
-    console.error(err);
+    console.error("Toggle Save Post Error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 export const getSavedPosts = async (req, res) => {
   try {
