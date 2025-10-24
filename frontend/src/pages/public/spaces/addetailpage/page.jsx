@@ -22,9 +22,10 @@ export default function DetailPage({ targetUserId }) {
   const [showTeamUp, setShowTeamUp] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [messageLoading, setMessageLoading] = useState(false);
   const [teamUps, setTeamUps] = useState([]);
+      const userId = user?._id;
 
   useEffect(() => {
     if (!id) return;
@@ -169,16 +170,17 @@ export default function DetailPage({ targetUserId }) {
 }, [id, apiUrl]);
 
 const handleTeamUpRequest = async () => {
-  if (!user) {
-    toast.warning("Login First");
-    return;
-  }
+        if (!userId) {
+            toast.info("Please login first.");
+            return;
+        }
 
   try {
     const res = await fetch(`${apiUrl}space/${id}/teamup`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
     });
     const data = await res.json();
 
