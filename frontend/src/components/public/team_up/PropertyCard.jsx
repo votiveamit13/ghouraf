@@ -48,7 +48,7 @@ export default function PropertyCard({ property }) {
         try {
             const res = await axios.post(`${apiUrl}save`, {
                 postId: property._id,
-                postCategory: "Teamup"
+                postCategory: property.postCategory || "Teamup",
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`,

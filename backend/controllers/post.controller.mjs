@@ -421,11 +421,17 @@ export const toggleSavePost = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     let effectiveCategory = postCategory;
+
     if (postCategory === "Spacewanted" && post.teamUp === true) {
       effectiveCategory = "Teamup";
     }
 
-    const existing = await SavedPost.findOne({ user: userId, postId, postCategory: effectiveCategory });
+    const existing = await SavedPost.findOne({
+      user: userId,
+      postId,
+      postCategory: effectiveCategory,
+    });
+
     if (existing) {
       await existing.deleteOne();
       return res.status(200).json({ message: "Removed from saved", saved: false });
