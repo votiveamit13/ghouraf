@@ -408,22 +408,23 @@ export const toggleSavePost = async (req, res) => {
       return res.status(400).json({ message: "postId and postCategory are required" });
     }
 
-    const existing = await SavedPost.findOne({ user: userId, postId, postCategory });
-    if (existing) {
-      await existing.deleteOne();
-      return res.status(200).json({ message: "Removed from saved", saved: false });
-    }
-
-    let Model;
+        let Model;
     switch (postCategory) {
       case "Space": Model = Space; break;
       case "Teamup": Model = TeamUp; break;
       case "Spacewanted": Model = SpaceWanted; break;
-      default: return res.status(400).json({ message: "Invalid postCategory" });
+      default:
+        return res.status(400).json({ message: "Invalid postCategory" });
     }
 
     const post = await Model.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const existing = await SavedPost.findOne({ user: userId, postId, postCategory: effectiveCategory });
+    if (existing) {
+      await existing.deleteOne();
+      return res.status(200).json({ message: "Removed from saved", saved: false });
+    }
 
     let snapshot;
     if (postCategory === "Space") {
@@ -440,18 +441,6 @@ export const toggleSavePost = async (req, res) => {
         description: post.description,
         photo: post.featuredImage
       };
-    } else if (postCategory === "Teamup") {
-      snapshot = {
-        title: post.title,
-        country: post.country,
-        state: post.state,
-        city: post.city,
-        roommatePref: post.roommatePref,
-        budget: post.budget,
-        budgetType: post.budgetType,
-        description: post.description,
-        photo: post.photos
-      };
     } else {
       snapshot = {
         title: post.title,
@@ -462,13 +451,18 @@ export const toggleSavePost = async (req, res) => {
         budget: post.budget,
         budgetType: post.budgetType,
         description: post.description,
-        photo: post.photos
+        photo: post.photos,
       };
     }
 
-    const savedPost = new SavedPost({ user: userId, postCategory, postId, snapshot });
-    await savedPost.save();
+    const savedPost = new SavedPost({
+      user: userId,
+      postCategory: effectiveCategory,
+      postId,
+      snapshot,
+    });
 
+    await savedPost.save();
     return res.status(201).json({ message: "Saved successfully", saved: true });
   } catch (err) {
     console.error(err);
