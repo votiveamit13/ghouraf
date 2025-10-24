@@ -47,9 +47,11 @@ export default function PropertyCard({ property }) {
         }
 
         try {
+            const listingPage = "Space";
             const res = await axios.post(`${apiUrl}save`, {
                 postId: property._id,
-                postCategory: "Space"
+                 postCategory: listingPage, 
+            listingPage: listingPage
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
