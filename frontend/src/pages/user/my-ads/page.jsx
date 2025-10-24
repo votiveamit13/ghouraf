@@ -89,19 +89,21 @@ export default function MyAds() {
                         ))}
                     </select>
 
-                    <select
-                        value={sort}
-                        onChange={(e) => {
-                            setSort(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="w-full md:w-[155px] h-[42px] border-[1px] border-[#D1D5DB] rounded-[5px] py-2 px-2">
-                        {["Recently posted", "Newest First", "Oldest First"].map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
+<select
+  value={sort}
+  onChange={(e) => {
+      setSort(e.target.value);
+      setCurrentPage(1);
+  }}
+  className="w-full md:w-[155px] h-[42px] border-[1px] border-[#D1D5DB] rounded-[5px] py-2 px-2"
+>
+  {["Recently posted", "Oldest First"].map((option) => (
+      <option key={option} value={option}>
+          {option}
+      </option>
+  ))}
+</select>
+
                 </div>
             </div>
 
