@@ -159,7 +159,7 @@ export default function ContactUs() {
                 </div>
             </section>
 
-
+{/* 
             <section className="w-full h-[400px]">
                 <iframe
                     title="flatmate"
@@ -170,7 +170,7 @@ export default function ContactUs() {
                     loading="lazy"
                     className="rounded-t-md"
                 ></iframe>
-            </section>
+            </section> */}
         </div>
     );
 }

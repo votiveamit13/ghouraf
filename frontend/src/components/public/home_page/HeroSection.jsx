@@ -78,11 +78,11 @@ export default function HeroSection() {
     >
       <div className="absolute inset-0 bg-black/40"></div>
 
-      <div className="relative z-10 text-center px-4 max-w-3xl mt-[150px]">
+      <div className="relative z-10 text-center px-4 max-w-3xl">
         <h1 className="text-white text-3xl sm:text-5xl font-bold mb-2">
           Welcome! Let’s get started
         </h1>
-        <p className="text-white text-lg sm:text-xl mb-6">
+        <p className="text-white text-lg sm:text-xl mb-4">
           Find the right home for you
         </p>
 

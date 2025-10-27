@@ -19,10 +19,6 @@ export default function UserDashboard() {
       <h1 className="text-[25px] font-bold text-black">
         Welcome <span className="text-[#A321A6]">{user.profile?.firstName}</span>
       </h1>
-      <div className="bg-[#E9E8E8] rounded-[10px] d-flex md:w-[25%] w-full px-4 py-3 mt-3 align-center">
-        <span className="text-[15px] text-black">Your account is a basic account
-        </span>
-      </div>
       <div className="p-5 grid grid-cols-1 md:grid-cols-4 gap-5 mt-5 rounded-[12px] border border-[#D7D7D7] shadow-[0px_12px_48px_0px_#0022330F]">
         <button className="align-left text-left" onClick={() => navigate("/user/messages")}>
           <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">

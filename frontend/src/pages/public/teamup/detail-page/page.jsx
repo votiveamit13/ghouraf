@@ -154,13 +154,12 @@ export default function TeamUpDetailPage() {
     }
 
     if (!teamup) {
-        return <div className="container mt-10 text-center">No team up found.</div>;
+        return <div className="container mt-10 mb-10 text-center">No team up found.</div>;
     }
 
     const locationString = getFullLocation(teamup.city, teamup.state, teamup.country);
 
     const images = [
-        teamup.featuredImage,
         ...(teamup.photos?.map((p) => p.url) || []),
     ];
 

@@ -496,9 +496,12 @@ export default function DetailPage({ targetUserId }) {
                         </div>
                         <button
                           onClick={async () => {
-                            if (!user) return toast.warning("Login First");
-                            if (person.userId._id === userId) return;
-                            try {
+                      if (!user) {
+                        toast.warning("Login First");
+                        return;
+                      }
+                      if (person.userId._id === userId) return;
+                      try {
                               setTeamUpMessageLoading(person.userId._id);
                               const chatId = await getChatId(user._id, person.userId._id);
                               navigate(
@@ -516,8 +519,8 @@ export default function DetailPage({ targetUserId }) {
                             person.userId._id === userId
                           }
                           className={`flex items-center gap-2 text-white text-sm px-4 py-[12px] rounded-[5px] ${person.userId._id === userId
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-[#565ABF]"
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-[#565ABF]"
                             }`}
                         >
                           {teamUpMessageLoading === person.userId._id ? (

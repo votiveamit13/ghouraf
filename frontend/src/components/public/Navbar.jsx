@@ -21,6 +21,7 @@ import Loader from "components/common/Loader";
 import EmailVerification from "components/user/EmailVerification";
 import { getErrorMessage } from "utils/errorHandler";
 import PostAdDialog from "components/common/PostAdDialog";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function Navbar() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -56,6 +57,9 @@ export default function Navbar() {
   const [forgotDialog, setForgotDialog] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
+  const [showInvalidDialog, setShowInvalidDialog] = useState(false);
+  const [showMoreInfoMobile, setShowMoreInfoMobile] = useState(false);
+
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -201,7 +205,11 @@ export default function Navbar() {
       }
 
       if (res.error) {
-        toast.error(res.message || "Something went wrong. Try again later.");
+        if (res.message?.toLowerCase().includes("invalid email or password")) {
+          setShowInvalidDialog(true);
+        } else {
+          toast.error(res.message || "Something went wrong. Try again later.");
+        }
         return;
       }
 
@@ -218,7 +226,12 @@ export default function Navbar() {
 
       toast.error("Unexpected login response");
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      const errorCode = err.code || "";
+      if (errorCode === "auth/invalid-credential" || errorCode === "auth/wrong-password" || errorCode === "auth/user-not-found") {
+        setShowInvalidDialog(true);
+      } else {
+        toast.error(getErrorMessage(err));
+      }
     } finally {
       setLoginLoading(false);
     }
@@ -286,21 +299,61 @@ export default function Navbar() {
           </NavLink>
 
           {/* DESKTOP MENU */}
-          <div className="hidden md:flex space-x-8">
-            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
-              <NavLink
-                key={item}
-                to={`/${item}`}
-                className={({ isActive }) =>
-                  `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
-                  }`
-                }
-              >
-                {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-              </NavLink>
-            ))}
+          <div className="hidden md:flex space-x-8 relative">
+  {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
+    if (item === "more-info") {
+      return (
+<div key={item} className="relative group">
+  <button
+    className={`font-semibold ${linkClass} text-[#565ABF]`}
+  >
+    More Info
+  </button>
 
-          </div>
+  <div
+    className="pointer-events-none absolute left-0 mt-2 w-40"
+  >
+    <div
+      className="pointer-events-auto bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50"
+    >
+      <NavLink
+        to="/about-us"
+        className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+      >
+        About Us
+      </NavLink>
+      <NavLink
+        to="/contact-us"
+        className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+      >
+        Contact Us
+      </NavLink>
+      <NavLink
+        to="/faq"
+        className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+      >
+        FAQ
+      </NavLink>
+    </div>
+  </div>
+</div>
+
+      );
+    }
+
+    return (
+      <NavLink
+        key={item}
+        to={`/${item}`}
+        className={({ isActive }) =>
+          `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+        }
+      >
+        {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+      </NavLink>
+    );
+  })}
+</div>
 
           <div className="hidden md:flex items-center space-x-6">
             {!user ? (
@@ -401,18 +454,62 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       {isOpen && (
         <div className="md:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4">
-          {["spaces", "place-wanted", "team-up", "more-info"].map((item) => (
+{["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
+  if (item === "more-info") {
+    return (
+      <div key={item} className="space-y-1">
+        <button
+          onClick={() => setShowMoreInfoMobile((prev) => !prev)}
+          className={`flex justify-between items-center w-full text-left ${linkClass} text-[#565ABF]`}
+        >
+          <span>{item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+          {/* <span>{showMoreInfoMobile ? "▲" : "▼"}</span> */}
+        </button>
+
+        {showMoreInfoMobile && (
+          <div className="pl-4 space-y-2">
             <NavLink
-              key={item}
-              to={`/${item}`}
-              className={({ isActive }) =>
-                `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"
-                }`
-              }
+              to="/about-us"
+              onClick={() => setIsOpen(false)}
+              className="block text-[#565abf] hover:text-[#565ABF]"
             >
-              {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              About Us
             </NavLink>
-          ))}
+            <NavLink
+              to="/contact-us"
+              onClick={() => setIsOpen(false)}
+              className="block text-[#565abf] hover:text-[#565ABF]"
+            >
+              Contact Us
+            </NavLink>
+            <NavLink
+              to="/faq"
+              onClick={() => setIsOpen(false)}
+              className="block text-[#565abf] hover:text-[#565ABF]"
+            >
+              FAQ
+            </NavLink>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Default links
+  return (
+    <NavLink
+      key={item}
+      to={`/${item}`}
+      onClick={() => setIsOpen(false)}
+      className={({ isActive }) =>
+        `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+      }
+    >
+      {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+    </NavLink>
+  );
+})}
+
 
           {!user ? (
             <>
@@ -967,6 +1064,21 @@ export default function Navbar() {
         />
       )}
       <PostAdDialog open={open} onClose={() => setOpen(false)} />
+      <ConfirmationDialog
+        show={showInvalidDialog}
+        title="Invalid Credentials"
+        message="The email or password you entered is incorrect. Please try again."
+        onConfirm={() => { }}
+        onCancel={() => setShowInvalidDialog(false)}
+      />
+      <style>
+        {`
+    .fixed.inset-0.bg-black\\/50 .bg-white button.bg-red-600 {
+      display: none !important;
+    }
+  `}
+      </style>
+
     </nav>
   );
 }

@@ -154,13 +154,12 @@ export default function SpaceWantedDetailPage() {
     }
 
     if (!spacewanted) {
-        return <div className="container mt-10 text-center">No space wanted found.</div>;
+        return <div className="container mt-10 mb-10 text-center">No space wanted found.</div>;
     }
 
     const locationString = getFullLocation(spacewanted.city, spacewanted.state, spacewanted.country);
 
     const images = [
-        spacewanted.featuredImage,
         ...(spacewanted.photos?.map((p) => p.url) || []),
     ];
 

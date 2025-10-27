@@ -46,17 +46,12 @@ export default function Footer() {
             </li>
             <li>
               <a href="/about-us" className="hover:text-white d-flex align-items-center">
-                <IoIosArrowForward color="#565ABF"/> About
+                <IoIosArrowForward color="#565ABF"/> About Us
               </a>
             </li>
             <li>
               <a href="/" className="hover:text-white d-flex align-items-center">
                 <IoIosArrowForward color="#565ABF"/> Services
-              </a>
-            </li>
-            <li>
-              <a href="/" className="hover:text-white d-flex align-items-center">
-                <IoIosArrowForward color="#565ABF"/> Who We Are
               </a>
             </li>
                         <li>
