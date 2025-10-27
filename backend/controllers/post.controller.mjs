@@ -811,8 +811,8 @@ export const updateAd = async (req, res) => {
   try {
     const { id } = req.params;
     const { postCategory } = req.body;
-
     let Model;
+
     switch (postCategory) {
       case "Space":
         Model = Space;
@@ -827,7 +827,25 @@ export const updateAd = async (req, res) => {
         return res.status(400).json({ message: "Invalid post category" });
     }
 
-    const updatedAd = await Model.findByIdAndUpdate(id, req.body, {
+    const updatedData = { ...req.body };
+
+    if (req.files) {
+      if (req.files.featuredImage && req.files.featuredImage[0]) {
+        updatedData.featuredImage = `/uploads/${req.files.featuredImage[0].filename}`;
+      }
+
+      if (req.files.photos && req.files.photos.length > 0) {
+        updatedData.photos = req.files.photos.map((f) => ({
+          url: `/uploads/${f.filename}`,
+        }));
+      } else if (req.body.existingPhotos) {
+        updatedData.photos = Array.isArray(req.body.existingPhotos)
+          ? req.body.existingPhotos.map((url) => ({ url }))
+          : [{ url: req.body.existingPhotos }];
+      }
+    }
+
+    const updatedAd = await Model.findByIdAndUpdate(id, updatedData, {
       new: true,
     });
 

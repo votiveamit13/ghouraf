@@ -32,7 +32,7 @@ router.get("/teamup/:id", getTeamUpById);
 router.post("/save", auth, toggleSavePost);
 router.get("/save/list", auth, getSavedPosts);
 router.get("/my-ads", auth, getMyAds);
-router.put("/my-ads/:id", auth, updateAd);
+router.put("/my-ads/:id", auth, upload.array("photos"), updateAd);
 router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 router.get("/spacewanted", getSpaceWanted);
 router.get("/spacewanted/:id", getSpaceWantedById);
