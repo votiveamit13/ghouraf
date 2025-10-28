@@ -42,10 +42,10 @@ export const createSpaceSchema = Joi.object({
         }),
 
     personalInfo: Joi.string()
-        .valid("Landlord", "Agent")
+        .valid("Landlord", "Agent", "Flatmate")
         .required()
         .messages({
-            "any.only": "Personal Info must be either 'Landlord' or 'Agent'",
+            "any.only": "Personal Info must be either 'Landlord', 'Agent' or 'Flatmate'",
             "string.empty": "Personal Info is required",
         }),
 
