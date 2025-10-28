@@ -59,7 +59,7 @@ export const createSpaceSchema = Joi.object({
         }),
 
 furnishing: Joi.boolean().truthy("true").falsy("false").required(),
-  smoking: Joi.boolean().truthy("true").falsy("false").required(),
+  smoking: Joi.boolean().truthy("true").falsy("false"),
 
     roomsAvailableFor: Joi.string()
         .valid(...roomAvailableForType)

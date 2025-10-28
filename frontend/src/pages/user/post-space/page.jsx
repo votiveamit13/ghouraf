@@ -70,33 +70,6 @@ function StepHeader({ step }) {
   );
 }
 
-const validateStep1 = (formData, errors) => {
-  const stepErrors = {};
-
-  if (!formData.title) stepErrors.title = ["Title is required"];
-  if (!formData.propertyType) stepErrors.propertyType = ["Property Type is required"];
-  if (!formData.budgetType) stepErrors.budgetType = ["Budget Type is required"];
-  if (!formData.budget) {
-    stepErrors.budget = ["Budget is required"];
-  } else if (Number(formData.budget) <= 0) {
-    stepErrors.budget = ["Budget must be greater than 0"];
-  } else if (Number(formData.budget) > 100000) {
-    stepErrors.budget = ["Budget cannot exceed 1,00,000"];
-  }
-
-  if (!formData.personalInfo) stepErrors.personalInfo = ["Personal Info is required"];
-  if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
-  if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
-  if (formData.smoking === "") stepErrors.smoking = ["Smoking preference is required"];
-  if (!formData.roomsAvailableFor) stepErrors.roomsAvailableFor = ["Rooms available for is required"];
-  if (!formData.bedrooms) stepErrors.bedrooms = ["Number of bedrooms is required"];
-  if (!formData.country) stepErrors.country = ["Country is required"];
-  if (!formData.state) stepErrors.state = ["State is required"];
-  if (!formData.city) stepErrors.city = ["City is required"];
-
-  return { ...errors, ...stepErrors };
-};
-
 const validateStep2 = (formData, featured, errors) => {
   const stepErrors = {};
 
@@ -151,36 +124,93 @@ export default function PostSpace() {
   const states = formData.country ? State.getStatesOfCountry(formData.country) : [];
   const cities = formData.state ? City.getCitiesOfState(formData.country, formData.state) : [];
 
+  const validateStep1 = (formData, errors) => {
+  const stepErrors = {};
+
+  if (!formData.title) stepErrors.title = ["Title is required"];
+  if (!formData.propertyType) stepErrors.propertyType = ["Property Type is required"];
+  if (!formData.budgetType) stepErrors.budgetType = ["Budget Type is required"];
+  if (!formData.budget) {
+    stepErrors.budget = ["Budget is required"];
+  } else if (Number(formData.budget) <= 0) {
+    stepErrors.budget = ["Budget must be greater than 0"];
+  } else if (Number(formData.budget) > 100000) {
+    stepErrors.budget = ["Budget cannot exceed 1,00,000"];
+  }
+
+  if (!formData.personalInfo) stepErrors.personalInfo = ["Personal Info is required"];
+  if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
+  if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
+  // if (formData.smoking === "") stepErrors.smoking = ["Smoking preference is required"];
+  if (!formData.roomsAvailableFor) stepErrors.roomsAvailableFor = ["Property Available is required"];
+  if (!formData.bedrooms) stepErrors.bedrooms = ["Number of bedrooms is required"];
+  if (!formData.country) stepErrors.country = ["Country is required"];
+  if (!formData.state) stepErrors.state = ["State is required"];
+  if (cities.length > 0 && !formData.city) {
+    stepErrors.city = ["City is required"];
+  } else if (cities.length === 0 && !formData.city && formData.city !== "NA") {
+    formData.city = "NA";
+  }
+
+  return { ...errors, ...stepErrors };
+};
+
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       setErrors({});
     }
   }, [formData, featured, photos]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (eOrName, value) => {
+    let name, val;
 
-    setFormData((prev) => {
-      let newValue;
+    if (typeof eOrName === "string") {
+      name = eOrName;
+      val = value;
+    if (name === "state") {
+      const newStates = State.getStatesOfCountry(formData.country);
+      const newCities = City.getCitiesOfState(formData.country, value);
+      
+      setFormData((prev) => ({
+        ...prev,
+        state: val,
+        city: newCities.length === 0 ? "NA" : "" 
+      }));
+      setErrors((prev) => ({ ...prev, city: undefined }));
+      return;
+    }
+  } else if (eOrName?.target) {
+    const { name: targetName, value: targetValue, type, checked } = eOrName.target;
+    name = targetName;
 
       if ((name === "size" || name === "budget") && type === "text") {
-        newValue = value.replace(/[^0-9]/g, "");
+        val = targetValue.replace(/[^0-9]/g, "");
       } else if (type === "checkbox" && name === "amenities") {
-        newValue = checked
-          ? [...prev.amenities, value]
-          : prev.amenities.filter((a) => a !== value);
+        setFormData((prev) => ({
+          ...prev,
+          amenities: checked
+            ? [...prev.amenities, targetValue]
+            : prev.amenities.filter((a) => a !== targetValue),
+        }));
+        setErrors((prev) => ({ ...prev, [name]: undefined }));
+        return;
       } else if (type === "checkbox") {
-        newValue = checked;
+        val = checked;
       } else {
-        newValue = value;
+        val = targetValue;
       }
+    } else {
+      console.warn("Invalid handleChange call:", eOrName);
+      return;
+    }
 
-      return { ...prev, [name]: newValue };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: val,
+    }));
 
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
-
 
   const handleFeaturedUpload = (e) => {
     const file = e.target.files[0];
@@ -207,7 +237,7 @@ export default function PostSpace() {
 
     switch (step) {
       case 1:
-        stepErrors = validateStep1(formData, errors);
+        stepErrors = validateStep1(formData, errors, cities);
         break;
       case 2:
         stepErrors = validateStep2(formData, featured, errors);
@@ -234,6 +264,15 @@ export default function PostSpace() {
     setStep((s) => Math.max(1, s - 1));
     setErrors({});
   };
+
+  useEffect(() => {
+  if (formData.state && cities.length === 0 && formData.city !== "NA") {
+    setFormData(prev => ({
+      ...prev,
+      city: "NA"
+    }));
+  }
+}, [cities, formData.state, formData.city]);
 
   const handlePublish = async () => {
     setIsSubmitting(true);
@@ -447,6 +486,7 @@ export default function PostSpace() {
                   <option value="">Select</option>
                   <option value="Landlord">Landlord</option>
                   <option value="Agent">Agent</option>
+                  <option value="Flatmate">Flatmate</option>
                 </select>
                 {errors.personalInfo && <div className="text-red-500 text-sm mt-1">{errors.personalInfo[0]}</div>}
               </div>
@@ -487,15 +527,15 @@ export default function PostSpace() {
                   value={formData.smoking}
                   onChange={handleChange}
                 >
-                  <option value="">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
+                  <option value="">In different</option>
+                  <option value="true">Allowed</option>
+                  <option value="false">Not Allowed</option>
                 </select>
                 {errors.smoking && <div className="text-red-500 text-sm mt-1">{errors.smoking[0]}</div>}
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">Rooms available for</label>
+                <label className="form-label text-black">Property Available</label>
                 <select
                   className={`form-control`}
                   name="roomsAvailableFor"
@@ -573,23 +613,28 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-                <label className="form-label text-black">City</label>
-                <select
-                  className={`form-control`}
-                  name="city"
-                  value={formData.city}
-                  onChange={(e) => handleChange("city", e.target.value)}
-                  disabled={!formData.state}
-                >
-                  <option value="">Select City</option>
-                  {cities.map((city) => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.city && <div className="text-red-500 text-sm mt-1">{errors.city[0]}</div>}
-              </div>
+  <label className="form-label text-black">City</label>
+  <select
+    name="city"
+    value={cities.length === 0 ? "NA" : formData.city}
+    onChange={(e) => handleChange("city", e.target.value)}
+    className="form-control"
+  >
+    {cities.length > 0 ? (
+      <>
+        <option value="">Select City</option>
+        {cities.map((city) => (
+          <option key={city.name} value={city.name}>
+            {city.name}
+          </option>
+        ))}
+      </>
+    ) : (
+      <option value="NA">No City Available</option>
+    )}
+  </select>
+  {errors.city && <div className="text-red-500 text-sm mt-1">{errors.city[0]}</div>}
+</div>
 
               <div className="col-md-12">
                 <label className="form-label text-black">Location</label>

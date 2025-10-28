@@ -193,6 +193,7 @@ export default function Filters({ filters, setFilters, setPage }) {
             <option value="all">All</option>
             <option value="Landlord">Landlord</option>
             <option value="Agent">Agent</option>
+            <option value="Flatmate">Flatmate</option>
           </select>
         </div>
       </div>
