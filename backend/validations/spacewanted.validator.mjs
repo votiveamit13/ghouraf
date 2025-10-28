@@ -25,13 +25,13 @@ export const createSpaceWantedSchema = Joi.object({
   propertyType: Joi.string()
     .required()
     .messages({
-      "string.empty": "Property Type is required",
+      "string.empty": "Space Wanted Type is required",
     }),
 
   roomSize: Joi.string()
     .required()
     .messages({
-      "string.empty": "Room Size is required",
+      "string.empty": "Space Size is required",
     }),
 
   country: Joi.string()
@@ -52,11 +52,11 @@ export const createSpaceWantedSchema = Joi.object({
       "string.empty": "City is required",
     }),
 
-  zip: Joi.string()
-    .required()
-    .messages({
-      "string.empty": "ZIP code is required",
-    }),
+  // zip: Joi.string()
+  //   .required()
+  //   .messages({
+  //     "string.empty": "ZIP code is required",
+  //   }),
 
   budget: Joi.number()
     .positive()
@@ -75,7 +75,7 @@ export const createSpaceWantedSchema = Joi.object({
       "string.empty": "Budget Type is required",
     }),
 
-  moveInDate: Joi.date().optional(),
+  moveInDate: Joi.string().optional(),
 
   period: Joi.string()
     .required()
@@ -84,13 +84,7 @@ export const createSpaceWantedSchema = Joi.object({
     }),
 
   amenities: Joi.array()
-    .items(Joi.string())
-    .min(1)
-    .required()
-    .messages({
-      "array.min": "At least one amenity is required",
-      "any.required": "Amenities are required",
-    }),
+    .items(Joi.string()).optional(),
 
   name: Joi.string()
     .required()
@@ -118,18 +112,18 @@ export const createSpaceWantedSchema = Joi.object({
     }),
 
   occupation: Joi.string()
-    .valid("Student", "Professionals")
+    .valid("Student", "Professional")
     .required()
     .messages({
-      "any.only": "Occupation must be 'Student' or 'Professionals'",
+      "any.only": "Occupation must be 'Student' or 'Professional'",
       "string.empty": "Occupation is required",
     }),
 
   smoke: Joi.string()
-    .valid("Yes", "No")
+    .valid("Yes", "No", "Sometimes")
     .optional()
     .messages({
-      "any.only": "Smoke must be 'Yes' or 'No'",
+      "any.only": "Smoke must be 'Yes', 'No' or 'Sometimes'",
     }),
 
   pets: Joi.string()
@@ -139,15 +133,15 @@ export const createSpaceWantedSchema = Joi.object({
       "any.only": "Pets must be 'Yes' or 'No'",
     }),
 
-  language: Joi.string().allow("").optional(),
+  // language: Joi.string().allow("").optional(),
 
-  roommatePref: Joi.string()
-    .valid(...roomAvailableForType)
-    .required()
-    .messages({
-      "any.only": `Roommate Preference must be one of: ${roomAvailableForType.join(", ")}`,
-      "string.empty": "Roommate Preference is required",
-    }),
+  // roommatePref: Joi.string()
+  //   .valid(...roomAvailableForType)
+  //   .required()
+  //   .messages({
+  //     "any.only": `Roommate Preference must be one of: ${roomAvailableForType.join(", ")}`,
+  //     "string.empty": "Roommate Preference is required",
+  //   }),
 
   photos: Joi.array()
     .items(

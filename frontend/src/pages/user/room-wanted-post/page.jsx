@@ -5,8 +5,10 @@ import locales from "locale-codes";
 import { toast } from "react-toastify";
 import { FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
 
 export default function RoomWantedAd() {
+    const { user } = useAuth();
     const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [allLocales, setAllLocales] = useState([]);
@@ -17,7 +19,7 @@ export default function RoomWantedAd() {
         country: "",
         state: "",
         city: "",
-        zip: "",
+        // zip: "",
         budget: "",
         budgetType: "",
         moveInDate: "",
@@ -29,15 +31,14 @@ export default function RoomWantedAd() {
         occupation: "",
         smoke: "",
         pets: "",
-        language: "",
-        roommatePref: "",
+        // language: "",
+        // roommatePref: "",
         title: "",
         description: "",
         teamUp: false,
     });
     const [images, setImages] = useState([]);
     const [errors, setErrors] = useState({});
-
     const countries = Country.getAllCountries();
     const cities = useMemo(() => {
         if (!formData.country) return [];
@@ -57,7 +58,7 @@ export default function RoomWantedAd() {
         setFormData((prev) => {
             let newValue;
 
-            if ((name === "age" || name === "budget") && type === "text") {
+            if ((name === "age" || name === "budget" || name === "roomSize") && type === "text") {
                 newValue = value.replace(/[^0-9]/g, "");
             } else if (type === "checkbox" && name === "amenities") {
                 newValue = checked
@@ -103,13 +104,19 @@ export default function RoomWantedAd() {
             newErrors.description = "Description must be at least 5 characters";
         }
 
-        if (!formData.propertyType) newErrors.propertyType = "Property Type is required";
-        if (!formData.roomSize) newErrors.roomSize = "Room Size is required";
+        if (!formData.propertyType) newErrors.propertyType = "Space Wanted Type is required";
+        if (!formData.roomSize) newErrors.roomSize = "Space Size is required";
 
         if (!formData.country) newErrors.country = "Country is required";
         if (!formData.state) newErrors.state = "State is required";
-        if (!formData.city) newErrors.city = "City is required";
-        if (!formData.zip) newErrors.zip = "ZIP code is required";
+        const stateCities = formData.country && formData.state ?
+            City.getCitiesOfState(formData.country, formData.state) : [];
+        if (stateCities.length > 0 && !formData.city) {
+            newErrors.city = "City is required";
+        } else if (stateCities.length === 0 && !formData.city) {
+            setFormData(prev => ({ ...prev, city: "NA" }));
+        }
+        // if (!formData.zip) newErrors.zip = "ZIP code is required";
 
         if (!formData.budget) {
             newErrors.budget = "Budget is required";
@@ -122,7 +129,7 @@ export default function RoomWantedAd() {
         if (!formData.budgetType) newErrors.budgetType = "Budget Type is required";
         if (!formData.period) newErrors.period = "Duration of stay is required";
 
-        if (!formData.amenities?.length) newErrors.amenities = "At least one amenity is required";
+        // if (!formData.amenities?.length) newErrors.amenities = "At least one amenity is required";
 
         if (!formData.name?.trim()) newErrors.name = "Name is required";
         if (!formData.age) {
@@ -135,21 +142,21 @@ export default function RoomWantedAd() {
         if (!["Male", "Female"].includes(formData.gender)) {
             newErrors.gender = "Gender must be either 'Male' or 'Female'";
         }
-        if (!["Student", "Professionals"].includes(formData.occupation)) {
-            newErrors.occupation = "Occupation must be 'Student' or 'Professionals'";
+        if (!["Student", "Professional"].includes(formData.occupation)) {
+            newErrors.occupation = "Occupation must be 'Student' or 'Professional'";
         }
 
-        if (!["Yes", "No"].includes(formData.smoke)) {
-            newErrors.smoke = "Smoke must be 'Yes' or 'No'";
+        if (!["Yes", "No", "Sometimes"].includes(formData.smoke)) {
+            newErrors.smoke = "Smoke must be 'Yes', 'No' 'Sometimes'";
         }
         if (!["Yes", "No"].includes(formData.pets)) {
             newErrors.pets = "Pets must be 'Yes' or 'No'";
         }
 
-        const allowedRoommatePrefs = ["any gender", "male", "female"];
-        if (!allowedRoommatePrefs.includes(formData.roommatePref)) {
-            newErrors.roommatePref = `Roommate Preference must be one of: ${allowedRoommatePrefs.join(", ")}`;
-        }
+        // const allowedRoommatePrefs = ["any gender", "male", "female"];
+        // if (!allowedRoommatePrefs.includes(formData.roommatePref)) {
+        //     newErrors.roommatePref = `Roommate Preference must be one of: ${allowedRoommatePrefs.join(", ")}`;
+        // }
 
         if (images.length) {
             images.forEach((img, i) => {
@@ -169,6 +176,23 @@ export default function RoomWantedAd() {
             setIsPreview(true);
         }
     };
+
+    useEffect(() => {
+        if (formData.state) {
+            const stateCities = City.getCitiesOfState(formData.country, formData.state);
+            if (stateCities.length === 0 && formData.city !== "NA") {
+                setFormData(prev => ({
+                    ...prev,
+                    city: "NA"
+                }));
+            } else if (stateCities.length > 0 && formData.city === "NA") {
+                setFormData(prev => ({
+                    ...prev,
+                    city: ""
+                }));
+            }
+        }
+    }, [formData.country, formData.state, formData.city]);
 
     const handleSubmit = async () => {
         if (!validateForm()) {
@@ -235,16 +259,15 @@ export default function RoomWantedAd() {
             <div className="w-full container px-8 space-y-8 mt-6">
                 {isPreview ? (
                     <>
-                        {/* Preview Section */}
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
                                 Preview Ad
                             </div>
                             <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <p><strong>Property Type:</strong> {formData.propertyType}</p>
+                                <p><strong>Space Wanted Type:</strong> {formData.propertyType}</p>
                                 <p><strong>Room Size:</strong> {formData.roomSize}</p>
                                 <p className="md:col-span-2">
-                                    <strong>Location:</strong> {formData.city}, {formData.state}, {formData.country} ({formData.zip})
+                                    <strong>Location:</strong> {formData.city === "NA" ? "No City Available" : formData.city}, {formData.state}, {formData.country}
                                 </p>
                                 <p><strong>Budget:</strong> {formData.budget} ({formData.budgetType})</p>
                                 <p><strong>Move-in Date:</strong> {formData.moveInDate}</p>
@@ -258,7 +281,7 @@ export default function RoomWantedAd() {
                                 <p><strong>Occupation:</strong> {formData.occupation}</p>
                                 <p><strong>Smoking:</strong> {formData.smoke}</p>
                                 <p><strong>Pets:</strong> {formData.pets}</p>
-                                <p><strong>Roommate Preference:</strong> {formData.roommatePref}</p>
+                                {/* <p><strong>Roommate Preference:</strong> {formData.roommatePref}</p> */}
                                 <p className="md:col-span-2">
                                     <strong>Description:</strong> {formData.description}
                                 </p>
@@ -295,15 +318,13 @@ export default function RoomWantedAd() {
                     </>
                 ) : (
                     <>
-                        {/* --- Basic Details --- */}
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
                                 Basic Details
                             </div>
                             <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                {/* Property Type */}
                                 <div>
-                                    <label className="block text-gray-700">Property Type</label>
+                                    <label className="block text-gray-700">Space Wanted Type</label>
                                     <select
                                         className={getInputClass("propertyType")}
                                         name="propertyType"
@@ -317,25 +338,19 @@ export default function RoomWantedAd() {
                                     {errors.propertyType && <p className="text-red-500 text-sm mt-1">{errors.propertyType}</p>}
                                 </div>
 
-                                {/* Room Size */}
                                 <div>
-                                    <label className="block text-gray-700">Room Sizes</label>
-                                    <select
+                                    <label className="block text-gray-700">Space Size</label>
+                                    <input
+                                        type="text"
                                         className={getInputClass("roomSize")}
                                         name="roomSize"
+                                        placeholder="Size unit is in m2"
                                         value={formData.roomSize}
                                         onChange={handleChange}
-                                    >
-                                        <option value="">Select</option>
-                                        <option>1RK</option>
-                                        <option>1BHK</option>
-                                        <option>2BHK</option>
-                                        <option>3BHK</option>
-                                    </select>
+                                    />
                                     {errors.roomSize && <p className="text-red-500 text-sm mt-1">{errors.roomSize}</p>}
                                 </div>
 
-                                {/* Country */}
                                 <div>
                                     <label className="block text-gray-700">Country</label>
                                     <select
@@ -352,7 +367,6 @@ export default function RoomWantedAd() {
                                     {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
                                 </div>
 
-                                {/* State */}
                                 <div>
                                     <label className="block text-gray-700">State</label>
                                     <select
@@ -373,7 +387,6 @@ export default function RoomWantedAd() {
                                     {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
                                 </div>
 
-                                {/* City */}
                                 <div>
                                     <label className="block text-gray-700">City</label>
                                     <select
@@ -384,15 +397,23 @@ export default function RoomWantedAd() {
                                         className={getInputClass("city")}
                                     >
                                         <option value="">Select City</option>
-                                        {City.getCitiesOfState(formData.country, formData.state).map((c) => (
-                                            <option key={c.name} value={c.name}>{c.name}</option>
-                                        ))}
+                                        {(() => {
+                                            const stateCities = formData.country && formData.state ?
+                                                City.getCitiesOfState(formData.country, formData.state) : [];
+
+                                            if (stateCities.length === 0) {
+                                                return <option value="NA">No City Available</option>;
+                                            }
+
+                                            return stateCities.map((c) => (
+                                                <option key={c.name} value={c.name}>{c.name}</option>
+                                            ));
+                                        })()}
                                     </select>
                                     {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                                 </div>
 
-                                {/* Zip */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-gray-700">Zip Code</label>
                                     <input
                                         type="text"
@@ -402,11 +423,10 @@ export default function RoomWantedAd() {
                                         className={getInputClass("zip")}
                                     />
                                     {errors.zip && <p className="text-red-500 text-sm mt-1">{errors.zip}</p>}
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
-                        {/* --- Budget & Requirements --- */}
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
                                 Budget & Requirements
@@ -452,13 +472,17 @@ export default function RoomWantedAd() {
                             <div className="px-4 py-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-gray-700">Move-in Date</label>
-                                    <input
-                                        type="date"
+                                    <select
                                         name="moveInDate"
                                         value={formData.moveInDate}
                                         onChange={handleChange}
                                         className={getInputClass("moveInDate")}
-                                    />
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="As soon as possible">As soon as possible</option>
+                                        <option value="In a week time">In a week time</option>
+                                        <option value="In a month time">In a month time</option>
+                                    </select>
                                     {errors.moveInDate && <p className="text-red-500 text-sm mt-1">{errors.moveInDate}</p>}
                                 </div>
                                 <div>
@@ -470,9 +494,8 @@ export default function RoomWantedAd() {
                                         className={getInputClass("period")}
                                     >
                                         <option value="">Select</option>
-                                        <option value="3 months">3 months</option>
-                                        <option value="6 months">6 months</option>
-                                        <option value="1 year">1 year</option>
+                                        <option value="Short term">Short term (6 months or less)</option>
+                                        <option value="Long term">Long term (7 months or more)</option>
                                     </select>
                                     {errors.period && <p className="text-red-500 text-sm mt-1">{errors.period}</p>}
                                 </div>
@@ -505,11 +528,9 @@ export default function RoomWantedAd() {
                                         </label>
                                     ))}
                                 </div>
-                                {errors.amenities && <p className="text-red-500 text-sm mt-1">{errors.amenities}</p>}
                             </div>
                         </div>
 
-                        {/* --- Personal Info --- */}
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
                                 Personal Info
@@ -520,7 +541,7 @@ export default function RoomWantedAd() {
                                     <input
                                         type="text"
                                         name="name"
-                                        value={formData.name}
+                                        value={`${user?.profile?.firstName} ${user?.profile?.lastName}`}
                                         onChange={handleChange}
                                         placeholder="Full Name"
                                         className={getInputClass("name")}
@@ -533,7 +554,7 @@ export default function RoomWantedAd() {
                                     <input
                                         type="text"
                                         name="age"
-                                        value={formData.age}
+                                        value={user?.profile?.age}
                                         onChange={handleChange}
                                         className={getInputClass("age")}
                                         placeholder="Enter age"
@@ -543,16 +564,13 @@ export default function RoomWantedAd() {
 
                                 <div>
                                     <label className="block text-gray-700 mb-1">Gender</label>
-                                    <select
+                                    <input
+                                        type="text"
                                         name="gender"
-                                        value={formData.gender}
+                                        value={user?.profile?.gender}
                                         onChange={handleChange}
                                         className={getInputClass("gender")}
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
+                                    />
                                     {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
                                 </div>
 
@@ -566,7 +584,7 @@ export default function RoomWantedAd() {
                                     >
                                         <option value="">Select</option>
                                         <option value="Student">Student</option>
-                                        <option value="Professionals">Professionals</option>
+                                        <option value="Professional">Professional</option>
                                     </select>
                                     {errors.occupation && <p className="text-red-500 text-sm mt-1">{errors.occupation}</p>}
                                 </div>
@@ -582,6 +600,7 @@ export default function RoomWantedAd() {
                                         <option value="">Select</option>
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
+                                        <option value="Sometimes">Sometimes</option>
                                     </select>
                                     {errors.smoke && <p className="text-red-500 text-sm mt-1">{errors.smoke}</p>}
                                 </div>
@@ -601,7 +620,7 @@ export default function RoomWantedAd() {
                                     {errors.pets && <p className="text-red-500 text-sm mt-1">{errors.pets}</p>}
                                 </div>
 
-                                <div>
+                                {/* <div>
                                     <label className="block text-gray-700 mb-1">
                                         Your Preferred Language
                                     </label>
@@ -618,9 +637,9 @@ export default function RoomWantedAd() {
                                             </option>
                                         ))}
                                     </select>
-                                </div>
+                                </div> */}
 
-                                <div>
+                                {/* <div>
                                     <label className="block text-gray-700 mb-1">Roommate Preference</label>
                                     <select
                                         name="roommatePref"
@@ -634,7 +653,7 @@ export default function RoomWantedAd() {
                                         <option value="female">Female</option>
                                     </select>
                                     {errors.roommatePref && <p className="text-red-500 text-sm mt-1">{errors.roommatePref}</p>}
-                                </div>
+                                </div> */}
 
                                 <div className="md:col-span-2">
                                     <label className="block text-gray-700 mb-1">Title</label>
@@ -661,7 +680,6 @@ export default function RoomWantedAd() {
                                     {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                                 </div>
 
-                                {/* Images */}
                                 <div className="md:col-span-2 mb-4">
                                     <label className="block text-gray-700 mb-1">Upload Photos</label>
                                     <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-1/2 rounded-[14px] relative overflow-hidden">
@@ -705,7 +723,6 @@ export default function RoomWantedAd() {
                             </div>
                         </div>
 
-                        {/* TEAM UP */}
                         <div>
                             <label className="text-black text-lg">TEAM UP</label>
                             <div className="flex items-center gap-3">

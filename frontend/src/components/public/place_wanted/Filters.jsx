@@ -11,7 +11,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
     period: "",
     minSize: "",
     maxSize: "",
-    roommatePref: "any",
+    // roommatePref: "any",
     occupation: "all",
     minAge: "",
     maxAge: "",
@@ -178,9 +178,8 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
             className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
           >
             <option value="">Select</option>
-            <option value="3 months">3 months</option>
-            <option value="6 months">6 months</option>
-            <option value="1 year">1 year</option>
+            <option value="Short term">Short term (6 months or less)</option>
+                                        <option value="Long term">Long term (7 months or more)</option>
           </select>
 
         </div>
@@ -208,7 +207,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
         </div>
       </div>
 
-            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+            {/* <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Roommate Preference</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
@@ -228,7 +227,7 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
 
                 <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Occupation</label>
@@ -236,7 +235,7 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
           {[
             { val: "all", label: "All" },
             { val: "Student", label: "Students" },
-            { val: "Professionals", label: "Professionals" },
+            { val: "Professional", label: "Professionals" },
           ].map((opt) => (
             <label key={opt.val} className="flex items-center space-x-2">
               <input

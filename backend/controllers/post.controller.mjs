@@ -693,7 +693,7 @@ export const getSpaceWanted = async (req, res) => {
       period,
       minSize,
       maxSize,
-      roommatePref,
+      // roommatePref,
       occupation,
       minAge,
       maxAge,
@@ -736,9 +736,9 @@ export const getSpaceWanted = async (req, res) => {
       if (maxSize) query.roomSize.$lte = Number(maxSize);
     }
 
-    if (roommatePref && roommatePref !== "any") {
-      query.roommatePref = roommatePref;
-    }
+    // if (roommatePref && roommatePref !== "any") {
+    //   query.roommatePref = roommatePref;
+    // }
 
     if (occupation && occupation !== "all") {
       query.occupation = occupation;
@@ -764,7 +764,7 @@ export const getSpaceWanted = async (req, res) => {
 
     const spaceWanted = await SpaceWanted.find(query)
       .select(
-        "title postCategory budget budgetType propertyType description amenities roomSize roommatePref occupation age period country state city photos status available is_deleted"
+        "title postCategory budget budgetType propertyType description amenities roomSize occupation age period country state city photos status available is_deleted"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort(sortOption)
