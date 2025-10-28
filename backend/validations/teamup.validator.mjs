@@ -8,12 +8,12 @@ export const createTeamUpSchema = Joi.object({
   country: Joi.string().required(),
   state: Joi.string().required(),
   city: Joi.string().required(),
-  zip: Joi.string().required(),
+  // zip: Joi.string().required(),
 
   budget: Joi.string().required(),
   budgetType: Joi.string().valid(...budgetType).required(),
 
-  moveInDate: Joi.date().optional(),
+  // moveInDate: Joi.date().optional(),
   period: Joi.string().optional(),
 
   amenities: Joi.array().items(Joi.string()).required(),
@@ -35,9 +35,9 @@ export const createTeamUpSchema = Joi.object({
   petsPreference: Joi.boolean().required(),
 
   language: Joi.string().optional(),
-  languagePreference: Joi.string().optional(),
+  // languagePreference: Joi.string().optional(),
 
-  roommatePref: Joi.string().valid(...roomAvailableForType).required(),
+  // roommatePref: Joi.string().valid(...roomAvailableForType).required(),
 
   description: Joi.string().allow("").required(),
   buddyDescription: Joi.string().allow("").optional(),

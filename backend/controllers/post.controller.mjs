@@ -318,7 +318,7 @@ export const getTeamUps = async (req, res) => {
       priceType,
       period,
       smoking,
-      roommatePref,
+      // roommatePref,
       occupationPreference,
       minAge,
       maxAge,
@@ -351,9 +351,9 @@ export const getTeamUps = async (req, res) => {
       query.smoke = smoking === "allowed";
     }
 
-    if (roommatePref && roommatePref !== "any") {
-      query.roommatePref = roommatePref;
-    }
+    // if (roommatePref && roommatePref !== "any") {
+    //   query.roommatePref = roommatePref;
+    // }
 
     if (period) {
       query.period = period;
@@ -382,7 +382,7 @@ export const getTeamUps = async (req, res) => {
 
     const teamUps = await TeamUp.find(query)
       .select(
-        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available is_deleted occupation"
+        "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort(sortOption)
@@ -395,7 +395,7 @@ export const getTeamUps = async (req, res) => {
     })
 
     .select(
-        "title postCategory budget budgetType smoke roommatePref description amenities moveInDate country state city photos status available is_deleted occupation"
+        "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo");
 

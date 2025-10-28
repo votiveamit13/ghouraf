@@ -9,7 +9,7 @@ export default function Filters({ filters, setFilters, setPage }) {
     priceType: "",
     period: "",
     smoking: "",
-    roommatePref: "",
+    // roommatePref: "",
     amenities: [],
     occupationPreference: "",
     minAge: "",
@@ -152,15 +152,14 @@ export default function Filters({ filters, setFilters, setPage }) {
             className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
           >
             <option value="">Select</option>
-            <option value="3 months">3 months</option>
-            <option value="6 months">6 months</option>
-            <option value="1 year">1 year</option>
+            <option value="Short Term">Short Term</option>
+            <option value="Long Term">Long Term</option>
           </select>
 
         </div>
       </div>
 
-      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+      {/* <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Roommate Preference</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
@@ -179,7 +178,7 @@ export default function Filters({ filters, setFilters, setPage }) {
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Smoking</label>
@@ -265,16 +264,22 @@ export default function Filters({ filters, setFilters, setPage }) {
               style={{ maxHeight: "200px", overflowY: "auto" }}
             >
               {[
-                "Furnished",
-                "Shared living room",
-                "Washing Machine",
-                "Yard/patio",
-                "Balcony/roof terrace",
-                "Parking",
-                "Garage",
-                "Disabled Access",
-                "Internet",
-                "Private bathroom",
+                "Sports",
+                "Music",
+                "Movies & TV",
+                "Reading",
+                "Photography",
+                "Going out",
+                "Hiking & Nature",
+                "Outdoor Activities & Adventures",
+                "Fitness & Gym / Working out",
+                "Walking Around Town/ Exploring the City",
+                "Jogging / Running",
+                "Science & Technology",
+                "Art",
+                "Traveling",
+                "Cooking & Food",
+                "Volunteering / Community Work",
               ].map((amenity) => (
                 <li key={amenity} className="flex items-center py-1">
                   <input

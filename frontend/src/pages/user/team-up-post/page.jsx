@@ -4,8 +4,10 @@ import { Country, State, City } from "country-state-city";
 import locales from "locale-codes";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
 
 export default function TeamUpAd() {
+    const { user } = useAuth();
     const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [isPreview, setIsPreview] = useState(false);
@@ -16,10 +18,10 @@ export default function TeamUpAd() {
         country: "",
         state: "",
         city: "",
-        zip: "",
+        // zip: "",
         budget: "",
         budgetType: "",
-        moveInDate: "",
+        // moveInDate: "",
         period: "",
         amenities: [],
         firstName: "",
@@ -34,8 +36,8 @@ export default function TeamUpAd() {
         pets: "",
         petsPreference: "",
         language: "",
-        languagePreference: "",
-        roommatePref: "",
+        // languagePreference: "",
+        // roommatePref: "",
         description: "",
         buddyDescription: "",
     };
@@ -51,7 +53,7 @@ export default function TeamUpAd() {
         if (!formData.country) newErrors.country = "Country is required";
         if (!formData.state) newErrors.state = "State is required";
         if (!formData.city) newErrors.city = "City is required";
-        if (!formData.zip.trim()) newErrors.zip = "Zip code is required";
+        // if (!formData.zip.trim()) newErrors.zip = "Zip code is required";
         if (!formData.budget) {
             newErrors.budget = "Budget is required";
         } else if (Number(formData.budget) <= 0) {
@@ -70,7 +72,7 @@ export default function TeamUpAd() {
         if (!formData.smoke) newErrors.smoke = "Select smoking category";
         if (!formData.pets) newErrors.pets = "Select pet category";
         if (!formData.petsPreference) newErrors.petsPreference = "Select pet preference category";
-        if (!formData.roommatePref) newErrors.roommatePref = "Select roommate preference";
+        // if (!formData.roommatePref) newErrors.roommatePref = "Select roommate preference";
         if (!formData.description) newErrors.description = "Description is required";
         if (!selectedFiles || selectedFiles.length === 0) {
             newErrors.photos = "Please upload at least one photo";
@@ -228,13 +230,13 @@ export default function TeamUpAd() {
                                     <h3 className="text-lg font-semibold mb-2 text-[#565ABF]">Basic Details</h3>
                                     <p><strong>Title:</strong> {formData.title}</p>
                                     <p><strong>Location:</strong> {formData.city}, {formData.state}, {formData.country}</p>
-                                    <p><strong>Zip Code:</strong> {formData.zip}</p>
+                                    {/* <p><strong>Zip Code:</strong> {formData.zip}</p> */}
                                 </div>
 
                                 <div>
                                     <h3 className="text-lg font-semibold mb-2 text-[#565ABF]">Budget & Requirements</h3>
                                     <p><strong>Budget:</strong> {formData.budget} ({formData.budgetType})</p>
-                                    <p><strong>Move-in Date:</strong> {formData.moveInDate}</p>
+                                    {/* <p><strong>Move-in Date:</strong> {formData.moveInDate}</p> */}
                                     <p><strong>Duration of Stay:</strong> {formData.period}</p>
                                     <p><strong>Amenities:</strong> {formData.amenities.join(", ") || "None"}</p>
                                 </div>
@@ -246,8 +248,8 @@ export default function TeamUpAd() {
                                     <p><strong>Occupation Type:</strong> {formData.occupationPreference}</p>
                                     <p><strong>Smoking:</strong> {formData.smoke === "true" ? "Yes" : "No"}</p>
                                     <p><strong>Pets Allowed:</strong> {formData.petsPreference === "true" ? "Yes" : "No"}</p>
-                                    <p><strong>Roommate Preference:</strong> {formData.roommatePref}</p>
-                                    <p><strong>Preferred Language:</strong> {formData.languagePreference}</p>
+                                    {/* <p><strong>Roommate Preference:</strong> {formData.roommatePref}</p> */}
+                                    {/* <p><strong>Preferred Language:</strong> {formData.languagePreference}</p> */}
                                 </div>
 
                                 <div>
@@ -355,7 +357,7 @@ export default function TeamUpAd() {
                                     </select>
                                     {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                                 </div>
-                                <div>
+                                {/* <div>
                                     <label className="block text-gray-700">Zip Code</label>
                                     <input
                                         type="text"
@@ -365,233 +367,11 @@ export default function TeamUpAd() {
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
                                     {errors.zip && <p className="text-red-500 text-sm mt-1">{errors.zip}</p>}
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-xl border border-gray-200">
-                            <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
-                                Budget & Requirements
-                            </div>
-                            <div>
-                                <div className="px-4 py-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-gray-700">Your Budget</label>
-                                        <input
-                                            type="text"
-                                            name="budget"
-                                            value={formData.budget}
-                                            onChange={handleChange}
-                                            placeholder="Total budget range for the flat"
-                                            className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        />
-                                        {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
-                                    </div>
-                                    <div className="flex items-end gap-6">
-                                        <label className="flex items-center gap-2 text-sm">
-                                            <input
-                                                type="radio"
-                                                name="budgetType"
-                                                value="Month"
-                                                checked={formData.budgetType === "Month"}
-                                                onChange={handleChange}
-                                            />
-                                            Per Month
-                                        </label>
-                                        <label className="flex items-center gap-2 text-sm">
-                                            <input
-                                                type="radio"
-                                                name="budgetType"
-                                                value="Week"
-                                                checked={formData.budgetType === "Week"}
-                                                onChange={handleChange}
-                                            />
-                                            Per Week
-                                        </label>
-                                        {errors.budgetType && <p className="text-red-500 text-sm mt-1">{errors.budgetType}</p>}
-                                    </div>
-                                </div>
-
-                                <div className="px-4 py-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-gray-700">Move-in Date</label>
-                                        <input
-                                            type="date"
-                                            name="moveInDate"
-                                            value={formData.moveInDate}
-                                            onChange={handleChange}
-                                            className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-700">
-                                            Duration of stay
-                                        </label>
-                                        <select
-                                            name="period"
-                                            value={formData.period}
-                                            onChange={handleChange}
-                                            className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        >
-                                            <option value="">Select</option>
-                                            <option value="3 months">3 months</option>
-                                            <option value="6 months">6 months</option>
-                                            <option value="1 year">1 year</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="px-4 py-2 mb-4">
-                                    <label className="block text-gray-700 mb-2">Amenities</label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                        {[
-                                            "Furnished",
-                                            "Shared living room",
-                                            "Washing machine",
-                                            "Yard/patio",
-                                            "Balcony/roof terrace",
-                                            "Parking",
-                                            "Garage",
-                                            "Disabled access",
-                                            "Internet",
-                                            "Private bathroom",
-                                        ].map((amenity) => (
-                                            <label key={amenity} className="flex items-center gap-2 px-3 py-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="amenities"
-                                                    value={amenity}
-                                                    checked={formData.amenities.includes(amenity)}
-                                                    onChange={handleChange}
-                                                />
-                                                {amenity}
-                                            </label>
-                                        ))}
-
-                                    </div>
-                                    {errors.amenities && <p className="text-red-500 text-sm mt-1">{errors.amenities}</p>}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-lg shadow-xl border border-gray-200">
-                            <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
-                                Lifestyle Preferences
-                            </div>
-                            <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-gray-700 mb-1">Gender</label>
-                                    <select
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        name="gender"
-                                        value={formData.gender}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">Select Gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                    </select>
-                                    {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 mb-1">Age Range</label>
-                                    <div className="flex space-x-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Min"
-                                            name="minAge"
-                                            value={formData.minAge}
-                                            onChange={handleChange}
-                                            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Max"
-                                            name="maxAge"
-                                            value={formData.maxAge}
-                                            onChange={handleChange}
-                                            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 mb-1">Occupation Type</label>
-                                    <select
-                                        name="occupationPreference"
-                                        value={formData.occupationPreference}
-                                        onChange={handleChange}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Student">Student</option>
-                                        <option value="Professionals">Professionals</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 mb-1">Smoking?</label>
-                                    <select
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        name="smoke"
-                                        value={formData.smoke}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">Select</option>
-                                        <option value={true}>Yes</option>
-                                        <option value={false}>No</option>
-                                    </select>
-                                    {errors.smoke && <p className="text-red-500 text-sm mt-1">{errors.smoke}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 mb-1">Pets?</label>
-                                    <select
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        name="petsPreference"
-                                        value={formData.petsPreference}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">Select</option>
-                                        <option value={true}>Yes</option>
-                                        <option value={false}>No</option>
-                                    </select>
-                                    {errors.petsPreference && <p className="text-red-500 text-sm mt-1">{errors.petsPreference}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 mb-1">Roommate Preference</label>
-                                    <select
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                        name="roommatePref"
-                                        value={formData.roommatePref}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="any gender">Any Gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                    </select>
-                                    {errors.roommatePref && <p className="text-red-500 text-sm mt-1">{errors.roommatePref}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 mb-1">
-                                        Your Preferred Language
-                                    </label>
-                                    <select
-                                        name="languagePreference"
-                                        value={formData.languagePreference}
-                                        onChange={handleChange}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    >
-                                        <option value="">Select Language</option>
-                                        {allLocales.map((locale) => (
-                                            <option key={locale.tag} value={locale.tag}>
-                                                {locale.name} ({locale.tag})
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-lg shadow-xl border border-gray-200">
+                                                <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
                                 About You
                             </div>
@@ -601,7 +381,7 @@ export default function TeamUpAd() {
                                     <input
                                         type="text"
                                         name="firstName"
-                                        value={formData.firstName}
+                                        value={user?.profile?.firstName}
                                         onChange={handleChange}
                                         placeholder="Enter your first name"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
@@ -613,19 +393,30 @@ export default function TeamUpAd() {
                                     <input
                                         type="text"
                                         name="lastName"
-                                        value={formData.lastName}
+                                        value={user?.profile?.lastName}
                                         onChange={handleChange}
                                         placeholder="Enter your last name"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                     />
                                     {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
                                 </div>
+                                                                <div>
+                                    <label className="block text-gray-700 mb-1">Gender</label>
+                                    <input
+                                        type="text"
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        name="gender"
+                                        value={user?.profile?.gender}
+                                        onChange={handleChange}
+                                    />
+                                    {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
+                                </div>
                                 <div>
                                     <label className="block text-gray-700 mb-1">Age</label>
                                     <input
                                         type="text"
                                         name="age"
-                                        value={formData.age}
+                                        value={user?.profile?.age}
                                         onChange={handleChange}
                                         placeholder="Age"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
@@ -711,6 +502,219 @@ export default function TeamUpAd() {
 
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
                             <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
+                                Budget & Requirements
+                            </div>
+                            <div>
+                                <div className="px-4 py-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-gray-700">Your Budget</label>
+                                        <input
+                                            type="text"
+                                            name="budget"
+                                            value={formData.budget}
+                                            onChange={handleChange}
+                                            placeholder="Total budget range for the flat"
+                                            className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        />
+                                        {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
+                                    </div>
+                                    <div className="flex items-end gap-6">
+                                        <label className="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="radio"
+                                                name="budgetType"
+                                                value="Month"
+                                                checked={formData.budgetType === "Month"}
+                                                onChange={handleChange}
+                                            />
+                                            Per Month
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="radio"
+                                                name="budgetType"
+                                                value="Week"
+                                                checked={formData.budgetType === "Week"}
+                                                onChange={handleChange}
+                                            />
+                                            Per Week
+                                        </label>
+                                        {errors.budgetType && <p className="text-red-500 text-sm mt-1">{errors.budgetType}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="px-4 py-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* <div>
+                                        <label className="block text-gray-700">Move-in Date</label>
+                                        <input
+                                            type="date"
+                                            name="moveInDate"
+                                            value={formData.moveInDate}
+                                            onChange={handleChange}
+                                            className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        />
+                                    </div> */}
+                                    <div>
+                                        <label className="block text-gray-700">
+                                            Duration of stay
+                                        </label>
+                                        <select
+                                            name="period"
+                                            value={formData.period}
+                                            onChange={handleChange}
+                                            className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="Short Term">Short Term</option>
+                                            <option value="Long Term">Long Term</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="px-4 py-2 mb-4">
+                                    <label className="block text-gray-700 mb-2">Interests</label>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        {[
+                                            "Sports",
+                                            "Music",
+                                            "Movies & TV",
+                                            "Reading",
+                                            "Photography",
+                                            "Going out",
+                                            "Hiking & Nature",
+                                            "Outdoor Activities & Adventures",
+                                            "Fitness & Gym / Working out",
+                                            "Walking Around Town/ Exploring the City",
+                                            "Jogging / Running",
+                                            "Science & Technology",
+                                            "Art",
+                                            "Traveling",
+                                            "Cooking & Food",
+                                            "Volunteering / Community Work",
+                                        ].map((amenity) => (
+                                            <label key={amenity} className="flex items-center gap-2 px-3 py-2">
+                                                <input
+                                                    type="checkbox"
+                                                    name="amenities"
+                                                    value={amenity}
+                                                    checked={formData.amenities.includes(amenity)}
+                                                    onChange={handleChange}
+                                                />
+                                                {amenity}
+                                            </label>
+                                        ))}
+
+                                    </div>
+                                    {errors.amenities && <p className="text-red-500 text-sm mt-1">{errors.amenities}</p>}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg shadow-xl border border-gray-200">
+                            <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
+                                Flatmate Preferences
+                            </div>
+                            <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-700 mb-1">Age Range</label>
+                                    <div className="flex space-x-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Min"
+                                            name="minAge"
+                                            value={formData.minAge}
+                                            onChange={handleChange}
+                                            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Max"
+                                            name="maxAge"
+                                            value={formData.maxAge}
+                                            onChange={handleChange}
+                                            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-gray-700 mb-1">Occupation Type</label>
+                                    <select
+                                        name="occupationPreference"
+                                        value={formData.occupationPreference}
+                                        onChange={handleChange}
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Professionals">Professionals</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-gray-700 mb-1">Smoking?</label>
+                                    <select
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        name="smoke"
+                                        value={formData.smoke}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Select</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
+                                    </select>
+                                    {errors.smoke && <p className="text-red-500 text-sm mt-1">{errors.smoke}</p>}
+                                </div>
+                                <div>
+                                    <label className="block text-gray-700 mb-1">Pets?</label>
+                                    <select
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        name="petsPreference"
+                                        value={formData.petsPreference}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Select</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
+                                    </select>
+                                    {errors.petsPreference && <p className="text-red-500 text-sm mt-1">{errors.petsPreference}</p>}
+                                </div>
+                                {/* <div>
+                                    <label className="block text-gray-700 mb-1">Roommate Preference</label>
+                                    <select
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                        name="roommatePref"
+                                        value={formData.roommatePref}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="any gender">Any Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                    {errors.roommatePref && <p className="text-red-500 text-sm mt-1">{errors.roommatePref}</p>}
+                                </div> */}
+                                {/* <div>
+                                    <label className="block text-gray-700 mb-1">
+                                        Your Preferred Language
+                                    </label>
+                                    <select
+                                        name="languagePreference"
+                                        value={formData.languagePreference}
+                                        onChange={handleChange}
+                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+                                    >
+                                        <option value="">Select Language</option>
+                                        {allLocales.map((locale) => (
+                                            <option key={locale.tag} value={locale.tag}>
+                                                {locale.name} ({locale.tag})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div> */}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg shadow-xl border border-gray-200">
+                            <div className="bg-[#565ABF] text-white px-4 py-3 rounded-t-lg font-semibold">
                                 Ad details
                             </div>
                             <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-1 gap-4">
@@ -719,7 +723,7 @@ export default function TeamUpAd() {
                                     <textarea
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         name="description"
-                                        placeholder="Please write what exactly you are looking for..."
+                                        placeholder="Please write about yourself..."
                                         rows={5}
                                         value={formData.description}
                                         onChange={handleChange}
