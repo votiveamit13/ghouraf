@@ -1065,6 +1065,7 @@ export default function Navbar() {
       )}
       <PostAdDialog open={open} onClose={() => setOpen(false)} />
       <ConfirmationDialog
+        className="navbar-confirm-dialog"
         show={showInvalidDialog}
         title="Invalid Credentials"
         message="The email or password you entered is incorrect. Please try again."
@@ -1073,7 +1074,7 @@ export default function Navbar() {
       />
       <style>
         {`
-    .fixed.inset-0.bg-black\\/50 .bg-white button.bg-red-600 {
+    .navbar-confirm-dialog .bg-white button.bg-red-600 {
       display: none !important;
     }
   `}

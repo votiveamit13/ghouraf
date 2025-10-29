@@ -1,10 +1,10 @@
 import React from "react";
 
-const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel }) => {
+const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel, className = "" }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${className}`}>
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
         <div className="flex justify-between items-center px-4 py-3 border-b">
           <h3 className="text-lg font-semibold text-gray-800">

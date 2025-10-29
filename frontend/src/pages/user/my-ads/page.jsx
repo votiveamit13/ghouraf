@@ -9,6 +9,7 @@ import ViewPost from "components/user/myads/ViewPost";
 import EditPost from "components/user/myads/EditPost";
 import { getFullLocation } from "utils/locationHelper";
 import { toast } from "react-toastify";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function MyAds() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -24,6 +25,9 @@ export default function MyAds() {
     const [selectedAd, setSelectedAd] = useState(null);
     const [showViewPost, setShowViewPost] = useState(false);
     const [showEditPost, setShowEditPost] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [deleteAdId, setDeleteAdId] = useState(null);
+
 
     const fetchAds = async () => {
         try {
@@ -75,33 +79,60 @@ export default function MyAds() {
     };
 
 
-const handleStatus = async (id, status) => {
-  try {
-    const token = localStorage.getItem("token");
-    const available = status === "Available";
+    const handleStatus = async (id, status) => {
+        try {
+            const token = localStorage.getItem("token");
+            const available = status === "Available";
 
-    await axios.put(
-      `${apiUrl}ad-availability/${id}`,
-      { available },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+            await axios.put(
+                `${apiUrl}ad-availability/${id}`,
+                { available },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-    toast.success(`Marked as ${status}`);
-    fetchAds();
-  } catch (error) {
-    console.error("Error updating status:", error);
-    toast.error("Failed to update status");
-  }
-};
+            toast.success(`Marked as ${status}`);
+            fetchAds();
+        } catch (error) {
+            console.error("Error updating status:", error);
+            toast.error("Failed to update status");
+        }
+    };
 
 
     const handlePromote = (id) => {
         console.log("Promote ad:", id);
     };
 
-    const handleDelete = async (id) => {
-
+    const handleDelete = (id) => {
+        setDeleteAdId(id);
+        setShowConfirmDialog(true);
     };
+
+    const confirmDelete = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            await axios.put(
+                `${apiUrl}ad-delete/${deleteAdId}`,
+                { is_deleted: true },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            toast.success("Ad deleted successfully");
+            setShowConfirmDialog(false);
+            setDeleteAdId(null);
+            fetchAds();
+        } catch (error) {
+            console.error("Error deleting ad:", error);
+            toast.error("Failed to delete ad");
+        }
+    };
+
+    const cancelDelete = () => {
+        setShowConfirmDialog(false);
+        setDeleteAdId(null);
+    };
+
+
 
     return (
         <div className="container px-4 mt-5 mb-8">
@@ -214,18 +245,28 @@ const handleStatus = async (id, status) => {
                                                         </button>
                                                         <div className="hidden group-hover:block absolute left-full top-0 w-36 bg-white border border-gray-200 rounded-lg shadow-lg">
                                                             <button
-                                                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                                                                onClick={() => handleStatus(ad._id, "Available")}
+                                                                disabled={ad.available === true}
+                                                                onClick={() => ad.available === false && handleStatus(ad._id, "Available")}
+                                                                className={`block w-full text-left px-4 py-2 border-b ${ad.available
+                                                                        ? "bg-green-100 text-green-600 font-medium cursor-not-allowed"
+                                                                        : "hover:bg-gray-100 text-gray-700"
+                                                                    }`}
                                                             >
                                                                 Available
                                                             </button>
+
                                                             <button
-                                                                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                                                                onClick={() => handleStatus(ad._id, "Unavailable")}
+                                                                disabled={ad.available === false}
+                                                                onClick={() => ad.available === true && handleStatus(ad._id, "Unavailable")}
+                                                                className={`block w-full text-left px-4 py-2 ${!ad.available
+                                                                        ? "bg-red-100 text-red-600 font-medium cursor-not-allowed"
+                                                                        : "hover:bg-gray-100 text-gray-700"
+                                                                    }`}
                                                             >
                                                                 Unavailable
                                                             </button>
                                                         </div>
+
                                                     </div>
 
                                                     <button
@@ -293,6 +334,15 @@ const handleStatus = async (id, status) => {
                     ad={selectedAd}
                 />
             )}
+
+            <ConfirmationDialog
+                show={showConfirmDialog}
+                title="Delete Ad"
+                message="Are you sure you want to delete this ad? This action cannot be undone."
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+            />
+
 
             <div className="mt-6 flex justify-center md:justify-end">
                 <UserPagination

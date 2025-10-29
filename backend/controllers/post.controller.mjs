@@ -728,6 +728,38 @@ export const updateAdAvailability = async (req, res) => {
   }
 };
 
+export const deleteAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_deleted = true } = req.body; 
+
+    let deletedAd = null;
+
+    const models = [Space, SpaceWanted, TeamUp];
+    for (const Model of models) {
+      deletedAd = await Model.findByIdAndUpdate(
+        id,
+        { is_deleted },
+        { new: true }
+      );
+      if (deletedAd) break;
+    }
+
+    if (!deletedAd) {
+      return res.status(404).json({ message: "Ad not found." });
+    }
+
+    res.json({
+      success: true,
+      message: is_deleted ? "Ad deleted successfully" : "Ad restored successfully",
+      data: deletedAd,
+    });
+  } catch (error) {
+    console.error("Error deleting ad:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 //Space Wanted
 export const createSpaceWanted = async (req, res) => {
   try {
