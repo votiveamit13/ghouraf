@@ -636,6 +636,98 @@ const [spaces, teamUps, spaceWanteds] = await Promise.all([
   }
 };
 
+export const updateAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { postCategory } = req.body;
+    let Model;
+
+    switch (postCategory) {
+      case "Space":
+        Model = Space;
+        break;
+      case "Spacewanted":
+        Model = SpaceWanted;
+        break;
+      case "Teamup":
+        Model = TeamUp;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid post category" });
+    }
+
+    const updatedData = { ...req.body };
+
+    if (req.files) {
+      if (req.files.featuredImage && req.files.featuredImage[0]) {
+        updatedData.featuredImage = `/uploads/${req.files.featuredImage[0].filename}`;
+      }
+
+      if (req.files.photos && req.files.photos.length > 0) {
+        updatedData.photos = req.files.photos.map((f) => ({
+          url: `/uploads/${f.filename}`,
+        }));
+      } else if (req.body.existingPhotos) {
+        updatedData.photos = Array.isArray(req.body.existingPhotos)
+          ? req.body.existingPhotos.map((url) => ({ url }))
+          : [{ url: req.body.existingPhotos }];
+      }
+    }
+
+    const updatedAd = await Model.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
+
+    if (!updatedAd) {
+      return res.status(404).json({ message: "Ad not found" });
+    }
+
+    res.json({
+      message: `${postCategory} ad updated successfully`,
+      data: updatedAd,
+    });
+  } catch (error) {
+    console.error("Error updating ad:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const updateAdAvailability = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { available } = req.body;
+
+    if (typeof available !== "boolean") {
+      return res.status(400).json({ message: "Invalid status value." });
+    }
+
+    let updatedAd = null;
+
+    const models = [Space, SpaceWanted, TeamUp];
+    for (const Model of models) {
+      updatedAd = await Model.findByIdAndUpdate(
+        id,
+        { available },
+        { new: true }
+      );
+      if (updatedAd) break;
+    }
+
+    if (!updatedAd) {
+      return res.status(404).json({ message: "Ad not found." });
+    }
+
+    res.json({
+      success: true,
+      message: `Status ${available ? "Available" : "Unavailable"}`,
+      data: updatedAd,
+    });
+  } catch (error) {
+    console.error("Error updating ad status:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 //Space Wanted
 export const createSpaceWanted = async (req, res) => {
   try {
@@ -806,61 +898,5 @@ export const getSpaceWantedById = async (req, res) => {
   }
 };
 
-//Update Post
-export const updateAd = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { postCategory } = req.body;
-    let Model;
-
-    switch (postCategory) {
-      case "Space":
-        Model = Space;
-        break;
-      case "Spacewanted":
-        Model = SpaceWanted;
-        break;
-      case "Teamup":
-        Model = TeamUp;
-        break;
-      default:
-        return res.status(400).json({ message: "Invalid post category" });
-    }
-
-    const updatedData = { ...req.body };
-
-    if (req.files) {
-      if (req.files.featuredImage && req.files.featuredImage[0]) {
-        updatedData.featuredImage = `/uploads/${req.files.featuredImage[0].filename}`;
-      }
-
-      if (req.files.photos && req.files.photos.length > 0) {
-        updatedData.photos = req.files.photos.map((f) => ({
-          url: `/uploads/${f.filename}`,
-        }));
-      } else if (req.body.existingPhotos) {
-        updatedData.photos = Array.isArray(req.body.existingPhotos)
-          ? req.body.existingPhotos.map((url) => ({ url }))
-          : [{ url: req.body.existingPhotos }];
-      }
-    }
-
-    const updatedAd = await Model.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
-
-    if (!updatedAd) {
-      return res.status(404).json({ message: "Ad not found" });
-    }
-
-    res.json({
-      message: `${postCategory} ad updated successfully`,
-      data: updatedAd,
-    });
-  } catch (error) {
-    console.error("Error updating ad:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
 
 

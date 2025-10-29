@@ -92,7 +92,8 @@ export default function SavedAds() {
                 <div className="flex flex-wrap gap-6 justify-start">
                     {displayedAds.map((ad) => {
                         const post = ad.snapshot;
-                        const locationString = getFullLocation(post.city, post.state, post.country);
+                        const city = post.city === "NA" ? "" : post.city;
+                        const locationString = getFullLocation(city, post.state, post.country);
                         return (
                             <div
                                 key={ad._id}

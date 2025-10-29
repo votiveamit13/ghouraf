@@ -5,7 +5,7 @@ import {
   toggleSavePost, getSavedPosts, getMyAds,
   createSpaceWanted, getSpaceWanted, getSpaceWantedById,
   requestTeamUp, getSpaceTeamUps, removeTeamUp,
-  updateAd
+  updateAd, updateAdAvailability
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
@@ -33,6 +33,7 @@ router.post("/save", auth, toggleSavePost);
 router.get("/save/list", auth, getSavedPosts);
 router.get("/my-ads", auth, getMyAds);
 router.put("/my-ads/:id", auth, upload.array("photos"), updateAd);
+router.put("/ad-availability/:id", auth, updateAdAvailability);
 router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 router.get("/spacewanted", getSpaceWanted);
 router.get("/spacewanted/:id", getSpaceWantedById);

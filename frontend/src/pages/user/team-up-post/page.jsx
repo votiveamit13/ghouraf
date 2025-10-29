@@ -52,7 +52,15 @@ export default function TeamUpAd() {
         if (!formData.title.trim()) newErrors.title = "Title is required";
         if (!formData.country) newErrors.country = "Country is required";
         if (!formData.state) newErrors.state = "State is required";
-        if (!formData.city) newErrors.city = "City is required";
+        const stateCities = formData.country && formData.state ? 
+        City.getCitiesOfState(formData.country, formData.state) : [];
+    
+    if (stateCities.length > 0 && !formData.city) {
+        newErrors.city = "City is required";
+    } else if (stateCities.length === 0 && !formData.city) {
+        // Auto-set to "NA" when no cities are available
+        setFormData(prev => ({ ...prev, city: "NA" }));
+    }
         // if (!formData.zip.trim()) newErrors.zip = "Zip code is required";
         if (!formData.budget) {
             newErrors.budget = "Budget is required";
@@ -89,6 +97,23 @@ export default function TeamUpAd() {
         if (!formData.state || !formData.country) return [];
         return City.getCitiesOfState(formData.country, formData.state);
     }, [formData.country, formData.state]);
+
+    useEffect(() => {
+    if (formData.state) {
+        const stateCities = City.getCitiesOfState(formData.country, formData.state);
+        if (stateCities.length === 0 && formData.city !== "NA") {
+            setFormData(prev => ({
+                ...prev,
+                city: "NA"
+            }));
+        } else if (stateCities.length > 0 && formData.city === "NA") {
+            setFormData(prev => ({
+                ...prev,
+                city: ""
+            }));
+        }
+    }
+}, [formData.country, formData.state, formData.city]);
 
     useEffect(() => {
         setAllLocales(locales.all);
@@ -339,24 +364,33 @@ export default function TeamUpAd() {
                                     </select>
                                     {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
                                 </div>
-                                <div>
-                                    <label className="block text-gray-700">City</label>
-                                    <select
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        disabled={!formData.country}
-                                        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
-                                    >
-                                        <option value="">Select City</option>
-                                        {cities.map((city) => (
-                                            <option key={city.name} value={city.name}>
-                                                {city.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
-                                </div>
+<div>
+    <label className="block text-gray-700">City</label>
+    <select
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        disabled={!formData.country}
+        className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
+    >
+        <option value="">Select City</option>
+        {(() => {
+            const stateCities = formData.country && formData.state ? 
+                City.getCitiesOfState(formData.country, formData.state) : [];
+            
+            if (stateCities.length === 0) {
+                return <option value="NA">No City Available</option>;
+            }
+            
+            return stateCities.map((city) => (
+                <option key={city.name} value={city.name}>
+                    {city.name}
+                </option>
+            ));
+        })()}
+    </select>
+    {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+</div>
                                 {/* <div>
                                     <label className="block text-gray-700">Zip Code</label>
                                     <input
