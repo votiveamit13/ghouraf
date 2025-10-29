@@ -7,7 +7,7 @@ import ViewDetails from "pages/admin/user-management/view-details/page";
 import ContactForm from "pages/admin/contact-form/page";
 import { MdContactMail, MdOutlineBedroomParent } from "react-icons/md";
 import FaqManagement from "pages/admin/faq-management/page";
-import { FaQuestion, FaQuora, FaRegCircleUser } from "react-icons/fa6";
+import { FaImages, FaQuestion, FaQuora, FaRegCircleUser } from "react-icons/fa6";
 import AddFaq from "components/admin/faq-management/AddFaq";
 import EditFaq from "components/admin/faq-management/EditFaq";
 import Spaces from "components/admin/post_management/Spaces";
@@ -16,6 +16,8 @@ import { AiFillDashboard } from "react-icons/ai";
 import { FaUserCog } from "react-icons/fa";
 import { RiTeamLine } from "react-icons/ri";
 import SpaceWanted from "components/admin/post_management/SpaceWanted";
+import HeroImage from "pages/admin/home-screen-image/page";
+import { CiImageOn } from "react-icons/ci";
 
 export const adminRoutes = [
   {
@@ -33,6 +35,19 @@ export const adminRoutes = [
     component: <AdminDashboard />,
     layout: "/admin",
     showInSidebar: true
+  },
+  {
+    name: "Home Screen Image Management",
+    icon: <FaImages size={20} className="text-[#565ABF]" />,
+    subRoutes: [
+      {
+        path: "/homescreen-image",
+        name: "Banner Image",
+        icon: <CiImageOn className="text-[#565ABF]" />,
+        component: <HeroImage />,
+        layout: "/admin",
+      },
+    ]
   },
   {
 
@@ -95,7 +110,6 @@ export const adminRoutes = [
     ]
   },
   {
-
     name: "FAQ Management",
     icon: <FaQuora size={20} className="text-[#565ABF]" />,
     subRoutes: [

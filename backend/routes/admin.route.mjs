@@ -6,9 +6,8 @@ import {
     addFaq, getAllFaq, updateFaqStatus, updateFaq, deleteFaq,
     getAllSpaces, updateSpaceStatus, deleteSpace,
     getAllTeamUps, updateTeamUpStatus, deleteTeamUp,
-    getAllSpaceWanted,
-    updateSpaceWantedStatus,
-    deleteSpaceWanted
+    getAllSpaceWanted, updateSpaceWantedStatus, deleteSpaceWanted,
+    updateHomeImage, getHomeImage
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -39,6 +38,8 @@ router.patch("/teamup/:id/delete", adminAuth, deleteTeamUp);
 router.get("/spacewanted", adminAuth, getAllSpaceWanted);
 router.patch("/spacewanted/:id/status", adminAuth, updateSpaceWantedStatus);
 router.patch("/spacewanted/:id/delete", adminAuth, deleteSpaceWanted);
+router.get("/hero-image", adminAuth, getHomeImage);
+router.post("/hero-image", adminAuth, upload.single("image"), updateHomeImage);
 
 
 export default router;

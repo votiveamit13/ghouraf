@@ -9,6 +9,7 @@ import faq from "../../models/faq.mjs";
 import Space from "../../models/Space.mjs";
 import TeamUp from "../../models/TeamUp.mjs";
 import SpaceWanted from "../../models/SpaceWanted.mjs";
+import { HeroImage } from "../../models/HeroImage.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -534,5 +535,66 @@ export const deleteSpaceWanted = async (req, res) => {
   } catch (err) {
     console.error("Error deleting space wanted:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+//home screen image
+export const getHomeImage = async (req, res) => {
+  try {
+    const home = await HeroImage.findOne().sort({ createdAt: -1 });
+
+    if (!home) {
+      return res.status(404).json({ message: "Home image not set." });
+    }
+
+    res.status(200).json({
+      message: "Home image fetched successfully.",
+      imagePath: home.imagePath,
+    });
+  } catch (error) {
+    console.error("Error fetching home image:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateHomeImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded." });
+    }
+
+    fileHandler.validateExtension(req.file.originalname, "image");
+
+    const saved = fileHandler.saveFile(req.file, "home");
+
+    let home = await HeroImage.findOne();
+
+    if (home) {
+      if (home.imagePath) {
+        const oldPath = home.imagePath.replace("/uploads/", "");
+        const oldFilePath = path.join(process.cwd(), "uploads", oldPath);
+
+        try {
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
+        } catch (err) {
+          console.warn("Failed to delete old image:", err.message);
+        }
+      }
+
+      home.imagePath = saved.relativePath;
+      await home.save();
+    } else {
+      home = await HeroImage.create({ imagePath: saved.relativePath });
+    }
+
+    res.status(200).json({
+      message: "Home image updated successfully.",
+      imagePath: saved.relativePath,
+    });
+  } catch (error) {
+    console.error("Error updating home image:", error);
+    res.status(500).json({ message: error.message });
   }
 };
