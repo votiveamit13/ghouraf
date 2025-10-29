@@ -568,170 +568,194 @@ export default function EditPost({ show, onClose, ad, onUpdated }) {
     return photo.url;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  let isValid = false;
+  if (ad?.postCategory === "Space") {
+    isValid = validateSpaceForm();
+  } else if (ad?.postCategory === "Spacewanted") {
+    isValid = validateSpaceWantedForm();
+  } else if (ad?.postCategory === "Teamup") {
+    isValid = validateTeamUpForm();
+  } else {
+    isValid = true;
+  }
+
+  if (!isValid) {
+    return;
+  }
+
+  setIsSubmitting(true);
+  try {
+    const token = localStorage.getItem("token");
+    const formPayload = new FormData();
+
+    let endpoint = `${apiUrl}my-ads/${ad._id}`;
     
-    let isValid = false;
-    if (ad?.postCategory === "Space") {
-      isValid = validateSpaceForm();
-    } else if (ad?.postCategory === "Spacewanted") {
-      isValid = validateSpaceWantedForm();
-    } else if (ad?.postCategory === "Teamup") {
-      isValid = validateTeamUpForm();
-    } else {
-      isValid = true;
+    if (ad.postCategory === "Space") {
+      endpoint = `${apiUrl}spaces/${ad._id}`;
+    } else if (ad.postCategory === "Spacewanted") {
+      endpoint = `${apiUrl}spacewanted/${ad._id}`;
+    } else if (ad.postCategory === "Teamup") {
+      endpoint = `${apiUrl}teamup/${ad._id}`;
     }
 
-    if (!isValid) {
-      return;
+    if (ad.postCategory === "Space") {
+      const processedData = {
+        ...formData,
+        postCategory: "Space",
+        furnishing: formData.furnishing === "true",
+        smoking: formData.smoking === "true",
+        bedrooms: parseInt(formData.bedrooms, 10),
+        budget: parseFloat(formData.budget),
+        size: parseFloat(formData.size)
+      };
+
+      Object.keys(processedData).forEach(key => {
+        if (key === "amenities") {
+          processedData.amenities.forEach(a => formPayload.append("amenities[]", a));
+        } else if (!["photos", "featuredImage"].includes(key)) {
+          formPayload.append(key, processedData[key]);
+        }
+      });
+
+      if (featured?.file) {
+        formPayload.append("featuredImage", featured.file);
+      } else if (featured?.isExisting) {
+        formPayload.append("existingFeaturedImage", featured.url);
+      }
+
+    } else if (ad.postCategory === "Spacewanted") {
+      const processedData = {
+        ...formData,
+        postCategory: "Spacewanted",
+        age: parseInt(formData.age, 10),
+        budget: parseFloat(formData.budget),
+        roomSize: parseFloat(formData.roomSize)
+      };
+
+      Object.keys(processedData).forEach(key => {
+        if (key === "amenities") {
+          processedData.amenities.forEach(a => formPayload.append("amenities[]", a));
+        } else if (!["photos"].includes(key)) {
+          formPayload.append(key, processedData[key]);
+        }
+      });
+
+    } else if (ad.postCategory === "Teamup") {
+      const processedData = {
+        ...formData,
+        postCategory: "Teamup",
+        age: parseInt(formData.age, 10),
+        budget: parseFloat(formData.budget),
+        minAge: formData.minAge ? parseInt(formData.minAge, 10) : null,
+        maxAge: formData.maxAge ? parseInt(formData.maxAge, 10) : null,
+        smoke: formData.smoke === "true",
+        pets: formData.pets === "true",
+        petsPreference: formData.petsPreference === "true",
+      };
+
+      Object.keys(processedData).forEach(key => {
+        if (key === "amenities") {
+          processedData.amenities.forEach(a => formPayload.append("amenities[]", a));
+        } else if (!["photos"].includes(key)) {
+          formPayload.append(key, processedData[key]);
+        }
+      });
     }
 
-    setIsSubmitting(true);
-    try {
-      const token = localStorage.getItem("token");
-      const formPayload = new FormData();
+    photos.forEach(photo => {
+      if (photo.file) {
+        formPayload.append("photos", photo.file);
+      } else if (photo.isExisting) {
+        formPayload.append("existingPhotos", photo.url);
+      }
+    });
 
-      if (ad.postCategory === "Space") {
-        const processedData = {
-          ...formData,
-          furnishing: formData.furnishing === "true",
-          smoking: formData.smoking === "true",
-          bedrooms: parseInt(formData.bedrooms, 10),
-          budget: parseFloat(formData.budget),
-          size: parseFloat(formData.size)
-        };
+    const response = await axios.put(endpoint, formPayload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        Object.keys(processedData).forEach(key => {
-          if (key === "amenities") {
-            processedData.amenities.forEach(a => formPayload.append("amenities[]", a));
+    toast.success("Ad updated successfully!");
+    onUpdated?.();
+    onClose?.();
+
+  } catch (err) {
+    console.error("Update error:", err);
+    
+    if (err.response?.status === 404) {
+      try {
+        console.log("Specific endpoint failed, trying generic endpoint...");
+        const token = localStorage.getItem("token");
+        const genericEndpoint = `${apiUrl}my-ads/${ad._id}`;
+        
+        // Create a new FormData for the fallback attempt
+        const fallbackFormPayload = new FormData();
+        
+        // Add all form data to the fallback payload
+        Object.keys(formData).forEach(key => {
+          if (key === "amenities" && Array.isArray(formData.amenities)) {
+            formData.amenities.forEach(a => fallbackFormPayload.append("amenities[]", a));
           } else if (!["photos", "featuredImage"].includes(key)) {
-            formPayload.append(key, processedData[key]);
+            fallbackFormPayload.append(key, formData[key]);
           }
         });
-
-        if (featured?.file) {
-          formPayload.append("featuredImage", featured.file);
-        } else if (featured?.isExisting) {
-          formPayload.append("featuredImage", featured.url);
+        
+        // Add postCategory for the generic endpoint
+        fallbackFormPayload.append("postCategory", ad.postCategory);
+        
+        // Handle photos for fallback
+        photos.forEach(photo => {
+          if (photo.file) {
+            fallbackFormPayload.append("photos", photo.file);
+          } else if (photo.isExisting) {
+            fallbackFormPayload.append("existingPhotos", photo.url);
+          }
+        });
+        
+        // Handle featured image for fallback (Space category only)
+        if (ad.postCategory === "Space") {
+          if (featured?.file) {
+            fallbackFormPayload.append("featuredImage", featured.file);
+          } else if (featured?.isExisting) {
+            fallbackFormPayload.append("existingFeaturedImage", featured.url);
+          }
         }
 
-        photos.forEach(photo => {
-          if (photo.file) {
-            formPayload.append("photos", photo.file);
-          } else if (photo.isExisting) {
-            formPayload.append("existingPhotos", photo.url);
-          }
-        });
-
-        await axios.put(`${apiUrl}spaces/${ad._id}`, formPayload, {
+        const response = await axios.put(genericEndpoint, fallbackFormPayload, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         });
-      } else if (ad.postCategory === "Spacewanted") {
-        const processedData = {
-          ...formData,
-          age: parseInt(formData.age, 10),
-          budget: parseFloat(formData.budget),
-          roomSize: parseFloat(formData.roomSize)
-        };
-
-        Object.keys(processedData).forEach(key => {
-          if (key === "amenities") {
-            processedData.amenities.forEach(a => formPayload.append("amenities[]", a));
-          } else if (!["photos"].includes(key)) {
-            formPayload.append(key, processedData[key]);
-          }
-        });
-
-        photos.forEach(photo => {
-          if (photo.file) {
-            formPayload.append("photos", photo.file);
-          } else if (photo.isExisting) {
-            formPayload.append("existingPhotos", photo.url);
-          }
-        });
-
-        await axios.put(`${apiUrl}spacewanted/${ad._id}`, formPayload, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else if (ad.postCategory === "Teamup") {
-        const processedData = {
-          ...formData,
-          age: parseInt(formData.age, 10),
-          budget: parseFloat(formData.budget),
-          minAge: formData.minAge ? parseInt(formData.minAge, 10) : null,
-          maxAge: formData.maxAge ? parseInt(formData.maxAge, 10) : null,
-          smoke: formData.smoke === "true",
-          pets: formData.pets === "true",
-          petsPreference: formData.petsPreference === "true",
-        };
-
-        Object.keys(processedData).forEach(key => {
-          if (key === "amenities") {
-            processedData.amenities.forEach(a => formPayload.append("amenities[]", a));
-          } else if (!["photos"].includes(key)) {
-            formPayload.append(key, processedData[key]);
-          }
-        });
-
-        photos.forEach(photo => {
-          if (photo.file) {
-            formPayload.append("photos", photo.file);
-          } else if (photo.isExisting) {
-            formPayload.append("existingPhotos", photo.url);
-          }
-        });
-
-        await axios.put(`${apiUrl}teamup/${ad._id}`, formPayload, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        Object.keys(formData).forEach((key) => {
-          if (["photos", "featuredImageObj"].includes(key)) return;
-          if (formData[key] != null) formPayload.append(key, formData[key]);
-        });
-
-        if (formData.featuredImageObj?.file)
-          formPayload.append("featuredImage", formData.featuredImageObj.file);
-        else if (formData.featuredImageObj?.url)
-          formPayload.append("featuredImage", formData.featuredImageObj.url);
-
-        (formData.photos || []).forEach((p) => {
-          if (p.file) formPayload.append("photos", p.file);
-          else if (p.url) formPayload.append("existingPhotos", p.url);
-        });
-
-        await axios.put(`${apiUrl}my-ads/${ad._id}`, formPayload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        
+        toast.success("Ad updated successfully!");
+        onUpdated?.();
+        onClose?.();
+        return;
+      } catch (fallbackErr) {
+        console.error("Fallback update error:", fallbackErr);
+        if (fallbackErr.response?.status === 422) {
+          const backendErrors = fallbackErr.response.data.errors || {};
+          setErrors(backendErrors);
+        } else {
+          toast.error(fallbackErr.response?.data?.message || "Failed to update ad");
+        }
       }
-
-      toast.success("Ad updated successfully!");
-      onUpdated?.();
-      onClose?.();
-    } catch (err) {
-      console.error("Update error:", err);
-      if (err.response?.status === 422) {
-        const backendErrors = err.response.data.errors || {};
-        setErrors(backendErrors);
-      } else {
-        toast.error(err.response?.data?.message || "Failed to update ad");
-      }
-    } finally {
-      setIsSubmitting(false);
+    } else if (err.response?.status === 422) {
+      const backendErrors = err.response.data.errors || {};
+      setErrors(backendErrors);
+    } else {
+      toast.error(err.response?.data?.message || "Failed to update ad");
     }
-  };
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   if (!show || !ad) return null;
 

@@ -13,11 +13,14 @@ export default function HeroImage() {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [loading, setLoading] = useState(false);
+    const token = localStorage.getItem("authToken");
 
-    useEffect(() => {
+useEffect(() => {
   const fetchHeroImage = async () => {
     try {
-      const res = await axios.get(`${apiUrl}admin/hero-image`);
+      const res = await axios.get(`${apiUrl}admin/hero-image`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.data?.imagePath) {
         setCurrentImage(res.data.imagePath);
       }
@@ -26,7 +29,7 @@ export default function HeroImage() {
     }
   };
   fetchHeroImage();
-}, [apiUrl]);
+}, [apiUrl, token]);
 
     const onSelectFile = (e) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -60,7 +63,6 @@ export default function HeroImage() {
         canvas.height = height;
 
         ctx.drawImage(image, x, y, width, height, 0, 0, width, height);
-
         return new Promise((resolve) => {
             canvas.toBlob((blob) => {
                 resolve(blob);
@@ -68,26 +70,32 @@ export default function HeroImage() {
         });
     }, [selectedImage, croppedAreaPixels]);
 
-    const handleSaveCrop = async () => {
-        try {
-            setLoading(true);
-            const croppedBlob = await getCroppedImg();
-            const formData = new FormData();
-            formData.append("image", croppedBlob, "home.jpg");
+const handleSaveCrop = async () => {
+  try {
+    setLoading(true);
+    const croppedBlob = await getCroppedImg();
+    const formData = new FormData();
+    formData.append("image", croppedBlob, "home.jpg");
 
-            await axios.post(`${apiUrl}admin/hero-image`, formData);
-            toast.success("Home screen image updated successfully!");
+    await axios.post(`${apiUrl}admin/hero-image`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-            const newUrl = URL.createObjectURL(croppedBlob);
-            setCurrentImage(newUrl);
-            setShowCropModal(false);
-        } catch (error) {
-            console.error(error);
-            toast.error("Error uploading image");
-        } finally {
-            setLoading(false);
-        }
-    };
+    toast.success("Home screen image updated successfully!");
+
+    const newUrl = URL.createObjectURL(croppedBlob);
+    setCurrentImage(newUrl);
+    setShowCropModal(false);
+  } catch (error) {
+    console.error(error);
+    toast.error("Error uploading image");
+  } finally {
+    setLoading(false);
+  }
+};
 
     return (
         <>
@@ -124,7 +132,7 @@ export default function HeroImage() {
 
                     {showCropModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl p-6 relative">
+                            <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl p-4 relative">
                                 <h3 className="text-lg font-semibold mb-3 text-gray-700">
                                     Adjust Home Screen Image
                                 </h3>
@@ -154,10 +162,10 @@ export default function HeroImage() {
                                     />
                                 </div>
 
-                                <div className="flex justify-end gap-3 mt-6">
+                                <div className="flex justify-end gap-3 mt-4">
                                     <button
                                         onClick={() => setShowCropModal(false)}
-                                        className="px-4 py-2 text-gray-600 hover:text-gray-800 rounded-md transition"
+                                        className="px-4 py-2 text-gray-600 border hover:text-gray-800 rounded-md transition"
                                     >
                                         Cancel
                                     </button>
