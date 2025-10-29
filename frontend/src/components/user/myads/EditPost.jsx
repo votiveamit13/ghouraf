@@ -601,10 +601,11 @@ const handleSubmit = async (e) => {
       endpoint = `${apiUrl}teamup/${ad._id}`;
     }
 
+    formPayload.append("postCategory", ad.postCategory);
+
     if (ad.postCategory === "Space") {
       const processedData = {
         ...formData,
-        postCategory: "Space",
         furnishing: formData.furnishing === "true",
         smoking: formData.smoking === "true",
         bedrooms: parseInt(formData.bedrooms, 10),
@@ -623,13 +624,12 @@ const handleSubmit = async (e) => {
       if (featured?.file) {
         formPayload.append("featuredImage", featured.file);
       } else if (featured?.isExisting) {
-        formPayload.append("existingFeaturedImage", featured.url);
+        formPayload.append("existingFeaturedImage", featured.url); 
       }
 
     } else if (ad.postCategory === "Spacewanted") {
       const processedData = {
         ...formData,
-        postCategory: "Spacewanted",
         age: parseInt(formData.age, 10),
         budget: parseFloat(formData.budget),
         roomSize: parseFloat(formData.roomSize)
@@ -646,7 +646,6 @@ const handleSubmit = async (e) => {
     } else if (ad.postCategory === "Teamup") {
       const processedData = {
         ...formData,
-        postCategory: "Teamup",
         age: parseInt(formData.age, 10),
         budget: parseFloat(formData.budget),
         minAge: formData.minAge ? parseInt(formData.minAge, 10) : null,
@@ -669,10 +668,12 @@ const handleSubmit = async (e) => {
       if (photo.file) {
         formPayload.append("photos", photo.file);
       } else if (photo.isExisting) {
-        formPayload.append("existingPhotos", photo.url);
+        formPayload.append("existingPhotos", photo.url); 
       }
     });
 
+    console.log("Sending update request to:", endpoint);
+    
     const response = await axios.put(endpoint, formPayload, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -693,10 +694,10 @@ const handleSubmit = async (e) => {
         const token = localStorage.getItem("token");
         const genericEndpoint = `${apiUrl}my-ads/${ad._id}`;
         
-        // Create a new FormData for the fallback attempt
         const fallbackFormPayload = new FormData();
         
-        // Add all form data to the fallback payload
+        fallbackFormPayload.append("postCategory", ad.postCategory);
+        
         Object.keys(formData).forEach(key => {
           if (key === "amenities" && Array.isArray(formData.amenities)) {
             formData.amenities.forEach(a => fallbackFormPayload.append("amenities[]", a));
@@ -705,24 +706,19 @@ const handleSubmit = async (e) => {
           }
         });
         
-        // Add postCategory for the generic endpoint
-        fallbackFormPayload.append("postCategory", ad.postCategory);
-        
-        // Handle photos for fallback
         photos.forEach(photo => {
           if (photo.file) {
             fallbackFormPayload.append("photos", photo.file);
           } else if (photo.isExisting) {
-            fallbackFormPayload.append("existingPhotos", photo.url);
+            fallbackFormPayload.append("existingPhotos", photo.url); 
           }
         });
         
-        // Handle featured image for fallback (Space category only)
         if (ad.postCategory === "Space") {
           if (featured?.file) {
             fallbackFormPayload.append("featuredImage", featured.file);
           } else if (featured?.isExisting) {
-            fallbackFormPayload.append("existingFeaturedImage", featured.url);
+            fallbackFormPayload.append("existingFeaturedImage", featured.url); 
           }
         }
 

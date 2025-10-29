@@ -658,24 +658,67 @@ export const updateAd = async (req, res) => {
 
     const updatedData = { ...req.body };
 
-    if (req.files) {
-      if (req.files.featuredImage && req.files.featuredImage[0]) {
-        updatedData.featuredImage = `/uploads/${req.files.featuredImage[0].filename}`;
+    if (postCategory === "Space") {
+      if (req.files?.featuredImage?.[0]) {
+        fileHandler.validateExtension(req.files.featuredImage[0].originalname, "image");
+        const saved = fileHandler.saveFile(req.files.featuredImage[0], "featured");
+        updatedData.featuredImage = saved.relativePath;
+      } else if (req.body.existingFeaturedImage) {
+        updatedData.featuredImage = req.body.existingFeaturedImage;
       }
+    }
 
-      if (req.files.photos && req.files.photos.length > 0) {
-        updatedData.photos = req.files.photos.map((f) => ({
-          url: `/uploads/${f.filename}`,
-        }));
-      } else if (req.body.existingPhotos) {
-        updatedData.photos = Array.isArray(req.body.existingPhotos)
-          ? req.body.existingPhotos.map((url) => ({ url }))
-          : [{ url: req.body.existingPhotos }];
+    if (req.files?.photos && req.files.photos.length > 0) {
+      const newPhotos = req.files.photos.map(file => {
+        fileHandler.validateExtension(file.originalname, "image");
+        const saved = fileHandler.saveFile(file, "photos");
+        return {
+          id: Date.now() + Math.random(),
+          url: saved.relativePath
+        };
+      });
+      
+      if (req.body.existingPhotos) {
+        const existingPhotos = Array.isArray(req.body.existingPhotos) 
+          ? req.body.existingPhotos.map(url => ({ id: Date.now() + Math.random(), url }))
+          : [{ id: Date.now() + Math.random(), url: req.body.existingPhotos }];
+        updatedData.photos = [...existingPhotos, ...newPhotos];
+      } else {
+        updatedData.photos = newPhotos;
       }
+    } else if (req.body.existingPhotos) {
+      updatedData.photos = Array.isArray(req.body.existingPhotos)
+        ? req.body.existingPhotos.map(url => ({ id: Date.now() + Math.random(), url }))
+        : [{ id: Date.now() + Math.random(), url: req.body.existingPhotos }];
+    }
+
+    if (postCategory === "Space") {
+      updatedData.furnishing = updatedData.furnishing === "true";
+      updatedData.smoking = updatedData.smoking === "true";
+      updatedData.bedrooms = Number(updatedData.bedrooms);
+      updatedData.budget = parseFloat(updatedData.budget);
+      updatedData.size = parseFloat(updatedData.size);
+    }
+
+    if (postCategory === "Spacewanted") {
+      updatedData.age = Number(updatedData.age);
+      updatedData.budget = parseFloat(updatedData.budget);
+      updatedData.roomSize = parseFloat(updatedData.roomSize);
+    }
+
+    if (postCategory === "Teamup") {
+      updatedData.age = Number(updatedData.age);
+      updatedData.budget = parseFloat(updatedData.budget);
+      updatedData.minAge = updatedData.minAge ? Number(updatedData.minAge) : null;
+      updatedData.maxAge = updatedData.maxAge ? Number(updatedData.maxAge) : null;
+      updatedData.smoke = updatedData.smoke === "true";
+      updatedData.pets = updatedData.pets === "true";
+      updatedData.petsPreference = updatedData.petsPreference === "true";
     }
 
     const updatedAd = await Model.findByIdAndUpdate(id, updatedData, {
       new: true,
+      runValidators: true
     });
 
     if (!updatedAd) {
