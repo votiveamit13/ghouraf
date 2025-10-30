@@ -12,6 +12,7 @@ import SpaceWanted from "../../models/SpaceWanted.mjs";
 import { HeroImage } from "../../models/HeroImage.mjs";
 import fs from "fs";
 import path from "path";
+import Policy from "../../models/Policy.mjs";
 
 export const login = async (req, res) => {
   try {
@@ -598,5 +599,72 @@ export const updateHomeImage = async (req, res) => {
   } catch (error) {
     console.error("Error updating home image:", error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+//policy management
+export const createPolicy = async (req, res) => {
+  try {
+    const { category, title, content } = req.body;
+    if (!category || !title || !content) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const existing = await Policy.findOne({ title });
+    if (existing) {
+      return res.status(400).json({ message: "Policy with this title already exists." });
+    }
+
+    const policy = await Policy.create({ category, title, content });
+    res.status(201).json(policy);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getAllPolicies = async (req, res) => {
+  try {
+    const policies = await Policy.find().sort({ updatedAt: -1 });
+    res.status(200).json(policies);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getPolicyById = async (req, res) => {
+  try {
+    const policy = await Policy.findById(req.params.id);
+    if (!policy) return res.status(404).json({ message: "Policy not found" });
+    res.status(200).json(policy);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updatePolicy = async (req, res) => {
+  try {
+    const { category, title, content } = req.body;
+    const policy = await Policy.findById(req.params.id);
+
+    if (!policy) return res.status(404).json({ message: "Policy not found" });
+
+    policy.category = category || policy.category;
+    policy.title = title || policy.title;
+    policy.content = content || policy.content;
+    await policy.save();
+
+    res.status(200).json({ message: "Policy updated successfully", policy });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deletePolicy = async (req, res) => {
+  try {
+    const policy = await Policy.findByIdAndDelete(req.params.id);
+    if (!policy) return res.status(404).json({ message: "Policy not found" });
+    res.status(200).json({ message: "Policy deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

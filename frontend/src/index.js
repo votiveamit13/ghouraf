@@ -33,6 +33,8 @@ import TeamUpDetailPage from "pages/public/teamup/detail-page/page";
 import { AdminAuthProvider } from "context/AdminAuthContext";
 import AdminPrivateRoute from "components/auth/AdminPrivateRoute";
 import LoginPage from "pages/admin/login/page";
+import PrivacyPolicy from "pages/public/privacypolicy/page";
+import TermsConditions from "pages/public/termsandconditions/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -60,6 +62,8 @@ root.render(
         <Route path="/about-us" element={<Public><AboutUs /></Public>} />
         <Route path="/contact-us" element={<Public><ContactUs /></Public>} />
         <Route path="/faq" element={<Public><Faqs /></Public>} />
+        <Route path="/privacy-policy" element={<Public><PrivacyPolicy /></Public>} />
+        <Route path="/terms-and-conditions" element={<Public><TermsConditions/></Public>} />
         <Route path="/auth/verified" element={<Public><AuthVerified /></Public>} />
         <Route element={<PrivateRoute />}>
           <Route path="/user" element={<Public><UserDashboard /></Public>} />

@@ -5,7 +5,7 @@ import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 import Edit from "pages/admin/user-management/edit-details/page";
 import ViewDetails from "pages/admin/user-management/view-details/page";
 import ContactForm from "pages/admin/contact-form/page";
-import { MdContactMail, MdOutlineBedroomParent } from "react-icons/md";
+import { MdContactMail, MdOutlineBedroomParent, MdOutlinePolicy, MdPolicy } from "react-icons/md";
 import FaqManagement from "pages/admin/faq-management/page";
 import { FaImages, FaQuestion, FaQuora, FaRegCircleUser } from "react-icons/fa6";
 import AddFaq from "components/admin/faq-management/AddFaq";
@@ -18,6 +18,9 @@ import { RiTeamLine } from "react-icons/ri";
 import SpaceWanted from "components/admin/post_management/SpaceWanted";
 import HeroImage from "pages/admin/home-screen-image/page";
 import { CiImageOn } from "react-icons/ci";
+import PolicyManagement from "pages/admin/policy-management/page";
+import AddPolicy from "components/admin/policy-management/AddPolicy";
+import EditPolicy from "components/admin/policy-management/EditPolicy";
 
 export const adminRoutes = [
   {
@@ -131,6 +134,31 @@ export const adminRoutes = [
   {
     path: "/faq-management/edit",
     component: <EditFaq />,
+    layout: "/admin",
+    showInSidebar: false
+  },
+  {
+    name: "Policy Management",
+    icon: <MdPolicy size={20} className="text-[#565ABF]" />,
+    subRoutes: [
+      {
+        path: "/policy-management",
+        name: "Policies List",
+        icon: <MdOutlinePolicy className="text-[#565ABF]" />,
+        component: <PolicyManagement />,
+        layout: "/admin",
+      },
+    ]
+  },
+    {
+    path: "/policy-management/add",
+    component: <AddPolicy />,
+    layout: "/admin",
+    showInSidebar: false
+  },
+  {
+    path: "/policy-management/edit",
+    component: <EditPolicy />,
     layout: "/admin",
     showInSidebar: false
   },

@@ -1,5 +1,6 @@
 import ContactForm from "../models/ContactForm.mjs";
 import Faq from "../models/faq.mjs";
+import Policy from "../models/Policy.mjs";
 
 export const sendMessage = async (req, res) => {
     try {
@@ -29,4 +30,16 @@ export const getAllFaq = async (req, res) => {
         console.error("getAllFaq error", err);
         return res.status(500).json({ message: "Server error" });
     }
+};
+
+export const getPolicyByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const policy = await Policy.findOne({ category });
+    if (!policy)
+      return res.status(404).json({ message: `${category} policy not found` });
+    res.status(200).json(policy);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

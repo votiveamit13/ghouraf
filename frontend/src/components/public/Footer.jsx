@@ -49,11 +49,6 @@ export default function Footer() {
                 <IoIosArrowForward color="#565ABF"/> About Us
               </a>
             </li>
-            <li>
-              <a href="/" className="hover:text-white d-flex align-items-center">
-                <IoIosArrowForward color="#565ABF"/> Services
-              </a>
-            </li>
                         <li>
               <a href="/faq" className="hover:text-white d-flex align-items-center">
                 <IoIosArrowForward color="#565ABF"/> FAQ
@@ -65,12 +60,12 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="/" className="hover:text-white d-flex align-items-center">
+              <a href="/privacy-policy" className="hover:text-white d-flex align-items-center">
                 <IoIosArrowForward color="#565ABF"/> Privacy Policy
               </a>
             </li>
             <li>
-              <a href="/" className="hover:text-white d-flex align-items-center">
+              <a href="/terms-and-conditions" className="hover:text-white d-flex align-items-center">
                 <IoIosArrowForward color="#565ABF"/> Terms & Conditions
               </a>
             </li>
