@@ -261,7 +261,7 @@ export const resendVerificationEmail = async (req, res) => {
               </tr>
               <tr>
                 <td style="padding:30px; color:#333333; font-size:16px; line-height:1.5;">
-                  <p>Hi there,</p>
+                  <p>Hi <b>${firstName}</b>,</p>
                   <p>We noticed you haven’t verified your email yet. Please click the button below to confirm your email address and activate your account.</p>
                   <table border="0" cellspacing="0" cellpadding="0" style="margin:30px auto;">
                     <tr>
@@ -476,7 +476,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "Email not found" });
     }
 
-    const firstName = user.firstName || "User";
+    const firstName = user.profile.firstName || "User";
 
     const actionCodeSettings = {
       url: `${process.env.FRONTEND_URL}`,

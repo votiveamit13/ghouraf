@@ -9,7 +9,7 @@ export default function PrivacyPolicy() {
   useEffect(() => {
     const fetchPolicy = async () => {
       try {
-        const res = await axios.get(`${apiUrl}policies/privacy`);
+        const res = await axios.get(`${apiUrl}policies/Privacy`);
         setPolicy(res.data);
       } catch (err) {
         console.error("Error fetching policy:", err);
@@ -38,11 +38,11 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="container px-4 mt-5 mb-8">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">
+      <h1 className="text-3xl font-semibold text-black mb-6 text-center">
         {policy.title}
       </h1>
       <div
-        className="prose prose-indigo max-w-none"
+        className="max-w-none text-black"
         dangerouslySetInnerHTML={{ __html: policy.content }}
       />
       <p className="text-sm text-gray-400 mt-8 text-right">

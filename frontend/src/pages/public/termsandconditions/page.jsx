@@ -9,7 +9,7 @@ export default function TermsConditions() {
   useEffect(() => {
     const fetchPolicy = async () => {
       try {
-        const res = await axios.get(`${apiUrl}policies/terms`);
+        const res = await axios.get(`${apiUrl}policies/Terms`);
         setPolicy(res.data);
       } catch (err) {
         console.error("Error fetching terms:", err);
@@ -42,7 +42,7 @@ export default function TermsConditions() {
         {policy.title}
       </h1>
       <div
-        className="prose prose-indigo max-w-none text-black"
+        className="max-w-none text-black"
         dangerouslySetInnerHTML={{ __html: policy.content }}
       />
       <p className="text-sm text-gray-400 mt-8 text-right">
