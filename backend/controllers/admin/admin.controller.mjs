@@ -10,6 +10,8 @@ import Space from "../../models/Space.mjs";
 import TeamUp from "../../models/TeamUp.mjs";
 import SpaceWanted from "../../models/SpaceWanted.mjs";
 import { HeroImage } from "../../models/HeroImage.mjs";
+import fs from "fs";
+import path from "path";
 
 export const login = async (req, res) => {
   try {
