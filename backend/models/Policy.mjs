@@ -12,11 +12,11 @@ const policySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    // slug: {
-    //   type: String,
-    //   unique: true,
-    //   trim: true,
-    // },
+    slug: {
+      type: String,
+      unique: true,
+      trim: true,
+    },
     content: {
       type: String,
       required: true,
@@ -25,15 +25,15 @@ const policySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// policySchema.pre("save", function (next) {
-//   if (!this.slug) {
-//     this.slug = this.title
-//       .toLowerCase()
-//       .replace(/[^a-z0-9]+/g, "-")
-//       .replace(/(^-|-$)+/g, "");
-//   }
-//   next();
-// });
+policySchema.pre("save", function (next) {
+  if (!this.slug) {
+    this.slug = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+  }
+  next();
+});
 
 const Policy = mongoose.model("Policy", policySchema);
 export default Policy;
