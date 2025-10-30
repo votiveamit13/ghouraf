@@ -45,9 +45,9 @@ const Header = () => {
           <div className="bg-white shadow rounded-lg p-4 flex justify-between items-center">
             <div>
               <h5 className="text-xs font-semibold text-gray-500 uppercase">
-                Booking
+                Post Report Count
               </h5>
-              <span className="text-2xl font-bold text-gray-800">49,65%</span>
+              <span className="text-2xl font-bold text-gray-800">496</span>
             </div>
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 text-white shadow">
               <i className="fas fa-percent" />

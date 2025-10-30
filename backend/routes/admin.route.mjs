@@ -39,6 +39,7 @@ router.get("/spacewanted", adminAuth, getAllSpaceWanted);
 router.patch("/spacewanted/:id/status", adminAuth, updateSpaceWantedStatus);
 router.patch("/spacewanted/:id/delete", adminAuth, deleteSpaceWanted);
 router.get("/hero-image", adminAuth, getHomeImage);
+router.get("/hero-image", getHomeImage);
 router.post("/hero-image", adminAuth, upload.single("image"), updateHomeImage);
 
 

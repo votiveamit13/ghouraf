@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
-import heroImage from "assets/img/ghouraf/hero-section.jpg";
 import { useNavigate } from "react-router-dom";
 import { City } from "country-state-city";
 import { getFullLocation } from "utils/locationHelper";
+import heroFallback from "assets/img/ghouraf/hero-section.jpg";
+import axios from "axios";
 
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState("spaces");
@@ -15,8 +16,23 @@ export default function HeroSection() {
     stateCode: "",
     countryCode: "",
   });
+  const [heroImage, setHeroImage] = useState(heroFallback);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchHeroImage = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}admin/hero-image`);
+        if (res.data?.data?.imageUrl) {
+          setHeroImage(res.data.data.imageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load hero image:", error);
+      }
+    };
+    fetchHeroImage();
+  }, []);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -103,44 +119,44 @@ export default function HeroSection() {
           </div>
         </div>
 
-<div className="flex flex-col items-center">
-  <div className="relative w-full max-w-3xl">
-    <div className="flex items-center bg-white rounded-full overflow-hidden shadow-lg w-full">
-      <input
-        type="text"
-        placeholder="Search by City"
-        className="flex-grow px-4 text-[#A321A6] placeholder-[#A321A6] outline-none text-sm sm:text-base"
-        value={searchInput}
-        onChange={handleInputChange}
-        onFocus={() => setShowDropdown(suggestions.length > 0)}
-        onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-      />
-      <button
-        onClick={handleSearch}
-        className="bg-[#A321A6] hover:from-purple-700 hover:to-pink-700 p-3 rounded-full text-white transition m-1"
-      >
-        <FiSearch className="w-5 h-5" />
-      </button>
-    </div>
+        <div className="flex flex-col items-center">
+          <div className="relative w-full max-w-3xl">
+            <div className="flex items-center bg-white rounded-full overflow-hidden shadow-lg w-full">
+              <input
+                type="text"
+                placeholder="Search by City"
+                className="flex-grow px-4 text-[#A321A6] placeholder-[#A321A6] outline-none text-sm sm:text-base"
+                value={searchInput}
+                onChange={handleInputChange}
+                onFocus={() => setShowDropdown(suggestions.length > 0)}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+              />
+              <button
+                onClick={handleSearch}
+                className="bg-[#A321A6] hover:from-purple-700 hover:to-pink-700 p-3 rounded-full text-white transition m-1"
+              >
+                <FiSearch className="w-5 h-5" />
+              </button>
+            </div>
 
-    {showDropdown && suggestions.length > 0 && (
-      <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-md w-full max-h-[200px] overflow-y-auto mt-1">
-        {suggestions.map((item, idx) => {
-          const fullName = getFullLocation(item.city, item.stateCode, item.countryCode);
-          return (
-            <li
-              key={idx}
-              onMouseDown={() => handleSelectSuggestion(item)}
-              className="text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
-            >
-              {fullName}
-            </li>
-          );
-        })}
-      </ul>
-    )}
-  </div>
-</div>
+            {showDropdown && suggestions.length > 0 && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-md w-full max-h-[200px] overflow-y-auto mt-1">
+                {suggestions.map((item, idx) => {
+                  const fullName = getFullLocation(item.city, item.stateCode, item.countryCode);
+                  return (
+                    <li
+                      key={idx}
+                      onMouseDown={() => handleSelectSuggestion(item)}
+                      className="text-left px-3 py-2 cursor-pointer hover:bg-gray-100"
+                    >
+                      {fullName}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );
