@@ -40,19 +40,6 @@ export const adminRoutes = [
     showInSidebar: true
   },
   {
-    name: "Home Screen Image Management",
-    icon: <FaImages size={20} className="text-[#565ABF]" />,
-    subRoutes: [
-      {
-        path: "/homescreen-image",
-        name: "Banner Image",
-        icon: <CiImageOn className="text-[#565ABF]" />,
-        component: <HeroImage />,
-        layout: "/admin",
-      },
-    ]
-  },
-  {
 
     name: "User Management",
     icon: <FaUserCog size={20} className="text-[#565ABF]" />,
@@ -168,7 +155,20 @@ export const adminRoutes = [
     icon: <MdContactMail size={20} className="text-[#565ABF]" />,
     component: <ContactForm />,
     layout: "/admin",
-  }
+  },
+    {
+    name: "Home Screen Image Management",
+    icon: <FaImages size={20} className="text-[#565ABF]" />,
+    subRoutes: [
+      {
+        path: "/homescreen-image",
+        name: "Banner Image",
+        icon: <CiImageOn className="text-[#565ABF]" />,
+        component: <HeroImage />,
+        layout: "/admin",
+      },
+    ]
+  },
 ];
 
 
