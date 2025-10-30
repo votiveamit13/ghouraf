@@ -108,8 +108,8 @@ export default function AddPolicy() {
                                     className="form-control"
                                 >
                                     <option value="">Select Category</option>
-                                    <option value="privacy">Privacy Policy</option>
-                                    <option value="terms">Terms & Conditions</option>
+                                    <option value="Privacy">Privacy Policy</option>
+                                    <option value="Terms">Terms & Conditions</option>
                                 </select>
                                 {errors.category && (
                                     <p className="text-red-500 text-sm mt-1">{errors.category}</p>

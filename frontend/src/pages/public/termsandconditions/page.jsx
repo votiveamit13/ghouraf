@@ -37,12 +37,12 @@ export default function TermsConditions() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">
+    <div className="container px-4 mt-5 mb-8">
+      <h1 className="text-3xl font-semibold text-black mb-6 text-center">
         {policy.title}
       </h1>
       <div
-        className="prose prose-indigo max-w-none"
+        className="prose prose-indigo max-w-none text-black"
         dangerouslySetInnerHTML={{ __html: policy.content }}
       />
       <p className="text-sm text-gray-400 mt-8 text-right">

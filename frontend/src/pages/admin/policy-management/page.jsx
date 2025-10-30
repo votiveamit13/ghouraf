@@ -82,7 +82,6 @@ export default function PolicyManagement() {
                   <th className="px-3 py-3 text-left font-semibold w-[60px]">S.No</th>
                   <th className="px-3 py-3 text-left font-semibold">Title</th>
                   <th className="px-3 py-3 text-left font-semibold">Policy Category</th>
-                  <th className="px-3 py-3 text-left font-semibold">Slug</th>
                   <th className="px-3 py-3 text-left font-semibold">Last Updated</th>
                   <th className="px-3 py-3 text-center font-semibold w-[100px]">Action</th>
                 </tr>
@@ -100,9 +99,8 @@ export default function PolicyManagement() {
                       <td className="px-3 py-3">{startIndex + index + 1}</td>
                       <td className="px-3 py-3">{policy.title}</td>
                                             <td className="px-3 py-3 text-gray-600">
-                        {policy.policycategory || "-"}
+                        {policy.category || "-"}
                       </td>
-                      <td className="px-3 py-3 text-gray-600">{policy.slug}</td>
                       <td className="px-3 py-3 text-gray-600">
                         {new Date(policy.updatedAt).toLocaleDateString()}
                       </td>

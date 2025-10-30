@@ -37,7 +37,7 @@ export default function PrivacyPolicy() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="container px-4 mt-5 mb-8">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">
         {policy.title}
       </h1>
