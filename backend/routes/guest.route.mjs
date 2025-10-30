@@ -1,8 +1,7 @@
 import express from "express";
-import { sendMessage, getAllFaq } from "../controllers/guest.controller.mjs";
+import { sendMessage, getAllFaq, getPolicyByCategory } from "../controllers/guest.controller.mjs";
 import { contactFormCreateSchema } from "../validations/contactform.validator.mjs";
 import { validate } from "../middleware/validate.mjs";
-import { getPolicyByCategory } from "../controllers/admin/admin.controller.mjs";
 
 const router = express.Router();
 
