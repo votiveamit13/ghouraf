@@ -49,6 +49,17 @@ export default function RoomWantedAd() {
     }, [formData.country]);
 
     useEffect(() => {
+  if (user?.profile) {
+    setFormData((prev) => ({
+      ...prev,
+      name: `${user.profile.firstName || ""} ${user.profile.lastName || ""}`.trim(),
+      age: user.profile.age || "",
+      gender: user.profile.gender || "",
+    }));
+  }
+}, [user]);
+
+    useEffect(() => {
         setAllLocales(locales.all);
     }, []);
 
@@ -139,8 +150,8 @@ export default function RoomWantedAd() {
         } else if (formData.age > 100) {
             newErrors.age = "Age cannot exceed 100";
         }
-        if (!["Male", "Female"].includes(formData.gender)) {
-            newErrors.gender = "Gender must be either 'Male' or 'Female'";
+        if (!["male", "female"].includes(formData.gender)) {
+            newErrors.gender = "Gender must be either 'male' or 'female'";
         }
         if (!["Student", "Professional"].includes(formData.occupation)) {
             newErrors.occupation = "Occupation must be 'Student' or 'Professional'";
@@ -541,7 +552,7 @@ export default function RoomWantedAd() {
                                     <input
                                         type="text"
                                         name="name"
-                                        value={`${user?.profile?.firstName} ${user?.profile?.lastName}`}
+                                        value={formData.name}
                                         onChange={handleChange}
                                         placeholder="Full Name"
                                         className={getInputClass("name")}
@@ -554,7 +565,7 @@ export default function RoomWantedAd() {
                                     <input
                                         type="text"
                                         name="age"
-                                        value={user?.profile?.age}
+                                        value={formData.age}
                                         onChange={handleChange}
                                         className={getInputClass("age")}
                                         placeholder="Enter age"
@@ -567,7 +578,7 @@ export default function RoomWantedAd() {
                                     <input
                                         type="text"
                                         name="gender"
-                                        value={user?.profile?.gender}
+                                        value={formData.gender}
                                         onChange={handleChange}
                                         className={getInputClass("gender")}
                                     />

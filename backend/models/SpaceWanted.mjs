@@ -18,7 +18,7 @@ const SpaceWantedSchema = new mongoose.Schema(
     amenities: [{ type: String }],
     name: { type: String, required: true },
     age: { type: Number, required: true },
-    gender: { type: String, enum: ["Male", "Female"], required: true },
+    gender: { type: String, enum: ["male", "female"], required: true },
     occupation: { type: String, enum: ["Student", "Professional"], required: true },
     smoke: { type: String, enum: ["Yes", "No", "Sometimes"] },
     pets: { type: String, enum: ["Yes", "No"] },

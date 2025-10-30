@@ -15,21 +15,21 @@ export default function HeroImage() {
     const [loading, setLoading] = useState(false);
     const token = localStorage.getItem("authToken");
 
-useEffect(() => {
-  const fetchHeroImage = async () => {
-    try {
-      const res = await axios.get(`${apiUrl}admin/hero-image`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.data?.imagePath) {
-        setCurrentImage(res.data.imagePath);
-      }
-    } catch (error) {
-      console.warn("No hero image set yet");
-    }
-  };
-  fetchHeroImage();
-}, [apiUrl, token]);
+    useEffect(() => {
+        const fetchHeroImage = async () => {
+            try {
+                const res = await axios.get(`${apiUrl}admin/hero-image`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (res.data?.imagePath) {
+                    setCurrentImage(res.data.imagePath);
+                }
+            } catch (error) {
+                console.warn("No hero image set yet");
+            }
+        };
+        fetchHeroImage();
+    }, [apiUrl, token]);
 
     const onSelectFile = (e) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -70,32 +70,32 @@ useEffect(() => {
         });
     }, [selectedImage, croppedAreaPixels]);
 
-const handleSaveCrop = async () => {
-  try {
-    setLoading(true);
-    const croppedBlob = await getCroppedImg();
-    const formData = new FormData();
-    formData.append("image", croppedBlob, "home.jpg");
+    const handleSaveCrop = async () => {
+        try {
+            setLoading(true);
+            const croppedBlob = await getCroppedImg();
+            const formData = new FormData();
+            formData.append("image", croppedBlob, "home.jpg");
 
-    await axios.post(`${apiUrl}admin/hero-image`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+            await axios.post(`${apiUrl}admin/hero-image`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
 
-    toast.success("Home screen image updated successfully!");
+            toast.success("Home screen image updated successfully!");
 
-    const newUrl = URL.createObjectURL(croppedBlob);
-    setCurrentImage(newUrl);
-    setShowCropModal(false);
-  } catch (error) {
-    console.error(error);
-    toast.error("Error uploading image");
-  } finally {
-    setLoading(false);
-  }
-};
+            const newUrl = URL.createObjectURL(croppedBlob);
+            setCurrentImage(newUrl);
+            setShowCropModal(false);
+        } catch (error) {
+            console.error(error);
+            toast.error("Error uploading image");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <>
@@ -108,25 +108,25 @@ const handleSaveCrop = async () => {
                         </h3>
                     </div>
 
-                    <div className="flex justify-center mb-4 mt-4">
-                        <img
-                            src={currentImage}
-                            alt="Current Home"
-                            className="rounded-lg shadow-md max-h-64 object-cover"
-                        />
-                    </div>
-
                     <div>
                         <input
                             type="file"
                             accept="image/*"
                             onChange={onSelectFile}
-                            className="block w-full mb-4 px-2 text-sm text-gray-600
-                     file:mr-4 file:py-2 file:px-4
-                     file:rounded-full file:border-0
-                     file:text-sm file:font-semibold
-                     file:bg-indigo-50 file:text-indigo-700
-                     hover:file:bg-indigo-100 cursor-pointer"
+                            className="block w-full mt-4 mb-4 px-3 text-sm text-gray-600
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-indigo-50 file:text-indigo-700
+                                hover:file:bg-indigo-100 cursor-pointer"
+                        />
+                    </div>
+
+                    <div className="flex justify-center mb-4 mt-4">
+                        <img
+                            src={currentImage}
+                            alt="Current Home"
+                            className="px-3 shadow-md object-cover"
                         />
                     </div>
 

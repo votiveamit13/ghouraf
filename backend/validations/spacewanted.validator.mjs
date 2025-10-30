@@ -104,10 +104,10 @@ export const createSpaceWantedSchema = Joi.object({
     }),
 
   gender: Joi.string()
-    .valid("Male", "Female")
+    .valid("male", "female")
     .required()
     .messages({
-      "any.only": "Gender must be either 'Male' or 'Female'",
+      "any.only": "Gender must be either 'male' or 'female'",
       "string.empty": "Gender is required",
     }),
 

@@ -46,6 +46,19 @@ export default function TeamUpAd() {
     const [allLocales, setAllLocales] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
 
+    useEffect(() => {
+  if (user?.profile) {
+    setFormData((prev) => ({
+      ...prev,
+      firstName: user.profile.firstName || "",
+      lastName: user.profile.lastName || "",
+      age: user.profile.age || "",
+      gender: user.profile.gender || "",
+    }));
+  }
+}, [user]);
+
+
     const validateForm = () => {
         let newErrors = {};
 
@@ -415,7 +428,7 @@ export default function TeamUpAd() {
                                     <input
                                         type="text"
                                         name="firstName"
-                                        value={user?.profile?.firstName}
+                                        value={formData.firstName}
                                         onChange={handleChange}
                                         placeholder="Enter your first name"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
@@ -427,7 +440,7 @@ export default function TeamUpAd() {
                                     <input
                                         type="text"
                                         name="lastName"
-                                        value={user?.profile?.lastName}
+                                        value={formData.lastName}
                                         onChange={handleChange}
                                         placeholder="Enter your last name"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
@@ -440,7 +453,7 @@ export default function TeamUpAd() {
                                         type="text"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         name="gender"
-                                        value={user?.profile?.gender}
+                                        value={formData.gender}
                                         onChange={handleChange}
                                     />
                                     {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
@@ -450,7 +463,7 @@ export default function TeamUpAd() {
                                     <input
                                         type="text"
                                         name="age"
-                                        value={user?.profile?.age}
+                                        value={formData.age}
                                         onChange={handleChange}
                                         placeholder="Age"
                                         className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"

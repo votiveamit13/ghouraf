@@ -20,23 +20,22 @@ export default function HeroSection() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchHeroImage = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}admin/herosection-image`);
-        if (res.data?.data?.imageUrl) {
-  setHeroImage(res.data.data.imageUrl);
-  console.log("✅ Hero image loaded from backend:", res.data.data.imageUrl);
-} else {
-  console.log("⚠️ Using fallback image (no backend image found)");
-}
+useEffect(() => {
+  const fetchHeroImage = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}admin/herosection-image`);
+      
+      if (res.data?.imagePath) {
+        setHeroImage(`${res.data.imagePath}`);
+        // console.log("✅ Hero image loaded:", res.data.imagePath);
+      } 
+    } catch (error) {
+      console.error("Failed to load hero image:", error);
+    }
+  };
+  fetchHeroImage();
+}, []);
 
-      } catch (error) {
-        console.error("Failed to load hero image:", error);
-      }
-    };
-    fetchHeroImage();
-  }, []);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
