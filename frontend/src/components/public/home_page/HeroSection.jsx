@@ -23,10 +23,14 @@ export default function HeroSection() {
   useEffect(() => {
     const fetchHeroImage = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}admin/hero-image`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}admin/herosection-image`);
         if (res.data?.data?.imageUrl) {
-          setHeroImage(res.data.data.imageUrl);
-        }
+  setHeroImage(res.data.data.imageUrl);
+  console.log("✅ Hero image loaded from backend:", res.data.data.imageUrl);
+} else {
+  console.log("⚠️ Using fallback image (no backend image found)");
+}
+
       } catch (error) {
         console.error("Failed to load hero image:", error);
       }
