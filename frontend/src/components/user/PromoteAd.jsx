@@ -78,8 +78,8 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId }) => {
             <input
               type="radio"
               name="plan"
-              value="20"
-              checked={selectedPlan === "20"}
+              value="30"
+              checked={selectedPlan === "30"}
               onChange={(e) => setSelectedPlan(e.target.value)}
               className="accent-purple-600"
             />

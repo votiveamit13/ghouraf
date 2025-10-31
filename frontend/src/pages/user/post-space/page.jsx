@@ -330,14 +330,14 @@ export default function PostSpace() {
         },
       });
 
-      navigate("/user/thank-you", {
-        state: {
-          title: "Your ad was successfully submitted",
-          subtitle: "This post will undergo a review process and will be published once approved.",
-          goBackPath: "/user/post-an-space",
-          viewAdsPath: "/my-spaces"
-        }
-      });
+    const newSpaceId = res.data?.space?._id;
+    if (!newSpaceId) {
+      toast.error("Failed to get created space ID.");
+      return;
+    }
+
+    localStorage.setItem("lastCreatedSpaceId", newSpaceId);
+
       setErrors({});
       setFormData({
         title: "",
@@ -360,6 +360,7 @@ export default function PostSpace() {
       setFeatured(null);
       setPhotos([]);
       setStep(1);
+      setShowPromoteModal(true);
 
     } catch (err) {
       if (err.response?.status === 422) {
@@ -900,14 +901,24 @@ export default function PostSpace() {
                 </button>
               </div>
             )}
-            <PromoteAdModal
-              show={showPromoteModal}
-              onClose={() => setShowPromoteModal(false)}
-              onPublishNormally={() => {
-                setShowPromoteModal(false);
-                handlePublish();
-              }}
-            />
+<PromoteAdModal
+  show={showPromoteModal}
+  onClose={() => setShowPromoteModal(false)}
+  onPublishNormally={() => {
+    setShowPromoteModal(false);
+    navigate("/user/thank-you", {
+      state: {
+        title: "Your ad was successfully submitted",
+        subtitle:
+          "This post will undergo a review process and will be published once approved.",
+        goBackPath: "/user/post-an-space",
+        viewAdsPath: "/my-spaces",
+      },
+    });
+  }}
+  spaceId={localStorage.getItem("lastCreatedSpaceId")}  
+/>
+
           </div>
         </div>
       </div>
