@@ -4,7 +4,7 @@ const policySchema = new mongoose.Schema(
   {
     category: {
       type: String,
-      enum: ["Privacy", "Terms"],
+      enum: ["Privacy", "Terms", "Safety", "Advice"],
       required: true,
     },
     title: {

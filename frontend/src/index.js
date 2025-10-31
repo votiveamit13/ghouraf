@@ -35,6 +35,8 @@ import AdminPrivateRoute from "components/auth/AdminPrivateRoute";
 import LoginPage from "pages/admin/login/page";
 import PrivacyPolicy from "pages/public/privacypolicy/page";
 import TermsConditions from "pages/public/termsandconditions/page";
+import SafetyTips from "pages/public/safetytips/page";
+import Advice from "pages/public/advice/page";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -64,6 +66,8 @@ root.render(
         <Route path="/faq" element={<Public><Faqs /></Public>} />
         <Route path="/privacy-policy" element={<Public><PrivacyPolicy /></Public>} />
         <Route path="/terms-and-conditions" element={<Public><TermsConditions/></Public>} />
+        <Route path="/safety-tips" element={<Public><SafetyTips/></Public>} />
+        <Route path="/advice" element={<Public><Advice/></Public>} />
         <Route path="/auth/verified" element={<Public><AuthVerified /></Public>} />
         <Route element={<PrivateRoute />}>
           <Route path="/user" element={<Public><UserDashboard /></Public>} />

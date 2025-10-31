@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiMenu, HiX, HiOutlineMail } from "react-icons/hi";
@@ -59,6 +59,30 @@ export default function Navbar() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [showInvalidDialog, setShowInvalidDialog] = useState(false);
   const [showMoreInfoMobile, setShowMoreInfoMobile] = useState(false);
+  const dropdownRef = useRef(null);
+  const mobileDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target)) {
+        setMobileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleDropdownAction = (action) => {
+    setDropdownOpen(false);
+    setMobileDropdownOpen(false);
+    if (action) action();
+  };
 
 
   const handleChange = (e) => {
@@ -300,60 +324,60 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex space-x-8 relative">
-  {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
-    if (item === "more-info") {
-      return (
-<div key={item} className="relative group">
-  <button
-    className={`font-semibold ${linkClass} text-[#565ABF]`}
-  >
-    More Info
-  </button>
+            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
+              if (item === "more-info") {
+                return (
+                  <div key={item} className="relative group">
+                    <button
+                      className={`font-semibold ${linkClass} text-[#565ABF]`}
+                    >
+                      More Info
+                    </button>
 
-  <div
-    className="pointer-events-none absolute left-0 mt-2 w-40"
-  >
-    <div
-      className="pointer-events-auto bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50"
-    >
-      <NavLink
-        to="/about-us"
-        className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-      >
-        About Us
-      </NavLink>
-      <NavLink
-        to="/contact-us"
-        className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-      >
-        Contact Us
-      </NavLink>
-      <NavLink
-        to="/faq"
-        className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-      >
-        FAQ
-      </NavLink>
-    </div>
-  </div>
-</div>
+                    <div
+                      className="pointer-events-none absolute left-0 mt-2 w-40"
+                    >
+                      <div
+                        className="pointer-events-auto bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50"
+                      >
+                        <NavLink
+                          to="/about-us"
+                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+                        >
+                          About Us
+                        </NavLink>
+                        <NavLink
+                          to="/contact-us"
+                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+                        >
+                          Contact Us
+                        </NavLink>
+                        <NavLink
+                          to="/faq"
+                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+                        >
+                          FAQ
+                        </NavLink>
+                      </div>
+                    </div>
+                  </div>
 
-      );
-    }
+                );
+              }
 
-    return (
-      <NavLink
-        key={item}
-        to={`/${item}`}
-        className={({ isActive }) =>
-          `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-        }
-      >
-        {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-      </NavLink>
-    );
-  })}
-</div>
+              return (
+                <NavLink
+                  key={item}
+                  to={`/${item}`}
+                  className={({ isActive }) =>
+                    `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                  }
+                >
+                  {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                </NavLink>
+              );
+            })}
+          </div>
 
           <div className="hidden md:flex items-center space-x-6">
             {!user ? (
@@ -385,7 +409,7 @@ export default function Navbar() {
                 <a href="/user" className="text-black hover:text-[#A321A6]">
                   <HiOutlineMail size={22} />
                 </a>
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="focus:outline-none"
@@ -402,33 +426,48 @@ export default function Navbar() {
 
                   {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg py-2 z-50">
-                      <a href="/user" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                      <a href="/user"
+                        className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                        onClick={() => handleDropdownAction()}
+                      >
                         <LuUserRound className="mr-2" /> My Account
                       </a>
                       <a
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          setOpen(true);
+                          handleDropdownAction(() => setOpen(true));
                         }}
                         className="flex items-center px-4 py-2 hover:text-[#565ABF]"
                       >
                         <FiPlusCircle className="mr-2" /> Post an Ad
                       </a>
-                      <a href="/user/my-ads" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                      <a href="/user/my-ads"
+                        className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                        onClick={() => handleDropdownAction()}
+                      >
                         <GoSync className="mr-2" /> My Ads
                       </a>
-                      <a href="/user/saved-ads" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                      <a href="/user/saved-ads"
+                        className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                        onClick={() => handleDropdownAction()}
+                      >
                         <GrFavorite className="mr-2" /> Saved Ads
                       </a>
-                      <a href="/user/messages" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                      <a href="/user/messages"
+                        className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                        onClick={() => handleDropdownAction()}
+                      >
                         <LuMessageSquareText className="mr-2" /> Messages
                       </a>
-                      <a href="/user/edit-my-details" className="flex items-center px-4 py-2 hover:text-[#565ABF]">
+                      <a href="/user/edit-my-details"
+                        className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                        onClick={() => handleDropdownAction()}
+                      >
                         <FiEdit className="mr-2" /> Edit My Details
                       </a>
                       <button
-                        onClick={handleLogout}
+                        onClick={() => handleDropdownAction(handleLogout)}
                         className="flex items-center w-full px-4 py-2 hover:text-[#565ABF]"
                       >
                         <LuLogOut className="mr-2" /> Logout
@@ -454,61 +493,61 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       {isOpen && (
         <div className="md:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4">
-{["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
-  if (item === "more-info") {
-    return (
-      <div key={item} className="space-y-1">
-        <button
-          onClick={() => setShowMoreInfoMobile((prev) => !prev)}
-          className={`flex justify-between items-center w-full text-left ${linkClass} text-[#565ABF]`}
-        >
-          <span>{item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}</span>
-          {/* <span>{showMoreInfoMobile ? "▲" : "▼"}</span> */}
-        </button>
+          {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
+            if (item === "more-info") {
+              return (
+                <div key={item} className="space-y-1">
+                  <button
+                    onClick={() => setShowMoreInfoMobile((prev) => !prev)}
+                    className={`flex justify-between items-center w-full text-left ${linkClass} text-[#565ABF]`}
+                  >
+                    <span>{item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                    {/* <span>{showMoreInfoMobile ? "▲" : "▼"}</span> */}
+                  </button>
 
-        {showMoreInfoMobile && (
-          <div className="pl-4 space-y-2">
-            <NavLink
-              to="/about-us"
-              onClick={() => setIsOpen(false)}
-              className="block text-[#565abf] hover:text-[#565ABF]"
-            >
-              About Us
-            </NavLink>
-            <NavLink
-              to="/contact-us"
-              onClick={() => setIsOpen(false)}
-              className="block text-[#565abf] hover:text-[#565ABF]"
-            >
-              Contact Us
-            </NavLink>
-            <NavLink
-              to="/faq"
-              onClick={() => setIsOpen(false)}
-              className="block text-[#565abf] hover:text-[#565ABF]"
-            >
-              FAQ
-            </NavLink>
-          </div>
-        )}
-      </div>
-    );
-  }
+                  {showMoreInfoMobile && (
+                    <div className="pl-4 space-y-2">
+                      <NavLink
+                        to="/about-us"
+                        onClick={() => setIsOpen(false)}
+                        className="block text-[#565abf] hover:text-[#565ABF]"
+                      >
+                        About Us
+                      </NavLink>
+                      <NavLink
+                        to="/contact-us"
+                        onClick={() => setIsOpen(false)}
+                        className="block text-[#565abf] hover:text-[#565ABF]"
+                      >
+                        Contact Us
+                      </NavLink>
+                      <NavLink
+                        to="/faq"
+                        onClick={() => setIsOpen(false)}
+                        className="block text-[#565abf] hover:text-[#565ABF]"
+                      >
+                        FAQ
+                      </NavLink>
+                    </div>
+                  )}
+                </div>
+              );
+            }
 
-  // Default links
-  return (
-    <NavLink
-      key={item}
-      to={`/${item}`}
-      onClick={() => setIsOpen(false)}
-      className={({ isActive }) =>
-        `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-      }
-    >
-      {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-    </NavLink>
-  );
-})}
+            // Default links
+            return (
+              <NavLink
+                key={item}
+                to={`/${item}`}
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  `block ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                }
+              >
+                {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              </NavLink>
+            );
+          })}
 
 
           {!user ? (
@@ -533,7 +572,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <div className="border-t pt-3">
+            <div className="border-t pt-3" ref={mobileDropdownRef}>
               <div
                 onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
                 className="flex items-center justify-between cursor-pointer"
@@ -559,34 +598,49 @@ export default function Navbar() {
 
               {mobileDropdownOpen && (
                 <div className="mt-3 space-y-2 pl-2">
-                  <a href="/user" className="flex items-center py-1 hover:text-[#565ABF]">
+                  <a href="/user"
+                    className="flex items-center py-1 hover:text-[#565ABF]"
+                    onClick={() => handleDropdownAction()}
+                  >
                     <LuUserRound className="mr-2" /> My Account
                   </a>
                   <a
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      setOpen(true);
+                      handleDropdownAction(() => setOpen(true));
                     }}
                     className="flex items-center px-4 py-2 hover:text-[#565ABF]"
                   >
                     <FiPlusCircle className="mr-2" /> Post an Ad
                   </a>
 
-                  <a href="/user/my-ads" className="flex items-center py-1 hover:text-[#565ABF]">
+                  <a href="/user/my-ads"
+                    className="flex items-center py-1 hover:text-[#565ABF]"
+                    onClick={() => handleDropdownAction()}
+                  >
                     <GoSync className="mr-2" /> My Ads
                   </a>
-                  <a href="/user/saved-ads" className="flex items-center py-1 hover:text-[#565ABF]">
+                  <a href="/user/saved-ads"
+                    className="flex items-center py-1 hover:text-[#565ABF]"
+                    onClick={() => handleDropdownAction()}
+                  >
                     <GrFavorite className="mr-2" /> Saved Ads
                   </a>
-                  <a href="/user/messages" className="flex items-center py-1 hover:text-[#565ABF]">
+                  <a href="/user/messages"
+                    className="flex items-center py-1 hover:text-[#565ABF]"
+                    onClick={() => handleDropdownAction()}
+                  >
                     <LuMessageSquareText className="mr-2" /> Messages
                   </a>
-                  <a href="/user/edit-my-details" className="flex items-center py-1 hover:text-[#565ABF]">
+                  <a href="/user/edit-my-details"
+                    className="flex items-center py-1 hover:text-[#565ABF]"
+                    onClick={() => handleDropdownAction()}
+                  >
                     <FiEdit className="mr-2" /> Edit My Details
                   </a>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => handleDropdownAction(handleLogout)}
                     className="flex items-center w-full py-1 hover:text-[#565ABF]"
                   >
                     <LuLogOut className="mr-2" /> Logout
