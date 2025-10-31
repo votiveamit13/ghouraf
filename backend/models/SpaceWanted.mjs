@@ -13,7 +13,7 @@ const SpaceWantedSchema = new mongoose.Schema(
     // zip: { type: String, required: true },
     budget: { type: Number, required: true },
     budgetType: { type: String, enum: budgetType, required: true },
-    moveInDate: { type: Date },
+    moveInDate: { type: String },
     period: { type: String, required: true },
     amenities: [{ type: String }],
     name: { type: String, required: true },
