@@ -164,9 +164,20 @@ export const getSpaces = async (req, res) => {
       query.amenities = { $all: amenities };
     }
 
-        let sortOption = { createdAt: -1 }; 
-    if (sortBy === "Lowest First") sortOption = { budget: 1 };
-    if (sortBy === "Highest First") sortOption = { budget: -1 };
+await Space.updateMany(
+  { isPromoted: true, promotedUntil: { $lt: new Date() } },
+  { $set: { isPromoted: false, promotedUntil: null, promotionDays: 0 } }
+);
+
+let sortOption = {
+  isPromoted: -1,
+  promotedAt: 1, 
+  createdAt: -1, 
+};
+
+if (sortBy === "Lowest First") sortOption = { ...sortOption, budget: 1 };
+if (sortBy === "Highest First") sortOption = { ...sortOption, budget: -1 };
+
 
     // if (moveInDate) {
     //   query.availableFrom = { $lte: new Date(moveInDate) };

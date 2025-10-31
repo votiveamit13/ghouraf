@@ -31,6 +31,10 @@ const SpaceSchema = new mongoose.Schema(
         is_deleted: { type: Boolean, default: false },
         reportsCount: { type: Number, default: 0 },
         teamUpsCount: { type: Number, default: 0 },
+        isPromoted: { type: Boolean, default: false },
+        promotedUntil: { type: Date, default: null },
+        promotionDays: { type: Number, default: 0 },
+        promotedAt: { type: Date, default: null },
     },
     { timestamps: true }
 );

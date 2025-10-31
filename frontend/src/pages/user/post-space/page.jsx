@@ -11,6 +11,7 @@ import { Numbers } from "../../../constants/numbers";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import PromoteAdModal from "components/user/PromoteAd";
 
 function StepHeader({ step }) {
   const steps = [
@@ -95,6 +96,8 @@ export default function PostSpace() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const [showPromoteModal, setShowPromoteModal] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -125,35 +128,35 @@ export default function PostSpace() {
   const cities = formData.state ? City.getCitiesOfState(formData.country, formData.state) : [];
 
   const validateStep1 = (formData, errors) => {
-  const stepErrors = {};
+    const stepErrors = {};
 
-  if (!formData.title) stepErrors.title = ["Title is required"];
-  if (!formData.propertyType) stepErrors.propertyType = ["Property Type is required"];
-  if (!formData.budgetType) stepErrors.budgetType = ["Budget Type is required"];
-  if (!formData.budget) {
-    stepErrors.budget = ["Budget is required"];
-  } else if (Number(formData.budget) <= 0) {
-    stepErrors.budget = ["Budget must be greater than 0"];
-  } else if (Number(formData.budget) > 100000) {
-    stepErrors.budget = ["Budget cannot exceed 1,00,000"];
-  }
+    if (!formData.title) stepErrors.title = ["Title is required"];
+    if (!formData.propertyType) stepErrors.propertyType = ["Property Type is required"];
+    if (!formData.budgetType) stepErrors.budgetType = ["Budget Type is required"];
+    if (!formData.budget) {
+      stepErrors.budget = ["Budget is required"];
+    } else if (Number(formData.budget) <= 0) {
+      stepErrors.budget = ["Budget must be greater than 0"];
+    } else if (Number(formData.budget) > 100000) {
+      stepErrors.budget = ["Budget cannot exceed 1,00,000"];
+    }
 
-  if (!formData.personalInfo) stepErrors.personalInfo = ["Personal Info is required"];
-  if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
-  if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
-  // if (formData.smoking === "") stepErrors.smoking = ["Smoking preference is required"];
-  if (!formData.roomsAvailableFor) stepErrors.roomsAvailableFor = ["Property Available is required"];
-  if (!formData.bedrooms) stepErrors.bedrooms = ["Number of bedrooms is required"];
-  if (!formData.country) stepErrors.country = ["Country is required"];
-  if (!formData.state) stepErrors.state = ["State is required"];
-  if (cities.length > 0 && !formData.city) {
-    stepErrors.city = ["City is required"];
-  } else if (cities.length === 0 && !formData.city && formData.city !== "NA") {
-    formData.city = "NA";
-  }
+    if (!formData.personalInfo) stepErrors.personalInfo = ["Personal Info is required"];
+    if (!formData.size || formData.size <= 0) stepErrors.size = ["Size must be greater than 0"];
+    if (formData.furnishing === "") stepErrors.furnishing = ["Furnishing is required"];
+    // if (formData.smoking === "") stepErrors.smoking = ["Smoking preference is required"];
+    if (!formData.roomsAvailableFor) stepErrors.roomsAvailableFor = ["Property Available is required"];
+    if (!formData.bedrooms) stepErrors.bedrooms = ["Number of bedrooms is required"];
+    if (!formData.country) stepErrors.country = ["Country is required"];
+    if (!formData.state) stepErrors.state = ["State is required"];
+    if (cities.length > 0 && !formData.city) {
+      stepErrors.city = ["City is required"];
+    } else if (cities.length === 0 && !formData.city && formData.city !== "NA") {
+      formData.city = "NA";
+    }
 
-  return { ...errors, ...stepErrors };
-};
+    return { ...errors, ...stepErrors };
+  };
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
@@ -167,21 +170,21 @@ export default function PostSpace() {
     if (typeof eOrName === "string") {
       name = eOrName;
       val = value;
-    if (name === "state") {
-      const newStates = State.getStatesOfCountry(formData.country);
-      const newCities = City.getCitiesOfState(formData.country, value);
-      
-      setFormData((prev) => ({
-        ...prev,
-        state: val,
-        city: newCities.length === 0 ? "NA" : "" 
-      }));
-      setErrors((prev) => ({ ...prev, city: undefined }));
-      return;
-    }
-  } else if (eOrName?.target) {
-    const { name: targetName, value: targetValue, type, checked } = eOrName.target;
-    name = targetName;
+      if (name === "state") {
+        const newStates = State.getStatesOfCountry(formData.country);
+        const newCities = City.getCitiesOfState(formData.country, value);
+
+        setFormData((prev) => ({
+          ...prev,
+          state: val,
+          city: newCities.length === 0 ? "NA" : ""
+        }));
+        setErrors((prev) => ({ ...prev, city: undefined }));
+        return;
+      }
+    } else if (eOrName?.target) {
+      const { name: targetName, value: targetValue, type, checked } = eOrName.target;
+      name = targetName;
 
       if ((name === "size" || name === "budget") && type === "text") {
         val = targetValue.replace(/[^0-9]/g, "");
@@ -266,13 +269,13 @@ export default function PostSpace() {
   };
 
   useEffect(() => {
-  if (formData.state && cities.length === 0 && formData.city !== "NA") {
-    setFormData(prev => ({
-      ...prev,
-      city: "NA"
-    }));
-  }
-}, [cities, formData.state, formData.city]);
+    if (formData.state && cities.length === 0 && formData.city !== "NA") {
+      setFormData(prev => ({
+        ...prev,
+        city: "NA"
+      }));
+    }
+  }, [cities, formData.state, formData.city]);
 
   const handlePublish = async () => {
     setIsSubmitting(true);
@@ -613,28 +616,28 @@ export default function PostSpace() {
               </div>
 
               <div className="col-md-6 mb-2">
-  <label className="form-label text-black">City</label>
-  <select
-    name="city"
-    value={cities.length === 0 ? "NA" : formData.city}
-    onChange={(e) => handleChange("city", e.target.value)}
-    className="form-control"
-  >
-    {cities.length > 0 ? (
-      <>
-        <option value="">Select City</option>
-        {cities.map((city) => (
-          <option key={city.name} value={city.name}>
-            {city.name}
-          </option>
-        ))}
-      </>
-    ) : (
-      <option value="NA">No City Available</option>
-    )}
-  </select>
-  {errors.city && <div className="text-red-500 text-sm mt-1">{errors.city[0]}</div>}
-</div>
+                <label className="form-label text-black">City</label>
+                <select
+                  name="city"
+                  value={cities.length === 0 ? "NA" : formData.city}
+                  onChange={(e) => handleChange("city", e.target.value)}
+                  className="form-control"
+                >
+                  {cities.length > 0 ? (
+                    <>
+                      <option value="">Select City</option>
+                      {cities.map((city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </>
+                  ) : (
+                    <option value="NA">No City Available</option>
+                  )}
+                </select>
+                {errors.city && <div className="text-red-500 text-sm mt-1">{errors.city[0]}</div>}
+              </div>
 
               <div className="col-md-12">
                 <label className="form-label text-black">Location</label>
@@ -871,7 +874,7 @@ export default function PostSpace() {
                     Previous
                   </button>
                   <button
-                    onClick={handlePublish}
+                    onClick={() => setShowPromoteModal(true)}
                     disabled={isSubmitting}
                     className="px-4 py-3 rounded-[6px] bg-[#565ABF] text-white hover:opacity-95 flex items-center gap-2 font-semibold disabled:opacity-50"
                   >
@@ -897,6 +900,14 @@ export default function PostSpace() {
                 </button>
               </div>
             )}
+            <PromoteAdModal
+              show={showPromoteModal}
+              onClose={() => setShowPromoteModal(false)}
+              onPublishNormally={() => {
+                setShowPromoteModal(false);
+                handlePublish();
+              }}
+            />
           </div>
         </div>
       </div>
