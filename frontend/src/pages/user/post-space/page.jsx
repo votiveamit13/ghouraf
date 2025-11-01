@@ -12,6 +12,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import PromoteAdModal from "components/user/PromoteAd";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import PromotionPaymentModal from "components/user/PromotionPaymentModal"; 
+
 
 function StepHeader({ step }) {
   const steps = [
@@ -98,6 +102,11 @@ export default function PostSpace() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState("10"); 
+const [clientSecret, setClientSecret] = useState(null);
+const [showPaymentModal, setShowPaymentModal] = useState(false);
+const [promotionLoading, setPromotionLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -277,19 +286,125 @@ export default function PostSpace() {
     }
   }, [cities, formData.state, formData.city]);
 
-// In PostSpace component - replace the handlePublish function
-const handlePublish = async (isPromoted = false, promotionDays = null) => {
-  setIsSubmitting(true);
+  const handlePublish = async () => {
+    setIsSubmitting(true);
+    try {
+      const formPayload = new FormData();
+      // console.log("Submitting form with data:", formData);
+      // console.log("Featured image:", featured ? featured.name : "None");
+      // console.log("Photos count:", photos.length);
+      // console.log(typeof formData.furnishing, formData.furnishing);
+      // console.log(typeof formData.smoking, formData.smoking);
+
+      const processedData = {
+        ...formData,
+        furnishing: formData.furnishing === "true",
+        smoking: formData.smoking === "true",
+        bedrooms: parseInt(formData.bedrooms, 10),
+        budget: parseFloat(formData.budget),
+        size: parseFloat(formData.size)
+      };
+
+      // console.log("Processed bedrooms:", processedData.bedrooms, typeof processedData.bedrooms);
+
+      Object.keys(processedData).forEach((key) => {
+        if (key === "amenities") {
+          processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
+        } else if (!["photos", "featuredImage"].includes(key)) {
+          if (key === "bedrooms" || key === "budget" || key === "size") {
+            formPayload.append(key, processedData[key].toString());
+          } else {
+            formPayload.append(key, processedData[key]);
+          }
+        }
+      });
+
+      if (featured) {
+        formPayload.append("featuredImage", featured);
+      }
+
+      photos.forEach((photo) => {
+        formPayload.append("photos", photo);
+      });
+
+      // console.log("Processed data:", processedData);
+      for (let [key, value] of formPayload.entries()) {
+        console.log(key, value, typeof value);
+      }
+
+      const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      navigate("/user/thank-you", {
+        state: {
+          title: "Your ad was successfully submitted",
+          subtitle: "This post will undergo a review process and will be published once approved.",
+          goBackPath: "/user/post-an-space",
+          viewAdsPath: "/my-spaces"
+        }
+      });
+      setErrors({});
+      setFormData({
+        title: "",
+        propertyType: "",
+        budget: "",
+        budgetType: "",
+        personalInfo: "",
+        size: "",
+        furnishing: "",
+        smoking: "",
+        roomsAvailableFor: "",
+        bedrooms: "",
+        country: "",
+        state: "",
+        city: "",
+        location: "",
+        description: "",
+        amenities: [],
+      });
+      setFeatured(null);
+      setPhotos([]);
+      setStep(1);
+
+    } catch (err) {
+      if (err.response?.status === 422) {
+        const backendErrors = err.response.data.errors || {};
+        setErrors(backendErrors);
+
+        const firstErrorField = Object.keys(backendErrors)[0];
+        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          errorElement.focus();
+        }
+        console.error("Validation errors:", backendErrors);
+      } else {
+        toast.error(err.response?.data?.message || "Server Error");
+        console.error("Server error:", err.response?.data);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+const initiatePromotionPayment = async (planShort) => {
+  const planKey = planShort === "30" ? "30_days" : "10_days";
+  setPromotionLoading(true);
+
   try {
     const formPayload = new FormData();
-    
+
     const processedData = {
       ...formData,
       furnishing: formData.furnishing === "true",
       smoking: formData.smoking === "true",
       bedrooms: parseInt(formData.bedrooms, 10),
-      budget: parseFloat(formData.budget),
-      size: parseFloat(formData.size)
+      budget: parseFloat(formData.budget || 0),
+      size: parseFloat(formData.size || 0),
     };
 
     Object.keys(processedData).forEach((key) => {
@@ -304,107 +419,32 @@ const handlePublish = async (isPromoted = false, promotionDays = null) => {
       }
     });
 
-    if (featured) {
-      formPayload.append("featuredImage", featured);
-    }
+    if (featured) formPayload.append("featuredImage", featured);
+    photos.forEach((photo) => formPayload.append("photos", photo));
 
-    photos.forEach((photo) => {
-      formPayload.append("photos", photo);
+    formPayload.append("promote", "true");
+    formPayload.append("plan", planKey);
+
+    const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
 
-    let endpoint, method, payload;
+    const { clientSecret } = res.data;
+    if (!clientSecret) throw new Error("No clientSecret returned from server");
 
-    if (isPromoted && promotionDays) {
-      // For promotion - send form data as JSON for Stripe session
-      endpoint = `${apiUrl}spaces/promote`;
-      method = "POST";
-      payload = JSON.stringify({ 
-        days: promotionDays, 
-        formData: processedData 
-      });
-    } else {
-      // For normal publish - use FormData
-      endpoint = `${apiUrl}spaces`;
-      method = "POST";
-      payload = formPayload;
-    }
-
-    const headers = {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    };
-
-    if (isPromoted) {
-      headers["Content-Type"] = "application/json";
-    }
-
-    const res = await axios({
-      method,
-      url: endpoint,
-      data: payload,
-      headers,
-    });
-
-    if (isPromoted) {
-      // Redirect to Stripe checkout for promoted posts
-      window.location.href = res.data.url;
-    } else {
-      // Normal publish - show success
-      navigate("/user/thank-you", {
-        state: {
-          title: "Your ad was successfully submitted",
-          subtitle: "This post will undergo a review process and will be published once approved.",
-          goBackPath: "/user/post-an-space",
-        }
-      });
-      
-      // Reset form
-      resetForm();
-    }
-
+    setSelectedPlanForPayment(planShort);
+    setClientSecret(clientSecret);
+    setShowPaymentModal(true);
   } catch (err) {
-    if (err.response?.status === 422) {
-      const backendErrors = err.response.data.errors || {};
-      setErrors(backendErrors);
-
-      const firstErrorField = Object.keys(backendErrors)[0];
-      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-      if (errorElement) {
-        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        errorElement.focus();
-      }
-    } else {
-      toast.error(err.response?.data?.message || "Server Error");
-    }
+    console.error("Promotion init error:", err.response?.data || err.message);
+    toast.error(err.response?.data?.message || "Failed to initiate promotion payment");
   } finally {
-    setIsSubmitting(false);
+    setPromotionLoading(false);
   }
 };
-
-const resetForm = () => {
-  setFormData({
-    title: "",
-    propertyType: "",
-    budget: "",
-    budgetType: "",
-    personalInfo: "",
-    size: "",
-    furnishing: "",
-    smoking: "",
-    roomsAvailableFor: "",
-    bedrooms: "",
-    country: "",
-    state: "",
-    city: "",
-    location: "",
-    description: "",
-    amenities: [],
-  });
-  setFeatured(null);
-  setPhotos([]);
-  setStep(1);
-  setErrors({});
-};
-
 
 
   const getPhotoUrl = (photo) => {
@@ -926,9 +966,42 @@ const resetForm = () => {
 <PromoteAdModal
   show={showPromoteModal}
   onClose={() => setShowPromoteModal(false)}
-  onPublishNormally={handlePublish} 
-  formData={formData}
+  onPublishNormally={() => {
+    setShowPromoteModal(false);
+    handlePublish();
+  }}
+  onProceedToPayment={(planShort) => {
+    // planShort e.g. "10" or "30"
+    setShowPromoteModal(false);
+    initiatePromotionPayment(planShort);
+  }}
+  loading={promotionLoading}
 />
+
+{/* Payment modal (Stripe Elements) */}
+{clientSecret && showPaymentModal && (
+  <Elements stripe={stripePromise} options={{ clientSecret }}>
+    <PromotionPaymentModal
+      clientSecret={clientSecret}
+      onClose={() => {
+        setShowPaymentModal(false);
+        setClientSecret(null);
+      }}
+      onSuccess={() => {
+        setShowPaymentModal(false);
+        setClientSecret(null);
+        toast.success("Payment successful! Your promoted ad will be live soon.");
+        navigate("/user/thank-you", {
+          state: {
+            title: "Payment successful",
+            subtitle: "Your promoted ad will go live after verification.",
+            goBackPath: "/user/post-an-space",
+          }
+        });
+      }}
+    />
+  </Elements>
+)}
 
           </div>
         </div>

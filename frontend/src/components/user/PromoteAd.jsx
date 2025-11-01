@@ -4,28 +4,10 @@ import promote from "../../assets/img/ghouraf/promote.png";
 import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId, formData }) => {
+const PromoteAdModal = ({ show, onClose, onPublishNormally, onProceedToPayment, loading }) => {
   const [selectedPlan, setSelectedPlan] = useState("10");
 
   if (!show) return null;
-
-  const handlePromotionPayment = async () => {
-    try {
-      await onPublishNormally(true, parseInt(selectedPlan));
-    } catch (err) {
-      console.error("Promotion error:", err);
-      alert("Failed to start promotion. Please try again.");
-    }
-  };
-
-  const handleNormalPublish = async () => {
-    try {
-      await onPublishNormally(false);
-      onClose();
-    } catch (err) {
-      console.error("Publish error:", err);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -50,7 +32,7 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId, formData })
         </h2>
 
         <p className="text-gray-600 text-sm mb-4">
-          Would you like to boost your listing's visibility?
+          Would you like to boost your listing’s visibility?
           <br />
           Promoted ads appear at the top of search results and reach more
           interested users.
@@ -73,8 +55,8 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId, formData })
             <input
               type="radio"
               name="plan"
-              value="30"
-              checked={selectedPlan === "30"}
+              value="20"
+              checked={selectedPlan === "20"}
               onChange={(e) => setSelectedPlan(e.target.value)}
               className="accent-purple-600"
             />
@@ -84,17 +66,19 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId, formData })
 
         <div className="flex flex-col gap-3">
           <button
-            onClick={handlePromotionPayment}
+          onClick={() => onProceedToPayment(selectedPlan)}
+           disabled={loading}
             className="bg-[#4E2DD2] hover:bg-[#3c21aa] text-white font-medium py-2.5 px-4 rounded-lg transition"
           >
-            Proceed To Promotion Payment
+            {loading ? "Processing..." : "Proceed To Promotion Payment"}
           </button>
 
           <button
-            onClick={handleNormalPublish}
-            className="bg-black border border-gray-300 text-white font-medium py-2.5 px-4 rounded-lg transition"
+            onClick={onPublishNormally}
+            disabled={loading}
+            className="bg-black border border-gray-300 text-white font-medium py-2.5 px-4 rounded-lg hover:bg-gray-100 transition"
           >
-            Publish Normally
+            {loading ? "Publishing..." : "Publish Normally"}
           </button>
         </div>
       </div>

@@ -5,14 +5,14 @@ import {
   toggleSavePost, getSavedPosts, getMyAds,
   createSpaceWanted, getSpaceWanted, getSpaceWantedById,
   requestTeamUp, getSpaceTeamUps, removeTeamUp,
-  updateAd, updateAdAvailability, deleteAd
+  updateAd, updateAdAvailability, deleteAd,
+  handleStripeWebhook
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
 import { createSpaceSchema } from "../validations/space.validator.mjs";
 import { upload } from "../middleware/upload.mjs";
 import { createTeamUpSchema } from "../validations/teamup.validator.mjs";
-import { createPromotionSession, handleFailedPayment, handleSuccessfulPayment } from "../controllers/stripe.controller.mjs";
 
 const router = express.Router();
 
@@ -22,6 +22,11 @@ const uploadFields = upload.fields([
 ]);
 
 router.post("/createspaces", auth, uploadFields, validate(createSpaceSchema), createSpace);
+router.post(
+  "/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  handleStripeWebhook
+);
 router.get("/spaces", getSpaces);
 router.get("/spaces/:id", getSpaceById);
 router.post("/space/:id/teamup", auth, requestTeamUp);
@@ -42,9 +47,6 @@ router.put("/ad-delete/:id", auth, deleteAd);
 router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 router.get("/spacewanted", getSpaceWanted);
 router.get("/spacewanted/:id", getSpaceWantedById);
-router.post("/spaces/promote", auth, createPromotionSession); 
-router.get("/spaces/payment-success", handleSuccessfulPayment);
-router.get("/spaces/payment-cancel", handleFailedPayment);
 
 
 export default router;
