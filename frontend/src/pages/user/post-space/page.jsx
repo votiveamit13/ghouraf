@@ -330,14 +330,13 @@ export default function PostSpace() {
         },
       });
 
-    const newSpaceId = res.data?.space?._id;
-    if (!newSpaceId) {
-      toast.error("Failed to get created space ID.");
-      return;
-    }
-
-    localStorage.setItem("lastCreatedSpaceId", newSpaceId);
-
+      navigate("/user/thank-you", {
+        state: {
+          title: "Your ad was successfully submitted",
+          subtitle: "This post will undergo a review process and will be published once approved.",
+          goBackPath: "/user/post-an-space",
+        }
+      });
       setErrors({});
       setFormData({
         title: "",
@@ -360,7 +359,6 @@ export default function PostSpace() {
       setFeatured(null);
       setPhotos([]);
       setStep(1);
-      setShowPromoteModal(true);
 
     } catch (err) {
       if (err.response?.status === 422) {
@@ -383,6 +381,37 @@ export default function PostSpace() {
     }
   };
 
+const handlePromotePayment = async (days) => {
+  try {
+    setIsSubmitting(true);
+
+    const tempRes = await axios.post(`${apiUrl}createspaces`, formPayload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    const spaceId = tempRes.data.data._id;
+
+    const paymentRes = await axios.post(
+      `${apiUrl}spaces/${spaceId}/promote`,
+      { days },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    window.location.href = paymentRes.data.url;
+  } catch (err) {
+    console.error("Payment promotion error:", err);
+    toast.error("Failed to initiate payment.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
 
   const getPhotoUrl = (photo) => {
@@ -901,23 +930,15 @@ export default function PostSpace() {
                 </button>
               </div>
             )}
-<PromoteAdModal
-  show={showPromoteModal}
-  onClose={() => setShowPromoteModal(false)}
-  onPublishNormally={() => {
-    setShowPromoteModal(false);
-    navigate("/user/thank-you", {
-      state: {
-        title: "Your ad was successfully submitted",
-        subtitle:
-          "This post will undergo a review process and will be published once approved.",
-        goBackPath: "/user/post-an-space",
-        viewAdsPath: "/my-spaces",
-      },
-    });
-  }}
-  spaceId={localStorage.getItem("lastCreatedSpaceId")}  
-/>
+            <PromoteAdModal
+              show={showPromoteModal}
+              onClose={() => setShowPromoteModal(false)}
+              onPublishNormally={() => {
+                setShowPromoteModal(false);
+                handlePublish();
+              }}
+              onPromote={handlePromotePayment}
+            />
 
           </div>
         </div>

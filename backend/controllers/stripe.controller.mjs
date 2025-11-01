@@ -35,6 +35,37 @@ export const createPromotionSession = async (req, res) => {
   }
 };
 
+export const createSpaceAfterPayment = async (req, res) => {
+  try {
+    const { formData, days } = req.body;
+    const userId = req.user.id; 
+
+    const promotedUntil = new Date();
+    promotedUntil.setDate(promotedUntil.getDate() + Number(days));
+
+    const newSpace = await Space.create({
+      ...formData,
+      user: userId,
+      isPromoted: true,
+      promotionDays: Number(days),
+      promotedUntil,
+      promotedAt: new Date(),
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Promoted space created successfully",
+      data: newSpace,
+    });
+  } catch (error) {
+    console.error("Create after payment error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create promoted space",
+    });
+  }
+};
+
 export const markSpacePromoted = async (req, res) => {
   try {
     const { spaceId, days } = req.query;

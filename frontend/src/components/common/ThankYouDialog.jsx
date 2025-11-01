@@ -2,7 +2,6 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import thankyou from "assets/img/ghouraf/thankyou.png";
 import heroImage from "assets/img/ghouraf/hero-section.jpg";
-import { FaArrowRightLong } from "react-icons/fa6";
 
 export default function ThankYou() {
   const location = useLocation();
@@ -12,7 +11,6 @@ export default function ThankYou() {
     title = "Your ad was successfully published",
     subtitle = "Your listing has been created successfully.",
     goBackPath = "/",
-    viewAdsPath = "/my-spaces"
   } = location.state || {};
 
   return (
@@ -45,12 +43,6 @@ export default function ThankYou() {
               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               Go Back
-            </button>
-            <button
-              onClick={() => navigate(viewAdsPath)}
-              className="px-4 py-2 bg-[#565ABF] text-white rounded-[5px] flex items-center gap-2"
-            >
-              View Ads <FaArrowRightLong/>
             </button>
           </div>
         </div>

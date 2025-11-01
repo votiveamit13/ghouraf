@@ -4,33 +4,33 @@ import promote from "../../assets/img/ghouraf/promote.png";
 import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId }) => {
+const PromoteAdModal = ({ show, onClose, onPublishNormally, onPromote }) => {
   const [selectedPlan, setSelectedPlan] = useState("10");
 
   if (!show) return null;
 
-  const handleStripePayment = async () => {
-    try {
-      const stripe = await stripePromise;
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${process.env.REACT_APP_API_URL}spaces/${spaceId}/promote`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ days: Number(selectedPlan) }),
-      });
+  // const handleStripePayment = async () => {
+  //   try {
+  //     const stripe = await stripePromise;
+  //     const token = localStorage.getItem("token");
+  //     const res = await fetch(`${process.env.REACT_APP_API_URL}spaces/${spaceId}/promote`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({ days: selectedPlan }),
+  //     });
 
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Payment failed. Please try again.");
-    }
-  };
+  //     const data = await res.json();
+  //     if (data.url) {
+  //       window.location.href = data.url;
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Payment failed. Please try again.");
+  //   }
+  // };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -89,7 +89,7 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId }) => {
 
         <div className="flex flex-col gap-3">
           <button
-            onClick={handleStripePayment}
+            onClick={onPromote}
             className="bg-[#4E2DD2] hover:bg-[#3c21aa] text-white font-medium py-2.5 px-4 rounded-lg transition"
           >
             Proceed To Promotion Payment
