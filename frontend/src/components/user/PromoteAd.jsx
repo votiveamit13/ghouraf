@@ -92,7 +92,7 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, spaceId, formData })
 
           <button
             onClick={handleNormalPublish}
-            className="bg-black border border-gray-300 text-white font-medium py-2.5 px-4 rounded-lg hover:bg-gray-100 transition"
+            className="bg-black border border-gray-300 text-white font-medium py-2.5 px-4 rounded-lg transition"
           >
             Publish Normally
           </button>

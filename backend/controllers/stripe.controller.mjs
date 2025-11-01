@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import Space from "../models/Space.mjs";
 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
