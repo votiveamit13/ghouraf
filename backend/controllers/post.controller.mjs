@@ -6,199 +6,199 @@ import SavedPost from "../models/SavedPost.mjs";
 import { createSpaceWantedSchema } from "../validations/spacewanted.validator.mjs";
 import SpaceWanted from "../models/SpaceWanted.mjs";
 import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
-import Stripe from "stripe";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  import Stripe from "stripe";
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-//Spaces
-export const createSpace = async (req, res) => {
-  try {
-    const { error } = createSpaceSchema.validate(req.body, { abortEarly: false });
-    const errors = {};
+  //Spaces
+  export const createSpace = async (req, res) => {
+    try {
+      const { error } = createSpaceSchema.validate(req.body, { abortEarly: false });
+      const errors = {};
 
-    if (error) {
-      error.details.forEach((err) => {
-        const key = err.path.join(".");
-        if (!errors[key]) errors[key] = [];
-        errors[key].push(err.message);
-      });
-    }
-
-    if (!req.files?.featuredImage?.[0]) {
-      errors.featuredImage = ["Featured image is required"];
-    }
-
-    if (Object.keys(errors).length > 0) {
-      const firstErrorMessage = Object.values(errors)[0][0];
-      const message =
-        Object.keys(errors).length > 1
-          ? `${firstErrorMessage} (and ${Object.keys(errors).length - 1} more errors)`
-          : firstErrorMessage;
-
-      return res.status(422).json({ message, errors });
-    }
-
-    const {
-      title,
-      propertyType,
-      budget,
-      budgetType,
-      personalInfo,
-      size,
-      furnishing,
-      smoking,
-      roomsAvailableFor,
-      bedrooms,
-      country,
-      state,
-      city,
-      location,
-      description,
-      amenities,
-      promote,
-      plan,
-    } = req.body;
-
-    let featuredImagePath = "";
-    if (req.files.featuredImage?.[0]) {
-      fileHandler.validateExtension(req.files.featuredImage[0].originalname, "image");
-      const saved = fileHandler.saveFile(req.files.featuredImage[0], "featured");
-      featuredImagePath = saved.relativePath;
-    }
-
-    const photos = [];
-    if (req.files.photos?.length) {
-      req.files.photos.forEach((file) => {
-        fileHandler.validateExtension(file.originalname, "image");
-        const saved = fileHandler.saveFile(file, "photos");
-        photos.push({ id: Date.now() + Math.random(), url: saved.relativePath });
-      });
-    }
-
-    if (promote === "true") {
-      const planPrices = {
-        "10_days": 10,
-        "30_days": 25,
-      };
-
-      const amountUSD = planPrices[plan];
-      if (!amountUSD) {
-        return res.status(400).json({ message: "Invalid promotion plan" });
+      if (error) {
+        error.details.forEach((err) => {
+          const key = err.path.join(".");
+          if (!errors[key]) errors[key] = [];
+          errors[key].push(err.message);
+        });
       }
 
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amountUSD * 100,
-        currency: "usd",
-        metadata: {
-          userId: req.user._id.toString(),
-          plan,
-          spaceData: JSON.stringify({
-            title,
-            propertyType,
-            budget,
-            budgetType,
-            personalInfo,
-            size,
-            furnishing,
-            smoking,
-            roomsAvailableFor,
-            bedrooms,
-            country,
-            state,
-            city,
-            location,
-            description,
-            amenities,
-            featuredImage: featuredImagePath,
-            photos,
-          }),
-        },
+      if (!req.files?.featuredImage?.[0]) {
+        errors.featuredImage = ["Featured image is required"];
+      }
+
+      if (Object.keys(errors).length > 0) {
+        const firstErrorMessage = Object.values(errors)[0][0];
+        const message =
+          Object.keys(errors).length > 1
+            ? `${firstErrorMessage} (and ${Object.keys(errors).length - 1} more errors)`
+            : firstErrorMessage;
+
+        return res.status(422).json({ message, errors });
+      }
+
+      const {
+        title,
+        propertyType,
+        budget,
+        budgetType,
+        personalInfo,
+        size,
+        furnishing,
+        smoking,
+        roomsAvailableFor,
+        bedrooms,
+        country,
+        state,
+        city,
+        location,
+        description,
+        amenities,
+        promote,
+        plan,
+      } = req.body;
+
+      let featuredImagePath = "";
+      if (req.files.featuredImage?.[0]) {
+        fileHandler.validateExtension(req.files.featuredImage[0].originalname, "image");
+        const saved = fileHandler.saveFile(req.files.featuredImage[0], "featured");
+        featuredImagePath = saved.relativePath;
+      }
+
+      const photos = [];
+      if (req.files.photos?.length) {
+        req.files.photos.forEach((file) => {
+          fileHandler.validateExtension(file.originalname, "image");
+          const saved = fileHandler.saveFile(file, "photos");
+          photos.push({ id: Date.now() + Math.random(), url: saved.relativePath });
+        });
+      }
+
+      if (promote === "true") {
+        const planPrices = {
+          "10_days": 10,
+          "30_days": 25,
+        };
+
+        const amountUSD = planPrices[plan];
+        if (!amountUSD) {
+          return res.status(400).json({ message: "Invalid promotion plan" });
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amountUSD * 100,
+          currency: "usd",
+          metadata: {
+            userId: req.user._id.toString(),
+            plan,
+            spaceData: JSON.stringify({
+              title,
+              propertyType,
+              budget,
+              budgetType,
+              personalInfo,
+              size,
+              furnishing,
+              smoking,
+              roomsAvailableFor,
+              bedrooms,
+              country,
+              state,
+              city,
+              location,
+              description,
+              amenities,
+              featuredImage: featuredImagePath,
+              photos,
+            }),
+          },
+        });
+
+        return res.status(200).json({
+          message: "Promotion payment initiated",
+          clientSecret: paymentIntent.client_secret,
+          promotionInfo: { plan, amountUSD },
+        });
+      }
+
+      const space = new Space({
+        user: req.user._id,
+        title,
+        propertyType,
+        budget,
+        budgetType,
+        personalInfo,
+        size,
+        furnishing: furnishing === "true",
+        smoking: smoking === "true",
+        roomsAvailableFor: roomsAvailableFor || req.body.rooms,
+        bedrooms: Number(bedrooms),
+        country,
+        state,
+        city,
+        location,
+        description,
+        amenities,
+        featuredImage: featuredImagePath,
+        photos,
+        promotion: { isPromoted: false, paymentStatus: "pending" },
       });
 
-      return res.status(200).json({
-        message: "Promotion payment initiated",
-        clientSecret: paymentIntent.client_secret,
-        promotionInfo: { plan, amountUSD },
-      });
+      await space.save();
+      res.status(201).json({ message: "Space posted successfully", space });
+    } catch (err) {
+      console.error("Error creating space:", err);
+      res.status(500).json({ message: "Server Error", error: err.message });
+    }
+  };
+
+  export const handleStripeWebhook = async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("Webhook signature verification failed:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    const space = new Space({
-      user: req.user._id,
-      title,
-      propertyType,
-      budget,
-      budgetType,
-      personalInfo,
-      size,
-      furnishing: furnishing === "true",
-      smoking: smoking === "true",
-      roomsAvailableFor: roomsAvailableFor || req.body.rooms,
-      bedrooms: Number(bedrooms),
-      country,
-      state,
-      city,
-      location,
-      description,
-      amenities,
-      featuredImage: featuredImagePath,
-      photos,
-      promotion: { isPromoted: false, paymentStatus: "pending" },
-    });
+    if (event.type === "payment_intent.succeeded") {
+      const paymentIntent = event.data.object;
+      const { userId, plan, spaceData } = paymentIntent.metadata;
 
-    await space.save();
-    res.status(201).json({ message: "Space posted successfully", space });
-  } catch (err) {
-    console.error("Error creating space:", err);
-    res.status(500).json({ message: "Server Error", error: err.message });
-  }
-};
+      const parsedData = JSON.parse(spaceData);
 
-export const handleStripeWebhook = async (req, res) => {
-  const sig = req.headers["stripe-signature"];
-  let event;
+      const days = plan === "30_days" ? 30 : 10;
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(startDate.getDate() + days);
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.error("Webhook signature verification failed:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+      const space = new Space({
+        user: userId,
+        ...parsedData,
+        promotion: {
+          isPromoted: true,
+          plan,
+          amountUSD: paymentIntent.amount / 100,
+          paymentStatus: "success",
+          paymentId: paymentIntent.id,
+          startDate,
+          endDate,
+        },
+        status: "active",
+      });
 
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    const { userId, plan, spaceData } = paymentIntent.metadata;
+      await space.save();
+      console.log("✅ Promoted space created successfully after payment");
+    }
 
-    const parsedData = JSON.parse(spaceData);
-
-    const days = plan === "30_days" ? 30 : 10;
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(startDate.getDate() + days);
-
-    const space = new Space({
-      user: userId,
-      ...parsedData,
-      promotion: {
-        isPromoted: true,
-        plan,
-        amountUSD: paymentIntent.amount / 100,
-        paymentStatus: "success",
-        paymentId: paymentIntent.id,
-        startDate,
-        endDate,
-      },
-      status: "active",
-    });
-
-    await space.save();
-    console.log("✅ Promoted space created successfully after payment");
-  }
-
-  res.json({ received: true });
-};
+    res.json({ received: true });
+  };
 
 
 

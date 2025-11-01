@@ -109,5 +109,7 @@ furnishing: Joi.boolean().truthy("true").falsy("false").required(),
             "array.min": "At least one amenity is required",
             "any.required": "Amenities are required",
         }),
+    promote: Joi.boolean().truthy("true").falsy("false").default(false),
+  plan: Joi.string().valid("10_days", "30_days").allow(null, ""),
 
 });
