@@ -5,9 +5,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const createPromotionSession = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { days } = req.body;
+    const { days, formData } = req.body; 
+    const userId = req.user.id; 
+    
     const price = days === 10 ? 1500 : 2000;
+
+    const tempSpace = new Space({
+      ...formData,
+      user: userId,
+      isPromoted: true, 
+      promotionDays: Number(days),
+      status: "inactive" 
+    });
+
+    const savedSpace = await tempSpace.save();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -24,65 +35,56 @@ export const createPromotionSession = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/payment-success?spaceId=${id}&days=${days}`,
-      cancel_url: `${process.env.CLIENT_URL}/payment-cancel`,
+      success_url: `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&spaceId=${savedSpace._id}`,
+      cancel_url: `${process.env.CLIENT_URL}/payment-cancel?spaceId=${savedSpace._id}`,
     });
 
-    res.json({ url: session.url });
+    res.json({ url: session.url, spaceId: savedSpace._id });
   } catch (err) {
     console.error("Stripe session error:", err);
     res.status(500).json({ message: "Failed to create Stripe session" });
   }
 };
 
-export const createSpaceAfterPayment = async (req, res) => {
+export const handleSuccessfulPayment = async (req, res) => {
   try {
-    const { formData, days } = req.body;
-    const userId = req.user.id; 
+    const { session_id, spaceId } = req.query;
 
-    const promotedUntil = new Date();
-    promotedUntil.setDate(promotedUntil.getDate() + Number(days));
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    
+    if (session.payment_status === 'paid') {
+      const promotedUntil = new Date();
+      promotedUntil.setDate(promotedUntil.getDate() + Number(session.metadata.days));
 
-    const newSpace = await Space.create({
-      ...formData,
-      user: userId,
-      isPromoted: true,
-      promotionDays: Number(days),
-      promotedUntil,
-      promotedAt: new Date(),
-    });
+      await Space.findByIdAndUpdate(spaceId, {
+        isPromoted: true,
+        promotionDays: Number(session.metadata.days),
+        promotedUntil,
+        promotedAt: new Date(),
+      });
 
-    res.status(201).json({
-      success: true,
-      message: "Promoted space created successfully",
-      data: newSpace,
-    });
-  } catch (error) {
-    console.error("Create after payment error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create promoted space",
-    });
+      res.redirect(`${process.env.CLIENT_URL}/promotion-success?spaceId=${spaceId}`);
+    } else {
+      await Space.findByIdAndDelete(spaceId);
+      res.redirect(`${process.env.CLIENT_URL}/payment-failed`);
+    }
+  } catch (err) {
+    console.error("Payment verification error:", err);
+    res.status(500).json({ message: "Failed to verify payment" });
   }
 };
 
-export const markSpacePromoted = async (req, res) => {
+export const handleFailedPayment = async (req, res) => {
   try {
-    const { spaceId, days } = req.query;
-
-    const promotedUntil = new Date();
-    promotedUntil.setDate(promotedUntil.getDate() + Number(days));
-
-    await Space.findByIdAndUpdate(spaceId, {
-      isPromoted: true,
-      promotionDays: Number(days),
-      promotedUntil,
-      promotedAt: new Date(),
-    });
-
-    res.redirect(`${process.env.CLIENT_URL}/promotion-success`);
+    const { spaceId } = req.query;
+    
+    if (spaceId) {
+      await Space.findByIdAndDelete(spaceId);
+    }
+    
+    res.redirect(`${process.env.CLIENT_URL}/payment-cancel`);
   } catch (err) {
-    console.error("Promotion update error:", err);
-    res.status(500).json({ message: "Failed to mark promoted" });
+    console.error("Cleanup error:", err);
+    res.redirect(`${process.env.CLIENT_URL}/payment-cancel`);
   }
 };

@@ -12,7 +12,7 @@ import { validate } from "../middleware/validate.mjs";
 import { createSpaceSchema } from "../validations/space.validator.mjs";
 import { upload } from "../middleware/upload.mjs";
 import { createTeamUpSchema } from "../validations/teamup.validator.mjs";
-import { createPromotionSession, createSpaceAfterPayment, markSpacePromoted } from "../controllers/stripe.controller.mjs";
+import { createPromotionSession, handleFailedPayment, handleSuccessfulPayment } from "../controllers/stripe.controller.mjs";
 
 const router = express.Router();
 
@@ -42,9 +42,9 @@ router.put("/ad-delete/:id", auth, deleteAd);
 router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 router.get("/spacewanted", getSpaceWanted);
 router.get("/spacewanted/:id", getSpaceWantedById);
-router.post("/spaces/:id/promote", auth, createPromotionSession);
-router.get("/spaces/promote-success", markSpacePromoted);
-router.post("/spaces/create-after-payment", auth, createSpaceAfterPayment);
+router.post("/spaces/promote", auth, createPromotionSession); 
+router.get("/spaces/payment-success", handleSuccessfulPayment);
+router.get("/spaces/payment-cancel", handleFailedPayment);
 
 
 export default router;
