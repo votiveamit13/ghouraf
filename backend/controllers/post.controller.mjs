@@ -196,9 +196,6 @@ export const handleStripeWebhook = async (req, res) => {
   res.json({ received: true });
 };
 
-
-
-
 export const getSpaces = async (req, res) => {
   try {
     const {
