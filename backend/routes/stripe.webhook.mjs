@@ -44,7 +44,7 @@ router.post(
             startDate,
             endDate,
           },
-          status: "active",
+          status: "inactive",
         });
 
         await space.save();

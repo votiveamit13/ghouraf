@@ -183,7 +183,7 @@ export const handleStripeWebhook = async (req, res) => {
           startDate,
           endDate,
         },
-        status: "active",
+        status: "inactive",
       });
 
       await space.save();
