@@ -11,7 +11,7 @@ import User from "./models/User.mjs";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
-
+import stripeWebhook from "./routes/stripe.webhook.mjs";
 
 dotenv.config();
 const app = express();
@@ -27,6 +27,8 @@ app.use(
 );
 
 app.use(morgan('dev'))
+
+app.use("/api/stripe", stripeWebhook);
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

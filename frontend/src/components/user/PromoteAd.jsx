@@ -76,7 +76,7 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, onProceedToPayment, 
           <button
             onClick={onPublishNormally}
             disabled={loading}
-            className="bg-black border border-gray-300 text-white font-medium py-2.5 px-4 rounded-lg hover:bg-gray-100 transition"
+            className="bg-black border border-gray-300 text-white font-medium py-2.5 px-4 rounded-lg transition"
           >
             {loading ? "Publishing..." : "Publish Normally"}
           </button>

@@ -1082,18 +1082,23 @@ export default function Navbar() {
 
 
                 <div className="flex gap-4 mb-2">
-                  <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
+                  <button 
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                     <img src={google} alt="Google" className="w-5 h-5" />
                     Google
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
+                  <button 
+                    type="button"
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                     <IoLogoFacebook size={25} />
                     Facebook
                   </button>
                 </div>
 
                 <p className="text-center text-sm text-[#000000]">
-                  Don’t have an account?{" "}
+                  Already have an account?{" "}
                   <button
                     href="/"
                     onClick={() => {
