@@ -6,8 +6,8 @@ import SavedPost from "../models/SavedPost.mjs";
 import { createSpaceWantedSchema } from "../validations/spacewanted.validator.mjs";
 import SpaceWanted from "../models/SpaceWanted.mjs";
 import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
-  import Stripe from "stripe";
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   //Spaces
 export const createSpace = async (req, res) => {
@@ -187,9 +187,9 @@ export const handleStripeWebhook = async (req, res) => {
       });
 
       await space.save();
-      console.log("✅ Promoted space created successfully after payment");
+      console.log("Promoted space created successfully after payment");
     } catch (error) {
-      console.error("❌ Error creating promoted space:", error);
+      console.error("Error creating promoted space:", error);
     }
   }
 
@@ -272,19 +272,19 @@ export const getSpaces = async (req, res) => {
       query.amenities = { $all: amenities };
     }
 
-await Space.updateMany(
-  { isPromoted: true, promotedUntil: { $lt: new Date() } },
-  { $set: { isPromoted: false, promotedUntil: null, promotionDays: 0 } }
-);
+    await Space.updateMany(
+      { isPromoted: true, promotedUntil: { $lt: new Date() } },
+      { $set: { isPromoted: false, promotedUntil: null, promotionDays: 0 } }
+    );
 
-let sortOption = {
-  isPromoted: -1,
-  promotedAt: 1, 
-  createdAt: -1, 
-};
+    let sortOption = {
+      isPromoted: -1,
+      promotedAt: 1, 
+      createdAt: -1, 
+    };
 
-if (sortBy === "Lowest First") sortOption = { ...sortOption, budget: 1 };
-if (sortBy === "Highest First") sortOption = { ...sortOption, budget: -1 };
+    if (sortBy === "Lowest First") sortOption = { ...sortOption, budget: 1 };
+    if (sortBy === "Highest First") sortOption = { ...sortOption, budget: -1 };
 
 
     // if (moveInDate) {

@@ -6,13 +6,18 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import Loader from "components/common/Loader";
 import { getFullLocation } from "utils/locationHelper";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
 
 export default function SavedAds() {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const { token } = useAuth();
     const [ads, setAds] = useState([]);
     const [filter, setFilter] = useState("All");
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const adsPerPage = 9;
 
@@ -37,6 +42,47 @@ export default function SavedAds() {
 
         fetchSavedPosts();
     }, []);
+
+const handleAdClick = (ad) => {
+  const postId = ad.postId; 
+
+  switch (ad.postCategory) {
+    case "Space":
+      navigate(`/spaces/${postId}`);
+      break;
+    case "Spacewanted":
+      navigate(`/place-wanted/${postId}`);
+      break;
+    case "Teamup":
+      navigate(`/team-up/${postId}`);
+      break;
+    default:
+      toast.error("Unknown post category");
+  }
+};
+
+const handleRemoveSaved = async (ad) => {
+        try {
+            const res = await axios.post(
+                `${apiUrl}save`,
+                {
+                    postId: ad.postId,
+                    postCategory: ad.postCategory,
+                    listingPage: ad.postCategory,
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            toast.success(res.data.message || "Removed from saved");
+            setAds((prev) => prev.filter((item) => item._id !== ad._id));
+        } catch (err) {
+            console.error("Error removing saved ad:", err);
+            toast.error("Failed to remove saved ad");
+        }
+    };
+
 
     const filteredAds = ads.filter(
         (ad) =>
@@ -103,14 +149,19 @@ export default function SavedAds() {
                                     <img
                                         src={`${post?.photo?.[0]?.url || post?.photo}`}
                                         alt={post?.title}
-                                        className="w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
+                                        onClick={() => handleAdClick(ad)}
+                                        className="cursor-pointer w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
                                     />
-                                    <span className="absolute top-4 right-4 bg-[#FF015E] text-white text-[13px] sm:text-[15px] font-semibold px-[12px] py-2 rounded-[4px] flex items-center gap-1">
+                                    <span 
+                                        onClick={() => handleRemoveSaved(ad)}
+                                        className="cursor-pointer absolute top-4 right-4 bg-[#FF015E] text-white text-[13px] sm:text-[15px] font-semibold px-[12px] py-2 rounded-[4px] flex items-center gap-1">
                                         <MdFavorite size={18} /> Saved
                                     </span>
                                 </div>
                                 <div className="flex flex-col flex-grow text-black p-1 mt-2">
-                                    <h3 className="font-semibold text-[16px] sm:text-[18px] text-black">
+                                    <h3 
+                                        onClick={() => handleAdClick(ad)}
+                                        className="cursor-pointer font-semibold text-[16px] sm:text-[18px] text-black">
                                         {post?.title}
                                     </h3>
                                     <p className="text-[15px] sm:text-[18px] flex items-center gap-1">

@@ -413,7 +413,9 @@ export const getAllTeamUps = async (req, res) => {
         "propertyType country state city zip budget budgetType title roommatePref moveInDate roomSize furnishing gender description photos status available createdAt"
       );
 
-    const merged = [...teamups, ...spaceWantedTeamUps];
+    const merged = [...teamups, ...spaceWantedTeamUps].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
     res.json(merged);
   } catch (err) {

@@ -90,7 +90,7 @@ export default function MyAds() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            toast.success(`Marked as ${status}`);
+            toast.success(`Updated the status`);
             fetchAds();
         } catch (error) {
             console.error("Error updating status:", error);
@@ -252,7 +252,7 @@ export default function MyAds() {
                                                                         : "hover:bg-gray-100 text-gray-700"
                                                                     }`}
                                                             >
-                                                                Available
+                                                                Resume
                                                             </button>
 
                                                             <button
@@ -263,7 +263,7 @@ export default function MyAds() {
                                                                         : "hover:bg-gray-100 text-gray-700"
                                                                     }`}
                                                             >
-                                                                Unavailable
+                                                                Pause
                                                             </button>
                                                         </div>
 

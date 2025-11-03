@@ -26,7 +26,11 @@ export default function SpaceWanted() {
                 const res = await axios.get(`${apiUrl}admin/spacewanted`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setSpaceWanted(res.data);
+
+                const sortedSpaceWanted = res.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+                setSpaceWanted(sortedSpaceWanted);
             } catch (err) {
                 console.error("Error fetching team up:", err);
             }
@@ -219,7 +223,7 @@ export default function SpaceWanted() {
                                 <p><span className="text-black">Country:</span> {selectedPost.country}</p>
                                 <p><span className="text-black">State:</span> {selectedPost.state}</p>
                                 <p><span className="text-black">City:</span> {selectedPost.city}</p>
-                                <p><span className="text-black">Zip:</span> {selectedPost.zip}</p>
+                                {/* <p><span className="text-black">Zip:</span> {selectedPost.zip}</p> */}
                                 <p><span className="text-black">Property Type:</span> {selectedPost.propertyType}</p>
                                 <p><span className="text-black">Room Size:</span> {selectedPost.roomSize}</p>
                                 <p>
@@ -249,8 +253,8 @@ export default function SpaceWanted() {
                                 <p><span className="text-black">Occupation:</span> {selectedPost.occupation}</p>
                                 <p><span className="text-black">Smokes:</span> {selectedPost.smoke || "N/A"}</p>
                                 <p><span className="text-black">Pets:</span> {selectedPost.pets || "N/A"}</p>
-                                <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p>
-                                <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p>
+                                {/* <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p> */}
+                                {/* <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p> */}
                             </div>
 
                             {selectedPost.amenities?.length > 0 && (

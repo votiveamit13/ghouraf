@@ -26,7 +26,11 @@ export default function Spaces() {
         const res = await axios.get(`${apiUrl}admin/spaces`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSpaces(res.data);
+
+        const sortedSpaces = res.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+        setSpaces(sortedSpaces);
       } catch (err) {
         console.error("Error fetching spaces:", err);
       }

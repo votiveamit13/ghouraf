@@ -26,6 +26,7 @@ export default function TeamUps() {
                 const res = await axios.get(`${apiUrl}admin/teamups`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+
                 setTeamUp(res.data);
             } catch (err) {
                 console.error("Error fetching team up:", err);
@@ -34,21 +35,21 @@ export default function TeamUps() {
         fetchTeamUp();
     }, [apiUrl]);
 
-const filteredPosts = useMemo(() => {
-  return teamup.filter((post) => {
-    const title = post.title || "";
-    
-    const posterName =
-      post.user?.profile
-        ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
-        : post.name || "";
+    const filteredPosts = useMemo(() => {
+        return teamup.filter((post) => {
+            const title = post.title || "";
 
-    return (
-      title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      posterName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
-}, [searchTerm, teamup]);
+            const posterName =
+                post.user?.profile
+                    ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
+                    : post.name || "";
+
+            return (
+                title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                posterName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        });
+    }, [searchTerm, teamup]);
 
 
     const pageSize = 10;
@@ -77,7 +78,7 @@ const filteredPosts = useMemo(() => {
                                 <tr>
                                     <th className="px-3 py-3 text-left font-semibold">S. No.</th>
                                     <th className="px-3 py-3 text-left font-semibold">Title</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Roommate Preference</th>
+                                    {/* <th className="px-3 py-3 text-left font-semibold">Roommate Preference</th> */}
                                     <th className="px-3 py-3 text-left font-semibold">Budget</th>
                                     <th className="px-3 py-3 text-left font-semibold">Posted By</th>
                                     <th className="px-3 py-3 text-left font-semibold">Availability</th>
@@ -90,7 +91,7 @@ const filteredPosts = useMemo(() => {
                                     <tr key={post._id}>
                                         <td className="px-3 py-3">{startIndex + index + 1}</td>
                                         <td className="px-3 py-3">{post.title}</td>
-                                        <td className="px-3 py-3">{post.roommatePref}</td>
+                                        {/* <td className="px-3 py-3">{post.roommatePref}</td> */}
                                         <td className="px-3 py-3">
                                             ${post.budget} {post.budgetType}
                                         </td>
@@ -230,9 +231,9 @@ const filteredPosts = useMemo(() => {
                                 <p><span className="text-black">Country:</span> {selectedPost.country}</p>
                                 <p><span className="text-black">State:</span> {selectedPost.state}</p>
                                 <p><span className="text-black">City:</span> {selectedPost.city}</p>
-                                <p><span className="text-black">Zip:</span> {selectedPost.zip}</p>
+                                {/* <p><span className="text-black">Zip:</span> {selectedPost.zip}</p> */}
                                 <p><span className="text-black">Budget:</span> ${selectedPost.budget} {selectedPost.budgetType}</p>
-                                <p><span className="text-black">Move-in Date:</span> {selectedPost.moveInDate ? new Date(selectedPost.moveInDate).toLocaleDateString() : "N/A"}</p>
+                                {/* <p><span className="text-black">Move-in Date:</span> {selectedPost.moveInDate ? new Date(selectedPost.moveInDate).toLocaleDateString() : "N/A"}</p> */}
                                 <p><span className="text-black">Duration:</span> {selectedPost.period || "N/A"}</p>
                                 <p><span className="text-black">Property Status:</span> {selectedPost.status}</p>
                                 <p><span className="text-black">Availability:</span>{" "}
@@ -249,7 +250,7 @@ const filteredPosts = useMemo(() => {
 
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <p><span className="text-black">Gender Preference:</span> {selectedPost.gender}</p>
-                                <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p>
+                                {/* <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p> */}
                                 <p><span className="text-black">Age Range:</span> {selectedPost.minAge || "-"} - {selectedPost.maxAge || "-"}</p>
                                 <p><span className="text-black">Occupation Preference:</span> {selectedPost.occupationPreference || "N/A"}</p>
                             </div>
@@ -259,12 +260,12 @@ const filteredPosts = useMemo(() => {
                                 <p><span className="text-black">Age:</span> {selectedPost.age || "N/A"}</p>
                                 <p><span className="text-black">Occupation:</span> {selectedPost.occupation || "N/A"}</p>
                                 <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p>
-                                <p><span className="text-black">Preferred Language:</span> {selectedPost.languagePreference || "N/A"}</p>
+                                {/* <p><span className="text-black">Preferred Language:</span> {selectedPost.languagePreference || "N/A"}</p> */}
                             </div>
 
                             {selectedPost.amenities?.length > 0 && (
                                 <div>
-                                    <h3 className="mb-2 text-black">Amenities</h3>
+                                    <h3 className="mb-2 text-black">Interests</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedPost.amenities.map((a, i) => (
                                             <span
