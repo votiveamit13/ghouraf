@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import { loadStripe } from "@stripe/stripe-js";
 import PromoteAdModal from "components/user/myads/PromoteAd";
+import { useAuth } from "context/AuthContext";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 
@@ -31,10 +32,10 @@ export default function MyAds() {
     const [showEditPost, setShowEditPost] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [deleteAdId, setDeleteAdId] = useState(null);
-const [showPromoteModal, setShowPromoteModal] = useState(false);
-const [promotingAd, setPromotingAd] = useState(null);
-const [loadingPayment, setLoadingPayment] = useState(false);
-
+    const [showPromoteModal, setShowPromoteModal] = useState(false);
+    const [promotingAd, setPromotingAd] = useState(null);
+    const [loadingPayment, setLoadingPayment] = useState(false);
+    const { user, token } = useAuth();
 
     const fetchAds = async () => {
         try {
@@ -106,55 +107,55 @@ const [loadingPayment, setLoadingPayment] = useState(false);
     };
 
 
-const handlePromote = (id) => {
-  const ad = ads.find((a) => a._id === id);
-  setPromotingAd(ad);
-  setShowPromoteModal(true);
-};
+    const handlePromote = (id) => {
+        const ad = ads.find((a) => a._id === id);
+        setPromotingAd(ad);
+        setShowPromoteModal(true);
+    };
 
 
-const handleProceedPromotion = async (selectedPlan) => {
-  if (!promotingAd) return;
-  try {
-    setLoadingPayment(true);
-    const stripe = await stripePromise;
-    const token = localStorage.getItem("token");
-    const userId = promotingAd.user?._id || promotingAd.user;
+    const handleProceedPromotion = async (selectedPlan) => {
+        if (!promotingAd) return;
+        try {
+            setLoadingPayment(true);
+            const stripe = await stripePromise;
+            const token = localStorage.getItem("token");
+            const userId = user?._id;
 
-    const plan = selectedPlan === "10" ? "10_days" : "30_days";
-    const response = await axios.post(
-      `${apiUrl}stripe/create-promotion-payment`,
-      {
-        userId,
-        plan,
-        adData: promotingAd,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+            const plan = selectedPlan === "10" ? "10_days" : "30_days";
+            const response = await axios.post(
+                `${apiUrl}stripe/create-promotion-payment`,
+                {
+                    userId,
+                    plan,
+                    adData: promotingAd,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-    const { clientSecret } = response.data;
+            const { clientSecret } = response.data;
 
-    const { error } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: {
-        },
-      },
-    });
+            const { error } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: {
+                    },
+                },
+            });
 
-    if (error) {
-      console.error("Payment failed:", error);
-      toast.error("Payment failed");
-    } else {
-      toast.success("Payment successful! Your ad will be promoted shortly.");
-      setShowPromoteModal(false);
-    }
-  } catch (error) {
-    console.error("Error initiating promotion:", error);
-    toast.error("Unable to start promotion payment");
-  } finally {
-    setLoadingPayment(false);
-  }
-};
+            if (error) {
+                console.error("Payment failed:", error);
+                toast.error("Payment failed");
+            } else {
+                toast.success("Payment successful! Your ad will be promoted shortly.");
+                setShowPromoteModal(false);
+            }
+        } catch (error) {
+            console.error("Error initiating promotion:", error);
+            toast.error("Unable to start promotion payment");
+        } finally {
+            setLoadingPayment(false);
+        }
+    };
 
 
 
@@ -303,8 +304,8 @@ const handleProceedPromotion = async (selectedPlan) => {
                                                                 disabled={ad.available === true}
                                                                 onClick={() => ad.available === false && handleStatus(ad._id, "Available")}
                                                                 className={`block w-full text-left px-4 py-2 border-b ${ad.available
-                                                                        ? "bg-green-100 text-green-600 font-medium cursor-not-allowed"
-                                                                        : "hover:bg-gray-100 text-gray-700"
+                                                                    ? "bg-green-100 text-green-600 font-medium cursor-not-allowed"
+                                                                    : "hover:bg-gray-100 text-gray-700"
                                                                     }`}
                                                             >
                                                                 Resume
@@ -314,8 +315,8 @@ const handleProceedPromotion = async (selectedPlan) => {
                                                                 disabled={ad.available === false}
                                                                 onClick={() => ad.available === true && handleStatus(ad._id, "Unavailable")}
                                                                 className={`block w-full text-left px-4 py-2 ${!ad.available
-                                                                        ? "bg-red-100 text-red-600 font-medium cursor-not-allowed"
-                                                                        : "hover:bg-gray-100 text-gray-700"
+                                                                    ? "bg-red-100 text-red-600 font-medium cursor-not-allowed"
+                                                                    : "hover:bg-gray-100 text-gray-700"
                                                                     }`}
                                                             >
                                                                 Pause
@@ -324,14 +325,17 @@ const handleProceedPromotion = async (selectedPlan) => {
 
                                                     </div>
 
-                                                    {!ad.promotionDisabled && (
                                                     <button
-                                                        className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b"
-                                                        onClick={() => handlePromote(ad._id)}
+                                                        className={`w-full text-left px-4 py-2 border-b ${ad?.promotion?.isPromoted
+                                                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                                : "hover:bg-gray-100"
+                                                            }`}
+                                                        onClick={() => !ad?.promotion?.isPromoted && handlePromote(ad._id)}
+                                                        disabled={ad?.promotion?.isPromoted === true}
                                                     >
                                                         Promote Ad
                                                     </button>
-                                                    )}
+
                                                     <button
                                                         className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                                                         onClick={() => handleDelete(ad._id)}

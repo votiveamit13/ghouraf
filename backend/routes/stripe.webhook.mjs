@@ -1,14 +1,16 @@
 import express from "express";
 import Stripe from "stripe";
 import Space from "../models/Space.mjs";
+import SpaceWanted from "../models/SpaceWanted.mjs";
+import TeamUp from "../models/TeamUp.mjs";
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 const PLAN_PRICES = {
-  "10_days": 1500, // $15
-  "30_days": 2000, // $20
+  "10_days": 1500,
+  "30_days": 2000,
 };
 
 router.post(
@@ -67,7 +69,8 @@ router.post(
 
 router.post("/create-promotion-payment", async (req, res) => {
   try {
-    const { userId, plan, adData } = req.body;
+     const userId = req.user?._id;
+    const { plan, adData } = req.body;
 
     if (!PLAN_PRICES[plan]) {
       return res.status(400).json({ message: "Invalid plan selected" });
