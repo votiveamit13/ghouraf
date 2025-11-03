@@ -113,50 +113,30 @@ export default function MyAds() {
         setShowPromoteModal(true);
     };
 
+    const handleProceedToPayment = async (planDays) => {
+  try {
+    setLoadingPayment(true);
+    const plan = planDays === "10" ? "10_days" : "30_days";
 
-    const handleProceedPromotion = async (selectedPlan) => {
-        if (!promotingAd) return;
-        try {
-            setLoadingPayment(true);
-            const stripe = await stripePromise;
-            const token = localStorage.getItem("token");
-            const userId = user?._id;
+    const res = await axios.post(
+      `${apiUrl}create-promotion-session`,
+      {
+        adId: promotingAd._id,
+        postCategory: promotingAd.postCategory,
+        plan,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-            const plan = selectedPlan === "10" ? "10_days" : "30_days";
-            const response = await axios.post(
-                `${apiUrl}stripe/create-promotion-payment`,
-                {
-                    userId,
-                    plan,
-                    adData: promotingAd,
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            const { clientSecret } = response.data;
-
-            const { error } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: {
-                    },
-                },
-            });
-
-            if (error) {
-                console.error("Payment failed:", error);
-                toast.error("Payment failed");
-            } else {
-                toast.success("Payment successful! Your ad will be promoted shortly.");
-                setShowPromoteModal(false);
-            }
-        } catch (error) {
-            console.error("Error initiating promotion:", error);
-            toast.error("Unable to start promotion payment");
-        } finally {
-            setLoadingPayment(false);
-        }
-    };
-
+    const stripe = await stripePromise;
+    await stripe.redirectToCheckout({ sessionId: res.data.id });
+  } catch (err) {
+    console.error("Promotion payment error:", err);
+    toast.error("Failed to start promotion payment.");
+  } finally {
+    setLoadingPayment(false);
+  }
+};
 
 
     const handleDelete = (id) => {
@@ -404,12 +384,13 @@ export default function MyAds() {
                 onCancel={cancelDelete}
             />
 
-            <PromoteAdModal
-                show={showPromoteModal}
-                onClose={() => setShowPromoteModal(false)}
-                onProceed={handleProceedPromotion}
-                loading={loadingPayment}
-            />
+<PromoteAdModal
+  show={showPromoteModal}
+  onClose={() => setShowPromoteModal(false)}
+  onProceed={handleProceedToPayment}
+  loading={loadingPayment}
+/>
+
 
 
             <div className="mt-6 flex justify-center md:justify-end">

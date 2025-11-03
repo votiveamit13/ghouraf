@@ -1,0 +1,130 @@
+import Stripe from "stripe";
+import Space from "../models/Space.model.js";
+import SpaceWanted from "../models/SpaceWanted.model.js";
+import TeamUp from "../models/TeamUp.model.js";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const modelMap = {
+  Space: Space,
+  Spacewanted: SpaceWanted,
+  Teamup: TeamUp,
+};
+
+export const createPromotionCheckout = async (req, res) => {
+  try {
+    const { adId, plan, postCategory } = req.body;
+    const userId = req.user._id;
+
+    if (!adId || !plan || !postCategory)
+      return res.status(400).json({ message: "Missing required fields" });
+
+    const Model = modelMap[postCategory];
+    if (!Model) return res.status(400).json({ message: "Invalid post category" });
+
+    const ad = await Model.findById(adId);
+    if (!ad) return res.status(404).json({ message: "Ad not found" });
+
+    const amountUSD = plan === "10_days" ? 15 : 20;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name: `Promote ${postCategory} Ad (${plan})` },
+            unit_amount: amountUSD * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        adId,
+        plan,
+        postCategory,
+        userId: userId.toString(),
+        amountUSD: amountUSD.toString(),
+      },
+      success_url: `${process.env.FRONTEND_URL}/promotion-success`,
+      cancel_url: `${process.env.FRONTEND_URL}/promotion-cancel`,
+    });
+
+    ad.promotion = {
+      isPromoted: false,
+      plan,
+      amountUSD,
+      paymentStatus: "pending",
+    };
+    await ad.save();
+
+    res.json({ id: session.id, url: session.url });
+  } catch (error) {
+    console.error("Stripe checkout error:", error);
+    res.status(500).json({ message: "Payment initiation failed", error: error.message });
+  }
+};
+
+export const handleStripeWebhook = async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.rawBody,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error("⚠️  Webhook signature verification failed.", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const { adId, postCategory, plan, amountUSD } = session.metadata;
+
+    const Model = modelMap[postCategory];
+    if (!Model) return res.status(400).send("Invalid post category in metadata");
+
+    const ad = await Model.findById(adId);
+    if (!ad) return res.status(404).send("Ad not found");
+
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(
+      startDate.getDate() + (plan === "10_days" ? 10 : 30)
+    );
+
+    ad.promotion = {
+      isPromoted: true,
+      plan,
+      amountUSD: parseFloat(amountUSD),
+      paymentStatus: "success",
+      paymentId: session.payment_intent,
+      startDate,
+      endDate,
+    };
+
+    await ad.save();
+    console.log(`Promotion activated for Ad ${ad._id}`);
+  }
+
+  if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {
+    const session = event.data.object;
+    const { adId, postCategory } = session.metadata;
+
+    const Model = modelMap[postCategory];
+    if (!Model) return;
+
+    const ad = await Model.findById(adId);
+    if (ad) {
+      ad.promotion.paymentStatus = "failed";
+      ad.promotion.isPromoted = false;
+      await ad.save();
+    }
+  }
+
+  res.json({ received: true });
+};

@@ -9,7 +9,7 @@ import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-  //Spaces
+//Spaces
 export const createSpace = async (req, res) => {
   try {
     const { error } = createSpaceSchema.validate(req.body, { abortEarly: false });

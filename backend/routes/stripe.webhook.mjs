@@ -1,17 +1,10 @@
 import express from "express";
 import Stripe from "stripe";
 import Space from "../models/Space.mjs";
-import SpaceWanted from "../models/SpaceWanted.mjs";
-import TeamUp from "../models/TeamUp.mjs";
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-const PLAN_PRICES = {
-  "10_days": 1500,
-  "30_days": 2000,
-};
 
 router.post(
   "/webhook",
@@ -66,45 +59,5 @@ router.post(
     res.status(200).json({ received: true });
   }
 );
-
-router.post("/create-promotion-payment", express.json(), async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { plan, adData } = req.body;
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: `Promote ${adData.title}`,
-            },
-            unit_amount: plan === "30_days" ? 3000 : 1000,
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: {
-        userId: userId.toString(),
-        plan,
-        adId: adData._id.toString(),
-        postCategory: adData.postCategory,
-      },
-      success_url: `${process.env.CLIENT_URL}/promotion-success`,
-      cancel_url: `${process.env.CLIENT_URL}/promotion-failed`,
-    });
-
-    res.json({ id: session.id, url: session.url });
-  } catch (err) {
-    console.error("Payment creation failed:", err);
-    res
-      .status(500)
-      .json({ message: "Payment creation failed", error: err.message });
-  }
-});
-
 
 export default router;
