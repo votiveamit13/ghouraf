@@ -6,6 +6,11 @@ const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+const PLAN_PRICES = {
+  "10_days": 1500, // $15
+  "30_days": 2000, // $20
+};
+
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -59,5 +64,35 @@ router.post(
     res.status(200).json({ received: true });
   }
 );
+
+router.post("/create-promotion-payment", async (req, res) => {
+  try {
+    const { userId, plan, adData } = req.body;
+
+    if (!PLAN_PRICES[plan]) {
+      return res.status(400).json({ message: "Invalid plan selected" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: PLAN_PRICES[plan],
+      currency: "usd",
+      metadata: {
+        userId,
+        plan,
+        spaceData: JSON.stringify(adData),
+      },
+      automatic_payment_methods: { enabled: true },
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    });
+  } catch (error) {
+    console.error("Error creating promotion payment:", error);
+    res.status(500).json({ message: "Payment creation failed", error: error.message });
+  }
+});
+
 
 export default router;

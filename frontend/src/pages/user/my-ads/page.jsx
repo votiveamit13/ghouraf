@@ -10,6 +10,10 @@ import EditPost from "components/user/myads/EditPost";
 import { getFullLocation } from "utils/locationHelper";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+import { loadStripe } from "@stripe/stripe-js";
+import PromoteAdModal from "components/user/myads/PromoteAd";
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
 
 export default function MyAds() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -27,6 +31,9 @@ export default function MyAds() {
     const [showEditPost, setShowEditPost] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [deleteAdId, setDeleteAdId] = useState(null);
+const [showPromoteModal, setShowPromoteModal] = useState(false);
+const [promotingAd, setPromotingAd] = useState(null);
+const [loadingPayment, setLoadingPayment] = useState(false);
 
 
     const fetchAds = async () => {
@@ -99,9 +106,57 @@ export default function MyAds() {
     };
 
 
-    const handlePromote = (id) => {
-        console.log("Promote ad:", id);
-    };
+const handlePromote = (id) => {
+  const ad = ads.find((a) => a._id === id);
+  setPromotingAd(ad);
+  setShowPromoteModal(true);
+};
+
+
+const handleProceedPromotion = async (selectedPlan) => {
+  if (!promotingAd) return;
+  try {
+    setLoadingPayment(true);
+    const stripe = await stripePromise;
+    const token = localStorage.getItem("token");
+    const userId = promotingAd.user?._id || promotingAd.user;
+
+    const plan = selectedPlan === "10" ? "10_days" : "30_days";
+    const response = await axios.post(
+      `${apiUrl}stripe/create-promotion-payment`,
+      {
+        userId,
+        plan,
+        adData: promotingAd,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const { clientSecret } = response.data;
+
+    const { error } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: {
+        },
+      },
+    });
+
+    if (error) {
+      console.error("Payment failed:", error);
+      toast.error("Payment failed");
+    } else {
+      toast.success("Payment successful! Your ad will be promoted shortly.");
+      setShowPromoteModal(false);
+    }
+  } catch (error) {
+    console.error("Error initiating promotion:", error);
+    toast.error("Unable to start promotion payment");
+  } finally {
+    setLoadingPayment(false);
+  }
+};
+
+
 
     const handleDelete = (id) => {
         setDeleteAdId(id);
@@ -269,12 +324,14 @@ export default function MyAds() {
 
                                                     </div>
 
+                                                    {!ad.promotionDisabled && (
                                                     <button
                                                         className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b"
                                                         onClick={() => handlePromote(ad._id)}
                                                     >
                                                         Promote Ad
                                                     </button>
+                                                    )}
                                                     <button
                                                         className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                                                         onClick={() => handleDelete(ad._id)}
@@ -341,6 +398,13 @@ export default function MyAds() {
                 message="Are you sure you want to delete this ad? This action cannot be undone."
                 onConfirm={confirmDelete}
                 onCancel={cancelDelete}
+            />
+
+            <PromoteAdModal
+                show={showPromoteModal}
+                onClose={() => setShowPromoteModal(false)}
+                onProceed={handleProceedPromotion}
+                loading={loadingPayment}
             />
 
 

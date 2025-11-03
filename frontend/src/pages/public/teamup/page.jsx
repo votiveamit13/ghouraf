@@ -94,6 +94,24 @@ useEffect(() => {
       </div>
 
       <div className="col-span-3">
+                <div className="flex items-center justify-end text-black mb-2 gap-2">
+          <div>Sort by:</div>
+          <div>
+            <select
+              name="sortBy"
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setPage(1);
+              }}
+              className="border-[1px] border-[#D1D5DB] px-2 py-[12px] w-full rounded-[10px] text-[#948E8E]"
+            >
+              <option value="Newest Ads">Newest Ads</option>
+              <option value="Lowest First">Budget (Lowest First)</option>
+              <option value="Highest First">Budget (Highest First)</option>
+            </select>
+          </div>
+        </div>
         {loading ? (
           <Loader fullScreen={false} />
         ) : !userHasPosted ? (

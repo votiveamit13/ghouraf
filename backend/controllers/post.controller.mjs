@@ -741,13 +741,29 @@ switch (sort) {
       }
     }
 
+    
+
 const [spaces, teamUps, spaceWanteds] = await Promise.all([
       spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
       teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
       spaceWantedFilter._skip ? [] : SpaceWanted.find(spaceWantedFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
     ]);
 
-    const combined = [...spaces, ...teamUps, ...spaceWanteds];
+    const markPromotions = (ads) =>
+      ads.map((ad) => ({
+        ...ad,
+        promotionDisabled:
+          ad?.isPromoted === true ||
+          (ad?.promotion &&
+            (ad?.promotion?.status === "active" ||
+              ad?.promotion?.expiresAt > new Date())),
+      }));
+
+    const combined = [
+      ...markPromotions(spaces),
+      ...markPromotions(teamUps),
+      ...markPromotions(spaceWanteds),
+    ];
 
       const totalCount = combined.length;
     const totalPages = Math.ceil(totalCount / limit);

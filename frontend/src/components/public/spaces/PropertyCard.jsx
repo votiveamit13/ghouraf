@@ -69,6 +69,12 @@ export default function PropertyCard({ property }) {
     return (
 
         <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
+            {/* {property.promotion?.isPromoted && (
+  <div className="absolute top-[-2px] left-[-2px] bg-yellow-300 text-black text-xs font-semibold px-2 py-1 rounded mb-2 inline-block">
+    Sponsored
+  </div>
+)} */}
+
             <Link to={`/spaces/${property._id}`}>
                 <div className="w-[200px] h-[260px]">
                     <img
