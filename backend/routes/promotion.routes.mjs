@@ -2,7 +2,7 @@ import express from "express";
 import {
   createPromotionCheckout,
   handleStripeWebhook,
-} from "../controllers/promotion.controller.js";
+} from "../controllers/promotion.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 
 

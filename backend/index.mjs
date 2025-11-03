@@ -6,6 +6,7 @@ import adminRoutes from "./routes/admin.route.mjs";
 import userRoutes from "./routes/user.route.mjs";
 import guestRoutes from "./routes/guest.route.mjs";
 import postRoutes from "./routes/post.route.mjs";
+import promotionRoutes from "./routes/promotion.routes.mjs";
 import dbConnection from "./config/db.connection.mjs";
 import User from "./models/User.mjs";
 import helmet from "helmet";
