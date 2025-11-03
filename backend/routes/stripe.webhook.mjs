@@ -67,7 +67,7 @@ router.post(
   }
 );
 
-router.post("/create-promotion-payment", async (req, res) => {
+router.post("/create-promotion-payment", express.json(), async (req, res) => {
   try {
      const userId = req.user?._id;
     const { plan, adData } = req.body;
