@@ -229,7 +229,6 @@ export default function TeamUpAd() {
                         subtitle:
                             "This post will undergo a review process and will be published once approved.",
                         goBackPath: "/user/team-up-post",
-                        viewAdsPath: "/team-up",
                     },
                 });
                 setFormData({ ...initialFormData });

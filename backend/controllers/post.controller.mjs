@@ -273,15 +273,24 @@ export const getSpaces = async (req, res) => {
     }
 
     await Space.updateMany(
-      { isPromoted: true, promotedUntil: { $lt: new Date() } },
-      { $set: { isPromoted: false, promotedUntil: null, promotionDays: 0 } }
+      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      { 
+        $set: { 
+          "promotion.isPromoted": false,
+          "promotion.plan": null,
+          "promotion.amountUSD": 0,
+          "promotion.paymentStatus": "expired"
+        }
+      }
     );
 
+
     let sortOption = {
-      isPromoted: -1,
-      promotedAt: 1, 
-      createdAt: -1, 
+      "promotion.isPromoted": -1, 
+      "promotion.startDate": 1, 
+      createdAt: -1 
     };
+
 
     if (sortBy === "Lowest First") sortOption = { ...sortOption, budget: 1 };
     if (sortBy === "Highest First") sortOption = { ...sortOption, budget: -1 };
@@ -294,7 +303,7 @@ export const getSpaces = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const spaces = await Space.find(query)
-      .select("title postCategory propertyType budget budgetType personalInfo amenities size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted")
+      .select("title postCategory propertyType budget budgetType personalInfo amenities size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted promotion")
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort(sortOption)
       .skip(skip)

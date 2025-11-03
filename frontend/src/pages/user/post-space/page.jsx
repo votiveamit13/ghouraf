@@ -104,9 +104,9 @@ export default function PostSpace() {
   const [isPublishing, setIsPublishing] = useState(false);
   const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState("10"); 
-const [clientSecret, setClientSecret] = useState(null);
-const [showPaymentModal, setShowPaymentModal] = useState(false);
-const [promotionLoading, setPromotionLoading] = useState(false);
+  const [clientSecret, setClientSecret] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [promotionLoading, setPromotionLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -344,7 +344,6 @@ const [promotionLoading, setPromotionLoading] = useState(false);
           title: "Your ad was successfully submitted",
           subtitle: "This post will undergo a review process and will be published once approved.",
           goBackPath: "/user/post-an-space",
-          viewAdsPath: "/my-spaces"
         }
       });
       setErrors({});

@@ -240,7 +240,6 @@ export default function RoomWantedAd() {
                         subtitle:
                             "This post will undergo a review process and will be published once approved.",
                         goBackPath: "/user/place-wanted-ad",
-                        viewAdsPath: "/",
                     },
                 });
             } else {
