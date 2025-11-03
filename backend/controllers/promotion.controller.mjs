@@ -1,7 +1,7 @@
 import Stripe from "stripe";
-import Space from "../models/Space.model.js";
-import SpaceWanted from "../models/SpaceWanted.model.js";
-import TeamUp from "../models/TeamUp.model.js";
+import Space from "../models/Space.mjs";
+import SpaceWanted from "../models/SpaceWanted.mjs";
+import TeamUp from "../models/TeamUp.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
