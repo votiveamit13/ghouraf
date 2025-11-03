@@ -69,31 +69,40 @@ router.post(
 
 router.post("/create-promotion-payment", express.json(), async (req, res) => {
   try {
-     const userId = req.user?._id;
+    const userId = req.user._id;
     const { plan, adData } = req.body;
 
-    if (!PLAN_PRICES[plan]) {
-      return res.status(400).json({ message: "Invalid plan selected" });
-    }
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: PLAN_PRICES[plan],
-      currency: "usd",
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `Promote ${adData.title}`,
+            },
+            unit_amount: plan === "30_days" ? 3000 : 1000,
+          },
+          quantity: 1,
+        },
+      ],
       metadata: {
-        userId,
+        userId: userId.toString(),
         plan,
-        spaceData: JSON.stringify(adData),
+        adId: adData._id.toString(),
+        postCategory: adData.postCategory,
       },
-      automatic_payment_methods: { enabled: true },
+      success_url: `${process.env.CLIENT_URL}/promotion-success`,
+      cancel_url: `${process.env.CLIENT_URL}/promotion-failed`,
     });
 
-    res.json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-    });
-  } catch (error) {
-    console.error("Error creating promotion payment:", error);
-    res.status(500).json({ message: "Payment creation failed", error: error.message });
+    res.json({ id: session.id, url: session.url });
+  } catch (err) {
+    console.error("Payment creation failed:", err);
+    res
+      .status(500)
+      .json({ message: "Payment creation failed", error: err.message });
   }
 });
 
