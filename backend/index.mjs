@@ -30,7 +30,8 @@ app.use(
 app.use(morgan('dev'))
 
 app.use("/api/stripe", stripeWebhook);
-app.use("/api/stripe/webhooks",express.raw({ type: "application/json" }), promotionRoutes);
+app.use("/api/stripe/webhooks/create-promotion-session", express.json());
+app.use("/api/stripe/webhooks", express.raw({ type: "application/json" }), promotionRoutes);
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

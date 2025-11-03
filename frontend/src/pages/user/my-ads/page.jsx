@@ -118,8 +118,15 @@ export default function MyAds() {
     setLoadingPayment(true);
     const plan = planDays === "10" ? "10_days" : "30_days";
 
+        console.log("Promoting Ad:", promotingAd);
+    console.log("Sending data:", {
+      adId: promotingAd._id,
+      postCategory: promotingAd.postCategory,
+      plan,
+    });
+
     const res = await axios.post(
-      `${apiUrl}create-promotion-session`,
+      `${apiUrl}stripe/webhooks/create-promotion-session`,
       {
         adId: promotingAd._id,
         postCategory: promotingAd.postCategory,
