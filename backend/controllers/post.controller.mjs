@@ -513,7 +513,9 @@ export const getTeamUps = async (req, res) => {
         "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
-
+            .sort(sortOption)
+      .skip(skip)
+      
         const spaceWantedTeamUps = await SpaceWanted.find({
       ...query,
       teamUp: true,
