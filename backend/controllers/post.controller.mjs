@@ -687,7 +687,6 @@ export const getSavedPosts = async (req, res) => {
 export const getMyAds = async (req, res) => {
   try {
     const userId = req.user?._id;
-
     const {
       page = 1,
       limit = 9,
@@ -698,68 +697,60 @@ export const getMyAds = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const spaceFilter = { user: userId, is_deleted: false };
-    const teamUpFilter = { user: userId, is_deleted: false };
-    const spaceWantedFilter = { user: userId, is_deleted: false };
+    const baseFilter = { user: userId, is_deleted: false };
 
     if (search) {
       const searchRegex = new RegExp(search, "i");
-      spaceFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
-      teamUpFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
-      spaceWantedFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
+      baseFilter.$or = [{ title: searchRegex }, { city: searchRegex }];
     }
 
-let sortOption;
+    let sortOption = { createdAt: -1 };
+    if (sort === "Oldest First") sortOption = { createdAt: 1 };
 
-switch (sort) {
-  case "Oldest First":
-    sortOption = { createdAt: 1 };
-    break;
-  case "Recently posted":
-  default:
-    sortOption = { createdAt: -1 };
-    break;
-}
+    const spaceFilter = { ...baseFilter };
+    const teamUpFilter = { ...baseFilter };
+    const spaceWantedFilter = { ...baseFilter };
 
-
-   if (category !== "All Category") {
+    if (category !== "All Category") {
       if (category === "Space") {
-        spaceFilter.postCategory = "Space";
         teamUpFilter._skip = true;
         spaceWantedFilter._skip = true;
       } else if (category === "Spacewanted") {
-        spaceWantedFilter.postCategory = "Spacewanted";
         spaceFilter._skip = true;
         teamUpFilter._skip = true;
       } else if (category === "Teamup") {
-        teamUpFilter.postCategory = "Teamup";
         spaceFilter._skip = true;
         spaceWantedFilter._skip = true;
       }
     }
 
-const [spaces, teamUps, spaceWanteds] = await Promise.all([
-      spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
-      teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
-      spaceWantedFilter._skip ? [] : SpaceWanted.find(spaceWantedFilter).sort(sortOption).skip(Number(skip)).limit(Number(limit)),
+    const [spaces, teamUps, spaceWanteds] = await Promise.all([
+      spaceFilter._skip ? [] : Space.find(spaceFilter).sort(sortOption),
+      teamUpFilter._skip ? [] : TeamUp.find(teamUpFilter).sort(sortOption),
+      spaceWantedFilter._skip ? [] : SpaceWanted.find(spaceWantedFilter).sort(sortOption),
     ]);
 
-    const combined = [...spaces, ...teamUps, ...spaceWanteds];
+    let combined = [...spaces, ...teamUps, ...spaceWanteds];
 
-      const totalCount = combined.length;
+    combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const totalCount = combined.length;
+    const paginated = combined.slice(skip, skip + Number(limit));
     const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({
       success: true,
-      data: combined,
+      data: paginated,
       totalCount,
       currentPage: Number(page),
       totalPages,
     });
   } catch (error) {
+    console.error("getMyAds error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 export const updateAd = async (req, res) => {
   try {
