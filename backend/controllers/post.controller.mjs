@@ -506,16 +506,13 @@ export const getTeamUps = async (req, res) => {
     if (sortBy === "Lowest First") sortOption = { budget: 1 };
     if (sortBy === "Highest First") sortOption = { budget: -1 };
 
-    const skip = (page - 1) * limit;
+    // const skip = (page - 1) * limit;
 
     const teamUps = await TeamUp.find(query)
       .select(
         "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
-      .sort(sortOption)
-      .skip(skip)
-      .limit(Number(limit));
 
         const spaceWantedTeamUps = await SpaceWanted.find({
       ...query,
@@ -527,28 +524,27 @@ export const getTeamUps = async (req, res) => {
       )
       .populate("user", "profile.firstName profile.lastName profile.photo");
 
-    let allTeamUps = [...teamUps, ...spaceWantedTeamUps];
+  let allTeamUps = [...teamUps, ...spaceWantedTeamUps];
 
-        if (sortBy === "Lowest First") {
-      allTeamUps.sort((a, b) => a.budget - b.budget);
-    } else if (sortBy === "Highest First") {
-      allTeamUps.sort((a, b) => b.budget - a.budget);
-    } else {
-      allTeamUps.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-    }
+if (sortBy === "Lowest First") {
+  allTeamUps.sort((a, b) => a.budget - b.budget);
+} else if (sortBy === "Highest First") {
+  allTeamUps.sort((a, b) => b.budget - a.budget);
+} else {
+  allTeamUps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
 
-    const total = allTeamUps.length;
-    const paginated = allTeamUps.slice(skip, skip + Number(limit));
+const total = allTeamUps.length;
+const skip = (page - 1) * limit;
+const paginated = allTeamUps.slice(skip, skip + Number(limit));
 
-    res.status(200).json({
-      success: true,
-      total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
-      data: paginated,
-    });
+res.status(200).json({
+  success: true,
+  total,
+  page: Number(page),
+  pages: Math.ceil(total / limit),
+  data: paginated,
+});
   } catch (error) {
     console.error("Get TeamUps error:", error);
     res.status(500).json({ success: false, message: error.message });
