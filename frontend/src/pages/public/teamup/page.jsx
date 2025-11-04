@@ -67,16 +67,12 @@ useEffect(() => {
 
       const res = await axios.get(`${apiUrl}teamups`, { params });
       const data = res.data.data || [];
+
+      const hasPosted = data.some((item) => item.user?._id === userId);
+      setUserHasPosted(hasPosted);
+
       setTeamups(data);
       setTotalPages(res.data.pages || 1);
-
-      if (page === 1) {
-        const checkRes = await axios.get(`${apiUrl}teamups`, {
-          params: { userId, limit: 1 }, 
-        });
-        const hasPosted = (checkRes.data.data || []).length > 0;
-        setUserHasPosted(hasPosted);
-      }
     } catch (err) {
       console.error("Failed to fetch team-ups:", err);
       setTeamups([]);
