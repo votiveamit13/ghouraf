@@ -175,6 +175,22 @@ export default function MyAds() {
         setDeleteAdId(null);
     };
 
+    useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paymentStatus = urlParams.get("payment");
+
+  if (paymentStatus === "success") {
+    toast.success("Your ad was successfully promoted!");
+    fetchAds();
+  } else if (paymentStatus === "cancel") {
+    toast.info("Payment was cancelled.");
+  }
+
+  if (paymentStatus) {
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, "", newUrl);
+  }
+}, []);
 
 
     return (
