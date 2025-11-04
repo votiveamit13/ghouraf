@@ -135,7 +135,6 @@ export default function MyAds() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // ✅ Stripe now requires direct redirection
             window.location.href = res.data.url;
 
         } catch (err) {
