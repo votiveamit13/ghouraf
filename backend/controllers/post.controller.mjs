@@ -508,6 +508,14 @@ export const getTeamUps = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+        const [teamUpCount, spaceWantedCount] = await Promise.all([
+      TeamUp.countDocuments(query),
+      SpaceWanted.countDocuments({ ...query, teamUp: true }),
+    ]);
+
+        const total = teamUpCount + spaceWantedCount;
+    const totalPages = Math.ceil(total / limit);
+
     const teamUps = await TeamUp.find(query)
       .select(
         "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation"
@@ -529,24 +537,21 @@ export const getTeamUps = async (req, res) => {
 
     let allTeamUps = [...teamUps, ...spaceWantedTeamUps];
 
-        if (sortBy === "Lowest First") {
+    if (sortBy === "Lowest First") {
       allTeamUps.sort((a, b) => a.budget - b.budget);
     } else if (sortBy === "Highest First") {
       allTeamUps.sort((a, b) => b.budget - a.budget);
     } else {
-      allTeamUps.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      allTeamUps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
-    const total = allTeamUps.length;
     const paginated = allTeamUps.slice(skip, skip + Number(limit));
 
     res.status(200).json({
       success: true,
       total,
       page: Number(page),
-      pages: Math.ceil(total / limit),
+      pages: totalPages,
       data: paginated,
     });
   } catch (error) {

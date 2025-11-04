@@ -1,21 +1,19 @@
 import React from "react";
 import PropertyCard from "./PropertyCard";
 
-export default function PropertyList({ properties, page, itemsPerPage }) {
-  const startIndex = (page - 1) * itemsPerPage;
-  const selectedProperties = properties.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-   if (!selectedProperties || selectedProperties.length === 0) {
-    return null;
+export default function PropertyList({ properties }) {
+  if (!properties || properties.length === 0) {
+    return (
+      <div className="text-center py-20 text-gray-500 font-medium text-lg">
+        No Spaces Found
+      </div>
+    );
   }
 
   return (
     <div>
-      {selectedProperties.map((property, idx) => (
-        <PropertyCard key={idx} property={property} />
+      {properties.map((property, idx) => (
+        <PropertyCard key={property._id || idx} property={property} />
       ))}
     </div>
   );
