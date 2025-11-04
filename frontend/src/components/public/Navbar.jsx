@@ -60,13 +60,18 @@ export default function Navbar() {
   const [showInvalidDialog, setShowInvalidDialog] = useState(false);
   const [showMoreInfoMobile, setShowMoreInfoMobile] = useState(false);
   const dropdownRef = useRef(null);
+  const dropdownRefMoreInfo = useRef(null);
   const mobileDropdownRef = useRef(null);
+  const [dropdownMoreInfo, setDropdownMoreInfo] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
+      if (dropdownRefMoreInfo.current && !dropdownRefMoreInfo.current.contains(event.target)) {
+      setDropdownMoreInfo(false);
+    }
       if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target)) {
         setMobileDropdownOpen(false);
       }
@@ -324,59 +329,60 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex space-x-8 relative">
-            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
-              if (item === "more-info") {
-                return (
-                  <div key={item} className="relative group">
-                    <button
-                      className={`font-semibold ${linkClass} text-[#565ABF]`}
-                    >
-                      More Info
-                    </button>
+{["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
+  if (item === "more-info") {
+    return (
+      <div key={item} className="relative" ref={dropdownRefMoreInfo}>
+        <button
+          onClick={() => setDropdownMoreInfo((prev) => !prev)}
+          className={`font-semibold ${linkClass} text-[#565ABF]`}
+        >
+          More Info
+        </button>
 
-                    <div
-                      className="pointer-events-none absolute left-0 mt-2 w-40"
-                    >
-                      <div
-                        className="pointer-events-auto bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50"
-                      >
-                        <NavLink
-                          to="/about-us"
-                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-                        >
-                          About Us
-                        </NavLink>
-                        <NavLink
-                          to="/contact-us"
-                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-                        >
-                          Contact Us
-                        </NavLink>
-                        <NavLink
-                          to="/faq"
-                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-                        >
-                          FAQ
-                        </NavLink>
-                      </div>
-                    </div>
-                  </div>
+        {dropdownMoreInfo && (
+          <div className="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-lg z-50">
+            <NavLink
+              to="/about-us"
+              className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+              onClick={() => setDropdownMoreInfo(false)}
+            >
+              About Us
+            </NavLink>
+            <NavLink
+              to="/contact-us"
+              className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+              onClick={() => setDropdownMoreInfo(false)}
+            >
+              Contact Us
+            </NavLink>
+            <NavLink
+              to="/faq"
+              className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+              onClick={() => setDropdownMoreInfo(false)}
+            >
+              FAQ
+            </NavLink>
+          </div>
+        )}
+      </div>
+    );
+  }
 
-                );
-              }
+  // default nav items
+  return (
+    <NavLink
+      key={item}
+      to={`/${item}`}
+      className={({ isActive }) =>
+        `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+      }
+    >
+      {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+    </NavLink>
+  );
+})}
 
-              return (
-                <NavLink
-                  key={item}
-                  to={`/${item}`}
-                  className={({ isActive }) =>
-                    `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-                  }
-                >
-                  {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                </NavLink>
-              );
-            })}
           </div>
 
           <div className="hidden md:flex items-center space-x-6">

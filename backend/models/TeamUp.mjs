@@ -39,7 +39,7 @@ const TeamUpSchema = new mongoose.Schema({
     smoke: { type: Boolean, required: true },
     pets: { type: Boolean, required: true },
     petsPreference: { type: Boolean, required: true },
-    language: { type: String },
+    // language: { type: String },
     // languagePreference: { type: String },
     // roommatePref: { type: String, enum: roomAvailableForType, required: true },
     description: { type: String, required: true },

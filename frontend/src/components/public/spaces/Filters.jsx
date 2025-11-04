@@ -65,9 +65,29 @@ export default function Filters({ filters, setFilters, setPage }) {
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Price</label>
         <div className="ml-5 border border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-2 py-2 mt-2 text-sm">
-          <input type="number" min={min} max={filters.maxValue} value={filters.minValue} onChange={handleMinChange} className="w-16 outline-none text-start" />
+           <input
+              type="text"
+              value={filters.minValue}
+              onChange={(e) => {
+                let value = e.target.value.replace(/\D/g, "");
+                value = value === "" ? 0 : Number(value);
+                value = Math.min(value, filters.maxValue, 100000);
+                handleFilterChange("minValue", value);
+              }} 
+              className="w-16 outline-none text-start" 
+            />
           <span>-</span>&nbsp;&nbsp;
-          <input type="number" min={filters.minValue} max={max} value={filters.maxValue} onChange={handleMaxChange} className="w-16 outline-none text-start" />
+          <input
+            type="text"
+            value={filters.maxValue}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, ""); 
+              value = value === "" ? 0 : Number(value);
+              value = Math.min(100000, Math.max(value, filters.minValue)); 
+              handleFilterChange("maxValue", value);
+            }} 
+            className="w-16 outline-none text-start" 
+          />
         </div>
 
         <div className="flex justify-between text-sm text-[#333333] mt-3">

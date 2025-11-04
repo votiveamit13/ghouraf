@@ -50,8 +50,8 @@ export default function PropertyCard({ property }) {
             const listingPage = "Space";
             const res = await axios.post(`${apiUrl}save`, {
                 postId: property._id,
-                 postCategory: listingPage, 
-            listingPage: listingPage
+                postCategory: listingPage,
+                listingPage: listingPage
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -65,6 +65,29 @@ export default function PropertyCard({ property }) {
             toast.error("Failed to save post");
         }
     };
+
+    const handleShare = async (e) => {
+        e.preventDefault();
+
+        const shareData = {
+            title: property.title,
+            text: `Check out this property in ${locationString}!`,
+            url: `${window.location.origin}/spaces/${property._id}`,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareData.url);
+                toast.info("Link copied to clipboard!");
+            }
+        } catch (err) {
+            console.error("Error sharing:", err);
+            toast.error("Failed to share this property.");
+        }
+    };
+
 
     return (
 
@@ -114,7 +137,9 @@ export default function PropertyCard({ property }) {
                         <GrFavorite />
                         {saved ? "Saved" : "Save"}
                     </button>
-                    <button className="px-3 py-2 rounded-[4px] text-sm border-[1px] border-[#565ABF] text-[#565ABF] flex gap-2 items-center"><GoShareAndroid />Share</button>
+                    <button
+                        onClick={handleShare}
+                        className="px-3 py-2 rounded-[4px] text-sm border-[1px] border-[#565ABF] text-[#565ABF] flex gap-2 items-center"><GoShareAndroid />Share</button>
                 </div>
             </div>
         </div>

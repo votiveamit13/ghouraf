@@ -34,7 +34,7 @@ export const createTeamUpSchema = Joi.object({
   pets: Joi.boolean().required(),
   petsPreference: Joi.boolean().required(),
 
-  language: Joi.string().optional(),
+  // language: Joi.string().optional(),
   // languagePreference: Joi.string().optional(),
 
   // roommatePref: Joi.string().valid(...roomAvailableForType).required(),

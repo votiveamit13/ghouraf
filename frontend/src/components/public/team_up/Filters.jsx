@@ -65,9 +65,29 @@ export default function Filters({ filters, setFilters, setPage }) {
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[18px]">Budget</label>
         <div className="ml-5 border border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-2 py-2 mt-2 text-sm">
-          <input type="number" min={min} max={filters.maxValue} value={filters.minValue} onChange={handleMinChange} className="w-16 outline-none text-start" />
+                     <input
+              type="text"
+              value={filters.minValue}
+              onChange={(e) => {
+                let value = e.target.value.replace(/\D/g, "");
+                value = value === "" ? 0 : Number(value);
+                value = Math.min(value, filters.maxValue, 100000);
+                handleFilterChange("minValue", value);
+              }} 
+              className="w-16 outline-none text-start" 
+            />
           <span>-</span>&nbsp;&nbsp;
-          <input type="number" min={filters.minValue} max={max} value={filters.maxValue} onChange={handleMaxChange} className="w-16 outline-none text-start" />
+          <input
+            type="text"
+            value={filters.maxValue}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, ""); 
+              value = value === "" ? 0 : Number(value);
+              value = Math.min(100000, Math.max(value, filters.minValue)); 
+              handleFilterChange("maxValue", value);
+            }} 
+            className="w-16 outline-none text-start" 
+          />
         </div>
 
         <div className="flex justify-between text-sm text-[#333333] mt-3">
@@ -226,21 +246,38 @@ export default function Filters({ filters, setFilters, setPage }) {
         <label className="font-medium text-[18px]">Age Range</label>
         <div className="flex space-x-2 mt-2 mb-3">
           <input
-            type="number"
-            min="0"
-            value={filters.minAge || ""}
-            onChange={(e) => handleFilterChange("minAge", e.target.value)}
-            placeholder="Min"
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          />
-          <input
-            type="number"
-            min="0"
-            value={filters.maxAge || ""}
-            onChange={(e) => handleFilterChange("maxAge", e.target.value)}
-            placeholder="Max"
-            className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
-          />
+  type="number"
+  value={filters.minAge || ""}
+  onKeyDown={(e) => {
+    if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+  }}
+  min="10"
+  max="99"
+  onChange={(e) => {
+    let val = e.target.value.replace(/\D/g, "");
+    if (val.length > 2) val = val.slice(0, 2); 
+    handleFilterChange("minAge", val);
+  }}
+  placeholder="Min"
+  className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+/>
+
+<input
+  type="number"
+  value={filters.maxAge || ""}
+  onKeyDown={(e) => {
+    if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+  }}
+  min="10"
+  max="99"
+  onChange={(e) => {
+    let val = e.target.value.replace(/\D/g, "");
+    if (val.length > 2) val = val.slice(0, 2);
+    handleFilterChange("maxAge", val);
+  }}
+  placeholder="Max"
+  className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
+/>
         </div>
       </div>
 

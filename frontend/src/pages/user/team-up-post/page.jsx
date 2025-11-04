@@ -35,7 +35,7 @@ export default function TeamUpAd() {
         smoke: "",
         pets: "",
         petsPreference: "",
-        language: "",
+        // language: "",
         // languagePreference: "",
         // roommatePref: "",
         description: "",
@@ -295,7 +295,7 @@ export default function TeamUpAd() {
                                     <p><strong>Age:</strong> {formData.age}</p>
                                     <p><strong>Occupation:</strong> {formData.occupation}</p>
                                     <p><strong>Do you have pets?:</strong> {formData.pets === "true" ? "Yes" : "No"}</p>
-                                    <p><strong>Language:</strong> {formData.language}</p>
+                                    {/* <p><strong>Language:</strong> {formData.language}</p> */}
                                 </div>
 
                                 <div>
@@ -496,7 +496,7 @@ export default function TeamUpAd() {
                                     </select>
                                     {errors.pets && <p className="text-red-500 text-sm mt-1">{errors.pets}</p>}
                                 </div>
-                                <div>
+                                {/* <div>
                                     <label className="block text-gray-700 mb-1">
                                         Your Language
                                     </label>
@@ -513,7 +513,7 @@ export default function TeamUpAd() {
                                             </option>
                                         ))}
                                     </select>
-                                </div>
+                                </div> */}
 
 
                                 <div className="md:col-span-2 mb-4">
