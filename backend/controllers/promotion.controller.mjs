@@ -47,8 +47,8 @@ export const createPromotionCheckout = async (req, res) => {
         userId: userId.toString(),
         amountUSD: amountUSD.toString(),
       },
-      success_url: `${process.env.FRONTEND_URL}/my-ads?payment=success`,
-      cancel_url: `${process.env.FRONTEND_URL}/my-ads?payment=cancel`,
+      success_url: `${process.env.FRONTEND_URL}/user/my-ads?payment=success`,
+      cancel_url: `${process.env.FRONTEND_URL}/user/my-ads?payment=cancel`,
     });
 
     ad.promotion = {

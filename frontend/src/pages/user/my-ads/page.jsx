@@ -114,36 +114,38 @@ export default function MyAds() {
     };
 
     const handleProceedToPayment = async (planDays) => {
-  try {
-    setLoadingPayment(true);
-    const plan = planDays === "10" ? "10_days" : "30_days";
+        try {
+            setLoadingPayment(true);
+            const plan = planDays === "10" ? "10_days" : "30_days";
 
-        console.log("Promoting Ad:", promotingAd);
-    console.log("Sending data:", {
-      adId: promotingAd._id,
-      postCategory: promotingAd.postCategory,
-      plan,
-    });
+            console.log("Promoting Ad:", promotingAd);
+            console.log("Sending data:", {
+                adId: promotingAd._id,
+                postCategory: promotingAd.postCategory,
+                plan,
+            });
 
-    const res = await axios.post(
-      `${apiUrl}stripe/webhooks/create-promotion-session`,
-      {
-        adId: promotingAd._id,
-        postCategory: promotingAd.postCategory,
-        plan,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+            const res = await axios.post(
+                `${apiUrl}stripe/webhooks/create-promotion-session`,
+                {
+                    adId: promotingAd._id,
+                    postCategory: promotingAd.postCategory,
+                    plan,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-    const stripe = await stripePromise;
-    await stripe.redirectToCheckout({ sessionId: res.data.id });
-  } catch (err) {
-    console.error("Promotion payment error:", err);
-    toast.error("Failed to start promotion payment.");
-  } finally {
-    setLoadingPayment(false);
-  }
-};
+            // ✅ Stripe now requires direct redirection
+            window.location.href = res.data.url;
+
+        } catch (err) {
+            console.error("Promotion payment error:", err);
+            toast.error("Failed to start promotion payment.");
+        } finally {
+            setLoadingPayment(false);
+        }
+    };
+
 
 
     const handleDelete = (id) => {
@@ -176,21 +178,21 @@ export default function MyAds() {
     };
 
     useEffect(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const paymentStatus = urlParams.get("payment");
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentStatus = urlParams.get("payment");
 
-  if (paymentStatus === "success") {
-    toast.success("Your ad was successfully promoted!");
-    fetchAds();
-  } else if (paymentStatus === "cancel") {
-    toast.info("Payment was cancelled.");
-  }
+        if (paymentStatus === "success") {
+            toast.success("Your ad was successfully promoted!");
+            fetchAds();
+        } else if (paymentStatus === "cancel") {
+            toast.info("Payment was cancelled.");
+        }
 
-  if (paymentStatus) {
-    const newUrl = window.location.pathname;
-    window.history.replaceState({}, "", newUrl);
-  }
-}, []);
+        if (paymentStatus) {
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, "", newUrl);
+        }
+    }, []);
 
 
     return (
@@ -330,8 +332,8 @@ export default function MyAds() {
 
                                                     <button
                                                         className={`w-full text-left px-4 py-2 border-b ${ad?.promotion?.isPromoted
-                                                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                                : "hover:bg-gray-100"
+                                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                            : "hover:bg-gray-100"
                                                             }`}
                                                         onClick={() => !ad?.promotion?.isPromoted && handlePromote(ad._id)}
                                                         disabled={ad?.promotion?.isPromoted === true}
@@ -407,12 +409,12 @@ export default function MyAds() {
                 onCancel={cancelDelete}
             />
 
-<PromoteAdModal
-  show={showPromoteModal}
-  onClose={() => setShowPromoteModal(false)}
-  onProceed={handleProceedToPayment}
-  loading={loadingPayment}
-/>
+            <PromoteAdModal
+                show={showPromoteModal}
+                onClose={() => setShowPromoteModal(false)}
+                onProceed={handleProceedToPayment}
+                loading={loadingPayment}
+            />
 
 
 
