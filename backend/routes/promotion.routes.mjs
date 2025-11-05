@@ -7,13 +7,6 @@ import { auth } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
-router.post(
-  "/create-promotion-session",
-  auth,
-  express.json(),
-  createPromotionCheckout
-);
+router.post("/", auth, createPromotionCheckout);
 
-router.post("/", handleStripeWebhook);
-
-export default router;
+export { router, handleStripeWebhook };
