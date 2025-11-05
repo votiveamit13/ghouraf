@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { getFullLocation } from "utils/locationHelper";
 import { getChatId } from "utils/firebaseChatHelper";
 import Loader from "components/common/Loader";
+import ReportAdDialog from "components/common/ReportAdDialog";
 
 export default function SpaceWantedDetailPage() {
     const { id } = useParams();
@@ -20,8 +21,9 @@ export default function SpaceWantedDetailPage() {
     const [spacewanted, setSpacewanted] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [messageLoading, setMessageLoading] = useState(false);
+    const [showReport, setShowReport] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -369,7 +371,7 @@ export default function SpaceWantedDetailPage() {
                 <div className="col-span-1 space-y-4">
                     <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px] p-5 text-center">
                         <img
-                             src={spacewanted.user?.profile?.photo
+                            src={spacewanted.user?.profile?.photo
                                 ? `${spacewanted.user.profile.photo}`
                                 : defaultImage}
                             alt="user"
@@ -402,8 +404,35 @@ export default function SpaceWantedDetailPage() {
                             <span className="text-[#565ABF]">TIP</span>: Always view before you pay any money.
                         </p>
                         <div className="px-4 mt-0 mb-4">
-                            <button className="flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC]"><BsFlag />Report this ad</button>
+                            <button
+                                onClick={() => {
+                                    if (!user) {
+                                        toast.warning("Login first.");
+                                        return;
+                                    }
+                                    setShowReport(true);
+                                }}
+                                disabled={user?._id === spacewanted.user?._id}
+                                className={`flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC] ${user?._id === spacewanted.user?._id ? "bg-gray-400 cursor-not-allowed text-white" : ""}`}
+                            >
+                                <BsFlag /> Report this ad
+                            </button>
                         </div>
+                        {showReport && (
+                            <ReportAdDialog
+                                show={showReport}
+                                onClose={() => setShowReport(false)}
+                                postId={spacewanted._id}
+                                postType={
+                                    spacewanted.postCategory === "Spacewanted"
+                                        ? "SpaceWanted"
+                                        : spacewanted.postCategory === "Teamup"
+                                            ? "TeamUp"
+                                            : "Space"
+                                }
+                                token={token}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

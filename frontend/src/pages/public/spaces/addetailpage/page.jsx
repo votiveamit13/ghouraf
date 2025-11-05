@@ -443,35 +443,36 @@ export default function DetailPage({ targetUserId }) {
             </p>
             <div className="px-4 mt-0 mb-4">
               <button
-  onClick={() => {
-    if (!user) {
-      toast.warning("Login first.");
-      return;
-    }
-    setShowReport(true);
-  }}
-  className="flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC]"
->
-  <BsFlag /> Report this ad
-</button>
+                onClick={() => {
+                  if (!user) {
+                    toast.warning("Login first.");
+                    return;
+                  }
+                  setShowReport(true);
+                }}
+                disabled={user?._id === space.user?._id}
+                className={`flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC] ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed" : ""}`}
+              >
+                <BsFlag /> Report this ad
+              </button>
 
             </div>
           </div>
-{showReport && (
-  <ReportAdDialog
-    show={showReport}
-    onClose={() => setShowReport(false)}
-    postId={space._id}
-    postType={
-      space.postCategory === "Spacewanted"
-        ? "SpaceWanted"
-        : space.postCategory === "Teamup"
-        ? "TeamUp"
-        : "Space"
-    }
-    token={token}
-  />
-)}
+          {showReport && (
+            <ReportAdDialog
+              show={showReport}
+              onClose={() => setShowReport(false)}
+              postId={space._id}
+              postType={
+                space.postCategory === "Spacewanted"
+                  ? "SpaceWanted"
+                  : space.postCategory === "Teamup"
+                    ? "TeamUp"
+                    : "Space"
+              }
+              token={token}
+            />
+          )}
 
           <button
             className="bg-[#565ABF] text-white font-semibold mt-5 py-3 px-4 rounded-[12px]"
@@ -525,12 +526,12 @@ export default function DetailPage({ targetUserId }) {
                         </div>
                         <button
                           onClick={async () => {
-                      if (!user) {
-                        toast.warning("Login First");
-                        return;
-                      }
-                      if (person.userId._id === userId) return;
-                      try {
+                            if (!user) {
+                              toast.warning("Login First");
+                              return;
+                            }
+                            if (person.userId._id === userId) return;
+                            try {
                               setTeamUpMessageLoading(person.userId._id);
                               const chatId = await getChatId(user._id, person.userId._id);
                               navigate(

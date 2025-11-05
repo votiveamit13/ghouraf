@@ -17,29 +17,27 @@ export default function ReportList() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [reportToDelete, setReportToDelete] = useState(null);
 
-  // Fetch all reports
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-        const res = await axios.get(`${apiUrl}admin/reports`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
+useEffect(() => {
+  const fetchReports = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const res = await axios.get(`${apiUrl}admin/reports`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
 
-        // Sort latest first
-        const sorted = res.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setReports(sorted);
-      } catch (err) {
-        console.error("Error fetching reports:", err);
-      }
-    };
-    fetchReports();
-  }, [apiUrl]);
+      const sorted = res.data.reports.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setReports(sorted);
+    } catch (err) {
+      console.error("Error fetching reports:", err);
+    }
+  };
+  fetchReports();
+}, [apiUrl]);
 
-  // Search filter
+
   const filteredReports = useMemo(() => {
     return reports.filter(
       (r) =>
@@ -54,7 +52,6 @@ export default function ReportList() {
     );
   }, [searchTerm, reports]);
 
-  // Pagination logic
   const pageSize = 10;
   const totalPages = Math.ceil(filteredReports.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
@@ -63,12 +60,11 @@ export default function ReportList() {
     startIndex + pageSize
   );
 
-  // Delete report
   const handleDelete = async () => {
     if (!reportToDelete) return;
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`${apiUrl}admin/reports/${reportToDelete._id}`, {
+      await axios.delete(`${apiUrl}admin/report/${reportToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -125,8 +121,8 @@ export default function ReportList() {
                         {report.reason}
                       </td>
                       <td className="px-3 py-3">
-                        {report.userId?.profile
-                          ? `${report.userId.profile.firstName} ${report.userId.profile.lastName}`
+                        {report.user?.profile
+                          ? `${report.user?.profile?.firstName} ${report.user?.profile?.lastName}`
                           : "—"}
                       </td>
                       <td className="px-3 py-3">
@@ -172,7 +168,6 @@ export default function ReportList() {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <ConfirmationDialog
         show={showConfirm}
         title="Delete Report"
@@ -184,13 +179,12 @@ export default function ReportList() {
         onConfirm={handleDelete}
       />
 
-      {/* View Modal */}
       {selectedReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white w-[600px] max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
             <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
               <h2 className="text-xl font-bold text-gray-800">
-                {selectedReport.title}
+                Report Details
               </h2>
               <button
                 className="text-gray-400 hover:text-gray-700 text-xl"
@@ -201,12 +195,13 @@ export default function ReportList() {
             </div>
 
             <div className="overflow-y-auto p-4 space-y-4 text-sm">
+                <p><strong>{selectedReport.title}</strong></p>
+              <p><strong>Description:</strong> {selectedReport.reason}</p>
               <p><strong>Post Category:</strong> {selectedReport.postType}</p>
-              <p><strong>Reported By:</strong> {selectedReport.userId?.profile
-                ? `${selectedReport.userId.profile.firstName} ${selectedReport.userId.profile.lastName}`
+              <p><strong>Reported By:</strong> {selectedReport.user?.profile
+                ? `${selectedReport.user?.profile?.firstName} ${selectedReport.user?.profile?.lastName}`
                 : "N/A"}
               </p>
-              <p><strong>Reason:</strong> {selectedReport.reason}</p>
               <p><strong>Date:</strong> {new Date(selectedReport.createdAt).toLocaleString()}</p>
             </div>
           </div>

@@ -10,6 +10,7 @@ import {
     updateHomeImage, getHomeImage,
     createPolicy, getAllPolicies, getPolicyById, updatePolicy, deletePolicy,
     getAllReports,
+    deleteReport,
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -49,6 +50,7 @@ router.get("/policies/:id", adminAuth, getPolicyById);
 router.put("/policies/:id", adminAuth, updatePolicy);
 router.delete("/policies/:id", adminAuth, deletePolicy);
 router.get("/reports", adminAuth, getAllReports);
+router.delete("report/:id", adminAuth, deleteReport)
 
 
 export default router;

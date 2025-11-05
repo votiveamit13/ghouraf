@@ -684,7 +684,7 @@ export const getAllReports = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const reports = await Report.find(query)
-      .populate("userId", "name email")
+      .populate("user", "profile.firstName profile.lastName profile.photo")
       .populate({
         path: "postId",
         select: "title description location postCategory reportsCount",
@@ -703,6 +703,43 @@ export const getAllReports = async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching reports:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const report = await Report.findById(id);
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    let model;
+    switch (report.postType) {
+      case "Space":
+        model = Space;
+        break;
+      case "SpaceWanted":
+        model = SpaceWanted;
+        break;
+      case "TeamUp":
+        model = TeamUp;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid post type" });
+    }
+
+    await model.findByIdAndUpdate(report.postId, {
+      $inc: { reportsCount: -1 },
+    });
+
+    await Report.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Report deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting report:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
