@@ -33,8 +33,12 @@ app.use("/api/stripe", stripeWebhook);
 app.post(
   "/api/stripe/webhooks",
   express.raw({ type: "application/json" }),
-  (req, res, next) => promotionRoutes.handleStripeWebhook(req, res, next)
+  (req, res) => {
+    req.rawBody = req.body;
+    promotionRoutes.handleStripeWebhook(req, res);
+  }
 );
+
 app.use(
   "/api/stripe/webhooks/create-promotion-session",
   express.json(),
