@@ -493,7 +493,7 @@ export default function RoomWantedAd() {
                                         <option value="In a week time">In a week time</option>
                                         <option value="In a month time">In a month time</option>
                                     </select>
-                                    {errors.moveInDate && <p className="text-red-500 text-sm mt-1">{errors.moveInDate}</p>}
+                                    {/* {errors.moveInDate && <p className="text-red-500 text-sm mt-1">{errors.moveInDate}</p>} */}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700">Duration of stay</label>

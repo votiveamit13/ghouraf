@@ -670,3 +670,38 @@ export const deletePolicy = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+//report
+export const getAllReports = async (req, res) => {
+  try {
+    const { status, postType, page = 1, limit = 10 } = req.query;
+
+    const query = {};
+    if (status) query.adminAction = status;
+    if (postType) query.postType = postType;
+
+    const skip = (page - 1) * limit;
+
+    const reports = await Report.find(query)
+      .populate("userId", "name email")
+      .populate({
+        path: "postId",
+        select: "title description location postCategory reportsCount",
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Report.countDocuments(query);
+
+    res.status(200).json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      reports,
+    });
+  } catch (err) {
+    console.error("Error fetching reports:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

@@ -5,7 +5,7 @@ import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 import Edit from "pages/admin/user-management/edit-details/page";
 import ViewDetails from "pages/admin/user-management/view-details/page";
 import ContactForm from "pages/admin/contact-form/page";
-import { MdContactMail, MdOutlineBedroomParent, MdOutlinePolicy, MdPolicy } from "react-icons/md";
+import { MdContactMail, MdOutlineBedroomParent, MdOutlineHomeWork, MdOutlinePolicy, MdPolicy } from "react-icons/md";
 import FaqManagement from "pages/admin/faq-management/page";
 import { FaImages, FaQuestion, FaQuora, FaRegCircleUser } from "react-icons/fa6";
 import AddFaq from "components/admin/faq-management/AddFaq";
@@ -21,6 +21,8 @@ import { CiImageOn } from "react-icons/ci";
 import PolicyManagement from "pages/admin/policy-management/page";
 import AddPolicy from "components/admin/policy-management/AddPolicy";
 import EditPolicy from "components/admin/policy-management/EditPolicy";
+import ReportList from "pages/admin/post-management/reports/page";
+import { GoReport } from "react-icons/go";
 
 export const adminRoutes = [
   {
@@ -86,7 +88,7 @@ export const adminRoutes = [
       {
         path: "/post-management/sapce-wanted",
         name: "Space Wanted",
-        icon: <RiTeamLine className="text-[#565ABF]" />,
+        icon: <MdOutlineHomeWork className="text-[#565ABF]" />,
         component: <SpaceWanted />,
         layout: "/admin",
       },
@@ -95,6 +97,13 @@ export const adminRoutes = [
         name: "Team Ups",
         icon: <RiTeamLine className="text-[#565ABF]" />,
         component: <TeamUps />,
+        layout: "/admin",
+      },
+      {
+        path: "/post-management/reports",
+        name: "Report List",
+        icon: <GoReport  className="text-[#565ABF]"/>,
+        component: <ReportList/>,
         layout: "/admin",
       }
     ]

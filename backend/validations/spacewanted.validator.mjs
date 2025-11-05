@@ -75,7 +75,7 @@ export const createSpaceWantedSchema = Joi.object({
       "string.empty": "Budget Type is required",
     }),
 
-  moveInDate: Joi.string().optional(),
+moveInDate: Joi.string().allow('').optional(),
 
   period: Joi.string()
     .required()

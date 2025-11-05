@@ -1148,5 +1148,58 @@ export const getSpaceWantedById = async (req, res) => {
   }
 };
 
+//Report
+const modelMap = {
+  Space,
+  Spacewanted: SpaceWanted,
+  Teamup: TeamUp,
+};
+
+const typeMap = {
+  Space: "Space",
+  Spacewanted: "SpaceWanted",
+  Teamup: "TeamUp",
+};
+
+export const createReport = async (req, res) => {
+  try {
+    const { postId, postType, title, reason } = req.body;
+    const userId = req.user?._id;
+
+    if (!postId || !postType || !title || !reason)
+      return res.status(400).json({ message: "All fields are required" });
+
+    const Model = modelMap[postType];
+    if (!Model) return res.status(400).json({ message: "Invalid post type" });
+
+    const post = await Model.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const existing = await Report.findOne({ postId, userId });
+    if (existing)
+      return res
+        .status(400)
+        .json({ message: "You have already reported this post" });
+
+    const report = await Report.create({
+      postId,
+      postType: typeMap[postType],
+      userId,
+      title,
+      reason,
+    });
+
+    post.reportsCount = (post.reportsCount || 0) + 1;
+    await post.save();
+
+    res.status(201).json({
+      message: "Report submitted successfully",
+      report,
+    });
+  } catch (err) {
+    console.error("Error creating report:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 

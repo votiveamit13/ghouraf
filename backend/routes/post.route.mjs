@@ -6,7 +6,8 @@ import {
   createSpaceWanted, getSpaceWanted, getSpaceWantedById,
   requestTeamUp, getSpaceTeamUps, removeTeamUp,
   updateAd, updateAdAvailability, deleteAd,
-  handleStripeWebhook
+  handleStripeWebhook,
+  createReport
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
@@ -47,6 +48,7 @@ router.put("/ad-delete/:id", auth, deleteAd);
 router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWanted);
 router.get("/spacewanted", getSpaceWanted);
 router.get("/spacewanted/:id", getSpaceWantedById);
+router.post("/create-report", auth, createReport);
 
 
 export default router;

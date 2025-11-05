@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { getChatId } from "utils/firebaseChatHelper";
 import { toast } from "react-toastify";
+import ReportAdDialog from "components/common/ReportAdDialog";
 
 export default function DetailPage({ targetUserId }) {
   const { id } = useParams();
@@ -27,6 +28,7 @@ export default function DetailPage({ targetUserId }) {
   const [teamUpMessageLoading, setTeamUpMessageLoading] = useState(false);
   const [teamUps, setTeamUps] = useState([]);
   const userId = user?._id;
+  const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -440,9 +442,36 @@ export default function DetailPage({ targetUserId }) {
               <span className="text-[#565ABF]">TIP</span>: Always view before you pay any money.
             </p>
             <div className="px-4 mt-0 mb-4">
-              <button className="flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC]"><BsFlag />Report this ad</button>
+              <button
+  onClick={() => {
+    if (!user) {
+      toast.warning("Login first.");
+      return;
+    }
+    setShowReport(true);
+  }}
+  className="flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC]"
+>
+  <BsFlag /> Report this ad
+</button>
+
             </div>
           </div>
+{showReport && (
+  <ReportAdDialog
+    show={showReport}
+    onClose={() => setShowReport(false)}
+    postId={space._id}
+    postType={
+      space.postCategory === "Spacewanted"
+        ? "SpaceWanted"
+        : space.postCategory === "Teamup"
+        ? "TeamUp"
+        : "Space"
+    }
+    token={token}
+  />
+)}
 
           <button
             className="bg-[#565ABF] text-white font-semibold mt-5 py-3 px-4 rounded-[12px]"
