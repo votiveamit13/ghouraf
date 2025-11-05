@@ -9,4 +9,4 @@ const router = express.Router();
 
 router.post("/", auth, createPromotionCheckout);
 
-export { router, handleStripeWebhook };
+export default { router, handleStripeWebhook };
