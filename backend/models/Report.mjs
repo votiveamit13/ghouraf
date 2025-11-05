@@ -11,7 +11,7 @@ const reportSchema = new mongoose.Schema({
         required: true,
         enum: ["Space", "SpaceWanted", "TeamUp"],
     },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     reason: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },

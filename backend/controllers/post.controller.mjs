@@ -1152,20 +1152,21 @@ export const getSpaceWantedById = async (req, res) => {
 //Report
 const modelMap = {
   Space,
-  Spacewanted: SpaceWanted,
-  Teamup: TeamUp,
+  SpaceWanted,
+  TeamUp,
 };
 
 const typeMap = {
   Space: "Space",
-  Spacewanted: "SpaceWanted",
-  Teamup: "TeamUp",
+  SpaceWanted: "SpaceWanted",
+  TeamUp: "TeamUp",
 };
+
 
 export const createReport = async (req, res) => {
   try {
     const { postId, postType, title, reason } = req.body;
-    const userId = req.user?._id;
+    const user = req.user?._id;
 
     if (!postId || !postType || !title || !reason)
       return res.status(400).json({ message: "All fields are required" });
@@ -1176,7 +1177,7 @@ export const createReport = async (req, res) => {
     const post = await Model.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const existing = await Report.findOne({ postId, userId });
+    const existing = await Report.findOne({ postId, user });
     if (existing)
       return res
         .status(400)
@@ -1185,7 +1186,7 @@ export const createReport = async (req, res) => {
     const report = await Report.create({
       postId,
       postType: typeMap[postType],
-      userId,
+      user,
       title,
       reason,
     });
@@ -1193,10 +1194,12 @@ export const createReport = async (req, res) => {
     post.reportsCount = (post.reportsCount || 0) + 1;
     await post.save();
 
-    res.status(201).json({
-      message: "Report submitted successfully",
-      report,
-    });
+res.status(201).json({
+  success: true,
+  message: "Report submitted successfully",
+  report,
+});
+
   } catch (err) {
     console.error("Error creating report:", err);
     res.status(500).json({ message: "Internal server error" });

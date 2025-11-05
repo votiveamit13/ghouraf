@@ -451,7 +451,7 @@ export default function DetailPage({ targetUserId }) {
                   setShowReport(true);
                 }}
                 disabled={user?._id === space.user?._id}
-                className={`flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC] ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed" : ""}`}
+                className={`flex items-center gap-2 rounded-[5px] text-black px-3 py-2 border-[1px] border-[#B6B6BC] ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed text-white" : ""}`}
               >
                 <BsFlag /> Report this ad
               </button>
