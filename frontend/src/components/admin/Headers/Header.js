@@ -45,7 +45,7 @@ const Header = () => {
           <div className="bg-white shadow rounded-lg p-4 flex justify-between items-center">
             <div>
               <h5 className="text-xs font-semibold text-gray-500 uppercase">
-                Post Report Count
+                Report Count
               </h5>
               <span className="text-2xl font-bold text-gray-800">496</span>
             </div>

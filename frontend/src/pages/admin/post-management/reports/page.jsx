@@ -102,11 +102,12 @@ useEffect(() => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-3 py-3 text-left font-semibold">S. No.</th>
+                                    <th className="px-3 py-3 text-left font-semibold">Post Title</th>
                   <th className="px-3 py-3 text-left font-semibold">Post Category</th>
-                  <th className="px-3 py-3 text-left font-semibold">Title</th>
-                  <th className="px-3 py-3 text-left font-semibold">Reason</th>
+                  <th className="px-3 py-3 text-left font-semibold">Report Data</th>
                   <th className="px-3 py-3 text-left font-semibold">Reported By</th>
                   <th className="px-3 py-3 text-left font-semibold">Date</th>
+                  <th className="px-3 py-3 text-left font-semibold">Delete Post</th>
                   <th className="px-3 py-3 text-left font-semibold">Action</th>
                 </tr>
               </thead>
@@ -115,11 +116,9 @@ useEffect(() => {
                   paginatedReports.map((report, index) => (
                     <tr key={report._id}>
                       <td className="px-3 py-3">{startIndex + index + 1}</td>
+                      <td className="px-3 py-3">{report.postId.title}</td>
                       <td className="px-3 py-3">{report.postType}</td>
                       <td className="px-3 py-3">{report.title}</td>
-                      <td className="px-3 py-3 truncate max-w-[200px]">
-                        {report.reason}
-                      </td>
                       <td className="px-3 py-3">
                         {report.user?.profile
                           ? `${report.user?.profile?.firstName} ${report.user?.profile?.lastName}`
@@ -127,6 +126,17 @@ useEffect(() => {
                       </td>
                       <td className="px-3 py-3">
                         {new Date(report.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-3 py-3 flex gap-2">
+                        <RiDeleteBinLine
+                          size={20}
+                          className="cursor-pointer"
+                          color="red"
+                          onClick={() => {
+                            setReportToDelete(report);
+                            setShowConfirm(true);
+                          }}
+                        />
                       </td>
                       <td className="px-3 py-3 flex gap-2">
                         <IoEyeOutline

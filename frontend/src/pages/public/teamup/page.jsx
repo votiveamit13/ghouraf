@@ -32,6 +32,7 @@ export default function TeamUp() {
     location: "",
     period: "",
     occupationPreference: "all",
+    occupation: "all",
     minAge: "",
     maxAge: "",
   });
@@ -46,6 +47,21 @@ export default function TeamUp() {
     }));
     setPage(1);
   }, [locationHook.search]);
+
+  useEffect(() => {
+  const checkHasPosted = async () => {
+    if (!userId) return;
+    try {
+      const res = await axios.get(`${apiUrl}teamups`, { params: { userId } });
+      const userPosts = res.data.data.filter(item => item.user?._id === userId);
+      setUserHasPosted(userPosts.length > 0);
+    } catch (err) {
+      setUserHasPosted(false);
+    }
+  };
+  checkHasPosted();
+}, [userId]);
+
 
 useEffect(() => {
   const fetchTeamups = async () => {
@@ -68,8 +84,8 @@ useEffect(() => {
       const res = await axios.get(`${apiUrl}teamups`, { params });
       const data = res.data.data || [];
 
-      const hasPosted = data.some((item) => item.user?._id === userId);
-      setUserHasPosted(hasPosted);
+      // const hasPosted = data.some((item) => item.user?._id === userId);
+      // setUserHasPosted(hasPosted);
 
       setTeamups(data);
       setTotalPages(res.data.pages || 1);
@@ -135,7 +151,7 @@ useEffect(() => {
           </>
         ) : (
           <div className="text-center py-20 text-gray-500 font-medium text-lg">
-            No Team Ups Found! Please login first
+            No Team Ups Found!
           </div>
         )}
       </div>

@@ -12,6 +12,7 @@ export default function Filters({ filters, setFilters, setPage }) {
     // roommatePref: "",
     amenities: [],
     occupationPreference: "",
+    occupation: "",
     minAge: "",
     maxAge: "",
   };
@@ -226,15 +227,15 @@ export default function Filters({ filters, setFilters, setPage }) {
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
-            { val: "students", label: "Students" },
-            { val: "professionals", label: "Professionals" },
+            { val: "Student", label: "Students" },
+            { val: "Professional", label: "Professionals" },
           ].map((opt) => (
             <label key={opt.val} className="flex items-center space-x-2">
               <input
                 type="radio"
-                name="occupationPreference"
-                checked={filters.occupationPreference === opt.val}
-                onChange={() => handleFilterChange("occupationPreference", opt.val)}
+                name="occupation"
+                checked={filters.occupation === opt.val}
+                onChange={() => handleFilterChange("occupation", opt.val)}
               />
               <span>{opt.label}</span>
             </label>
