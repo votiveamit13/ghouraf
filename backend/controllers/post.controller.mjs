@@ -274,8 +274,8 @@ export const getSpaces = async (req, res) => {
 
     await Space.updateMany(
       { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
-      { 
-        $set: { 
+      {
+        $set: {
           "promotion.isPromoted": false,
           "promotion.plan": null,
           "promotion.amountUSD": 0,
@@ -285,21 +285,19 @@ export const getSpaces = async (req, res) => {
     );
 
 
-let sortOption = {};
+    let sortOption = {};
 
-if (sortBy === "Lowest First") {
-  sortOption = { budget: 1 }; 
-} else if (sortBy === "Highest First") {
-  sortOption = { budget: -1 };
-} else {
-  sortOption = {
-    "promotion.isPromoted": -1,
-    "promotion.startDate": 1,
-    createdAt: -1,
-  };
-}
-
-
+    if (sortBy === "Lowest First") {
+      sortOption = { budget: 1 };
+    } else if (sortBy === "Highest First") {
+      sortOption = { budget: -1 };
+    } else {
+      sortOption = {
+        "promotion.isPromoted": -1,
+        "promotion.startDate": 1,
+        createdAt: -1,
+      };
+    }
 
     // if (moveInDate) {
     //   query.availableFrom = { $lte: new Date(moveInDate) };
@@ -378,14 +376,14 @@ export const getSpaceTeamUps = async (req, res) => {
   }
 };
 
-export const removeTeamUp = async (req,res) => {
+export const removeTeamUp = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
 
     const removed = await SpaceTeamUps.findOneAndDelete({ postId: id, userId });
 
-    if(!removed) {
+    if (!removed) {
       return res.status(404).json({
         success: false,
         message: "You have not requested to team up on this post.",
@@ -507,50 +505,84 @@ export const getTeamUps = async (req, res) => {
       query.amenities = { $all: amenitiesArray };
     }
 
-    let sortOption = { createdAt: -1 };
-    if (sortBy === "Lowest First") sortOption = { budget: 1 };
-    if (sortBy === "Highest First") sortOption = { budget: -1 };
+    await TeamUp.updateMany(
+      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        $set: {
+          "promotion.isPromoted": false,
+          "promotion.plan": null,
+          "promotion.amountUSD": 0,
+          "promotion.paymentStatus": "expired",
+        },
+      }
+    );
+
+    await SpaceWanted.updateMany(
+      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        $set: {
+          "promotion.isPromoted": false,
+          "promotion.plan": null,
+          "promotion.amountUSD": 0,
+          "promotion.paymentStatus": "expired",
+        },
+      }
+    );
 
     // const skip = (page - 1) * limit;
 
     const teamUps = await TeamUp.find(query)
       .select(
-        "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation createdAt"
+        "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation createdAt promotion"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
 
 
-        const spaceWantedTeamUps = await SpaceWanted.find({
+    const spaceWantedTeamUps = await SpaceWanted.find({
       ...query,
       teamUp: true,
     })
 
-    .select(
-        "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation createdAt"
+      .select(
+        "title postCategory budget budgetType smoke description amenities moveInDate country state city photos status available is_deleted occupation createdAt promotion"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo");
 
-  let allTeamUps = [...teamUps, ...spaceWantedTeamUps];
+    let allTeamUps = [...teamUps, ...spaceWantedTeamUps];
 
-if (sortBy === "Lowest First") {
-  allTeamUps.sort((a, b) => a.budget - b.budget);
-} else if (sortBy === "Highest First") {
-  allTeamUps.sort((a, b) => b.budget - a.budget);
-} else {
-  allTeamUps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-}
+    if (sortBy === "Lowest First") {
+      allTeamUps.sort((a, b) => a.budget - b.budget);
+    } else if (sortBy === "Highest First") {
+      allTeamUps.sort((a, b) => b.budget - a.budget);
+    } else {
+      allTeamUps.sort((a, b) => {
+        if (a.promotion?.isPromoted && !b.promotion?.isPromoted) return -1;
+        if (!a.promotion?.isPromoted && b.promotion?.isPromoted) return 1;
 
-const total = allTeamUps.length;
-const skip = (page - 1) * limit;
-const paginated = allTeamUps.slice(skip, skip + Number(limit));
+        if (
+          a.promotion?.isPromoted &&
+          b.promotion?.isPromoted &&
+          a.promotion.startDate &&
+          b.promotion.startDate
+        ) {
+          return new Date(a.promotion.startDate) - new Date(b.promotion.startDate);
+        }
 
-res.status(200).json({
-  success: true,
-  total,
-  page: Number(page),
-  pages: Math.ceil(total / limit),
-  data: paginated,
-});
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+    }
+
+    const total = allTeamUps.length;
+    const skip = (page - 1) * limit;
+    const paginated = allTeamUps.slice(skip, skip + Number(limit));
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      data: paginated,
+    });
   } catch (error) {
     console.error("Get TeamUps error:", error);
     res.status(500).json({ success: false, message: error.message });
@@ -587,7 +619,7 @@ export const getTeamUpById = async (req, res) => {
 export const toggleSavePost = async (req, res) => {
   try {
     const userId = req.user._id;
-    let { postId, postCategory, listingPage } = req.body; 
+    let { postId, postCategory, listingPage } = req.body;
 
     if (!postId || !postCategory || !listingPage) {
       return res.status(400).json({ message: "postId, postCategory and listingPage are required" });
@@ -611,7 +643,7 @@ export const toggleSavePost = async (req, res) => {
     const post = await Model.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    let effectiveCategory = listingPage; 
+    let effectiveCategory = listingPage;
     if (listingPage === "Teamup" && postCategory === "Spacewanted" && post.teamUp === true) {
       effectiveCategory = "Teamup";
     }
@@ -798,9 +830,9 @@ export const updateAd = async (req, res) => {
           url: saved.relativePath
         };
       });
-      
+
       if (req.body.existingPhotos) {
-        const existingPhotos = Array.isArray(req.body.existingPhotos) 
+        const existingPhotos = Array.isArray(req.body.existingPhotos)
           ? req.body.existingPhotos.map(url => ({ id: Date.now() + Math.random(), url }))
           : [{ id: Date.now() + Math.random(), url: req.body.existingPhotos }];
         updatedData.photos = [...existingPhotos, ...newPhotos];
@@ -895,7 +927,7 @@ export const updateAdAvailability = async (req, res) => {
 export const deleteAd = async (req, res) => {
   try {
     const { id } = req.params;
-    const { is_deleted = true } = req.body; 
+    const { is_deleted = true } = req.body;
 
     let deletedAd = null;
 
@@ -1043,10 +1075,32 @@ export const getSpaceWanted = async (req, res) => {
       query.amenities = { $all: amenitiesArray };
     }
 
+    await SpaceWanted.updateMany(
+      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        $set: {
+          "promotion.isPromoted": false,
+          "promotion.plan": null,
+          "promotion.amountUSD": 0,
+          "promotion.paymentStatus": "expired"
+        }
+      }
+    );
 
-    let sortOption = { createdAt: -1 }; 
-    if (sortBy === "Lowest First") sortOption = { budget: 1 };
-    if (sortBy === "Highest First") sortOption = { budget: -1 };
+
+    let sortOption = {};
+
+    if (sortBy === "Lowest First") {
+      sortOption = { budget: 1 };
+    } else if (sortBy === "Highest First") {
+      sortOption = { budget: -1 };
+    } else {
+      sortOption = {
+        "promotion.isPromoted": -1,
+        "promotion.startDate": 1,
+        createdAt: -1,
+      };
+    }
 
     const skip = (page - 1) * limit;
 
