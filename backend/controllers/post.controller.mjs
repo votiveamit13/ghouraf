@@ -285,15 +285,20 @@ export const getSpaces = async (req, res) => {
     );
 
 
-    let sortOption = {
-      "promotion.isPromoted": -1, 
-      "promotion.startDate": 1, 
-      createdAt: -1 
-    };
+let sortOption = {};
 
+if (sortBy === "Lowest First") {
+  sortOption = { budget: 1 }; 
+} else if (sortBy === "Highest First") {
+  sortOption = { budget: -1 };
+} else {
+  sortOption = {
+    "promotion.isPromoted": -1,
+    "promotion.startDate": 1,
+    createdAt: -1,
+  };
+}
 
-    if (sortBy === "Lowest First") sortOption = { ...sortOption, budget: 1 };
-    if (sortBy === "Highest First") sortOption = { ...sortOption, budget: -1 };
 
 
     // if (moveInDate) {
