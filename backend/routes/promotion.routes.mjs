@@ -5,10 +5,14 @@ import {
 } from "../controllers/promotion.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 
-
 const router = express.Router();
 
-router.post("/create-promotion-session", auth, createPromotionCheckout);
+router.post(
+  "/create-promotion-session",
+  auth,
+  express.json(),
+  createPromotionCheckout
+);
 
 router.post("/", handleStripeWebhook);
 
