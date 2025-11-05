@@ -9,7 +9,7 @@ import {
     getAllSpaceWanted, updateSpaceWantedStatus, deleteSpaceWanted,
     updateHomeImage, getHomeImage,
     createPolicy, getAllPolicies, getPolicyById, updatePolicy, deletePolicy,
-    getAllReports
+    getAllReports,
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";

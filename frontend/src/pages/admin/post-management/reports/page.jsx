@@ -1,37 +1,217 @@
+import { useState, useEffect, useMemo } from "react";
 import Header from "components/admin/Headers/Header";
+import { IoEyeOutline } from "react-icons/io5";
+import { RiDeleteBinLine } from "react-icons/ri";
+import SearchFilter from "components/common/SearchFilter";
+import PaginationComponent from "components/common/Pagination";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function ReportList() {
-    return (
-        <>
-            <Header />
-            <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
-                <div className="bg-white shadow rounded-lg overflow-hidden">
-                    <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800">
-                            Reports Management
-                        </h3>
-                    </div>
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const [reports, setReports] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState(null);
 
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm text-gray-700 table-fixed">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-3 py-3 text-left font-semibold">S. No.</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Post Category</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Title</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Description</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Report Date</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Reported By</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+  // Fetch all reports
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await axios.get(`${apiUrl}admin/reports`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
 
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        // Sort latest first
+        const sorted = res.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setReports(sorted);
+      } catch (err) {
+        console.error("Error fetching reports:", err);
+      }
+    };
+    fetchReports();
+  }, [apiUrl]);
+
+  // Search filter
+  const filteredReports = useMemo(() => {
+    return reports.filter(
+      (r) =>
+        r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.userId?.profile?.firstName
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        r.userId?.profile?.lastName
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, reports]);
+
+  // Pagination logic
+  const pageSize = 10;
+  const totalPages = Math.ceil(filteredReports.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedReports = filteredReports.slice(
+    startIndex,
+    startIndex + pageSize
+  );
+
+  // Delete report
+  const handleDelete = async () => {
+    if (!reportToDelete) return;
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(`${apiUrl}admin/reports/${reportToDelete._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+
+      setReports((prev) =>
+        prev.filter((r) => r._id !== reportToDelete._id)
+      );
+      toast.success("Report deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete report:", err);
+      toast.error("Failed to delete report");
+    } finally {
+      setShowConfirm(false);
+      setReportToDelete(null);
+    }
+  };
+
+  return (
+    <>
+      <Header />
+      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+            <h3 className="text-lg font-semibold text-gray-800">
+              Reports Management
+            </h3>
+            <SearchFilter
+              placeholder="Search by title, reason or user..."
+              onSearch={setSearchTerm}
+            />
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-gray-700 table-fixed">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 text-left font-semibold">S. No.</th>
+                  <th className="px-3 py-3 text-left font-semibold">Post Category</th>
+                  <th className="px-3 py-3 text-left font-semibold">Title</th>
+                  <th className="px-3 py-3 text-left font-semibold">Reason</th>
+                  <th className="px-3 py-3 text-left font-semibold">Reported By</th>
+                  <th className="px-3 py-3 text-left font-semibold">Date</th>
+                  <th className="px-3 py-3 text-left font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {paginatedReports.length > 0 ? (
+                  paginatedReports.map((report, index) => (
+                    <tr key={report._id}>
+                      <td className="px-3 py-3">{startIndex + index + 1}</td>
+                      <td className="px-3 py-3">{report.postType}</td>
+                      <td className="px-3 py-3">{report.title}</td>
+                      <td className="px-3 py-3 truncate max-w-[200px]">
+                        {report.reason}
+                      </td>
+                      <td className="px-3 py-3">
+                        {report.userId?.profile
+                          ? `${report.userId.profile.firstName} ${report.userId.profile.lastName}`
+                          : "—"}
+                      </td>
+                      <td className="px-3 py-3">
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-3 py-3 flex gap-2">
+                        <IoEyeOutline
+                          size={20}
+                          className="cursor-pointer"
+                          color="#A321A6"
+                          onClick={() => setSelectedReport(report)}
+                        />
+                        <RiDeleteBinLine
+                          size={20}
+                          className="cursor-pointer"
+                          color="red"
+                          onClick={() => {
+                            setReportToDelete(report);
+                            setShowConfirm(true);
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4 text-gray-500">
+                      No reports found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="px-6 py-4 border-t border-gray-200">
+            <PaginationComponent
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        show={showConfirm}
+        title="Delete Report"
+        message="Are you sure you want to delete this report?"
+        onCancel={() => {
+          setShowConfirm(false);
+          setReportToDelete(null);
+        }}
+        onConfirm={handleDelete}
+      />
+
+      {/* View Modal */}
+      {selectedReport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-[600px] max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-800">
+                {selectedReport.title}
+              </h2>
+              <button
+                className="text-gray-400 hover:text-gray-700 text-xl"
+                onClick={() => setSelectedReport(null)}
+              >
+                ✕
+              </button>
             </div>
-        </>
-    )
+
+            <div className="overflow-y-auto p-4 space-y-4 text-sm">
+              <p><strong>Post Category:</strong> {selectedReport.postType}</p>
+              <p><strong>Reported By:</strong> {selectedReport.userId?.profile
+                ? `${selectedReport.userId.profile.firstName} ${selectedReport.userId.profile.lastName}`
+                : "N/A"}
+              </p>
+              <p><strong>Reason:</strong> {selectedReport.reason}</p>
+              <p><strong>Date:</strong> {new Date(selectedReport.createdAt).toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
