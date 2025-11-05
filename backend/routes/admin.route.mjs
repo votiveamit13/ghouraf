@@ -50,7 +50,7 @@ router.get("/policies/:id", adminAuth, getPolicyById);
 router.put("/policies/:id", adminAuth, updatePolicy);
 router.delete("/policies/:id", adminAuth, deletePolicy);
 router.get("/reports", adminAuth, getAllReports);
-router.delete("report/:id", adminAuth, deleteReport)
+router.delete("/report/:id", adminAuth, deleteReport)
 
 
 export default router;
