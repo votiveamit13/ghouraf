@@ -10,10 +10,6 @@ const router = express.Router();
 
 router.post("/create-promotion-session", auth, createPromotionCheckout);
 
-router.post(
-  "/stripe/webhooks",
-  express.raw({ type: "application/json" }),
-  handleStripeWebhook
-);
+router.post("/", handleStripeWebhook);
 
 export default router;
