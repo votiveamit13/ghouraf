@@ -7,6 +7,7 @@ import { createSpaceWantedSchema } from "../validations/spacewanted.validator.mj
 import SpaceWanted from "../models/SpaceWanted.mjs";
 import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
 import Stripe from "stripe";
+import Report from "../models/Report.mjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //Spaces
