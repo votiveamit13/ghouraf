@@ -3,6 +3,7 @@ import Header from "../Headers/Header";
 import { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function EditAd() {
   const { state } = useLocation();
@@ -65,37 +66,39 @@ export default function EditAd() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Inside EditAd component
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validate()) return;
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("authToken");
 
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("adminToken");
+      const adData = new FormData();
+      adData.append("title", formData.title);
+      adData.append("url", formData.url);
+      if (formData.image && formData.image instanceof File) {
+        adData.append("image", formData.image);
+      }
 
-    const adData = new FormData();
-    adData.append("title", formData.title);
-    adData.append("url", formData.url);
-    if (formData.image && formData.image instanceof File) {
-      adData.append("image", formData.image);
+      await axios.put(`${apiUrl}admin/edit-ad/${ad._id}`, adData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Ad updated successfully!");
+      navigate("/admin/ad-management");
+    } catch (error) {
+      console.error("Failed to update ad:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update ad. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    await axios.put(`${apiUrl}admin/edit-ad/${ad._id}`, adData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    navigate("/admin/ad-management");
-  } catch (error) {
-    console.error("Failed to update ad:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
   return (

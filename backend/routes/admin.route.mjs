@@ -20,6 +20,7 @@ import { upload } from "../middleware/upload.mjs";
 import { validate } from "../middleware/validate.mjs";
 import { faqSchema } from "../validations/faq.validator.mjs";
 import { profileValidator } from "../validations/profile.validator.mjs";
+import { deleteAd } from "../controllers/post.controller.mjs";
 
 const router = express.Router();
 
@@ -61,6 +62,7 @@ router.patch("/post-action/:postType/:id", handlePostAction);
 router.post("/create-ad", adminAuth, upload.single("image"), createAd);
 router.put("/edit-ad/:id", adminAuth, upload.single("image"), updateAd);
 router.get("/getAllAds", adminAuth, getAllAds);
+router.delete("/deleteAd/:id", adminAuth, deleteAd);
 
 
 export default router;

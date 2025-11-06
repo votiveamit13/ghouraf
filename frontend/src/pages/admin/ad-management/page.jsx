@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import Header from "components/admin/Headers/Header";
 import { IoEyeOutline } from "react-icons/io5";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaRegEdit } from "react-icons/fa";
+import { toast } from "react-toastify";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function AdManagement() {
   const navigate = useNavigate();
@@ -12,14 +15,20 @@ export default function AdManagement() {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [selectedAd, setSelectedAd] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [adToDelete, setAdToDelete] = useState(null);
+
   const getAllAds = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("authToken");
       const { data } = await axios.get(`${apiUrl}admin/getAllAds`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAds(data?.ads || []);
+      setAds(data?.data || []);
     } catch (error) {
       console.error("Failed to fetch ads:", error);
     } finally {
@@ -31,16 +40,49 @@ export default function AdManagement() {
     getAllAds();
   }, []);
 
+  const handleDeleteClick = (ad) => {
+    setAdToDelete(ad);
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!adToDelete) return;
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(`${apiUrl}admin/deleteAd/${adToDelete._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAds((prev) => prev.filter((a) => a._id !== adToDelete._id));
+      toast.success("Ad deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete ad:", error);
+      toast.error("Failed to delete ad.");
+    } finally {
+      setShowConfirm(false);
+      setAdToDelete(null);
+    }
+  };
+
+  const handleView = (ad) => {
+    setSelectedAd(ad);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedAd(null);
+  };
+
   return (
     <>
       <Header />
       <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+          <div className="px-3 py-3 border-b border-gray-200 flex justify-between">
             <h3 className="text-lg font-semibold text-gray-800">Ad Management</h3>
             <button
               onClick={() => navigate("/admin/ad-management/add")}
-              className="flex items-center justify-center gap-2 px-3 py-2 border-[1px] border-[#565ABF] rounded-[10px]"
+              className="flex items-center justify-center gap-2 px-3 py-2 border border-[#565ABF] text-[#565ABF] rounded-lg hover:bg-[#565ABF] hover:text-white transition"
             >
               Create Ad <IoMdAdd size={18} />
             </button>
@@ -86,21 +128,26 @@ export default function AdManagement() {
                           style={{ width: 80, height: 80, objectFit: "cover" }}
                         />
                       </td>
-                      <td className="px-3 py-3 text-center">
-                        <button
-                          onClick={() =>
-                            navigate("/admin/ad-management/edit", { state: { ad } })
-                          }
-                          className="btn btn-sm btn-outline-primary me-2"
-                        >
-                          <IoEyeOutline />
-                        </button>
-                        <button
-                          onClick={() => console.log("TODO: delete logic")}
-                          className="btn btn-sm btn-outline-danger"
-                        >
-                          <RiDeleteBinLine />
-                        </button>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-3 justify-center">
+                          <FaRegEdit
+                            size={18}
+                            className="cursor-pointer text-gray-600"
+                            onClick={() =>
+                              navigate("/admin/ad-management/edit", { state: { ad } })
+                            }
+                          />
+                          <IoEyeOutline
+                            size={20}
+                            className="cursor-pointer text-purple-600"
+                            onClick={() => handleView(ad)}
+                          />
+                          <RiDeleteBin6Line
+                            size={20}
+                            className="cursor-pointer text-red-600"
+                            onClick={() => handleDeleteClick(ad)}
+                          />
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -110,6 +157,53 @@ export default function AdManagement() {
           </div>
         </div>
       </div>
+
+      {showModal && selectedAd && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-xl w-full px-4 py-4 relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-xl"
+            >
+              ×
+            </button>
+            <div className="flex flex-col items-center text-center gap-3">
+              <img
+                src={`${apiUrl}/${selectedAd.image}`}
+                alt={selectedAd.title}
+                className="rounded border"
+                style={{ width: 150, height: 150, objectFit: "cover" }}
+              />
+              <h4 className="text-lg text-black font-semibold">{selectedAd.title}</h4>
+              <p className="text-black text-left break-all">
+                <strong>URL:</strong>&nbsp;
+                <a
+                  href={selectedAd.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {selectedAd.url}
+                </a>
+              </p>
+              <button
+                onClick={closeModal}
+                className="mt-3 px-5 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmationDialog
+        show={showConfirm}
+        title="Delete Confirmation"
+        message={`Are you sure you want to delete "${adToDelete?.title}"?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowConfirm(false)}
+      />
     </>
   );
 }

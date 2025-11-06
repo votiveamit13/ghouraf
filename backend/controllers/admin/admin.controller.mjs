@@ -15,6 +15,7 @@ import path from "path";
 import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
 import Ad from "../../models/Ad.mjs";
+import fs from "fs";
 
 const modelMap = {
   Space,
@@ -969,5 +970,33 @@ export const getAllAds = async (req, res) => {
   } catch (err) {
     console.error("Get All Ads Error:", err);
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ad = await Ad.findById(id);
+    if (!ad) {
+      return res.status(404).json({ success: false, message: "Ad not found" });
+    }
+
+    if (ad.image && fs.existsSync(`uploads/${ad.image}`)) {
+      fs.unlinkSync(`uploads/${ad.image}`);
+    }
+
+    await Ad.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Ad deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting ad:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while deleting the ad",
+    });
   }
 };
