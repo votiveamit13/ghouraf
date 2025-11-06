@@ -15,7 +15,6 @@ import path from "path";
 import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
 import Ad from "../../models/Ad.mjs";
-import fs from "fs";
 
 const modelMap = {
   Space,
