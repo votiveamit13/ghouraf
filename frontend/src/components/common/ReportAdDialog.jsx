@@ -5,17 +5,22 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
   const apiUrl = process.env.REACT_APP_API_URL;
   const [title, setTitle] = useState("");
   const [reason, setReason] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   if (!show) return null;
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (!reason.trim()) newErrors.reason = "Reason is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!title.trim() || !reason.trim()) {
-      toast.warning("Please fill in all fields.");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
@@ -35,6 +40,7 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
         onClose();
         setTitle("");
         setReason("");
+        setErrors({});
       } else {
         toast.error(data.message || "Failed to submit report.");
       }
@@ -63,18 +69,24 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4">
+        <form onSubmit={handleSubmit} className="px-4 py-2">
           <div className="mb-3">
             <label className="form-label fw-semibold text-secondary small mb-1">
               Title
             </label>
             <input
               type="text"
-              className="form-control border border-gray-300 rounded py-2 px-3"
+              className={`form-control border rounded py-2 px-3`}
               placeholder="Enter report title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+              }}
             />
+            {errors.title && (
+              <small className="text-danger fw-semibold">{errors.title}</small>
+            )}
           </div>
 
           <div className="mb-3">
@@ -83,11 +95,17 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
             </label>
             <textarea
               rows="4"
-              className="form-control border border-gray-300 rounded py-2 px-3"
+              className={`form-control border rounded py-2 px-3`}
               placeholder="Describe the issue"
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e) => {
+                setReason(e.target.value);
+                if (errors.reason) setErrors((prev) => ({ ...prev, reason: "" }));
+              }}
             ></textarea>
+            {errors.reason && (
+              <small className="text-danger fw-semibold">{errors.reason}</small>
+            )}
           </div>
 
           <div className="d-flex justify-content-end gap-2 pt-3 border-top">
@@ -102,7 +120,7 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
             <button
               type="submit"
               disabled={loading}
-              className="btn p-3 border-t text-center text-white"
+              className="btn p-3 text-center text-white"
               style={{
                 backgroundColor: "#565ABF",
                 opacity: loading ? 0.7 : 1,
@@ -114,12 +132,7 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
         </form>
       </div>
 
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+
     </div>
   );
 }

@@ -15,6 +15,12 @@ import path from "path";
 import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
 
+const modelMap = {
+  Space,
+  SpaceWanted,
+  TeamUp,
+};
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -771,7 +777,7 @@ export const getAllReports = async (req, res) => {
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .populate({
         path: "postId",
-        select: "title description location postCategory reportsCount",
+        populate: { path: "user", select: "profile.firstName profile.lastName profile.photo" },
       })
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -825,5 +831,39 @@ export const deleteReport = async (req, res) => {
   } catch (err) {
     console.error("Error deleting report:", err);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const handlePostAction = async (req, res) => {
+  try {
+    const { postType, id } = req.params;
+    const { action } = req.body;
+
+    const Model = modelMap[postType];
+    if (!Model) return res.status(400).json({ message: "Invalid post type" });
+
+    const post = await Model.findById(id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    switch (action) {
+      case "activate":
+        post.status = "active";
+        break;
+      case "deactivate":
+        post.status = "inactive";
+        break;
+      case "delete":
+        post.is_deleted = true;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid action" });
+    }
+
+    await post.save();
+
+    res.json({ success: true, message: `Post ${action}d successfully`, post });
+  } catch (error) {
+    console.error("Post action error:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };

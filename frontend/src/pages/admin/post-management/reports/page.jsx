@@ -7,6 +7,7 @@ import PaginationComponent from "components/common/Pagination";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import { toast } from "react-toastify";
 import axios from "axios";
+import ViewPostModal from "components/admin/post_management/report-management/ViewPost";
 
 export default function ReportList() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -16,26 +17,28 @@ export default function ReportList() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [reportToDelete, setReportToDelete] = useState(null);
+  const [viewModal, setViewModal] = useState({ show: false, report: null });
 
-useEffect(() => {
-  const fetchReports = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const res = await axios.get(`${apiUrl}admin/reports`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
 
-      const sorted = res.data.reports.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setReports(sorted);
-    } catch (err) {
-      console.error("Error fetching reports:", err);
-    }
-  };
-  fetchReports();
-}, [apiUrl]);
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await axios.get(`${apiUrl}admin/reports`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+
+        const sorted = res.data.reports.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setReports(sorted);
+      } catch (err) {
+        console.error("Error fetching reports:", err);
+      }
+    };
+    fetchReports();
+  }, [apiUrl]);
 
 
   const filteredReports = useMemo(() => {
@@ -102,13 +105,13 @@ useEffect(() => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-3 py-3 text-left font-semibold">S. No.</th>
-                                    <th className="px-3 py-3 text-left font-semibold">Post Title</th>
+                  <th className="px-3 py-3 text-left font-semibold">Post Title</th>
                   <th className="px-3 py-3 text-left font-semibold">Post Category</th>
                   <th className="px-3 py-3 text-left font-semibold">Report Data</th>
                   <th className="px-3 py-3 text-left font-semibold">Reported By</th>
                   <th className="px-3 py-3 text-left font-semibold">Date</th>
-                  <th className="px-3 py-3 text-left font-semibold">Delete Post</th>
-                  <th className="px-3 py-3 text-left font-semibold">Action</th>
+                  <th className="px-3 py-3 text-left font-semibold">Post Action</th>
+                  <th className="px-3 py-3 text-left font-semibold">Report Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
@@ -127,17 +130,61 @@ useEffect(() => {
                       <td className="px-3 py-3">
                         {new Date(report.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-3 py-3 flex gap-2">
-                        <RiDeleteBinLine
-                          size={20}
-                          className="cursor-pointer"
-                          color="red"
-                          onClick={() => {
-                            setReportToDelete(report);
-                            setShowConfirm(true);
+                      <td className="px-3 py-3">
+                        <select
+                          className="border px-2 py-1 rounded"
+                          onChange={async (e) => {
+                            const value = e.target.value;
+                            e.target.value = "Select Action";
+
+                            if (value === "View Post") {
+                              setViewModal({ show: true, report });
+                              return;
+                            }
+
+                            let action;
+                            if (value === "Inactive") action = "deactivate";
+                            else if (value === "Active") action = "activate";
+                            else if (value === "Delete Post") action = "delete";
+                            else return;
+
+                            try {
+                              const token = localStorage.getItem("authToken");
+                              const res = await axios.patch(
+                                `${apiUrl}admin/post-action/${report.postType}/${report.postId._id}`,
+                                { action },
+                                { headers: { Authorization: `Bearer ${token}` } }
+                              );
+
+                              toast.success(res.data.message);
+
+                              setReports((prev) =>
+                                prev.map((r) =>
+                                  r.postId._id === report.postId._id
+                                    ? { ...r, postId: { ...r.postId, ...res.data.post } }
+                                    : r
+                                )
+                              );
+                            } catch (err) {
+                              console.error("Failed to update post:", err);
+                              toast.error("Failed to perform action.");
+                            }
                           }}
-                        />
+                        >
+                          <option>Select Action</option>
+                          <option>View Post</option>
+                          <option>Active</option>
+                          <option>Inactive</option>
+                          <option>Delete Post</option>
+                        </select>
                       </td>
+                      <ViewPostModal
+                        show={viewModal.show}
+                        report={viewModal.report}
+                        onClose={() => setViewModal({ show: false, report: null })}
+                      />
+
+
                       <td className="px-3 py-3 flex gap-2">
                         <IoEyeOutline
                           size={20}
@@ -205,7 +252,7 @@ useEffect(() => {
             </div>
 
             <div className="overflow-y-auto p-4 space-y-4 text-sm">
-                <p><strong>{selectedReport.title}</strong></p>
+              <p><strong>{selectedReport.title}</strong></p>
               <p><strong>Description:</strong> {selectedReport.reason}</p>
               <p><strong>Post Category:</strong> {selectedReport.postType}</p>
               <p><strong>Reported By:</strong> {selectedReport.user?.profile

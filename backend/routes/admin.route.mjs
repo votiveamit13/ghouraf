@@ -9,11 +9,8 @@ import {
     getAllSpaceWanted, updateSpaceWantedStatus, deleteSpaceWanted,
     updateHomeImage, getHomeImage,
     createPolicy, getAllPolicies, getPolicyById, updatePolicy, deletePolicy,
-    getAllReports,
-    deleteReport,
-    toggleSpaceAdminPromotion,
-    toggleSpaceWantedAdminPromotion,
-    toggleTeamUpAdminPromotion,
+    getAllReports, deleteReport, handlePostAction,
+    toggleSpaceAdminPromotion, toggleSpaceWantedAdminPromotion, toggleTeamUpAdminPromotion,
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -53,10 +50,11 @@ router.get("/policies/:id", adminAuth, getPolicyById);
 router.put("/policies/:id", adminAuth, updatePolicy);
 router.delete("/policies/:id", adminAuth, deletePolicy);
 router.get("/reports", adminAuth, getAllReports);
-router.delete("/report/:id", adminAuth, deleteReport)
+router.delete("/report/:id", adminAuth, deleteReport);
 router.patch("/space/:id/promotion", adminAuth, toggleSpaceAdminPromotion);
 router.patch("/spacewanted/:id/promotion", adminAuth, toggleSpaceWantedAdminPromotion);
 router.patch("/teamup/:id/promotion", adminAuth, toggleTeamUpAdminPromotion);
+router.patch("/post-action/:postType/:id", handlePostAction);
 
 
 export default router;

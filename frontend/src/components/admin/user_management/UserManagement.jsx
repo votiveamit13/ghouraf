@@ -130,7 +130,7 @@ const UserManagement = () => {
                     <td className="px-3 py-3">{user.profile?.mobile}</td>
                     <td className="px-3 py-3">
                       <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[60%] ${user.status === "active"
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[70%] ${user.status === "active"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                           }`}
