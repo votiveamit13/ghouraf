@@ -28,8 +28,8 @@ export default function Spaces() {
         });
 
         const sortedSpaces = res.data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
         setSpaces(sortedSpaces);
       } catch (err) {
         console.error("Error fetching spaces:", err);
@@ -78,6 +78,7 @@ export default function Spaces() {
                   <th className="px-3 py-3 text-left font-semibold">Budget</th>
                   <th className="px-3 py-3 text-left font-semibold">Posted By</th>
                   <th className="px-3 py-3 text-left font-semibold">Availability</th>
+                  <th className="px-3 py-3 text-left font-semibold">Promotion</th>
                   <th className="px-3 py-3 text-left font-semibold">Status</th>
                   <th className="px-3 py-3 text-left font-semibold">Action</th>
                 </tr>
@@ -96,6 +97,49 @@ export default function Spaces() {
                     </td>
                     <td className="px-3 py-3">
                       {post.available ? "Available" : "Not Available"}
+                    </td>
+                    <td className="px-3 py-3">
+                      <select
+                        className="border px-2 py-1 rounded"
+                        value={post.promotion?.isPromoted ? "true" : "false"}
+                        onChange={async (e) => {
+                          const promote = e.target.value === "true";
+                          try {
+                            const token = localStorage.getItem("authToken");
+                            await axios.patch(
+                              `${apiUrl}admin/space/${post._id}/promotion`,
+                              { promote },
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+
+                            setSpaces((prev) =>
+                              prev.map((p) =>
+                                p._id === post._id
+                                  ? {
+                                    ...p,
+                                    promotion: {
+                                      ...p.promotion,
+                                      isPromoted: promote,
+                                      promotionType: "admin",
+                                      startDate: promote ? new Date() : null,
+                                      endDate: promote ? null : null,
+                                    },
+                                  }
+                                  : p
+                              )
+                            );
+
+                            toast.success(promote ? "Ad promoted" : "Promotion removed");
+                          } catch (err) {
+                            console.error("Failed to update promotion:", err);
+                            toast.error("Failed to update promotion. Try again.");
+                          }
+                        }}
+                      >
+                        <option value="true">Promote</option>
+                        <option value="false">Remove</option>
+                      </select>
+
                     </td>
                     <td className="px-3 py-3">
                       <select

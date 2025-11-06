@@ -240,7 +240,7 @@ export const deleteMessage = async (req, res) => {
 
 export const addFaq = async (req, res) => {
   try {
-    const {question, answer, status} = req.body;
+    const { question, answer, status } = req.body;
 
     const faq = await Faq.create({ question, answer, status });
 
@@ -269,19 +269,19 @@ export const updateFaqStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if(!["active", "inactive"].includes(status)){
-      return res.status(400).json({ message: "Invalid status"});
+    if (!["active", "inactive"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     const faq = await Faq.findById(id);
-    if(!faq) return res.status(404).json({ message: "FAQ not found"});
+    if (!faq) return res.status(404).json({ message: "FAQ not found" });
 
     faq.status = status;
     await faq.save();
 
     const safeFaq = faq.toObject();
     delete safeFaq.__v;
-  res.json({ message: `FAQ ${status} successfully`, faq: safeFaq });
+    res.json({ message: `FAQ ${status} successfully`, faq: safeFaq });
   } catch (err) {
     console.error("Error updating status:", err);
     res.status(500).json({ message: "Server error" });
@@ -359,12 +359,12 @@ export const updateSpaceStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if(!["active", "inactive"].includes(status)) {
+    if (!["active", "inactive"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
     const space = await Space.findById(id);
-    if(!space) return res.status(404).json({ message: "Space not found" });
+    if (!space) return res.status(404).json({ message: "Space not found" });
 
     space.status = status;
     await space.save();
@@ -381,9 +381,9 @@ export const deleteSpace = async (req, res) => {
     const { id } = req.params;
 
     const space = await Space.findById(id);
-    if(!space) return res.status(404).json({ message: "Space not found" });
+    if (!space) return res.status(404).json({ message: "Space not found" });
 
-    if(space.is_deleted) {
+    if (space.is_deleted) {
       return res.status(400).json({ message: "Space already deleted" });
     }
 
@@ -394,6 +394,34 @@ export const deleteSpace = async (req, res) => {
   } catch (err) {
     console.error("Error deleting space:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const toggleSpaceAdminPromotion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { promote } = req.body;
+
+    const space = await Space.findById(id);
+    if (!space) return res.status(404).json({ message: "Space not found" });
+
+    if (promote) {
+      space.promotion.isPromoted = true;
+      space.promotion.promotionType = "admin";
+      space.promotion.paymentStatus = "success";
+      space.promotion.startDate = new Date();
+      space.promotion.endDate = null;
+    } else {
+      space.promotion.isPromoted = false;
+      space.promotion.promotionType = "admin";
+      space.promotion.endDate = null;
+    }
+
+    await space.save();
+    res.json({ message: "Promotion updated successfully" });
+  } catch (error) {
+    console.error("Admin promotion update error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -486,6 +514,34 @@ export const deleteTeamUp = async (req, res) => {
   }
 };
 
+export const toggleTeamUpAdminPromotion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { promote } = req.body;
+
+    const teamup = await TeamUp.findById(id);
+    if (!teamup) return res.status(404).json({ message: "Team Up not found" });
+
+    if (promote) {
+      teamup.promotion.isPromoted = true;
+      teamup.promotion.promotionType = "admin";
+      teamup.promotion.paymentStatus = "success";
+      teamup.promotion.startDate = new Date();
+      teamup.promotion.endDate = null;
+    } else {
+      teamup.promotion.isPromoted = false;
+      teamup.promotion.promotionType = "admin";
+      teamup.promotion.endDate = null;
+    }
+
+    await teamup.save();
+    res.json({ message: "Promotion updated successfully" });
+  } catch (error) {
+    console.error("Admin promotion update error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 export const getAllSpaceWanted = async (req, res) => {
   try {
     const spacewanted = await SpaceWanted.find({ is_deleted: false })
@@ -494,7 +550,7 @@ export const getAllSpaceWanted = async (req, res) => {
         "title country state city zip budget budgetType propertyType roomSize moveInDate period amenities firstName lastName name age gender occupation smoke pets language roommatePref description photos teamUp status available createdAt"
       );
 
-      res.json(spacewanted);
+    res.json(spacewanted);
   } catch (err) {
     console.error("Error fetching team-ups:", err);
     res.status(500).json({ message: "Server error" });
@@ -506,12 +562,12 @@ export const updateSpaceWantedStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if(!["active", "inactive"].includes(status)) {
+    if (!["active", "inactive"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
     const spacewanted = await SpaceWanted.findById(id);
-    if(!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
+    if (!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
 
     spacewanted.status = status;
     await spacewanted.save();
@@ -528,19 +584,47 @@ export const deleteSpaceWanted = async (req, res) => {
     const { id } = req.params;
 
     const spacewanted = await SpaceWanted.findById(id);
-    if(!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
+    if (!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
 
-    if(spacewanted.is_deleted) {
+    if (spacewanted.is_deleted) {
       return res.status(400).json({ message: "Space Wanted already deleted" });
     }
 
     spacewanted.is_deleted = true;
     await spacewanted.save();
 
-    res.json({ message: "Space Wanted deleted successfully", spacewanted});
+    res.json({ message: "Space Wanted deleted successfully", spacewanted });
   } catch (err) {
     console.error("Error deleting space wanted:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const toggleSpaceWantedAdminPromotion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { promote } = req.body;
+
+    const spacewanted = await SpaceWanted.findById(id);
+    if (!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
+
+    if (promote) {
+      spacewanted.promotion.isPromoted = true;
+      spacewanted.promotion.promotionType = "admin";
+      spacewanted.promotion.paymentStatus = "success";
+      spacewanted.promotion.startDate = new Date();
+      spacewanted.promotion.endDate = null;
+    } else {
+      spacewanted.promotion.isPromoted = false;
+      spacewanted.promotion.promotionType = "admin";
+      spacewanted.promotion.endDate = null;
+    }
+
+    await spacewanted.save();
+    res.json({ message: "Promotion updated successfully" });
+  } catch (error) {
+    console.error("Admin promotion update error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 

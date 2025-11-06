@@ -274,16 +274,21 @@ export const getSpaces = async (req, res) => {
     }
 
     await Space.updateMany(
-      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        "promotion.isPromoted": true,
+        "promotion.promotionType": "user",
+        "promotion.endDate": { $lt: new Date() },
+      },
       {
         $set: {
           "promotion.isPromoted": false,
           "promotion.plan": null,
           "promotion.amountUSD": 0,
-          "promotion.paymentStatus": "expired"
-        }
+          "promotion.paymentStatus": "expired",
+        },
       }
     );
+
 
 
     let sortOption = {};
@@ -508,7 +513,11 @@ export const getTeamUps = async (req, res) => {
     }
 
     await TeamUp.updateMany(
-      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        "promotion.isPromoted": true,
+        "promotion.promotionType": "user",
+        "promotion.endDate": { $lt: new Date() },
+      },
       {
         $set: {
           "promotion.isPromoted": false,
@@ -520,7 +529,11 @@ export const getTeamUps = async (req, res) => {
     );
 
     await SpaceWanted.updateMany(
-      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        "promotion.isPromoted": true,
+        "promotion.promotionType": "user",
+        "promotion.endDate": { $lt: new Date() },
+      },
       {
         $set: {
           "promotion.isPromoted": false,
@@ -1078,14 +1091,18 @@ export const getSpaceWanted = async (req, res) => {
     }
 
     await SpaceWanted.updateMany(
-      { "promotion.isPromoted": true, "promotion.endDate": { $lt: new Date() } },
+      {
+        "promotion.isPromoted": true,
+        "promotion.promotionType": "user",
+        "promotion.endDate": { $lt: new Date() },
+      },
       {
         $set: {
           "promotion.isPromoted": false,
           "promotion.plan": null,
           "promotion.amountUSD": 0,
-          "promotion.paymentStatus": "expired"
-        }
+          "promotion.paymentStatus": "expired",
+        },
       }
     );
 
@@ -1195,11 +1212,11 @@ export const createReport = async (req, res) => {
     post.reportsCount = (post.reportsCount || 0) + 1;
     await post.save();
 
-res.status(201).json({
-  success: true,
-  message: "Report submitted successfully",
-  report,
-});
+    res.status(201).json({
+      success: true,
+      message: "Report submitted successfully",
+      report,
+    });
 
   } catch (err) {
     console.error("Error creating report:", err);

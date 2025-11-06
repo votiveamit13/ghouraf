@@ -92,7 +92,7 @@ useEffect(() => {
       className="relative bg-cover bg-center flex items-center justify-center"
       style={{
         backgroundImage: `url(${heroImage})`,
-        height: "800px",
+        height: "680px",
       }}
     >
       <div className="absolute inset-0 bg-black/40"></div>
