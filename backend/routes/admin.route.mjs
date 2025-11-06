@@ -13,14 +13,13 @@ import {
     toggleSpaceAdminPromotion, toggleSpaceWantedAdminPromotion, toggleTeamUpAdminPromotion,
     createAd,
     updateAd,
-    getAllAds,
+    getAllAds, deleteAd
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
 import { validate } from "../middleware/validate.mjs";
 import { faqSchema } from "../validations/faq.validator.mjs";
 import { profileValidator } from "../validations/profile.validator.mjs";
-import { deleteAd } from "../controllers/post.controller.mjs";
 
 const router = express.Router();
 

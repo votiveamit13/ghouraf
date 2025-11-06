@@ -981,9 +981,9 @@ export const deleteAd = async (req, res) => {
       return res.status(404).json({ success: false, message: "Ad not found" });
     }
 
-    // if (ad.image && fs.existsSync(`uploads/${ad.image}`)) {
-    //   fs.unlinkSync(`uploads/${ad.image}`);
-    // }
+    if (ad.image && fs.existsSync(`uploads/${ad.image}`)) {
+      fs.unlinkSync(`uploads/${ad.image}`);
+    }
 
     await Ad.findByIdAndDelete(id);
 
