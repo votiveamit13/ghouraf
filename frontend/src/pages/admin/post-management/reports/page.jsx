@@ -130,54 +130,118 @@ export default function ReportList() {
                       <td className="px-3 py-3">
                         {new Date(report.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-3 py-3">
-                        <select
-                          className="border px-2 py-1 rounded"
-                          onChange={async (e) => {
-                            const value = e.target.value;
-                            e.target.value = "Select Action";
+<td className="px-3 py-3">
+  <div
+    className={`relative inline-block ${
+      report.postId.is_deleted ? "opacity-70 cursor-not-allowed" : ""
+    }`}
+  >
+    <select
+      className={`border px-2 py-1 rounded appearance-none w-[150px] ${
+        report.postId.is_deleted ? "pointer-events-none bg-gray-100" : "cursor-pointer"
+      }`}
+      value={
+        report.postId.is_deleted
+          ? "Deleted"
+          : "Select Action"
+      }
+      onChange={async (e) => {
+        const value = e.target.value;
+        e.target.value = "Select Action";
 
-                            if (value === "View Post") {
-                              setViewModal({ show: true, report });
-                              return;
-                            }
+        if (report.postId.is_deleted) {
+          toast.info("This post has been deleted.");
+          return;
+        }
 
-                            let action;
-                            if (value === "Inactive") action = "deactivate";
-                            else if (value === "Active") action = "activate";
-                            else if (value === "Delete Post") action = "delete";
-                            else return;
+        if (value === "View Post") {
+          setViewModal({ show: true, report });
+          return;
+        }
 
-                            try {
-                              const token = localStorage.getItem("authToken");
-                              const res = await axios.patch(
-                                `${apiUrl}admin/post-action/${report.postType}/${report.postId._id}`,
-                                { action },
-                                { headers: { Authorization: `Bearer ${token}` } }
-                              );
+        let action;
+        if (value === "Inactive") action = "deactivate";
+        else if (value === "Active") action = "activate";
+        else if (value === "Delete Post") action = "delete";
+        else return;
 
-                              toast.success(res.data.message);
+        try {
+          const token = localStorage.getItem("authToken");
+          const res = await axios.patch(
+            `${apiUrl}admin/post-action/${report.postType}/${report.postId._id}`,
+            { action },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
 
-                              setReports((prev) =>
-                                prev.map((r) =>
-                                  r.postId._id === report.postId._id
-                                    ? { ...r, postId: { ...r.postId, ...res.data.post } }
-                                    : r
-                                )
-                              );
-                            } catch (err) {
-                              console.error("Failed to update post:", err);
-                              toast.error("Failed to perform action.");
-                            }
-                          }}
-                        >
-                          <option>Select Action</option>
-                          <option>View Post</option>
-                          <option>Active</option>
-                          <option>Inactive</option>
-                          <option>Delete Post</option>
-                        </select>
-                      </td>
+          toast.success(res.data.message);
+
+          setReports((prev) =>
+            prev.map((r) =>
+              r.postId._id === report.postId._id
+                ? { ...r, postId: { ...r.postId, ...res.data.post } }
+                : r
+            )
+          );
+        } catch (err) {
+          console.error("Failed to update post:", err);
+          toast.error("Failed to perform action.");
+        }
+      }}
+    >
+      {report.postId.is_deleted ? (
+        <option disabled className="text-red-600 font-semibold bg-red-50">
+          Deleted
+        </option>
+      ) : (
+        <option>Select Action</option>
+      )}
+
+      <option>View Post</option>
+
+      {!report.postId.is_deleted && (
+        <option
+          disabled={report.postId.status === "active"}
+          className={`${
+            report.postId.status === "active"
+              ? "text-green-600 font-semibold bg-green-50"
+              : ""
+          }`}
+        >
+          Active
+        </option>
+      )}
+
+      <option
+        disabled={
+          report.postId.status === "inactive" || report.postId.is_deleted
+        }
+        className={`${
+          report.postId.status === "inactive"
+            ? "text-red-600 font-semibold bg-red-50"
+            : report.postId.is_deleted
+            ? "text-gray-400 opacity-60"
+            : ""
+        }`}
+      >
+        Inactive
+      </option>
+
+      <option
+        disabled={report.postId.is_deleted}
+        className={`${
+          report.postId.is_deleted ? "text-gray-400 opacity-60" : ""
+        }`}
+      >
+        Delete Post
+      </option>
+    </select>
+
+    {report.postId.is_deleted && (
+      <div className="absolute inset-0 cursor-not-allowed"></div>
+    )}
+  </div>
+</td>
+
                       <ViewPostModal
                         show={viewModal.show}
                         report={viewModal.report}

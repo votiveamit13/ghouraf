@@ -14,6 +14,7 @@ import fs from "fs";
 import path from "path";
 import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
+import Ad from "../../models/Ad.mjs";
 
 const modelMap = {
   Space,
@@ -865,5 +866,108 @@ export const handlePostAction = async (req, res) => {
   } catch (error) {
     console.error("Post action error:", error);
     res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+//ad management
+export const createAd = async (req, res) => {
+  try {
+    const { title, url } = req.body;
+    const file = req.file;
+
+    if(!title || !url || !file) {
+      return res.status(400).json({ message: "Title, URL, and Image are required" });
+    }
+
+    fileHandler.validateExtension(file.originalname, "image");
+
+    const savedFile = fileHandler.saveFile(file, "ads");
+
+    const newAd = await Ad.create({
+      title,
+      url,
+      image: savedFile.relativePath,
+    });
+
+    return res.status(201).json({
+      message: "Ad created successfully",
+      ad: newAd,
+    });
+  } catch (err) {
+    console.error("Create Ad Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, url } = req.body;
+    const file = req.file;
+
+    const ad = await Ad.findById(id);
+    if (!ad) return res.status(404).json({ message: "Ad not found" });
+
+    let imagePath = ad.image;
+
+    if (file) {
+      fileHandler.validateExtension(file.originalname, "image");
+      const savedFile = fileHandler.saveFile(file, "ads");
+
+      if (ad.image) {
+        const oldPath = ad.image.startsWith("/uploads")
+          ? ad.image.replace("/uploads", "uploads")
+          : ad.image;
+        try {
+          fs.unlinkSync(oldPath);
+        } catch (e) {
+          console.warn("Old image not found:", oldPath);
+        }
+      }
+
+      imagePath = savedFile.relativePath;
+    }
+
+    ad.title = title || ad.title;
+    ad.url = url || ad.url;
+    ad.image = imagePath;
+
+    await ad.save();
+
+    res.status(200).json({
+      message: "Ad updated successfully",
+      ad,
+    });
+  } catch (err) {
+    console.error("Update Ad Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getAllAds = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const sort = { createdAt: -1 };
+
+    const [ads, total] = await Promise.all([
+      Ad.find().sort(sort).skip(skip).limit(limit),
+      Ad.countDocuments(),
+    ]);
+
+    res.status(200).json({
+      message: "Ads fetched successfully",
+      data: ads,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err) {
+    console.error("Get All Ads Error:", err);
+    res.status(500).json({ message: err.message });
   }
 };

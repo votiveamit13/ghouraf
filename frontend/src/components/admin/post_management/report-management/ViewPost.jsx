@@ -84,7 +84,7 @@ export default function ViewPostModal({ show, report, onClose }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto p-5 text-sm space-y-2">
+        <div className="overflow-y-auto px-5 py-3 text-sm space-y-2">
           {renderPostDetails()}
           {post.photos?.length > 0 && (
             <div className="mt-3">

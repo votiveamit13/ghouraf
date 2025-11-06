@@ -14,7 +14,7 @@ import Spaces from "components/admin/post_management/Spaces";
 import TeamUps from "components/admin/post_management/TeamUps";
 import { AiFillDashboard } from "react-icons/ai";
 import { FaUserCog } from "react-icons/fa";
-import { RiTeamLine } from "react-icons/ri";
+import { RiAdvertisementFill, RiAdvertisementLine, RiTeamLine } from "react-icons/ri";
 import SpaceWanted from "components/admin/post_management/SpaceWanted";
 import HeroImage from "pages/admin/home-screen-image/page";
 import { CiImageOn } from "react-icons/ci";
@@ -23,6 +23,9 @@ import AddPolicy from "components/admin/policy-management/AddPolicy";
 import EditPolicy from "components/admin/policy-management/EditPolicy";
 import ReportList from "pages/admin/post-management/reports/page";
 import { GoReport } from "react-icons/go";
+import AdManagement from "pages/admin/ad-management/page";
+import CreateAd from "components/admin/ad-managmenet/CreateAd";
+import EditAd from "components/admin/ad-managmenet/EditAd";
 
 export const adminRoutes = [
   {
@@ -107,6 +110,31 @@ export const adminRoutes = [
         layout: "/admin",
       }
     ]
+  },
+    {
+    name: "Ad Management",
+    icon: <RiAdvertisementFill size={20} className="text-[#565ABF]" />,
+    subRoutes: [
+      {
+        path: "/ad-management",
+        name: "Ad List",
+        icon: <RiAdvertisementLine className="text-[#565ABF]" />,
+        component: <AdManagement />,
+        layout: "/admin",
+      },
+    ]
+  },
+  {
+    path: "/ad-management/add",
+    component: <CreateAd />,
+    layout: "/admin",
+    showInSidebar: false
+  },
+    {
+    path: "/ad-management/edit",
+    component: <EditAd />,
+    layout: "/admin",
+    showInSidebar: false
   },
   {
     name: "FAQ Management",

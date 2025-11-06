@@ -11,6 +11,9 @@ import {
     createPolicy, getAllPolicies, getPolicyById, updatePolicy, deletePolicy,
     getAllReports, deleteReport, handlePostAction,
     toggleSpaceAdminPromotion, toggleSpaceWantedAdminPromotion, toggleTeamUpAdminPromotion,
+    createAd,
+    updateAd,
+    getAllAds,
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -55,6 +58,9 @@ router.patch("/space/:id/promotion", adminAuth, toggleSpaceAdminPromotion);
 router.patch("/spacewanted/:id/promotion", adminAuth, toggleSpaceWantedAdminPromotion);
 router.patch("/teamup/:id/promotion", adminAuth, toggleTeamUpAdminPromotion);
 router.patch("/post-action/:postType/:id", handlePostAction);
+router.post("/create-ad", adminAuth, upload.single("image"), createAd);
+router.put("/edit-ad/:id", adminAuth, upload.single("image"), updateAd);
+router.get("/getAllAds", adminAuth, getAllAds);
 
 
 export default router;
