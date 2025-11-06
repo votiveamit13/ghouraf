@@ -8,12 +8,15 @@ import axios from "axios";
 import { FaRegEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+import PaginationComponent from "components/common/Pagination"; 
 
 export default function AdManagement() {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
+
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1 });
 
   const [selectedAd, setSelectedAd] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -21,24 +24,33 @@ export default function AdManagement() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [adToDelete, setAdToDelete] = useState(null);
 
-  const getAllAds = async () => {
+  const getAllAds = async (page = 1) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
-      const { data } = await axios.get(`${apiUrl}admin/getAllAds`, {
+      const { data } = await axios.get(`${apiUrl}admin/getAllAds?page=${page}&limit=10`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setAds(data?.data || []);
+      setPagination(data?.pagination || { page: 1, pages: 1 });
     } catch (error) {
       console.error("Failed to fetch ads:", error);
+      toast.error("Failed to load ads");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getAllAds();
-  }, []);
+    getAllAds(pagination.page);
+  }, [pagination.page]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage !== pagination.page) {
+      setPagination((prev) => ({ ...prev, page: newPage }));
+    }
+  };
 
   const handleDeleteClick = (ad) => {
     setAdToDelete(ad);
@@ -52,8 +64,8 @@ export default function AdManagement() {
       await axios.delete(`${apiUrl}admin/deleteAd/${adToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAds((prev) => prev.filter((a) => a._id !== adToDelete._id));
       toast.success("Ad deleted successfully!");
+      getAllAds(pagination.page);
     } catch (error) {
       console.error("Failed to delete ad:", error);
       toast.error("Failed to delete ad.");
@@ -117,12 +129,23 @@ export default function AdManagement() {
                 ) : (
                   ads.map((ad, index) => (
                     <tr key={ad._id} className="border-t">
-                      <td className="px-3 py-3">{index + 1}</td>
+                      <td className="px-3 py-3">
+                        {(pagination.page - 1) * 10 + (index + 1)}
+                      </td>
                       <td className="px-3 py-3">{ad.title}</td>
-                      <td className="px-3 py-3">{ad.url}</td>
+                      <td className="px-3 py-3">
+                        <a
+                          href={ad.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 hover:underline break-all"
+                        >
+                          {ad.url}
+                        </a>
+                      </td>
                       <td className="px-3 py-3">
                         <img
-                          src={`${apiUrl}/${ad.image}`}
+                          src={ad.image}
                           alt={ad.title}
                           className="rounded border"
                           style={{ width: 80, height: 80, objectFit: "cover" }}
@@ -155,6 +178,14 @@ export default function AdManagement() {
               </tbody>
             </table>
           </div>
+
+          <div className="p-4 border-t border-gray-200 flex justify-end">
+            <PaginationComponent
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       </div>
 
@@ -169,12 +200,14 @@ export default function AdManagement() {
             </button>
             <div className="flex flex-col items-center text-center gap-3">
               <img
-                src={`${apiUrl}/${selectedAd.image}`}
+                src={selectedAd.image}
                 alt={selectedAd.title}
                 className="rounded border"
                 style={{ width: 150, height: 150, objectFit: "cover" }}
               />
-              <h4 className="text-lg text-black font-semibold">{selectedAd.title}</h4>
+              <h4 className="text-lg text-black font-semibold break-all">
+                {selectedAd.title}
+              </h4>
               <p className="text-black text-left break-all">
                 <strong>URL:</strong>&nbsp;
                 <a

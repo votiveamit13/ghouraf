@@ -167,13 +167,12 @@ export default function EditAd() {
                   <p className="text-red-500 text-sm mt-1">{errors.image}</p>
                 )}
 
-                {/* Image Preview Section */}
                 {preview && (
                   <div className="mt-3 position-relative d-inline-block">
                     <img
                       src={
                         typeof preview === "string" && !preview.startsWith("blob:")
-                          ? `${apiUrl}/${preview}`
+                          ? `${preview}`
                           : preview
                       }
                       alt="Preview"
