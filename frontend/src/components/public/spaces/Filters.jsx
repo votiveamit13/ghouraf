@@ -3,7 +3,7 @@ import { Numbers } from "../../../constants/numbers";
 
 export default function Filters({ filters, setFilters, setPage }) {
   const [showAmenities, setShowAmenities] = useState(false);
-    const dropdownRef = useRef(null);
+  const dropdownRef = useRef(null);
   const defaultFilters = {
     minValue: 0,
     maxValue: 100000,
@@ -20,15 +20,15 @@ export default function Filters({ filters, setFilters, setPage }) {
     // moveInDate: "",
   };
 
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setShowAmenities(false);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowAmenities(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const min = 0;
   const max = 100000;
@@ -65,28 +65,28 @@ export default function Filters({ filters, setFilters, setPage }) {
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[16px]">Price</label>
         <div className="border border-[#D7D7D7] rounded-[7px] flex justify-between items-center max-w-[70%] mx-auto px-2 py-2 mt-2 text-sm">
-           <input
-              type="text"
-              value={filters.minValue}
-              onChange={(e) => {
-                let value = e.target.value.replace(/\D/g, "");
-                value = value === "" ? 0 : Number(value);
-                value = Math.min(value, filters.maxValue, 100000);
-                handleFilterChange("minValue", value);
-              }} 
-              className="w-16 outline-none text-start" 
-            />
+          <input
+            type="text"
+            value={filters.minValue}
+            onChange={(e) => {
+              let value = e.target.value.replace(/\D/g, "");
+              value = value === "" ? 0 : Number(value);
+              value = Math.min(value, filters.maxValue, 100000);
+              handleFilterChange("minValue", value);
+            }}
+            className="w-16 outline-none text-start"
+          />
           <span>-</span>&nbsp;&nbsp;
           <input
             type="text"
             value={filters.maxValue}
             onChange={(e) => {
-              let value = e.target.value.replace(/\D/g, ""); 
+              let value = e.target.value.replace(/\D/g, "");
               value = value === "" ? 0 : Number(value);
-              value = Math.min(100000, Math.max(value, filters.minValue)); 
+              value = Math.min(100000, Math.max(value, filters.minValue));
               handleFilterChange("maxValue", value);
-            }} 
-            className="w-16 outline-none text-start" 
+            }}
+            className="w-16 outline-none text-start"
           />
         </div>
 
@@ -109,17 +109,25 @@ export default function Filters({ filters, setFilters, setPage }) {
             min={min}
             max={max}
             value={filters.minValue}
-            onChange={(e) => handleFilterChange("minValue", Number(e.target.value))}
+            onChange={(e) => {
+              const newMin = Math.min(Number(e.target.value), filters.maxValue);
+              handleFilterChange("minValue", newMin);
+            }}
             className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none"
           />
+
           <input
             type="range"
             min={min}
             max={max}
             value={filters.maxValue}
-            onChange={(e) => handleFilterChange("maxValue", Number(e.target.value))}
+            onChange={(e) => {
+              const newMax = Math.max(Number(e.target.value), filters.minValue);
+              handleFilterChange("maxValue", newMax);
+            }}
             className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none"
           />
+
 
           <style jsx>{`
             input[type="range"] {
@@ -184,7 +192,7 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
-            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[16px]">Number of bedrooms</label>
         <div className="space-y-1 mt-1 mb-3">
           <select
@@ -202,7 +210,7 @@ export default function Filters({ filters, setFilters, setPage }) {
         </div>
       </div>
 
-            <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
+      <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[16px]">Ad Posted By</label>
         <div className="space-y-1 mt-1 mb-3">
           <select

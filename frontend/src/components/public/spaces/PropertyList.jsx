@@ -16,9 +16,11 @@ export default function PropertyList({ properties }) {
       {properties.map((property, idx) => (
         <React.Fragment key={property._id || idx}>
           <PropertyCard property={property} />
-          {idx === 6 && <AdBanner />} 
+          {idx === 6 && <AdBanner />}
         </React.Fragment>
       ))}
+
+      {properties.length <= 6 && <AdBanner />}
     </div>
   );
 }
