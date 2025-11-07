@@ -13,7 +13,9 @@ import {
     toggleSpaceAdminPromotion, toggleSpaceWantedAdminPromotion, toggleTeamUpAdminPromotion,
     createAd,
     updateAd,
-    getAllAds, deleteAd
+    getAllAds, deleteAd,
+    getAboutUsImage,
+    updateAboutUsImage
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -47,6 +49,13 @@ router.patch("/spacewanted/:id/delete", adminAuth, deleteSpaceWanted);
 router.get("/hero-image", adminAuth, getHomeImage);
 router.get("/herosection-image", getHomeImage);
 router.post("/hero-image", adminAuth, upload.single("image"), updateHomeImage);
+router.get("/aboutus-image", adminAuth, getAboutUsImage);
+router.get("/aboutussection-image", getAboutUsImage);
+router.post("/aboutus-image", adminAuth, upload.fields([
+    { name: "image1", maxCount: 1 },
+    { name: "image2", maxCount: 1 },
+    { name: "image3", maxCount: 1 },
+]), updateAboutUsImage);
 router.post("/policies", adminAuth, createPolicy);
 router.get("/policies", adminAuth, getAllPolicies);
 router.get("/policies/:id", adminAuth, getPolicyById);

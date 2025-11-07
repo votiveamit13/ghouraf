@@ -3,6 +3,7 @@ import Cropper from "react-easy-crop";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Header from "components/admin/Headers/Header";
+import AboutUsImages from "components/admin/home-screen-management/AboutUsImage";
 
 export default function HeroImage() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -129,6 +130,8 @@ export default function HeroImage() {
                             className="px-3 shadow-md object-cover"
                         />
                     </div>
+                    <AboutUsImages/>
+
 
                     {showCropModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

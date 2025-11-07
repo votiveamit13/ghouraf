@@ -15,6 +15,7 @@ import path from "path";
 import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
 import Ad from "../../models/Ad.mjs";
+import { AboutUsImage } from "../../models/AboutUsImage";
 
 const modelMap = {
   Space,
@@ -692,6 +693,73 @@ export const updateHomeImage = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating home image:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAboutUsImage = async (req, res) => {
+  try {
+    const aboutus = await AboutUsImage.findOne().sort({ createdAt: -1 });
+
+    if (!aboutus) {
+      return res.status(404).json({ message: "About Us images not set." });
+    }
+
+    res.status(200).json({
+      message: "Images fetched successfully.",
+      imagePath1: aboutus.imagePath1,
+      imagePath2: aboutus.imagePath2,
+      imagePath3: aboutus.imagePath3,
+    });
+  } catch (error) {
+    console.error("Error fetching About Us images:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateAboutUsImage = async (req, res) => {
+  try {
+    if (!req.files || !req.files.image1 || !req.files.image2 || !req.files.image3) {
+      return res.status(400).json({ message: "All three images are required." });
+    }
+
+    const saved1 = fileHandler.saveFile(req.files.image1[0], "about-us");
+    const saved2 = fileHandler.saveFile(req.files.image2[0], "about-us");
+    const saved3 = fileHandler.saveFile(req.files.image3[0], "about-us");
+
+    let aboutus = await AboutUsImage.findOne();
+
+    if (aboutus) {
+      [aboutus.imagePath1, aboutus.imagePath2, aboutus.imagePath3].forEach((oldPath) => {
+        if (oldPath) {
+          const fullPath = path.join(process.cwd(), "uploads", oldPath.replace("/uploads/", ""));
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+          }
+        }
+      });
+
+      aboutus.imagePath1 = saved1.relativePath;
+      aboutus.imagePath2 = saved2.relativePath;
+      aboutus.imagePath3 = saved3.relativePath;
+
+      await aboutus.save();
+    } else {
+      aboutus = await AboutUsImage.create({
+        imagePath1: saved1.relativePath,
+        imagePath2: saved2.relativePath,
+        imagePath3: saved3.relativePath,
+      });
+    }
+
+    res.status(200).json({
+      message: "About Us images updated successfully.",
+      imagePath1: aboutus.imagePath1,
+      imagePath2: aboutus.imagePath2,
+      imagePath3: aboutus.imagePath3,
+    });
+  } catch (error) {
+    console.error("Error updating About Us images:", error);
     res.status(500).json({ message: error.message });
   }
 };
