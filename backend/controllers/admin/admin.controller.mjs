@@ -15,7 +15,7 @@ import path from "path";
 import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
 import Ad from "../../models/Ad.mjs";
-import { AboutUsImage } from "../../models/AboutUsImage";
+import { AboutUsImage } from "../../models/AboutUsImage.mjs";
 
 const modelMap = {
   Space,
