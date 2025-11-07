@@ -1,3 +1,4 @@
+import Ad from "../models/Ad.mjs";
 import ContactForm from "../models/ContactForm.mjs";
 import Faq from "../models/faq.mjs";
 import Policy from "../models/Policy.mjs";
@@ -41,5 +42,19 @@ export const getPolicyByCategory = async (req, res) => {
     res.status(200).json(policy);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const getPublicAds = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const query = status ? { status } : {};
+
+    const ads = await Ad.find(query).sort({ createdAt: -1 });
+
+    res.status(200).json({ data: ads });
+  } catch (err) {
+    console.error("Error fetching ads:", err);
+    res.status(500).json({ message: "Failed to fetch ads" });
   }
 };

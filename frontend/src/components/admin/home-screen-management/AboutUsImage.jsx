@@ -149,7 +149,7 @@ const urls = [data.imagePath1, data.imagePath2, data.imagePath3].map((url) =>
 
   return (
     <>
-      <div className="px-3 flex items-center justify-between gap-12 mb-4 flex-wrap">
+      <div className="px-3 flex items-center justify-between gap-4 mb-4 flex-wrap">
         {[1, 2, 3].map((num, index) => (
           <div
             key={num}

@@ -1,5 +1,6 @@
 import React from "react";
 import PropertyCard from "./PropertyCard";
+import AdBanner from "../AdBanner";
 
 export default function PropertyList({ properties }) {
   if (!properties || properties.length === 0) {
@@ -13,7 +14,10 @@ export default function PropertyList({ properties }) {
   return (
     <div>
       {properties.map((property, idx) => (
-        <PropertyCard key={property._id || idx} property={property} />
+        <React.Fragment key={property._id || idx}>
+          <PropertyCard property={property} />
+          {idx === 6 && <AdBanner />} 
+        </React.Fragment>
       ))}
     </div>
   );

@@ -125,7 +125,7 @@ export default function AdManagement() {
                   <th className="px-3 py-3 text-left font-semibold">Title</th>
                   <th className="px-3 py-3 text-left font-semibold">URL</th>
                   <th className="px-3 py-3 text-left font-semibold">Image</th>
-                  <th className="px-3 py-3 text-left font-semibold">Status</th>
+                  <th className="px-3 py-3 text-left font-semibold w-[180px]">Status</th>
                   <th className="px-3 py-3 text-center font-semibold w-[100px]">
                     Action
                   </th>
