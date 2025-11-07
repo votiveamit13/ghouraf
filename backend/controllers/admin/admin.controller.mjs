@@ -1067,3 +1067,32 @@ export const deleteAd = async (req, res) => {
     });
   }
 };
+
+export const updateAdStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["active", "inactive"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const ad = await Ad.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!ad) {
+      return res.status(404).json({ message: "Ad not found" });
+    }
+
+    return res.status(200).json({
+      message: "Status updated successfully",
+      data: ad,
+    });
+  } catch (error) {
+    console.error("Error updating ad status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

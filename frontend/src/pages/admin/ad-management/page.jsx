@@ -85,6 +85,23 @@ export default function AdManagement() {
     setSelectedAd(null);
   };
 
+  const handleStatusChange = async (adId, newStatus) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    await axios.put(
+      `${apiUrl}admin/updateAdStatus/${adId}`,
+      { status: newStatus },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success("Ad status updated!");
+    getAllAds(pagination.page);
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    toast.error("Failed to update ad status.");
+  }
+};
+
+
   return (
     <>
       <Header />
@@ -108,6 +125,7 @@ export default function AdManagement() {
                   <th className="px-3 py-3 text-left font-semibold">Title</th>
                   <th className="px-3 py-3 text-left font-semibold">URL</th>
                   <th className="px-3 py-3 text-left font-semibold">Image</th>
+                  <th className="px-3 py-3 text-left font-semibold">Status</th>
                   <th className="px-3 py-3 text-center font-semibold w-[100px]">
                     Action
                   </th>
@@ -151,6 +169,17 @@ export default function AdManagement() {
                           style={{ width: 80, height: 80, objectFit: "cover" }}
                         />
                       </td>
+<td className="px-3 py-3">
+  <select
+    value={ad.status}
+    onChange={(e) => handleStatusChange(ad._id, e.target.value)}
+    className="block w-[75%] px-2 py-1 border-[1px] border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+  >
+    <option value="active">Active</option>
+    <option value="inactive">Inactive</option>
+  </select>
+</td>
+
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3 justify-center">
                           <FaRegEdit

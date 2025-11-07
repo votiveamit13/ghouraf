@@ -65,7 +65,7 @@ export default function Filters({ filters, setFilters, setPage }) {
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[16px]">Budget</label>
-        <div className="ml-5 border border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-2 py-2 mt-2 text-sm">
+        <div className="border border-[#D7D7D7] rounded-[7px] flex justify-between items-center max-w-[70%] mx-auto px-2 py-2 mt-2 text-sm">
                      <input
               type="text"
               value={filters.minValue}

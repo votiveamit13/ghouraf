@@ -149,7 +149,7 @@ const urls = [data.imagePath1, data.imagePath2, data.imagePath3].map((url) =>
 
   return (
     <>
-      <div className="px-[40px] flex items-center justify-between gap-12 mb-4 flex-wrap">
+      <div className="px-3 flex items-center justify-between gap-12 mb-4 flex-wrap">
         {[1, 2, 3].map((num, index) => (
           <div
             key={num}
@@ -191,7 +191,7 @@ const urls = [data.imagePath1, data.imagePath2, data.imagePath3].map((url) =>
         ))}
       </div>
 
-      <div className="text-right mr-[38px] mb-8">
+      <div className="text-right mr-3 mb-8">
         <button
           onClick={handleUpload}
           disabled={loading}
