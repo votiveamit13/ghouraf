@@ -63,7 +63,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Price</label>
+        <label className="font-medium text-[16px]">Price</label>
         <div className="ml-5 border border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-2 py-2 mt-2 text-sm">
            <input
               type="text"
@@ -163,7 +163,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Size of Apartment</label>
+        <label className="font-medium text-[16px]">Size of Apartment</label>
         <div className="flex space-x-2 mt-2 mb-3">
           <input
             type="number"
@@ -185,7 +185,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
             <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Number of bedrooms</label>
+        <label className="font-medium text-[16px]">Number of bedrooms</label>
         <div className="space-y-1 mt-1 mb-3">
           <select
             value={filters.bedrooms}
@@ -203,7 +203,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
             <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Ad Posted By</label>
+        <label className="font-medium text-[16px]">Ad Posted By</label>
         <div className="space-y-1 mt-1 mb-3">
           <select
             value={filters.adPostedBy}
@@ -219,7 +219,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Property Type</label>
+        <label className="font-medium text-[16px]">Property Type</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
@@ -240,7 +240,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Furnishing</label>
+        <label className="font-medium text-[16px]">Furnishing</label>
         <div className="space-y-1 mt-1 mb-3">
           {["all", "unfurnished", "furnished"].map((val) => (
             <label key={val} className="flex items-center space-x-2">
@@ -257,7 +257,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Smoking</label>
+        <label className="font-medium text-[16px]">Smoking</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
@@ -278,7 +278,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Rooms Available For</label>
+        <label className="font-medium text-[16px]">Rooms Available For</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "any", label: "Any Gender" },
@@ -299,7 +299,7 @@ export default function Filters({ filters, setFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7] relative" ref={dropdownRef}>
-        <label className="font-medium text-[18px]">Amenities</label>
+        <label className="font-medium text-[16px]">Amenities</label>
         <div className="mt-2 w-full">
           <button
             type="button"

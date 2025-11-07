@@ -109,10 +109,10 @@ export default function PropertyCard({ property }) {
             </Link>
             <div className="flex flex-col flex-grow w-[450px] text-[#000000]">
                 <Link to={`/spaces/${property._id}`}>
-                    <h3 className="font-semibold text-[24px] text-black">{property.title}</h3>
+                    <h3 className="font-semibold text-[20px] text-black">{property.title}</h3>
                 </Link>
-                <p className="text-[18px] flex items-center gap-1"><TfiLocationPin />{locationString}</p>
-                <p className="text-[18px]">Property Type - {property.propertyType}</p>
+                <p className="text-[16px] flex items-center gap-1"><TfiLocationPin />{locationString}</p>
+                <p className="text-[16px]">Property Type - {property.propertyType}</p>
                 <p className="text-[15px] mt-1">{property.description}</p>
 
                 <div className="flex items-center mt-2 gap-2">

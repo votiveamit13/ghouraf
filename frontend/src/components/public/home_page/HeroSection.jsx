@@ -27,7 +27,6 @@ useEffect(() => {
       
       if (res.data?.imagePath) {
         setHeroImage(`${res.data.imagePath}`);
-        // console.log("✅ Hero image loaded:", res.data.imagePath);
       } 
     } catch (error) {
       console.error("Failed to load hero image:", error);

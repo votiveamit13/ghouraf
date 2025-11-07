@@ -72,7 +72,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Budget</label>
+        <label className="font-medium text-[16px]">Budget</label>
         <div className="ml-5 border border-[#D7D7D7] rounded-[7px] flex justify-between items-center w-[60%] px-2 py-2 mt-2 text-sm">
           <input
             type="text"
@@ -172,7 +172,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Property Type</label>
+        <label className="font-medium text-[16px]">Property Type</label>
         <div className="space-y-1 mt-1 mb-3">
           {["all", "Room", "Apartment"].map((val) => (
             <label key={val} className="flex items-center space-x-2">
@@ -189,7 +189,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Duration of Stay</label>
+        <label className="font-medium text-[16px]">Duration of Stay</label>
         <div className="space-y-1 mt-1 mb-3">
           <select
             name="period"
@@ -206,7 +206,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Room Size</label>
+        <label className="font-medium text-[16px]">Room Size</label>
         <div className="flex space-x-2 mt-2 mb-3">
           <input
             type="number"
@@ -250,7 +250,7 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
       </div> */}
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Occupation</label>
+        <label className="font-medium text-[16px]">Occupation</label>
         <div className="space-y-1 mt-1 mb-3">
           {[
             { val: "all", label: "All" },
@@ -271,7 +271,7 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
-        <label className="font-medium text-[18px]">Age Range</label>
+        <label className="font-medium text-[16px]">Age Range</label>
         <div className="flex space-x-2 mt-2 mb-3">
 <input
   type="number"
@@ -311,7 +311,7 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
       </div>
 
       <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7] relative" ref={dropdownRef}>
-        <label className="font-medium text-[18px]">Amenities</label>
+        <label className="font-medium text-[16px]">Amenities</label>
 
         <div className="mt-2 w-full">
           <button

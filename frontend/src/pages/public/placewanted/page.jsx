@@ -6,6 +6,8 @@ import SearchBar from "components/public/SearchBar";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Loader from "components/common/Loader";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 export default function PlaceWanted() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -15,8 +17,19 @@ export default function PlaceWanted() {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({});
-
+    const locationHook = useLocation();
     const itemsPerPage = 10;
+
+    useEffect(() => {
+  const parsed = queryString.parse(locationHook.search);
+  setFilters((prev) => ({
+    ...prev,
+    city: parsed.city || "",
+    state: parsed.state || "",
+    country: parsed.country || "",
+  }));
+  setPage(1);
+}, [locationHook.search]);
 
     useEffect(() => {
         fetchProperties();

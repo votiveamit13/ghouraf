@@ -102,7 +102,7 @@ export default function PropertyCard({ property }) {
             </Link>
             <div className="flex flex-col flex-grow w-[450px] text-[#000000]">
                 <Link to={`/team-up/${property._id}`}>
-                    <h3 className="font-semibold text-[24px] text-black">{property.title} in {locationString}</h3>
+                    <h3 className="font-semibold text-[20px] text-black">{property.title} in {locationString}</h3>
                 </Link>
                 {/* <p className="text-[18px]">Roommate preference - <span className="text-[#565ABF]"> {property.roommatePref.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</span></p> */}
                 <p className="text-[15px] mt-1">{property.description}</p>
