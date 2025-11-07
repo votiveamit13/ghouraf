@@ -1,34 +1,79 @@
 import { GoArrowUpRight } from "react-icons/go";
 import { FaPhoneAlt } from "react-icons/fa";
-import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
-import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
-import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function WelcomeToGhouraf() {
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  const [images, setImages] = useState([null, null, null]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const { data } = await axios.get(`${apiUrl}admin/aboutussection-image`);
+        const urls = [
+          data.imagePath1 ? `${data.imagePath1}` : null,
+          data.imagePath2 ? `${data.imagePath2}` : null,
+          data.imagePath3 ? `${data.imagePath3}` : null,
+        ];
+        setImages(urls);
+      } catch (error) {
+        console.error("Error fetching About Us section images:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [apiUrl]);
+
   return (
     <section className="w-full bg-white py-16">
       <div className="container mx-auto sm:px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center gap-12">
-        <div className="flex md:flex-row items-center justify-center gap-6">
-          <div className="flex w-full md:w-1/2 items-center justify-center">
-            <img
-              src={flatmate1}
-              alt="Flatmate 3"
-              className="w-full md:w-[100%] lg:h-80 md:h-80 sm:h-50 object-fit rounded-xl shadow-md"
-            />
+        <div className="flex md:flex-row items-center justify-center gap-6 w-full md:w-1/2">
+          <div className="flex items-center justify-center w-full md:w-1/2">
+            {loading ? (
+              <div className="w-full h-80 bg-gray-100 animate-pulse rounded-xl" />
+            ) : images[0] ? (
+              <img
+                src={images[0]}
+                alt="About Us 1"
+                className="w-full md:w-[100%] lg:h-80 md:h-80 sm:h-50 object-cover rounded-xl shadow-md"
+              />
+            ) : (
+              <div className="w-full h-80 bg-gray-100 flex items-center justify-center rounded-xl text-gray-400">
+                No Image
+              </div>
+            )}
           </div>
+
           <div className="flex flex-col gap-6 w-full md:w-1/2">
-            <img
-              src={flatmate2}
-              alt="Flatmate 1"
-              className="w-full lg:h-64 md:h-64 sm:h-34 object-fit rounded-xl shadow-md"
-            />
-            <img
-              src={flatmate3}
-              alt="Flatmate 2"
-              className="w-full lg:h-64 md:h-64 sm:h-34 object-fit rounded-xl shadow-md"
-            />
+            {[images[1], images[2]].map((img, i) =>
+              loading ? (
+                <div
+                  key={i}
+                  className="w-full lg:h-64 md:h-64 sm:h-34 bg-gray-100 animate-pulse rounded-xl"
+                />
+              ) : img ? (
+                <img
+                  key={i}
+                  src={img}
+                  alt={`About Us ${i + 2}`}
+                  className="w-full lg:h-64 md:h-64 sm:h-34 object-cover rounded-xl shadow-md"
+                />
+              ) : (
+                <div
+                  key={i}
+                  className="w-full lg:h-64 md:h-64 sm:h-34 bg-gray-100 flex items-center justify-center rounded-xl text-gray-400"
+                >
+                  No Image
+                </div>
+              )
+            )}
           </div>
         </div>
 
@@ -49,9 +94,10 @@ export default function WelcomeToGhouraf() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <button 
+            <button
               onClick={() => navigate("/about-us")}
-              className="px-5 py-3 bg-black text-white rounded-[12px] flex items-center gap-2 hover:bg-gray-900 transition w-full sm:w-auto justify-center">
+              className="px-5 py-3 bg-black text-white rounded-[12px] flex items-center gap-2 hover:bg-gray-900 transition w-full sm:w-auto justify-center"
+            >
               Read More
               <span>
                 <GoArrowUpRight size={25} />

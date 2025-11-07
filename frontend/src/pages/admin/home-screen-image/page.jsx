@@ -127,7 +127,7 @@ export default function HeroImage() {
                         <img
                             src={currentImage}
                             alt="Current Home"
-                            className="px-3 shadow-md object-cover"
+                            className="px-3 object-cover"
                         />
                     </div>
                     <AboutUsImages/>
