@@ -12,6 +12,7 @@ export const AdminAuthProvider = ({ children }) => {
   }, []);
 
   const login = (tokenValue) => {
+    console.log("Storing token:", tokenValue);
     localStorage.setItem("authToken", tokenValue);
     setToken(tokenValue);
   };
