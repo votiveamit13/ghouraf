@@ -16,7 +16,6 @@ export default function Spaces() {
   const [spaces, setSpaces] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [ads, setAds] = useState([]);
 
   const [filters, setFilters] = useState({
     minValue: 0,
@@ -51,19 +50,6 @@ export default function Spaces() {
   }, [locationHook.search]);
 
   useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const { data } = await axios.get(`${apiUrl}ads?status=active`);
-        setAds(data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch ads:", err);
-        setAds([]);
-      }
-    };
-    fetchAds();
-  }, [apiUrl]);
-
-  useEffect(() => {
     const fetchSpaces = async () => {
       setLoading(true);
       try {
@@ -87,8 +73,8 @@ export default function Spaces() {
         });
 
         const { data } = await axios.get(`${apiUrl}spaces`, { params });
-        setSpaces(data.data);
-        setTotalPages(data.pages);
+        setSpaces(data.data || []);
+        setTotalPages(data.pages || 1);
       } catch (err) {
         console.error("Failed to fetch spaces:", err);
         setSpaces([]);
@@ -131,11 +117,7 @@ export default function Spaces() {
           <Loader fullScreen={false} />
         ) : (
           <>
-            <PropertyList
-              properties={spaces}
-              ads={ads}         
-              currentPage={page}
-            />
+            <PropertyList properties={spaces} />
             {spaces.length > 0 && (
               <div className="text-end flex justify-end mt-5">
                 <UserPagination
