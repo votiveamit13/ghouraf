@@ -16,7 +16,8 @@ import {
     getAllAds, deleteAd,
     getAboutUsImage,
     updateAboutUsImage,
-    updateAdStatus
+    updateAdStatus,
+    getDashboardStats
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -73,6 +74,7 @@ router.put("/edit-ad/:id", adminAuth, upload.single("image"), updateAd);
 router.get("/getAllAds", adminAuth, getAllAds);
 router.delete("/deleteAd/:id", adminAuth, deleteAd);
 router.put("/updateAdStatus/:id", adminAuth, updateAdStatus);
+router.get("/stats", adminAuth, getDashboardStats);
 
 
 export default router;

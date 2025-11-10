@@ -1096,3 +1096,37 @@ export const updateAdStatus = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+//dashboard insights
+export const getDashboardStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+
+    const newUsers = await User.countDocuments({
+      createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+    });
+
+    const [spaceCount, spaceWantedCount, teamUpCount] = await Promise.all([
+      Space.countDocuments(),
+      SpaceWanted.countDocuments(),
+      TeamUp.countDocuments(),
+    ]);
+
+    const totalPosts = spaceCount + spaceWantedCount + teamUpCount;
+
+    const reportsCount = await Report.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalUsers,
+        newUsers,
+        totalPosts,
+        reportsCount,
+      },
+    });
+  } catch (err) {
+    console.error("Dashboard Stats Error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
