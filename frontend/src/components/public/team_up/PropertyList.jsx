@@ -2,8 +2,8 @@ import React from "react";
 import PropertyCard from "./PropertyCard";
 import AdBanner from "../AdBanner";
 
-export default function PropertyList({ properties }) {
-  if (!properties || properties.length === 0) {
+export default function PropertyList({ properties = [], ads = [] }) {
+  if ((!properties || properties.length === 0) && (!ads || ads.length === 0)) {
     return (
       <div className="text-center py-20 text-gray-500 font-medium text-lg">
         No Team Up Found
@@ -11,16 +11,40 @@ export default function PropertyList({ properties }) {
     );
   }
 
+  const promoted = properties.filter((p) => p?.promotion?.isPromoted);
+  const normal = properties.filter((p) => !p?.promotion?.isPromoted);
+
+  const propertiesWithAds = [...normal];
+  const orderedAds = [...ads];
+
+  let adIndex = 0;
+  let insertPosition = 2;
+
+  while (adIndex < orderedAds.length) {
+    if (insertPosition <= propertiesWithAds.length + adIndex) {
+      const prevItemIsAd = propertiesWithAds[insertPosition - 1]?.isAd;
+      if (!prevItemIsAd) {
+        propertiesWithAds.splice(insertPosition, 0, { isAd: true, ad: orderedAds[adIndex] });
+        adIndex++;
+        insertPosition += 3;
+      } else {
+        insertPosition++;
+      }
+    } else {
+      propertiesWithAds.push({ isAd: true, ad: orderedAds[adIndex] });
+      adIndex++;
+    }
+  }
+
+  const finalList = [...promoted, ...propertiesWithAds];
+
   return (
     <div>
-      {properties.map((property, idx) => (
-        <React.Fragment key={property._id || idx}>
-          <PropertyCard property={property} />
-          {idx === 6 && <AdBanner />}
+      {finalList.map((item, idx) => (
+        <React.Fragment key={item._id || `ad-${idx}`}>
+          {item.isAd ? <AdBanner ad={item.ad} /> : <PropertyCard property={item} />}
         </React.Fragment>
       ))}
-
-      {properties.length <= 6 && <AdBanner />}
     </div>
   );
 }

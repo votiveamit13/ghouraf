@@ -17,8 +17,10 @@ export default function PlaceWanted() {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({});
+    const [ads, setAds] = useState([]);
     const locationHook = useLocation();
     const itemsPerPage = 10;
+    const adsPerPage = 4;
 
     useEffect(() => {
   const parsed = queryString.parse(locationHook.search);
@@ -32,46 +34,47 @@ export default function PlaceWanted() {
 }, [locationHook.search]);
 
     useEffect(() => {
-        fetchProperties();
+        fetchData();
     }, [page, sortBy, filters]);
 
-    const fetchProperties = async () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
-            const params = {
+            const propertyParams = {
                 page,
                 limit: itemsPerPage,
                 sortBy,
                 ...filters,
-                amenities: filters.amenities,
+                amenities: filters.amenities ? filters.amenities.join(',') : undefined,
             };
 
-            const queryString = new URLSearchParams({
-                ...filters,
-                page,
-                limit: itemsPerPage,
-                sortBy,
-            }).toString();
+            Object.keys(propertyParams).forEach((key) => {
+                if (
+                    propertyParams[key] === "" ||
+                    propertyParams[key] === "all" ||
+                    propertyParams[key] === "any" ||
+                    propertyParams[key] === 0
+                ) {
+                    delete propertyParams[key];
+                }
+            });
 
-            let finalUrl = `${apiUrl}spacewanted?${queryString}`;
-            if (filters.amenities && filters.amenities.length > 0) {
-                const amenitiesQuery = filters.amenities
-                    .map(a => `amenities=${encodeURIComponent(a)}`)
-                    .join("&");
-                finalUrl += `&${amenitiesQuery}`;
-            }
+            const propertiesReq = axios.get(`${apiUrl}spacewanted`, { params: propertyParams });
+            const adsReq = axios.get(`${apiUrl}ads`, {
+                params: { status: "active", page, limit: adsPerPage }
+            });
 
-            const { data } = await axios.get(finalUrl);
+            const [propertiesRes, adsRes] = await Promise.all([propertiesReq, adsReq]);
 
-            if (data.success) {
-                setProperties(data.data || []);
-                setTotalPages(data.pages || 1);
-            } else {
-                toast.error("Failed to fetch listings");
-            }
-        } catch (error) {
-            console.error("Error fetching properties:", error);
-            toast.error("Something went wrong while fetching data");
+            setProperties(propertiesRes.data.data || []);
+            setTotalPages(propertiesRes.data.pages || 1);
+            setAds(adsRes.data.data || []);
+        } catch (err) {
+            console.error("Failed to fetch properties or ads:", err);
+            setProperties([]);
+            setAds([]);
+            setTotalPages(1);
+            toast.error("Failed to fetch listings");
         } finally {
             setLoading(false);
         }
@@ -106,19 +109,24 @@ export default function PlaceWanted() {
 
                 {loading ? (
                     <Loader fullScreen={false} />
-                ) : properties.length === 0 ? (
-                    <p className="text-center mt-5">No Space Wanted found</p>
                 ) : (
-                    <>
-                        <PropertyList properties={properties} page={1} itemsPerPage={itemsPerPage} />
-                        <div className="text-end flex justify-end mt-5">
-                            <UserPagination
-                                currentPage={page}
-                                totalPages={totalPages}
-                                onPageChange={setPage}
-                            />
-                        </div>
-                    </>
+                    <PropertyList properties={properties} ads={ads} />
+                )}
+
+                {properties.length > 0 && !loading && (
+                    <div className="text-end flex justify-end mt-5">
+                        <UserPagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
+                )}
+
+                {properties.length === 0 && !loading && (
+                    <div className="text-center py-20 text-gray-500 font-medium text-lg">
+                        No Space Wanted Found
+                    </div>
                 )}
             </div>
         </div>

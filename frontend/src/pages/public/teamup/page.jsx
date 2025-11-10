@@ -21,7 +21,9 @@ export default function TeamUp() {
   const [sortBy, setSortBy] = useState("Newest Ads");
   const [userHasPosted, setUserHasPosted] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [ads, setAds] = useState([]);
   const itemsPerPage = 10;
+  const adsPerPage = 4;
 
   const [filters, setFilters] = useState({
     minValue: 0,
@@ -64,42 +66,44 @@ export default function TeamUp() {
 
 
 useEffect(() => {
-  const fetchTeamups = async () => {
-    setLoading(true);
-    try {
-      const params = { page, limit: itemsPerPage, sortBy, ...filters };
+    const fetchData = async () => {
+      if (!userId) return;
+      setLoading(true);
+      try {
+        const params = { page, limit: itemsPerPage, sortBy, ...filters };
 
-      Object.keys(params).forEach((key) => {
-        if (
-          params[key] === "all" ||
-          params[key] === "any" ||
-          params[key] === "" ||
-          params[key] === 0 ||
-          (Array.isArray(params[key]) && params[key].length === 0)
-        ) {
-          delete params[key];
-        }
-      });
+        Object.keys(params).forEach((key) => {
+          if (
+            params[key] === "all" ||
+            params[key] === "any" ||
+            params[key] === "" ||
+            params[key] === 0 ||
+            (Array.isArray(params[key]) && params[key].length === 0)
+          ) {
+            delete params[key];
+          }
+        });
 
-      const res = await axios.get(`${apiUrl}teamups`, { params });
-      const data = res.data.data || [];
+        const teamupsReq = axios.get(`${apiUrl}teamups`, { params });
+        const adsReq = axios.get(`${apiUrl}ads`, { params: { status: "active", page, limit: adsPerPage } });
 
-      // const hasPosted = data.some((item) => item.user?._id === userId);
-      // setUserHasPosted(hasPosted);
+        const [teamupsRes, adsRes] = await Promise.all([teamupsReq, adsReq]);
 
-      setTeamups(data);
-      setTotalPages(res.data.pages || 1);
-    } catch (err) {
-      console.error("Failed to fetch team-ups:", err);
-      setTeamups([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setTeamups(teamupsRes.data.data || []);
+        setTotalPages(teamupsRes.data.pages || 1);
+        setAds(adsRes.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch team-ups or ads:", err);
+        setTeamups([]);
+        setAds([]);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (userId) fetchTeamups();
-}, [page, filters, sortBy, apiUrl, userId]);
+    fetchData();
+  }, [page, filters, sortBy, apiUrl, userId]);
 
 
   return (
@@ -132,28 +136,19 @@ useEffect(() => {
           <Loader fullScreen={false} />
         ) : !userHasPosted ? (
           <div className="text-center py-20 text-gray-500 font-medium text-lg">
-            You haven’t posted any Team Up yet.<br/>Please post first to view other members posts
+            You haven’t posted any Team Up yet.<br />Please post first to view other members posts
           </div>
-        ) : teamups.length > 0 ? (
-          <>
-            <PropertyList
-              properties={teamups}
-              page={page}
-              itemsPerPage={itemsPerPage}
-            />
-            <div className="text-end flex justify-end mt-5">
-              <UserPagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
-            </div>
-          </>
         ) : (
-          <div className="text-center py-20 text-gray-500 font-medium text-lg">
-            No Team Ups Found!
-          </div>
+          <>
+            <PropertyList properties={teamups} ads={ads} />
+            {teamups.length > 0 && (
+              <div className="text-end flex justify-end mt-5">
+                <UserPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+              </div>
+            )}
+          </>
         )}
+
       </div>
     </div>
   );
