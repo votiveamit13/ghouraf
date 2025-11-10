@@ -1136,10 +1136,9 @@ const daysAgo = (days) => new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 export const getDashboardCharts = async (req, res) => {
   try {
     const period = req.query.period || "month";
+    const now = new Date();
 
     let userActivity = [];
-    let postsActivity = [];
-
     if (period === "week") {
       const startDate = daysAgo(7);
 
@@ -1151,26 +1150,14 @@ export const getDashboardCharts = async (req, res) => {
             count: { $sum: 1 },
           },
         },
-        { $sort: { "_id": 1 } },
+        { $sort: { _id: 1 } },
       ]);
 
       const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      userActivity = weekDays.map((day, idx) => {
-        const found = users.find((u) => u._id === idx + 1);
-        return { label: day, count: found ? found.count : 0 };
-      });
-
-      const [spaces, wanted, teams] = await Promise.all([
-        Space.countDocuments({ createdAt: { $gte: startDate } }),
-        SpaceWanted.countDocuments({ createdAt: { $gte: startDate } }),
-        TeamUp.countDocuments({ createdAt: { $gte: startDate } }),
-      ]);
-
-      postsActivity = [
-        { label: "Looking for Room", count: wanted },
-        { label: "Offering Room/Apartment", count: spaces },
-        { label: "Team Up", count: teams },
-      ];
+      userActivity = weekDays.map((day, i) => ({
+        label: day,
+        count: users.find((u) => u._id === i + 1)?.count || 0,
+      }));
     } else {
       const startDate = daysAgo(28);
 
@@ -1178,40 +1165,75 @@ export const getDashboardCharts = async (req, res) => {
         { $match: { createdAt: { $gte: startDate } } },
         {
           $project: {
-            week: { $ceil: { $divide: [{ $subtract: [new Date(), "$createdAt"] }, 7 * 24 * 60 * 60 * 1000] } },
+            diffDays: {
+              $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 * 24],
+            },
           },
         },
         {
-          $group: {
-            _id: "$week",
-            count: { $sum: 1 },
+          $project: {
+            weekNum: { $ceil: { $divide: ["$diffDays", 7] } },
           },
         },
+        { $group: { _id: "$weekNum", count: { $sum: 1 } } },
       ]);
 
-      userActivity = Array.from({ length: 4 }, (_, i) => ({
-        label: `Week ${i + 1}`,
-        count: users.find((u) => u._id === i + 1)?.count || 0,
-      }));
-
-      const [spaces, wanted, teams] = await Promise.all([
-        Space.countDocuments({ createdAt: { $gte: startDate } }),
-        SpaceWanted.countDocuments({ createdAt: { $gte: startDate } }),
-        TeamUp.countDocuments({ createdAt: { $gte: startDate } }),
-      ]);
-
-      postsActivity = [
-        { label: "Space Wanted", count: wanted },
-        { label: "Spaces", count: spaces },
-        { label: "Team Up", count: teams },
-      ];
+      userActivity = Array.from({ length: 4 }, (_, i) => {
+        const found = users.find((u) => u._id === 4 - i);
+        return { label: `Week ${i + 1}`, count: found ? found.count : 0 };
+      });
     }
+
+    const getPostsData = async (Model) => {
+      const startDate = period === "week" ? daysAgo(7) : daysAgo(28);
+      const groupStage =
+        period === "week"
+          ? { $dayOfWeek: "$createdAt" }
+          : {
+              $ceil: {
+                $divide: [
+                  { $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 * 24] },
+                  7,
+                ],
+              },
+            };
+
+      return await Model.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        { $group: { _id: groupStage, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } },
+      ]);
+    };
+
+    const [spaceWanted, spaces, teamUp] = await Promise.all([
+      getPostsData(SpaceWanted),
+      getPostsData(Space),
+      getPostsData(TeamUp),
+    ]);
+
+    const timeLabels =
+      period === "week"
+        ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        : ["Week 1", "Week 2", "Week 3", "Week 4"];
+
+    const normalize = (arr) =>
+      timeLabels.map((_, i) => {
+        const id = period === "week" ? i + 1 : 4 - i;
+        return arr.find((a) => a._id === id)?.count || 0;
+      });
+
+    const postsActivity = [
+      { label: "Space Wanted", data: normalize(spaceWanted) },
+      { label: "Spaces", data: normalize(spaces) },
+      { label: "Team Up", data: normalize(teamUp) },
+    ];
 
     res.status(200).json({
       success: true,
       data: {
         userActivity,
         postsActivity,
+        labels: timeLabels,
       },
     });
   } catch (error) {

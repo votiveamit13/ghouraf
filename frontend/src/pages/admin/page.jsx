@@ -5,19 +5,21 @@ import axios from "axios";
 
 const Dashboard = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
- const [activeTab, setActiveTab] = useState("month");
+  const [activeTab, setActiveTab] = useState("month");
+  const [chartLabels, setChartLabels] = useState([]);
   const [userActivity, setUserActivity] = useState([]);
   const [postsActivity, setPostsActivity] = useState([]);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("authToken");
         const { data } = await axios.get(`${apiUrl}admin/charts?period=${activeTab}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (data.success) {
+          setChartLabels(data.data.labels);
           setUserActivity(data.data.userActivity);
           setPostsActivity(data.data.postsActivity);
         }
@@ -29,13 +31,11 @@ const Dashboard = () => {
     fetchChartData();
   }, [activeTab]);
 
-  const labels = userActivity.map((u) => u.label);
-  const signups = userActivity.map((u) => u.count);
-
   return (
     <>
       <Header />
-<div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+
+      <div className="px-[40px] mt-[-8%] w-full">
         <div className="bg-gradient-to-r from-[#565ABF] to-[#A321A6] rounded-xl shadow p-4 w-full">
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-white text-xl font-semibold">Overview</h2>
@@ -64,11 +64,11 @@ const Dashboard = () => {
                   ? "Signups (last 4 weeks)"
                   : "Signups (last 7 days)"
               }
-              labels={labels}
+              labels={chartLabels}
               series={[
                 {
                   label: "Signups",
-                  data: signups,
+                  data: userActivity.map((u) => u.count),
                   type: "bar",
                   backgroundColor: "#4F46E5",
                 },
@@ -84,23 +84,23 @@ const Dashboard = () => {
                   ? "By Category (last 4 weeks)"
                   : "By Category (last 7 days)"
               }
-              labels={postsActivity.map((p) => p.label)}
+              labels={chartLabels}
               series={[
                 {
                   label: "Space Wanted",
-                  data: [postsActivity[0]?.count || 0],
+                  data: postsActivity[0]?.data || [],
                   type: "bar",
                   backgroundColor: "#6366F1",
                 },
                 {
                   label: "Spaces",
-                  data: [postsActivity[1]?.count || 0],
+                  data: postsActivity[1]?.data || [],
                   type: "bar",
                   backgroundColor: "#EC4899",
                 },
                 {
                   label: "Team Up",
-                  data: [postsActivity[2]?.count || 0],
+                  data: postsActivity[2]?.data || [],
                   type: "bar",
                   backgroundColor: "#10B981",
                 },
@@ -110,7 +110,7 @@ const Dashboard = () => {
             />
           </div>
         </div>
-        </div>
+      </div>
     </>
   );
 };
