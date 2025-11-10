@@ -1180,7 +1180,6 @@ const typeMap = {
   TeamUp: "TeamUp",
 };
 
-
 export const createReport = async (req, res) => {
   try {
     const { postId, postType, title, reason } = req.body;

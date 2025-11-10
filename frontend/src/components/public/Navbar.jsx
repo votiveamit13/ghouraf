@@ -12,7 +12,7 @@ import { FaRegUser } from "react-icons/fa";
 import { BsGenderMale } from "react-icons/bs";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, FacebookAuthProvider } from "firebase/auth";
 import { auth } from "../../firebase";
 import { GoSync } from "react-icons/go";
 import { FiEdit, FiPlusCircle } from "react-icons/fi";
@@ -314,6 +314,30 @@ export default function Navbar() {
       await auth.signOut();
     }
   };
+
+  const handleFacebookLogin = async () => {
+  try {
+    const provider = new FacebookAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const idToken = await result.user.getIdToken();
+
+    const res = await login(idToken);
+
+    if (res.user) {
+      toast.success("Login Successful");
+      setLoginDialog(false);
+      setRegisterDialog(false);
+      navigate("/user");
+    } else if (res.error) {
+      toast.error(res.message || "Facebook login failed");
+      await auth.signOut();
+    }
+  } catch (err) {
+    toast.error(err.message || "Facebook login failed");
+    await auth.signOut();
+  }
+};
+
 
   return (
     <nav className="bg-white fixed top-0 left-0 w-full z-20 p-[5px] shadow-lg">
@@ -761,7 +785,10 @@ export default function Navbar() {
                     <img src={google} alt="Google" className="w-5 h-5" />
                     Google
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
+                  <button 
+                    type="button"
+                    onClick={handleFacebookLogin}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                     <IoLogoFacebook size={22} />
                     Facebook
                   </button>
@@ -1097,6 +1124,7 @@ export default function Navbar() {
                   </button>
                   <button 
                     type="button"
+                    onClick={handleFacebookLogin}
                     className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                     <IoLogoFacebook size={25} />
                     Facebook

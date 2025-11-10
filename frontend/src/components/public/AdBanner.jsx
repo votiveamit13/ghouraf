@@ -1,26 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function AdBanner() {
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const [ad, setAd] = useState(null);
-
-    useEffect(() => {
-        const fetchAds = async () => {
-            try {
-                const { data } = await axios.get(`${apiUrl}ads?status=active`);
-                if (data?.data?.length > 0) {
-                    const randomAd = data.data[Math.floor(Math.random() * data.data.length)];
-                    setAd(randomAd);
-                }
-            } catch (err) {
-                console.error("Failed to load ads:", err);
-            }
-        };
-        fetchAds();
-    }, [apiUrl]);
-
-    if (!ad) return null;
+export default function AdBanner({ ad }) {
+if (!ad) return null;
 
     return (
 
@@ -43,7 +25,7 @@ export default function AdBanner() {
                     <img
                         src={ad.image}
                         alt={ad.title}
-                        className="w-[100%] h-[200px] object-cover rounded-md border"
+                        className="w-[100%] h-[300px] object-cover rounded-md border"
                     />
                 </div>
             </a>

@@ -16,6 +16,7 @@ export default function Spaces() {
   const [spaces, setSpaces] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [ads, setAds] = useState([]);
 
   const [filters, setFilters] = useState({
     minValue: 0,
@@ -49,7 +50,18 @@ export default function Spaces() {
     setPage(1);
   }, [locationHook.search]);
 
-
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const { data } = await axios.get(`${apiUrl}ads?status=active`);
+        setAds(data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch ads:", err);
+        setAds([]);
+      }
+    };
+    fetchAds();
+  }, [apiUrl]);
 
   useEffect(() => {
     const fetchSpaces = async () => {
@@ -115,19 +127,30 @@ export default function Spaces() {
             </select>
           </div>
         </div>
-        {loading ? (
+         {loading ? (
           <Loader fullScreen={false} />
-        ) : spaces.length > 0 ? (
-          <>
-            <PropertyList properties={spaces} page={page} itemsPerPage={itemsPerPage} />
-            <div className="text-end flex justify-end mt-5">
-              <UserPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-            </div>
-          </>
         ) : (
-          <div className="text-center py-20 text-gray-500 font-medium text-lg">
-            No Spaces Found
-          </div>
+          <>
+            <PropertyList
+              properties={spaces}
+              ads={ads}         
+              currentPage={page}
+            />
+            {spaces.length > 0 && (
+              <div className="text-end flex justify-end mt-5">
+                <UserPagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+            {spaces.length === 0 && (
+              <div className="text-center py-20 text-gray-500 font-medium text-lg">
+                No Spaces Found
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

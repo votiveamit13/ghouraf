@@ -17,7 +17,7 @@ const Dashboard = () => {
         const { data } = await axios.get(`${apiUrl}admin/charts?period=${activeTab}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+        
         if (data.success) {
           setChartLabels(data.data.labels);
           setUserActivity(data.data.userActivity);

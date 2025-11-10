@@ -1097,7 +1097,7 @@ export const updateAdStatus = async (req, res) => {
   }
 };
 
-//dashboard insights
+//dashboard insights & charts
 export const getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();

@@ -134,8 +134,9 @@ export const login = async (req, res) => {
     if (!email) return res.status(400).json({ message: "No email in token" });
 
     const firebaseUser = await authAdmin.getUser(decoded.uid).catch(() => null);
-    const isGoogleProvider =
-      firebaseUser?.providerData?.some(p => p.providerId === "google.com") || false;
+    const providerId = firebaseUser?.providerData?.[0]?.providerId || decoded.firebase?.sign_in_provider;
+    const isGoogleProvider = providerId === "google.com";
+    const isFacebookProvider = providerId === "facebook.com";
 
     const displayName = decoded.name || firebaseUser?.displayName || "";
     const nameParts = displayName.trim().split(" ");
@@ -169,7 +170,7 @@ export const login = async (req, res) => {
 
     const userByEmail = await User.findOne({ email: email.toLowerCase() });
     if (userByEmail) {
-      if (isGoogleProvider) {
+      if (isGoogleProvider || isFacebookProvider) {
         userByEmail.firebaseUid = decoded.uid;
 
         userByEmail.profile = {
@@ -198,8 +199,9 @@ export const login = async (req, res) => {
       }
     }
 
-    if (!isGoogleProvider)
-      return res.status(400).json({ message: "Provider must be Google" });
+    if (!isGoogleProvider && !isFacebookProvider)
+      return res.status(400).json({ message: "Provider must be Google or Facebook" });
+
 
     const hashedPassword = await bcrypt.hash(randomString(24), 10);
     const profile = {
@@ -327,44 +329,44 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-else if (section === "email") {
-  const { email, confirmEmail, password } = req.body;
-  if (!email || !confirmEmail || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-  if (email !== confirmEmail) {
-    return res.status(400).json({ message: "Emails do not match" });
-  }
+    else if (section === "email") {
+      const { email, confirmEmail, password } = req.body;
+      if (!email || !confirmEmail || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+      if (email !== confirmEmail) {
+        return res.status(400).json({ message: "Emails do not match" });
+      }
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ message: "Invalid password" });
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) return res.status(401).json({ message: "Invalid password" });
 
-  const newEmail = email.toLowerCase();
+      const newEmail = email.toLowerCase();
 
-  const emailExists = await User.findOne({
-    email: newEmail,
-    _id: { $ne: user._id },
-  });
-  if (emailExists) {
-    return res.status(400).json({ message: "Email already exists in system" });
-  }
+      const emailExists = await User.findOne({
+        email: newEmail,
+        _id: { $ne: user._id },
+      });
+      if (emailExists) {
+        return res.status(400).json({ message: "Email already exists in system" });
+      }
 
-  try {
-    const existingFbUser = await authAdmin.getUserByEmail(newEmail);
-    if (existingFbUser && existingFbUser.uid !== user.firebaseUid) {
-      return res.status(400).json({ message: "Email already exists in Firebase" });
+      try {
+        const existingFbUser = await authAdmin.getUserByEmail(newEmail);
+        if (existingFbUser && existingFbUser.uid !== user.firebaseUid) {
+          return res.status(400).json({ message: "Email already exists in Firebase" });
+        }
+      } catch (fbErr) {
+        if (fbErr.code !== "auth/user-not-found") {
+          console.error("Firebase email check error:", fbErr);
+          return res.status(500).json({ message: "Error checking email in Firebase" });
+        }
+      }
+
+      await authAdmin.updateUser(user.firebaseUid, { email: newEmail });
+
+      updates.email = newEmail;
     }
-  } catch (fbErr) {
-    if (fbErr.code !== "auth/user-not-found") {
-      console.error("Firebase email check error:", fbErr);
-      return res.status(500).json({ message: "Error checking email in Firebase" });
-    }
-  }
-
-  await authAdmin.updateUser(user.firebaseUid, { email: newEmail });
-
-  updates.email = newEmail;
-}
 
 
     else if (section === "password") {
@@ -419,8 +421,8 @@ else if (section === "email") {
       if (req.file) {
         fileHandler.validateExtension(req.file.originalname, "image");
         const savedFile = fileHandler.saveFile(req.file, "profile_pics");
-  const photoUrl = `${process.env.FRONTEND_URL}${savedFile.relativePath}`;
-  sets["profile.photo"] = photoUrl;
+        const photoUrl = `${process.env.FRONTEND_URL}${savedFile.relativePath}`;
+        sets["profile.photo"] = photoUrl;
       }
 
       updates = { ...updates, ...sets };
@@ -455,7 +457,7 @@ export const getUserById = async (req, res) => {
       "_id profile.firstName profile.lastName profile.photo email createdAt"
     );
 
-    if(!user) {
+    if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
@@ -487,8 +489,8 @@ export const forgotPassword = async (req, res) => {
 
     await sendEmail({
       to: email,
-        subject: "Reset your password",
-        html: `
+      subject: "Reset your password",
+      html: `
   <!DOCTYPE html>
   <html>
     <head>
