@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FaUsers } from "react-icons/fa6";
+import { TiUserAdd } from "react-icons/ti";
+import { BsPostcardFill } from "react-icons/bs";
+import { TbMessageReportFilled } from "react-icons/tb";
 
 const Header = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -12,13 +16,16 @@ const Header = () => {
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await axios.get(`${apiUrl}admin/stats`);
-        if (data.success) {
-          setStats(data.data);
-        }
+        const token = localStorage.getItem("authToken");
+        const { data } = await axios.get(`${apiUrl}admin/stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (data.success) setStats(data.data);
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
       } finally {
@@ -43,7 +50,7 @@ const Header = () => {
               </span>
             </div>
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500 text-white shadow">
-              <i className="fas fa-chart-bar" />
+              <FaUsers size={20}/>
             </div>
           </div>
 
@@ -57,7 +64,7 @@ const Header = () => {
               </span>
             </div>
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500 text-white shadow">
-              <i className="fas fa-chart-pie" />
+              <TiUserAdd size={20}/>
             </div>
           </div>
 
@@ -71,7 +78,7 @@ const Header = () => {
               </span>
             </div>
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-400 text-white shadow">
-              <i className="fas fa-users" />
+              <BsPostcardFill size={20}/>
             </div>
           </div>
 
@@ -85,7 +92,7 @@ const Header = () => {
               </span>
             </div>
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 text-white shadow">
-              <i className="fas fa-percent" />
+              <TbMessageReportFilled size={20}/>
             </div>
           </div>
         </div>

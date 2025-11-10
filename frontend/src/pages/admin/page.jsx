@@ -1,51 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "components/admin/Headers/Header";
 import ActivityChart from "components/admin/charts/ActivityChart";
+import axios from "axios";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("month");
+  const apiUrl = process.env.REACT_APP_API_URL;
+ const [activeTab, setActiveTab] = useState("month");
+  const [userActivity, setUserActivity] = useState([]);
+  const [postsActivity, setPostsActivity] = useState([]);
 
-  const weeklyLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const weeklySignups = [30, 28, 35, 40, 38, 42, 50];
+   useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const { data } = await axios.get(`${apiUrl}admin/charts?period=${activeTab}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  const monthlyLabels = ["Week 1", "Week 2", "Week 3", "Week 4"];
-  const monthlySignups = [210, 250, 230, 280];
+        if (data.success) {
+          setUserActivity(data.data.userActivity);
+          setPostsActivity(data.data.postsActivity);
+        }
+      } catch (err) {
+        console.error("Error fetching chart data:", err);
+      }
+    };
 
-  const labels = activeTab === "month" ? monthlyLabels : weeklyLabels;
-  const signups = activeTab === "month" ? monthlySignups : weeklySignups;
+    fetchChartData();
+  }, [activeTab]);
+
+  const labels = userActivity.map((u) => u.label);
+  const signups = userActivity.map((u) => u.count);
 
   return (
     <>
       <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+<div className="px-[40px] mt-[-8%] w-full fluid position-relative">
         <div className="bg-gradient-to-r from-[#565ABF] to-[#A321A6] rounded-xl shadow p-4 w-full">
           <div className="flex justify-between items-center mb-3">
-            <div>
-              <h2 className="text-white text-xl font-semibold">Overview</h2>
-            </div>
+            <h2 className="text-white text-xl font-semibold">Overview</h2>
             <div className="flex space-x-2">
-              <button
-                className={`px-3 py-1 rounded ${
-                  activeTab === "month"
-                    ? "bg-white text-indigo-600"
-                    : "bg-indigo-500 text-white"
-                }`}
-                onClick={() => setActiveTab("month")}
-              >
-                Month
-              </button>
-              <button
-                className={`px-3 py-1 rounded ${
-                  activeTab === "week"
-                    ? "bg-white text-indigo-600"
-                    : "bg-indigo-500 text-white"
-                }`}
-                onClick={() => setActiveTab("week")}
-              >
-                Week
-              </button>
+              {["month", "week"].map((tab) => (
+                <button
+                  key={tab}
+                  className={`px-3 py-1 rounded ${
+                    activeTab === tab
+                      ? "bg-white text-indigo-600"
+                      : "bg-indigo-500 text-white"
+                  }`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab === "month" ? "Month" : "Week"}
+                </button>
+              ))}
             </div>
           </div>
+
           <div className="d-flex gap-5">
             <ActivityChart
               title="User Activity"
@@ -65,7 +75,6 @@ const Dashboard = () => {
               ]}
               yLabel="Users"
               height={200}
-              onPointClick={(ctx) => console.log("Clicked point:", ctx)}
             />
 
             <ActivityChart
@@ -75,23 +84,23 @@ const Dashboard = () => {
                   ? "By Category (last 4 weeks)"
                   : "By Category (last 7 days)"
               }
-              labels={labels}
+              labels={postsActivity.map((p) => p.label)}
               series={[
                 {
-                  label: "Looking for Room",
-                  data: [18, 20, 22, 24, 25, 26, 30],
+                  label: "Space Wanted",
+                  data: [postsActivity[0]?.count || 0],
                   type: "bar",
                   backgroundColor: "#6366F1",
                 },
                 {
-                  label: "Offering Room/Apartment",
-                  data: [10, 12, 11, 14, 15, 13, 16],
+                  label: "Spaces",
+                  data: [postsActivity[1]?.count || 0],
                   type: "bar",
                   backgroundColor: "#EC4899",
                 },
                 {
                   label: "Team Up",
-                  data: [6, 8, 7, 9, 10, 9, 12],
+                  data: [postsActivity[2]?.count || 0],
                   type: "bar",
                   backgroundColor: "#10B981",
                 },
@@ -101,7 +110,7 @@ const Dashboard = () => {
             />
           </div>
         </div>
-      </div>
+        </div>
     </>
   );
 };

@@ -1130,3 +1130,92 @@ export const getDashboardStats = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+const daysAgo = (days) => new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+export const getDashboardCharts = async (req, res) => {
+  try {
+    const period = req.query.period || "month";
+
+    let userActivity = [];
+    let postsActivity = [];
+
+    if (period === "week") {
+      const startDate = daysAgo(7);
+
+      const users = await User.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $group: {
+            _id: { $dayOfWeek: "$createdAt" },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id": 1 } },
+      ]);
+
+      const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      userActivity = weekDays.map((day, idx) => {
+        const found = users.find((u) => u._id === idx + 1);
+        return { label: day, count: found ? found.count : 0 };
+      });
+
+      const [spaces, wanted, teams] = await Promise.all([
+        Space.countDocuments({ createdAt: { $gte: startDate } }),
+        SpaceWanted.countDocuments({ createdAt: { $gte: startDate } }),
+        TeamUp.countDocuments({ createdAt: { $gte: startDate } }),
+      ]);
+
+      postsActivity = [
+        { label: "Looking for Room", count: wanted },
+        { label: "Offering Room/Apartment", count: spaces },
+        { label: "Team Up", count: teams },
+      ];
+    } else {
+      const startDate = daysAgo(28);
+
+      const users = await User.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $project: {
+            week: { $ceil: { $divide: [{ $subtract: [new Date(), "$createdAt"] }, 7 * 24 * 60 * 60 * 1000] } },
+          },
+        },
+        {
+          $group: {
+            _id: "$week",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      userActivity = Array.from({ length: 4 }, (_, i) => ({
+        label: `Week ${i + 1}`,
+        count: users.find((u) => u._id === i + 1)?.count || 0,
+      }));
+
+      const [spaces, wanted, teams] = await Promise.all([
+        Space.countDocuments({ createdAt: { $gte: startDate } }),
+        SpaceWanted.countDocuments({ createdAt: { $gte: startDate } }),
+        TeamUp.countDocuments({ createdAt: { $gte: startDate } }),
+      ]);
+
+      postsActivity = [
+        { label: "Space Wanted", count: wanted },
+        { label: "Spaces", count: spaces },
+        { label: "Team Up", count: teams },
+      ];
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        userActivity,
+        postsActivity,
+      },
+    });
+  } catch (error) {
+    console.error("Chart Data Error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch chart data" });
+  }
+};
