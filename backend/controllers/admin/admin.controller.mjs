@@ -16,6 +16,7 @@ import Policy from "../../models/Policy.mjs";
 import Report from "../../models/Report.mjs";
 import Ad from "../../models/Ad.mjs";
 import { AboutUsImage } from "../../models/AboutUsImage.mjs";
+import Newsletter from "../../models/Newsletter.mjs";
 
 const modelMap = {
   Space,
@@ -1239,5 +1240,50 @@ export const getDashboardCharts = async (req, res) => {
   } catch (error) {
     console.error("Chart Data Error:", error);
     res.status(500).json({ success: false, message: "Failed to fetch chart data" });
+  }
+};
+
+//newsletter
+export const getAllNewsletters = async (req, res) => {
+  try {
+    const { search = "", page = 1, limit = 10 } = req.query;
+
+    const query = search
+      ? { email: { $regex: search, $options: "i" } }
+      : {};
+
+    const total = await Newsletter.countDocuments(query);
+
+    const newsletters = await Newsletter.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    return res.status(200).json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      newsletters,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+export const deleteNewsletter = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const newsletter = await Newsletter.findById(id);
+    if (!newsletter) {
+      return res.status(404).json({ error: "Newsletter not found" });
+    }
+
+    await Newsletter.findByIdAndDelete(id);
+    return res.status(200).json({ message: "Newsletter deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Something went wrong" });
   }
 };

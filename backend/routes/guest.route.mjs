@@ -1,5 +1,5 @@
 import express from "express";
-import { sendMessage, getAllFaq, getPolicyByCategory, getPublicAds } from "../controllers/guest.controller.mjs";
+import { sendMessage, getAllFaq, getPolicyByCategory, getPublicAds, subscribeNewsletter } from "../controllers/guest.controller.mjs";
 import { contactFormCreateSchema } from "../validations/contactform.validator.mjs";
 import { validate } from "../middleware/validate.mjs";
 
@@ -9,5 +9,6 @@ router.post("/sendMessage", validate(contactFormCreateSchema), sendMessage);
 router.get("/faqs", getAllFaq);
 router.get("/policies/:category", getPolicyByCategory);
 router.get("/ads", getPublicAds);
+router.post("/subscribe", subscribeNewsletter);
 
 export default router;

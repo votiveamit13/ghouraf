@@ -13,7 +13,7 @@ import EditFaq from "components/admin/faq-management/EditFaq";
 import Spaces from "components/admin/post_management/Spaces";
 import TeamUps from "components/admin/post_management/TeamUps";
 import { AiFillDashboard } from "react-icons/ai";
-import { FaUserCog } from "react-icons/fa";
+import { FaMailBulk, FaUserCog } from "react-icons/fa";
 import { RiAdvertisementFill, RiAdvertisementLine, RiTeamLine } from "react-icons/ri";
 import SpaceWanted from "components/admin/post_management/SpaceWanted";
 import HeroImage from "pages/admin/home-screen-image/page";
@@ -26,6 +26,7 @@ import { GoReport } from "react-icons/go";
 import AdManagement from "pages/admin/ad-management/page";
 import CreateAd from "components/admin/ad-managmenet/CreateAd";
 import EditAd from "components/admin/ad-managmenet/EditAd";
+import Newsletter from "pages/admin/newsletter-management/page";
 
 export const adminRoutes = [
   {
@@ -205,6 +206,13 @@ export const adminRoutes = [
         layout: "/admin",
       },
     ]
+  },
+    {
+    path: "/newsletter",
+    name: "Newsletter",
+    icon: <FaMailBulk size={20} className="text-[#565ABF]" />,
+    component: <Newsletter />,
+    layout: "/admin",
   },
 ];
 

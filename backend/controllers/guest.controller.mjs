@@ -1,6 +1,7 @@
 import Ad from "../models/Ad.mjs";
 import ContactForm from "../models/ContactForm.mjs";
 import Faq from "../models/faq.mjs";
+import Newsletter from "../models/Newsletter.mjs";
 import Policy from "../models/Policy.mjs";
 
 export const sendMessage = async (req, res) => {
@@ -69,5 +70,37 @@ export const getPublicAds = async (req, res) => {
   } catch (err) {
     console.error("Error fetching ads:", err);
     res.status(500).json({ message: "Failed to fetch ads" });
+  }
+};
+
+export const subscribeNewsletter = async (req, res) => {
+  try {
+    const { email, agreedToTerms } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    if (agreedToTerms !== true) {
+      return res.status(400).json({ error: "You must agree to the terms & conditions" });
+    }
+
+    const existing = await Newsletter.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ error: "Email is already subscribed" });
+    }
+
+    const newsletter = new Newsletter({ email, agreedToTerms });
+    await newsletter.save();
+
+    return res.status(201).json({ message: "Subscribed successfully!" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Something went wrong" });
   }
 };

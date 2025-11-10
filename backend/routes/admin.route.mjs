@@ -11,14 +11,10 @@ import {
     createPolicy, getAllPolicies, getPolicyById, updatePolicy, deletePolicy,
     getAllReports, deleteReport, handlePostAction,
     toggleSpaceAdminPromotion, toggleSpaceWantedAdminPromotion, toggleTeamUpAdminPromotion,
-    createAd,
-    updateAd,
-    getAllAds, deleteAd,
-    getAboutUsImage,
-    updateAboutUsImage,
-    updateAdStatus,
-    getDashboardStats,
-    getDashboardCharts
+    createAd, updateAd, getAllAds, deleteAd, updateAdStatus,
+    getAboutUsImage, updateAboutUsImage,
+    getDashboardStats, getDashboardCharts,
+    getAllNewsletters, deleteNewsletter
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -77,6 +73,7 @@ router.delete("/deleteAd/:id", adminAuth, deleteAd);
 router.put("/updateAdStatus/:id", adminAuth, updateAdStatus);
 router.get("/stats", adminAuth, getDashboardStats);
 router.get("/charts", adminAuth, getDashboardCharts);
-
+router.get("/newsletter", adminAuth, getAllNewsletters);
+router.delete("/newsletter/:id", adminAuth, deleteNewsletter);
 
 export default router;

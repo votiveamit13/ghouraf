@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import UserPagination from "../../../components/common/UserPagination";
 import { TfiLocationPin } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
@@ -14,6 +14,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import PromoteAdModal from "components/user/myads/PromoteAd";
 import { useAuth } from "context/AuthContext";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
 
 
 export default function MyAds() {
@@ -36,6 +37,20 @@ export default function MyAds() {
     const [promotingAd, setPromotingAd] = useState(null);
     const [loadingPayment, setLoadingPayment] = useState(false);
     const { user, token } = useAuth();
+    const menuRefs = useRef({});
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            const refs = Object.values(menuRefs.current);
+            if (!refs.some((ref) => ref?.contains(event.target))) {
+                setOpenMenu(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
 
     const fetchAds = async () => {
         try {
@@ -118,11 +133,11 @@ export default function MyAds() {
             setLoadingPayment(true);
             const plan = planDays === "10" ? "10_days" : "30_days";
 
-console.log("Promoting Ad payload:", {
-  adId: promotingAd._id,
-  postCategory: promotingAd.postCategory,
-  plan,
-});
+            console.log("Promoting Ad payload:", {
+                adId: promotingAd._id,
+                postCategory: promotingAd.postCategory,
+                plan,
+            });
 
 
             const res = await axios.post(
@@ -263,6 +278,7 @@ console.log("Promoting Ad payload:", {
                             return (
                                 <div
                                     key={ad._id}
+                                    ref={(el) => (menuRefs.current[ad._id] = el)}
                                     className="relative w-full sm:w-[48%] lg:w-[32%] border border-[#D7D7D7] rounded-[12px] shadow-lg  flex flex-col p-4"
                                 >
                                     <div className="absolute top-3 right-3 z-999">
@@ -278,13 +294,19 @@ console.log("Promoting Ad payload:", {
                                                 <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-[15px] shadow-lg z-10">
                                                     <button
                                                         className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b"
-                                                        onClick={() => handleEdit(ad._id)}
+                                                        onClick={() => {
+                                                            handleEdit(ad._id);
+                                                            setOpenMenu(null);
+                                                        }}
                                                     >
                                                         Edit
                                                     </button>
                                                     <button
                                                         className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b"
-                                                        onClick={() => handleView(ad._id)}
+                                                        onClick={() => {
+                                                            handleView(ad._id);
+                                                            setOpenMenu(null);
+                                                        }}
                                                     >
                                                         View
                                                     </button>
@@ -306,7 +328,10 @@ console.log("Promoting Ad payload:", {
                                                         <div className="hidden group-hover:block absolute left-full top-0 w-36 bg-white border border-gray-200 rounded-lg shadow-lg">
                                                             <button
                                                                 disabled={ad.available === true}
-                                                                onClick={() => ad.available === false && handleStatus(ad._id, "Available")}
+                                                                onClick={() => {
+                                                                    if (!ad.available) handleStatus(ad._id, "Available");
+                                                                    setOpenMenu(null);
+                                                                }}
                                                                 className={`block w-full text-left px-4 py-2 border-b ${ad.available
                                                                     ? "bg-green-100 text-green-600 font-medium cursor-not-allowed"
                                                                     : "hover:bg-gray-100 text-gray-700"
@@ -317,7 +342,10 @@ console.log("Promoting Ad payload:", {
 
                                                             <button
                                                                 disabled={ad.available === false}
-                                                                onClick={() => ad.available === true && handleStatus(ad._id, "Unavailable")}
+                                                                onClick={() => {
+                                                                    if (ad.available) handleStatus(ad._id, "Unavailable");
+                                                                    setOpenMenu(null);
+                                                                }}
                                                                 className={`block w-full text-left px-4 py-2 ${!ad.available
                                                                     ? "bg-red-100 text-red-600 font-medium cursor-not-allowed"
                                                                     : "hover:bg-gray-100 text-gray-700"
