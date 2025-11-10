@@ -8,7 +8,6 @@ import SpaceWanted from "../models/SpaceWanted.mjs";
 import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
 import Stripe from "stripe";
 import Report from "../models/Report.mjs";
-import Ad from "../models/Ad.mjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //Spaces
@@ -321,36 +320,14 @@ export const getSpaces = async (req, res) => {
 
     const total = await Space.countDocuments(query);
 
-    const ads = await Ad.find({ status: "active" })
-      .sort({ createdAt: -1 })
-      .limit(4)
-      .lean();
-
-     const combinedList = [];
-    const randomPositions = new Set();
-
-    while (randomPositions.size < ads.length) {
-      const rand = Math.floor(Math.random() * (spaces.length + 1));
-      randomPositions.add(rand);
-    }
-
-    let adIndex = 0;
-    for (let i = 0; i <= spaces.length; i++) {
-      if (randomPositions.has(i) && adIndex < ads.length) {
-        combinedList.push({ isAd: true, ad: ads[adIndex++] });
-      }
-      if (i < spaces.length) combinedList.push(spaces[i]);
-    }
-
     res.status(200).json({
       success: true,
       total,
       page: Number(page),
       pages: Math.ceil(total / limit),
-      data: combinedList,
+      data: spaces,
     });
   } catch (error) {
-    console.error("Error in getSpaces:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
