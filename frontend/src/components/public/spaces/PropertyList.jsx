@@ -1,33 +1,32 @@
-import React, { useMemo } from "react";
+import React from "react";
 import PropertyCard from "./PropertyCard";
 import AdBanner from "../AdBanner";
 
-export default function PropertyList({ properties = [], ads = [], currentPage }) {
-  // Handle empty case *after* hook definitions, not before
+export default function PropertyList({ properties = [], ads = [] }) {
+  if (!properties || properties.length === 0) {
+    return (
+      <div className="text-center py-20 text-gray-500 font-medium text-lg">
+        No Spaces Found
+      </div>
+    );
+  }
+
+  // Promoted spaces always at top
   const promoted = properties.filter((p) => p?.promotion?.isPromoted);
   const normal = properties.filter((p) => !p?.promotion?.isPromoted);
 
-  // Sort ads by latest first
-  const sortedAds = useMemo(
-    () => [...ads].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [ads]
-  );
-
-  // Pick a few random ads per page
-  const randomAds = useMemo(() => {
-    const shuffled = [...sortedAds].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3); // show 3 ads max
-  }, [sortedAds, currentPage]);
-
+  // Make a copy of normal spaces
   const propertiesWithAds = [...normal];
   const usedIndexes = new Set();
 
-  randomAds.forEach((ad, i) => {
+  // Insert ads randomly without overlapping positions
+  ads.forEach((ad, i) => {
     if (propertiesWithAds.length === 0) return;
 
+    // Random position in the normal spaces array
     let position = Math.floor(Math.random() * (propertiesWithAds.length + 1));
 
-    // ensure no duplicate or adjacent positions
+    // Avoid duplicate or adjacent positions
     while (
       usedIndexes.has(position) ||
       usedIndexes.has(position - 1) ||
@@ -40,16 +39,8 @@ export default function PropertyList({ properties = [], ads = [], currentPage })
     propertiesWithAds.splice(position, 0, { isAd: true, ad });
   });
 
+  // Final list: promoted first, then normal + ads
   const finalList = [...promoted, ...propertiesWithAds];
-
-  // ✅ Now handle the empty render safely
-  if (finalList.length === 0) {
-    return (
-      <div className="text-center py-20 text-gray-500 font-medium text-lg">
-        No Spaces Found
-      </div>
-    );
-  }
 
   return (
     <div>

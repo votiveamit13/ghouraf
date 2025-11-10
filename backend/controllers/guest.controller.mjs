@@ -47,12 +47,25 @@ export const getPolicyByCategory = async (req, res) => {
 
 export const getPublicAds = async (req, res) => {
   try {
-    const { status } = req.query;
+    const { status, page = 1, limit = 4 } = req.query;
     const query = status ? { status } : {};
 
-    const ads = await Ad.find(query).sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
 
-    res.status(200).json({ data: ads });
+    const ads = await Ad.find(query)
+      .sort({ createdAt: -1 })
+      .skip(Number(skip))
+      .limit(Number(limit));
+
+    const total = await Ad.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      data: ads,
+    });
   } catch (err) {
     console.error("Error fetching ads:", err);
     res.status(500).json({ message: "Failed to fetch ads" });

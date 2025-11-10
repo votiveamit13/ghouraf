@@ -36,6 +36,7 @@ export default function Spaces() {
   });
 
   const itemsPerPage = 10;
+  const adsPerPage = 4;
 
   useEffect(() => {
     const parsed = queryString.parse(locationHook.search);
@@ -51,54 +52,45 @@ export default function Spaces() {
   }, [locationHook.search]);
 
   useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const { data } = await axios.get(`${apiUrl}ads?status=active`);
-        setAds(data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch ads:", err);
-        setAds([]);
-      }
-    };
-    fetchAds();
-  }, [apiUrl]);
-
-  useEffect(() => {
-    const fetchSpaces = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const params = {
+        const spaceParams = {
           page,
           limit: itemsPerPage,
           sortBy,
           ...filters,
-          amenities: filters.amenities.join(','),
+          amenities: filters.amenities.join(',')
         };
 
-        Object.keys(params).forEach((key) => {
-          if (
-            params[key] === "all" ||
-            params[key] === "any" ||
-            params[key] === "" ||
-            params[key] === 0
-          ) {
-            delete params[key];
+        Object.keys(spaceParams).forEach((key) => {
+          if (spaceParams[key] === "all" || spaceParams[key] === "any" || spaceParams[key] === "" || spaceParams[key] === 0) {
+            delete spaceParams[key];
           }
         });
 
-        const { data } = await axios.get(`${apiUrl}spaces`, { params });
-        setSpaces(data.data);
-        setTotalPages(data.pages);
+        const spaceReq = axios.get(`${apiUrl}spaces`, { params: spaceParams });
+
+        const adsReq = axios.get(`${apiUrl}ads`, {
+          params: { status: "active", page, limit: adsPerPage }
+        });
+
+        const [spaceRes, adsRes] = await Promise.all([spaceReq, adsReq]);
+
+        setSpaces(spaceRes.data.data);
+        setTotalPages(spaceRes.data.pages);
+        setAds(adsRes.data.data);
       } catch (err) {
-        console.error("Failed to fetch spaces:", err);
+        console.error("Failed to fetch spaces or ads:", err);
         setSpaces([]);
+        setAds([]);
         setTotalPages(1);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSpaces();
+    fetchData();
   }, [page, filters, sortBy, apiUrl]);
 
   return (
@@ -127,14 +119,13 @@ export default function Spaces() {
             </select>
           </div>
         </div>
-         {loading ? (
+          {loading ? (
           <Loader fullScreen={false} />
         ) : (
           <>
             <PropertyList
               properties={spaces}
-              ads={ads}         
-              currentPage={page}
+              ads={ads}
             />
             {spaces.length > 0 && (
               <div className="text-end flex justify-end mt-5">
