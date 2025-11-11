@@ -1,8 +1,8 @@
-import express from "express";
-import { sendNotification } from "../controllers/notification.controller.mjs";
+// import express from "express";
+// import { sendNotification } from "../controllers/notification.controller.mjs";
 
-const router = express.Router();
+// const router = express.Router();
 
-router.post("/send", sendNotification);
+// router.post("/send", sendNotification);
 
-export default router;
+// export default router;
