@@ -27,6 +27,8 @@ import AdManagement from "pages/admin/ad-management/page";
 import CreateAd from "components/admin/ad-managmenet/CreateAd";
 import EditAd from "components/admin/ad-managmenet/EditAd";
 import Newsletter from "pages/admin/newsletter-management/page";
+import ViewProfile from "components/admin/profile-management/ViewProfile";
+import EditProfile from "components/admin/profile-management/EditProfile";
 
 export const adminRoutes = [
   {
@@ -34,6 +36,22 @@ export const adminRoutes = [
     name: "Login",
     icon: "ni ni-key-25 text-[#565ABF]",
     component: <LoginPage />,
+    layout: "/admin",
+    showInSidebar: false
+  },
+    {
+    path: "/profile",
+    name: "My Profile",
+    icon: "ni ni-key-25 text-[#565ABF]",
+    component: <ViewProfile />,
+    layout: "/admin",
+    showInSidebar: false
+  },
+    {
+    path: "/edit-profile",
+    name: "Edit My Profile",
+    icon: "ni ni-key-25 text-[#565ABF]",
+    component: <EditProfile />,
     layout: "/admin",
     showInSidebar: false
   },

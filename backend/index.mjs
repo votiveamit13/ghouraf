@@ -52,10 +52,14 @@ app.use("/api/admin", adminRoutes);
 app.use("/api", userRoutes, guestRoutes, postRoutes);
 
 dbConnection().then(async () => {
-  const existingAdmin = await User.findOne({ email: "admin@example.com" });
+  const existingAdmin = await User.findOne({ isAdmin: true });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash("admin123", 10);
-    await User.create({ email: "admin@example.com", password: hashedPassword, isAdmin: true});
+    await User.create({
+      email: "admin@example.com",
+      password: hashedPassword,
+      isAdmin: true,
+    });
     console.log("Default admin created");
   }
 });

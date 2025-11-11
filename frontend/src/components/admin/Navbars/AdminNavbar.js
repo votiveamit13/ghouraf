@@ -110,15 +110,15 @@ const AdminNavbar = () => {
           <img
             src={require("../../../assets/img/theme/team-4-800x800.jpg")}
             alt="User"
-            className="w-8 h-8 rounded-full"
+            className="w-12 h-12 rounded-full"
           />
           <span className="text-white text-sm font-medium">Admin User</span>
         </div>
 
         {isMenuOpen && (
-          <div className="absolute right-0 top-10 w-48 bg-white text-gray-700 rounded-md shadow-lg z-50">
+          <div className="absolute right-0 top-14 w-48 bg-white text-gray-700 rounded-md shadow-lg z-50">
             <Link
-              to="/admin/user-profile"
+              to="/admin/profile"
               className="block px-4 py-2 hover:bg-gray-100"
             >
               My Profile

@@ -14,7 +14,9 @@ import {
     createAd, updateAd, getAllAds, deleteAd, updateAdStatus,
     getAboutUsImage, updateAboutUsImage,
     getDashboardStats, getDashboardCharts,
-    getAllNewsletters, deleteNewsletter
+    getAllNewsletters, deleteNewsletter,
+    getAdminProfile,
+    updateAdminProfile
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -75,5 +77,7 @@ router.get("/stats", adminAuth, getDashboardStats);
 router.get("/charts", adminAuth, getDashboardCharts);
 router.get("/newsletter", adminAuth, getAllNewsletters);
 router.delete("/newsletter/:id", adminAuth, deleteNewsletter);
+router.get("/profile", adminAuth, getAdminProfile);
+router.put("/edit-profile", adminAuth, upload.single("image"), updateAdminProfile);
 
 export default router;
