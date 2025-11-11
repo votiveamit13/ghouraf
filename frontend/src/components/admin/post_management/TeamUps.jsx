@@ -35,27 +35,30 @@ export default function TeamUps() {
         fetchTeamUp();
     }, [apiUrl]);
 
-    const filteredPosts = useMemo(() => {
-        return teamup.filter((post) => {
-            const title = post.title || "";
+const pageSize = 10;
+const startIndex = (currentPage - 1) * pageSize;
 
-            const posterName =
-                post.user?.profile
-                    ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
-                    : post.name || "";
+const pageData = teamup.slice(startIndex, startIndex + pageSize);
 
-            return (
-                title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                posterName.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        });
-    }, [searchTerm, teamup]);
+const filteredPosts = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return pageData.filter((post) => {
+        const title = post.title || "";
+        const posterName =
+            post.user?.profile
+                ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
+                : post.name || "";
 
+        return (
+            title.toLowerCase().includes(term) ||
+            posterName.toLowerCase().includes(term)
+        );
+    });
+}, [searchTerm, pageData]);
 
-    const pageSize = 10;
-    const totalPages = Math.ceil(filteredPosts.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedPosts = filteredPosts.slice(startIndex, startIndex + pageSize);
+const totalPages = Math.ceil(teamup.length / pageSize);
+const paginatedPosts = filteredPosts;
+
 
     return (
         <>

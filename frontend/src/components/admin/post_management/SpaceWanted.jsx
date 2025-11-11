@@ -38,20 +38,26 @@ export default function SpaceWanted() {
         fetchSpaceWanted();
     }, [apiUrl]);
 
-    const filteredPosts = useMemo(() => {
-        return spaceWanted.filter(
-            (post) =>
-                post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                `${post.user?.profile?.firstName} ${post.user?.profile?.lastName}`
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-        );
-    }, [searchTerm, spaceWanted]);
+const pageSize = 10;
+const startIndex = (currentPage - 1) * pageSize;
 
-    const pageSize = 10;
-    const totalPages = Math.ceil(filteredPosts.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedPosts = filteredPosts.slice(startIndex, startIndex + pageSize);
+const pageData = spaceWanted.slice(startIndex, startIndex + pageSize);
+
+const filteredPosts = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return pageData.filter(
+        (post) =>
+            post.title?.toLowerCase().includes(term) ||
+            `${post.user?.profile?.firstName || ""} ${post.user?.profile?.lastName || ""}`
+                .toLowerCase()
+                .includes(term)
+    );
+}, [searchTerm, pageData]);
+
+const totalPages = Math.ceil(spaceWanted.length / pageSize);
+
+const paginatedPosts = filteredPosts;
+
 
     return (
         <>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PaginationComponent from "components/common/Pagination";
 import { RiDeleteBinLine } from "react-icons/ri";
 import SearchFilter from "components/common/SearchFilter";
@@ -14,7 +14,6 @@ export default function Newsletter() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [newsletters, setNewsletters] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [newsletterToDelete, setNewsletterToDelete] = useState(null);
@@ -28,7 +27,6 @@ export default function Newsletter() {
       });
 
       setNewsletters(res.data.newsletters || []);
-      setTotalPages(res.data.pages || 1);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -55,9 +53,18 @@ export default function Newsletter() {
       toast.error(err.response?.data?.error || "Failed to delete newsletter");
     }
   };
-
   const pageSize = 10;
+  const filteredNewsletters = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return newsletters.filter((n) => n.email.toLowerCase().includes(term));
+  }, [searchTerm, newsletters]);
+
+  const totalPages = Math.ceil(filteredNewsletters.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
+  const paginatedNewsletters = filteredNewsletters.slice(
+    startIndex,
+    startIndex + pageSize
+  );
 
   return (
     <>
@@ -78,7 +85,7 @@ export default function Newsletter() {
                   <tr>
                     <th className="px-3 py-3 text-left font-semibold">S. No.</th>
                     <th className="px-3 py-3 text-left font-semibold">Email Id</th>
-                    <th className="px-3 py-3 text-right font-semibold">Action</th>
+                    <th className="px-3 py-3 text-center font-semibold">Action</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
@@ -93,7 +100,7 @@ export default function Newsletter() {
                       <tr key={item._id}>
                         <td className="px-3 py-3">{startIndex + index + 1}</td>
                         <td className="px-3 py-3">{item.email}</td>
-                        <td className="px-3 py-3 flex gap-2 justify-end">
+                        <td className="px-3 py-3 flex gap-2 justify-center">
                           <RiDeleteBinLine
                             size={20}
                             className="cursor-pointer"

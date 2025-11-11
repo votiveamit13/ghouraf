@@ -14,7 +14,6 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -59,17 +58,25 @@ const UserManagement = () => {
     }
   };
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const fullName = `${user.profile?.firstName || ""} ${user.profile?.lastName || ""}`;
-      const email = user.email || "";
+const pageSize = 10;
+const startIndex = (currentPage - 1) * pageSize;
+const pageData = users.slice(startIndex, startIndex + pageSize);
 
-      return (
-        fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }, [users, searchTerm]);
+const filteredUsers = useMemo(() => {
+  const term = searchTerm.toLowerCase();
+  return pageData.filter((user) => {
+    const fullName = `${user.profile?.firstName || ""} ${user.profile?.lastName || ""}`;
+    const email = user.email || "";
+    return (
+      fullName.toLowerCase().includes(term) ||
+      email.toLowerCase().includes(term)
+    );
+  });
+}, [searchTerm, pageData]);
+
+const totalPages = Math.ceil(users.length / pageSize);
+const paginatedUsers = filteredUsers;
+
 
   const handleDelete = async () => {
     try {
@@ -86,10 +93,6 @@ const UserManagement = () => {
       setSelectedUser(null);
     }
   };
-
-  const totalPages = Math.ceil(filteredUsers.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
 
   return (
     <>

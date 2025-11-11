@@ -41,27 +41,28 @@ export default function ReportList() {
   }, [apiUrl]);
 
 
-  const filteredReports = useMemo(() => {
-    return reports.filter(
-      (r) =>
-        r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.userId?.profile?.firstName
-          ?.toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        r.userId?.profile?.lastName
-          ?.toLowerCase()
-          .includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, reports]);
+const pageSize = 10;
+const startIndex = (currentPage - 1) * pageSize;
 
-  const pageSize = 10;
-  const totalPages = Math.ceil(filteredReports.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedReports = filteredReports.slice(
-    startIndex,
-    startIndex + pageSize
-  );
+const pageData = reports.slice(startIndex, startIndex + pageSize);
+
+const filteredReports = useMemo(() => {
+  const term = searchTerm.toLowerCase();
+
+  return pageData.filter((r) => {
+    const category = r.postType?.toLowerCase() || "";
+    const reportedBy = `${r.user?.profile?.firstName || ""} ${r.user?.profile?.lastName || ""}`.toLowerCase();
+
+    return (
+      category.includes(term) ||
+      reportedBy.includes(term)
+    );
+  });
+}, [searchTerm, pageData]);
+
+const totalPages = Math.ceil(reports.length / pageSize);
+const paginatedReports = filteredReports;
+
 
   const handleDelete = async () => {
     if (!reportToDelete) return;
@@ -95,7 +96,7 @@ export default function ReportList() {
               Reports Management
             </h3>
             <SearchFilter
-              placeholder="Search by title, reason or user..."
+              placeholder="Search by post category, reported by..."
               onSearch={setSearchTerm}
             />
           </div>

@@ -35,17 +35,26 @@ const [selectedMessage, setSelectedMessage] = useState(null);
     fetchMessages();
   }, [token, apiUrl]);
 
-  const filteredMessages = useMemo(() => {
-    return messages.filter((message) => {
-      const fullName = `${message.fullName || ""}`;
-      const email = message.email || "";
+const startIndex = (currentPage - 1) * pageSize;
 
-      return (
-        fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }, [messages, searchTerm]);
+const pageData = messages.slice(startIndex, startIndex + pageSize);
+
+const filteredMessages = useMemo(() => {
+  const term = searchTerm.toLowerCase();
+  return pageData.filter((message) => {
+    const fullName = message.fullName?.toLowerCase() || "";
+    const email = message.email?.toLowerCase() || "";
+
+    return (
+      fullName.includes(term) ||
+      email.includes(term)
+    );
+  });
+}, [pageData, searchTerm]);
+
+const totalPages = Math.ceil(messages.length / pageSize);
+const paginatedmessages = filteredMessages;
+
 
     const handleDelete = async () => {
       try {
@@ -63,10 +72,6 @@ const [selectedMessage, setSelectedMessage] = useState(null);
       }
     };
 
-
-    const totalPages = Math.ceil(filteredMessages.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedmessages = filteredMessages.slice(startIndex, startIndex + pageSize);
 
     return (
         <>
