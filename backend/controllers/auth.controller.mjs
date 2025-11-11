@@ -301,12 +301,24 @@ export const resendVerificationEmail = async (req, res) => {
     });
 
 
-
     res.json({ message: "Verification email resent" });
   } catch (err) {
-    console.error("Resend error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+  console.error("Resend error:", err);
+
+  let message = "Server error";
+
+  if (err.message?.includes("TOO_MANY_ATTEMPTS_TRY_LATER")) {
+    message = "Too many attempts. Please try again later.";
+  } 
+  else if (err.errorInfo?.message) {
+    message = err.errorInfo.message;
+  } 
+  else if (err.message) {
+    message = err.message;
   }
+
+  return res.status(500).json({ message });
+}
 };
 
 export const updateProfile = async (req, res) => {
