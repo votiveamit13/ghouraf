@@ -33,6 +33,10 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    if (!admin.isAdmin) {
+      return res.status(403).json({ message: "Access denied. Not an admin account." });
+    }
+
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });

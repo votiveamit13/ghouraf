@@ -39,6 +39,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post(`${apiUrl}auth/login`, { idToken });
 
+          if (res.data?.emailVerified === false) {
+      return { emailVerified: false, message: res.data.message };
+    }
+
+        if (res.data?.inactive) {
+      return { inactive: true, message: res.data.message };
+    }
+
       if (res.data?.user) {
         setUser(res.data.user);
         setToken(idToken);
