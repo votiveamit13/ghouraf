@@ -155,8 +155,8 @@ export default function SpaceWantedDetailPage() {
         return <Loader fullScreen />;
     }
 
-    if (!spacewanted) {
-        return <div className="container mt-10 mb-10 text-center">No space wanted found.</div>;
+    if (!spacewanted || spacewanted.is_deleted) {
+        return <div className="container mt-10 mb-10 text-center h-[200px] items-center flex justify-center">No space wanted found.</div>;
     }
 
     const locationString = getFullLocation(spacewanted.city, spacewanted.state, spacewanted.country);

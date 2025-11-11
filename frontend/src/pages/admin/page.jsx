@@ -45,8 +45,8 @@ const Dashboard = () => {
                   key={tab}
                   className={`px-3 py-1 rounded ${
                     activeTab === tab
-                      ? "bg-white text-indigo-600"
-                      : "bg-indigo-500 text-white"
+                      ? "bg-indigo-500 text-white"
+                      : "bg-white text-indigo-600"
                   }`}
                   onClick={() => setActiveTab(tab)}
                 >

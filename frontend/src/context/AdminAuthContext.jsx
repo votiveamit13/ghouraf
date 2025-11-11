@@ -22,7 +22,6 @@ const fetchAdminProfile = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // ✅ Handle both shapes: { admin: {...} } or direct object
     const adminData = res.data?.admin || res.data || null;
     setAdmin(adminData);
   } catch (error) {

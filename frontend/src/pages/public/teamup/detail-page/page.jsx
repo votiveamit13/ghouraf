@@ -155,8 +155,8 @@ export default function TeamUpDetailPage() {
         return <Loader fullScreen />;
     }
 
-    if (!teamup) {
-        return <div className="container mt-10 mb-10 text-center">No team up found.</div>;
+    if (!teamup || teamup.is_deleted) {
+        return <div className="container mt-10 mb-10 text-center h-[200px] items-center flex justify-center">No team up found.</div>;
     }
 
     const locationString = getFullLocation(teamup.city, teamup.state, teamup.country);

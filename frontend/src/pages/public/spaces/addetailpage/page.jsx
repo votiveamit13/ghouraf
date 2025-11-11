@@ -38,7 +38,7 @@ export default function DetailPage({ targetUserId }) {
         setLoading(true);
         const res = await fetch(`${apiUrl}spaces/${id}`);
         const data = await res.json();
-
+        console.log(data);
         if (data.success) {
           setSpace(data.data);
         } else {
@@ -215,8 +215,8 @@ export default function DetailPage({ targetUserId }) {
     return <Loader fullScreen />;
   }
 
-  if (!space) {
-    return <div className="container mt-10 mb-10 text-center">No space found.</div>;
+  if (!space || space.is_deleted) {
+    return <div className="container mt-10 mb-10 text-center h-[200px] items-center flex justify-center">No space found.</div>;
   }
 
   const locationString = getFullLocation(space.city, space.state, space.country);
