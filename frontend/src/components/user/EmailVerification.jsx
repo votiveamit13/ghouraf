@@ -4,12 +4,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 export default function EmailVerification({ email, onClose }) {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [loading, setLoading] = useState(false);
 
   const handleResend = async () => {
     try {
       setLoading(true);
-      await axios.post(`https://ghouraf.votivereact.in/api/auth/resend-verification`, { email });
+      await axios.post(`${apiUrl}auth/resend-verification`, { email });
       toast.success("Verification email resent successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to resend verification");
