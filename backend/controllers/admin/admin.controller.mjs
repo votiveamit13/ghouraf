@@ -1307,32 +1307,41 @@ export const getAdminProfile = async (req, res) => {
 export const updateAdminProfile = async (req, res) => {
   try {
     const admin = await User.findOne({ isAdmin: true });
-
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, currentPassword, newPassword } = req.body;
     const updates = {};
 
     if (firstName) updates["profile.firstName"] = firstName;
     if (lastName) updates["profile.lastName"] = lastName;
     if (email) updates.email = email;
 
-    if (password && password.trim() !== "") {
-      const hashedPassword = await bcrypt.hash(password, 10);
+    if (currentPassword && newPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, admin.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
       updates.password = hashedPassword;
     }
 
     if (req.file) {
-      const uploadPath = `/uploads/${req.file.filename}`;
-      
-      if (admin.profile?.photo) {
-        const oldPath = path.join(process.cwd(), admin.profile.photo);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
+      try {
+        const savedFile = fileHandler.saveFile(req.file, "admin");
 
-      updates["profile.photo"] = uploadPath;
+        if (admin.profile?.photo) {
+          const oldPath = path.join(process.cwd(), admin.profile.photo);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+
+        updates["profile.photo"] = savedFile.relativePath;
+      } catch (fileError) {
+        console.error("File upload error:", fileError);
+        return res.status(400).json({ message: "File upload failed" });
+      }
     }
 
     const updatedAdmin = await User.findByIdAndUpdate(admin._id, updates, {
@@ -1348,3 +1357,4 @@ export const updateAdminProfile = async (req, res) => {
     res.status(500).json({ message: "Failed to update admin profile" });
   }
 };
+

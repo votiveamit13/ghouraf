@@ -3,13 +3,25 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FiSearch } from "react-icons/fi";
 import routes from "../../../routes";
+import { useAdminAuth } from "context/AdminAuthContext";
 
 const AdminNavbar = () => {
+  const { admin } = useAdminAuth();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+console.log("admin", admin)
+  const adminName =
+  admin?.profile?.firstName && admin?.profile?.lastName
+    ? `${admin.profile.firstName} ${admin.profile.lastName}`
+    : "Admin User";
+
+const adminImage =
+  admin?.profile?.photo && admin.profile.photo !== "/uploads/undefined"
+    ? `${admin.profile.photo}`
+    : require("../../../assets/img/theme/team-4-800x800.jpg");
 
   const getSidebarOptions = (routes) => {
     const options = [];
@@ -107,12 +119,15 @@ const AdminNavbar = () => {
           className="flex items-center space-x-2 cursor-pointer"
           onClick={() => setIsMenuOpen((prev) => !prev)}
         >
-          <img
-            src={require("../../../assets/img/theme/team-4-800x800.jpg")}
+         <img
+            src={adminImage}
             alt="User"
-            className="w-12 h-12 rounded-full"
+            className="w-12 h-12 rounded-full object-cover"
+            onError={(e) => {
+              e.target.src = require("../../../assets/img/theme/team-4-800x800.jpg");
+            }}
           />
-          <span className="text-white text-sm font-medium">Admin User</span>
+          <span className="text-white text-sm font-medium">{adminName}</span>
         </div>
 
         {isMenuOpen && (

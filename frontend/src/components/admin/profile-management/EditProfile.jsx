@@ -6,10 +6,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import Loader from "components/common/Loader";
+import { useAdminAuth } from "context/AdminAuthContext";
 
 export default function EditProfile() {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
+   const { refreshAdmin } = useAdminAuth();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -147,6 +149,7 @@ export default function EditProfile() {
       });
 
       toast.success("Profile updated successfully!");
+      await refreshAdmin();
       navigate("/admin/profile");
     } catch (error) {
       console.error("Failed to update profile:", error);
