@@ -130,7 +130,7 @@ const UserManagement = () => {
                     <td className="px-3 py-3">{user.profile?.mobile}</td>
                     <td className="px-3 py-3">
                       <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[70%] ${user.status === "active"
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[80%] ${user.status === "active"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                           }`}
@@ -148,7 +148,7 @@ const UserManagement = () => {
                         onChange={(e) =>
                           handleActionChange(user._id, e.target.value)
                         }
-                        className="block w-[40%] px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="block w-[50%] px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                       >
                         <option value="unblock">Unblock</option>
                         <option value="block">Block</option>

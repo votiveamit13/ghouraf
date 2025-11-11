@@ -1101,9 +1101,10 @@ export const updateAdStatus = async (req, res) => {
 //dashboard insights & charts
 export const getDashboardStats = async (req, res) => {
   try {
-    const totalUsers = await User.countDocuments();
+    const totalUsers = await User.countDocuments({ isAdmin: { $ne: true } });
 
     const newUsers = await User.countDocuments({
+      isAdmin: { $ne: true },
       createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
     });
 

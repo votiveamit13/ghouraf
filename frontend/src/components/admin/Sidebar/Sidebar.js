@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -17,41 +17,52 @@ import {
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
-
+  const sidebarRef = useRef(null);
 
   const toggleCollapse = () => setCollapseOpen((data) => !data);
   const closeCollapse = () => setCollapseOpen(false);
 
   const toggleSubmenu = (name) => {
-    setOpenSubmenu(openSubmenu === name ? null : name);
+    setOpenSubmenu((prev) => (prev === name ? null : name));
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setOpenSubmenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const createLinks = (routes) => {
     return routes
       .filter((route) => route.showInSidebar !== false)
       .map((prop, key) => {
         if (prop.subRoutes) {
-
           const isOpen = openSubmenu === prop.name;
+
           return (
             <div key={key} className="w-100">
               <NavItem>
-<div
-  className="d-flex align-items-center nav-link"
-  style={{ cursor: "pointer" }}
-  onClick={() => toggleSubmenu(prop.name)}
->
-  <span className="me-2">
-    {typeof prop.icon === "string" ? <i className={prop.icon} /> : prop.icon}
-  </span>
-  {prop.name}
-<span className="ml-2">
-  {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
-</span>
-</div>
-
+                <div
+                  className="d-flex items-center justify-between nav-link"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => toggleSubmenu(prop.name)}
+                >
+                  <div className="flex">
+                    <span className="me-2">
+                      {typeof prop.icon === "string" ? <i className={prop.icon} /> : prop.icon}
+                    </span>
+                    {prop.name}
+                  </div>
+                  <span>{isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}</span>
+                </div>
               </NavItem>
-              <Collapse isOpen={isOpen} >
+
+              <Collapse isOpen={isOpen}>
                 {prop.subRoutes.map((sub, subKey) => (
                   <NavItem key={subKey}>
                     <NavLink
@@ -60,7 +71,10 @@ const Sidebar = (props) => {
                       className={({ isActive }) =>
                         isActive ? "active nav-link" : "nav-link"
                       }
-                      onClick={closeCollapse}
+                      onClick={() => {
+                        closeCollapse();
+                        setOpenSubmenu(null);
+                      }}
                     >
                       <span className="me-2">
                         {typeof sub.icon === "string" ? <i className={sub.icon} /> : sub.icon}
@@ -69,30 +83,30 @@ const Sidebar = (props) => {
                     </NavLink>
                   </NavItem>
                 ))}
-
               </Collapse>
             </div>
           );
         }
 
-        // Normal single route
         return (
           <NavItem key={key}>
             <NavLink
               to={prop.layout + prop.path}
-              end={prop.path === ""} 
+              end={prop.path === ""}
               tag={NavLinkRRD}
               className={({ isActive }) =>
                 isActive ? "active nav-link" : "nav-link"
               }
-              onClick={closeCollapse}
+              onClick={() => {
+                closeCollapse();
+                setOpenSubmenu(null);
+              }}
             >
               <span className="me-2">
                 {typeof prop.icon === "string" ? <i className={prop.icon} /> : prop.icon}
               </span>
               {prop.name}
             </NavLink>
-
           </NavItem>
         );
       });
@@ -105,25 +119,19 @@ const Sidebar = (props) => {
       className="navbar-vertical fixed-left navbar-light bg-white"
       expand="md"
       id="sidenav-main"
+      ref={sidebarRef}
     >
       <Container fluid>
         {logo ? (
           <NavbarBrand className="pt-0">
-            <img
-              className="navbar-brand-img"
-              alt={logo.imgAlt}
-              src={logo.imgSrc}
-            />
+            <img className="navbar-brand-img" alt={logo.imgAlt} src={logo.imgSrc} />
           </NavbarBrand>
         ) : null}
-        <button
-          className="navbar-toggler"
-          type="button"
-          onClick={toggleCollapse}
-        >
+
+        <button className="navbar-toggler" type="button" onClick={toggleCollapse}>
           <span className="navbar-toggler-icon" />
         </button>
-        {/* Collapse */}
+
         <Collapse navbar isOpen={collapseOpen}>
           <div className="navbar-collapse-header d-md-none">
             <Row>
@@ -141,17 +149,14 @@ const Sidebar = (props) => {
                 </Col>
               ) : null}
               <Col className="collapse-close" xs="6">
-                <button
-                  className="navbar-toggler"
-                  type="button"
-                  onClick={toggleCollapse}
-                >
+                <button className="navbar-toggler" type="button" onClick={toggleCollapse}>
                   <span />
                   <span />
                 </button>
               </Col>
             </Row>
           </div>
+
           <Nav navbar>{createLinks(routes)}</Nav>
           <hr className="my-3" />
         </Collapse>

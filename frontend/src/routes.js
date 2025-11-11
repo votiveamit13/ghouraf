@@ -205,13 +205,6 @@ export const adminRoutes = [
     layout: "/admin",
     showInSidebar: false
   },
-  {
-    path: "/contact-forms",
-    name: "Contact Forms",
-    icon: <MdContactMail size={20} className="text-[#565ABF]" />,
-    component: <ContactForm />,
-    layout: "/admin",
-  },
     {
     name: "Home Screen Image Management",
     icon: <FaImages size={20} className="text-[#565ABF]" />,
@@ -224,6 +217,13 @@ export const adminRoutes = [
         layout: "/admin",
       },
     ]
+  },
+    {
+    path: "/contact-forms",
+    name: "Contact Forms",
+    icon: <MdContactMail size={20} className="text-[#565ABF]" />,
+    component: <ContactForm />,
+    layout: "/admin",
   },
     {
     path: "/newsletter",
