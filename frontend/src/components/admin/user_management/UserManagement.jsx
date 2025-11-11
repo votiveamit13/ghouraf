@@ -27,7 +27,10 @@ const UserManagement = () => {
         const res = await axios.get(`${apiUrl}/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUsers(res.data);
+                const sortedUsers = res.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setUsers(sortedUsers);
       } catch (err) {
         console.error("Error fetching users", err);
       }

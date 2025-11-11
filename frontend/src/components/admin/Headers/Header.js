@@ -4,6 +4,7 @@ import { FaUsers } from "react-icons/fa6";
 import { TiUserAdd } from "react-icons/ti";
 import { BsPostcardFill } from "react-icons/bs";
 import { TbMessageReportFilled } from "react-icons/tb";
+import { RiAdvertisementFill } from "react-icons/ri";
 
 const Header = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -57,14 +58,14 @@ const Header = () => {
           <div className="bg-white shadow rounded-lg p-4 flex justify-between items-center">
             <div>
               <h5 className="text-xs font-semibold text-gray-500 uppercase">
-                New Users
+                Total Ads
               </h5>
               <span className="text-2xl font-bold text-gray-800">
-                {loading ? "..." : stats.newUsers.toLocaleString()}
+                {loading ? "..." : stats.adPosts.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500 text-white shadow">
-              <TiUserAdd size={20}/>
+              <RiAdvertisementFill size={20}/>
             </div>
           </div>
 

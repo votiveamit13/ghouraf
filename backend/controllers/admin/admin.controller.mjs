@@ -1103,15 +1103,12 @@ export const getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({ isAdmin: { $ne: true } });
 
-    const newUsers = await User.countDocuments({
-      isAdmin: { $ne: true },
-      createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-    });
+    const adPosts = await Ad.countDocuments();
 
     const [spaceCount, spaceWantedCount, teamUpCount] = await Promise.all([
-      Space.countDocuments(),
-      SpaceWanted.countDocuments(),
-      TeamUp.countDocuments(),
+Space.countDocuments({ is_deleted: { $ne: true } }),
+      SpaceWanted.countDocuments({ is_deleted: { $ne: true } }),
+      TeamUp.countDocuments({ is_deleted: { $ne: true } }),
     ]);
 
     const totalPosts = spaceCount + spaceWantedCount + teamUpCount;
@@ -1122,7 +1119,7 @@ export const getDashboardStats = async (req, res) => {
       success: true,
       data: {
         totalUsers,
-        newUsers,
+        adPosts,
         totalPosts,
         reportsCount,
       },

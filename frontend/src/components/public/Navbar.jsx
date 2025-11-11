@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { IoIosAddCircleOutline } from "react-icons/io";
+import { IoIosAddCircleOutline, IoMdNotificationsOutline } from "react-icons/io";
 import { HiMenu, HiX, HiOutlineMail } from "react-icons/hi";
 import { LuUserPen, LuUserRound, LuMessageSquareText, LuLogOut } from "react-icons/lu";
 import { TfiEmail } from "react-icons/tfi";
@@ -22,6 +22,7 @@ import EmailVerification from "components/user/EmailVerification";
 import { getErrorMessage } from "utils/errorHandler";
 import PostAdDialog from "components/common/PostAdDialog";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+import NotificationPanel from "components/common/NotificationPanel";
 
 export default function Navbar() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -70,8 +71,8 @@ export default function Navbar() {
         setDropdownOpen(false);
       }
       if (dropdownRefMoreInfo.current && !dropdownRefMoreInfo.current.contains(event.target)) {
-      setDropdownMoreInfo(false);
-    }
+        setDropdownMoreInfo(false);
+      }
       if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target)) {
         setMobileDropdownOpen(false);
       }
@@ -316,27 +317,27 @@ export default function Navbar() {
   };
 
   const handleFacebookLogin = async () => {
-  try {
-    const provider = new FacebookAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const idToken = await result.user.getIdToken();
+    try {
+      const provider = new FacebookAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
 
-    const res = await login(idToken);
+      const res = await login(idToken);
 
-    if (res.user) {
-      toast.success("Login Successful");
-      setLoginDialog(false);
-      setRegisterDialog(false);
-      navigate("/user");
-    } else if (res.error) {
-      toast.error(res.message || "Facebook login failed");
+      if (res.user) {
+        toast.success("Login Successful");
+        setLoginDialog(false);
+        setRegisterDialog(false);
+        navigate("/user");
+      } else if (res.error) {
+        toast.error(res.message || "Facebook login failed");
+        await auth.signOut();
+      }
+    } catch (err) {
+      toast.error(err.message || "Facebook login failed");
       await auth.signOut();
     }
-  } catch (err) {
-    toast.error(err.message || "Facebook login failed");
-    await auth.signOut();
-  }
-};
+  };
 
 
   return (
@@ -353,65 +354,66 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex space-x-8 relative">
-{["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
-  if (item === "more-info") {
-    return (
-      <div key={item} className="relative" ref={dropdownRefMoreInfo}>
-        <button
-          onClick={() => setDropdownMoreInfo((prev) => !prev)}
-          className={`font-semibold ${linkClass} text-[#565ABF]`}
-        >
-          More Info
-        </button>
+            {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
+              if (item === "more-info") {
+                return (
+                  <div key={item} className="relative" ref={dropdownRefMoreInfo}>
+                    <button
+                      onClick={() => setDropdownMoreInfo((prev) => !prev)}
+                      className={`font-semibold ${linkClass} text-[#565ABF]`}
+                    >
+                      More Info
+                    </button>
 
-        {dropdownMoreInfo && (
-          <div className="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-lg z-50">
-            <NavLink
-              to="/about-us"
-              className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-              onClick={() => setDropdownMoreInfo(false)}
-            >
-              About Us
-            </NavLink>
-            <NavLink
-              to="/contact-us"
-              className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-              onClick={() => setDropdownMoreInfo(false)}
-            >
-              Contact Us
-            </NavLink>
-            <NavLink
-              to="/faq"
-              className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
-              onClick={() => setDropdownMoreInfo(false)}
-            >
-              FAQ
-            </NavLink>
-          </div>
-        )}
-      </div>
-    );
-  }
+                    {dropdownMoreInfo && (
+                      <div className="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-lg z-50">
+                        <NavLink
+                          to="/about-us"
+                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+                          onClick={() => setDropdownMoreInfo(false)}
+                        >
+                          About Us
+                        </NavLink>
+                        <NavLink
+                          to="/contact-us"
+                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+                          onClick={() => setDropdownMoreInfo(false)}
+                        >
+                          Contact Us
+                        </NavLink>
+                        <NavLink
+                          to="/faq"
+                          className="block px-4 py-2 text-[#565ABF] hover:bg-gray-100"
+                          onClick={() => setDropdownMoreInfo(false)}
+                        >
+                          FAQ
+                        </NavLink>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
 
-  // default nav items
-  return (
-    <NavLink
-      key={item}
-      to={`/${item}`}
-      className={({ isActive }) =>
-        `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
-      }
-    >
-      {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-    </NavLink>
-  );
-})}
+              // default nav items
+              return (
+                <NavLink
+                  key={item}
+                  to={`/${item}`}
+                  className={({ isActive }) =>
+                    `font-semibold ${linkClass} ${isActive ? activeClass : "text-[#565ABF]"}`
+                  }
+                >
+                  {item.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                </NavLink>
+              );
+            })}
 
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
             {!user ? (
               <>
+
                 <button
                   onClick={() => setRegisterDialog(true)}
                   className="font-semibold flex items-center hover:text-[#A321A6] text-[#565ABF] text-[15px]"
@@ -436,9 +438,7 @@ export default function Navbar() {
                 <span className="font-semibold text-black">
                   Hi, {user.profile.firstName?.split(" ")[0] || "User"}
                 </span>
-                <a href="/user" className="text-black hover:text-[#A321A6]">
-                  <HiOutlineMail size={22} />
-                </a>
+                <NotificationPanel userId={user?._id} isMobile={false} />
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -619,9 +619,7 @@ export default function Navbar() {
                   <span className="font-semibold">
                     Hi, {user.profile.firstName?.split(" ")[0] || "User"}
                   </span>
-                  <a href="/user" className="text-black hover:text-[#A321A6]">
-                    <HiOutlineMail size={22} />
-                  </a>
+                  <NotificationPanel userId={user?._id} isMobile={true} />
                 </div>
                 <span>{mobileDropdownOpen ? "▲" : "▼"}</span>
               </div>
@@ -785,7 +783,7 @@ export default function Navbar() {
                     <img src={google} alt="Google" className="w-5 h-5" />
                     Google
                   </button>
-                  <button 
+                  <button
                     type="button"
                     onClick={handleFacebookLogin}
                     className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
@@ -1115,14 +1113,14 @@ export default function Navbar() {
 
 
                 <div className="flex gap-4 mb-2">
-                  <button 
+                  <button
                     type="button"
                     onClick={handleGoogleLogin}
                     className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
                     <img src={google} alt="Google" className="w-5 h-5" />
                     Google
                   </button>
-                  <button 
+                  <button
                     type="button"
                     onClick={handleFacebookLogin}
                     className="flex-1 flex items-center justify-center gap-2 bg-[#565ABF] hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg shadow-md">
