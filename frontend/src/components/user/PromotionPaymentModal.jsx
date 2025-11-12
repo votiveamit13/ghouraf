@@ -59,7 +59,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-lg p-4">
+      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-[40%] overflow-scroll h-[550px] p-4 no-scrollbar">
         <button 
           onClick={onClose} 
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
@@ -71,7 +71,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
         <h3 className="text-lg font-semibold mb-3 text-gray-900">Complete Promotion Payment</h3>
         <p className="text-sm text-gray-600 mb-3">Enter your payment details to promote your ad.</p>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <PaymentElement 
             id="payment-element"
             options={paymentElementOptions}
