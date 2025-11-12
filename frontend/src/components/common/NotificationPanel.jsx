@@ -52,9 +52,9 @@ export default function NotificationPanel({ userId, isMobile }) {
 
       if (postCategory === "Space") {
         navigate(`/spaces/${postId}`);
-      } else if (postCategory === "SpaceWanted") {
+      } else if (postCategory === "Spacewanted") {
         navigate(`/place-wanted/${postId}`);
-      } else if (postCategory === "TeamUp") {
+      } else if (postCategory === "Teamup") {
         navigate(`/team-up/${postId}`);
       }
     }

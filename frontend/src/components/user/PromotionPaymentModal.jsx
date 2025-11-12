@@ -22,24 +22,19 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          // Make sure to change this to your payment completion page
           return_url: `${window.location.origin}/payment-success`,
         },
         redirect: 'if_required'
       });
 
       if (error) {
-        // This point is only reached if there's an immediate error
         setMessage(error.message);
         toast.error(error.message || "An unexpected error occurred.");
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Payment succeeded
         toast.success("Payment successful! Finalizing your promoted ad...");
         onSuccess();
       } else {
-        // Payment is processing or requires additional action
         setMessage("Payment processing...");
-        // The PaymentIntent will be in processing state, webhook will handle the rest
         toast.success("Payment processing... Your ad will be promoted shortly.");
         onSuccess();
       }
@@ -64,7 +59,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-lg p-6">
+      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-lg p-4">
         <button 
           onClick={onClose} 
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
@@ -74,7 +69,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
         </button>
 
         <h3 className="text-lg font-semibold mb-3 text-gray-900">Complete Promotion Payment</h3>
-        <p className="text-sm text-gray-600 mb-6">Enter your payment details to promote your ad.</p>
+        <p className="text-sm text-gray-600 mb-3">Enter your payment details to promote your ad.</p>
 
         <div className="mb-6">
           <PaymentElement 

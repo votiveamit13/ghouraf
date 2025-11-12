@@ -39,6 +39,7 @@ export default function RoomWantedAd() {
     });
     const [images, setImages] = useState([]);
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const countries = Country.getAllCountries();
     const cities = useMemo(() => {
         if (!formData.country) return [];
@@ -49,15 +50,15 @@ export default function RoomWantedAd() {
     }, [formData.country]);
 
     useEffect(() => {
-  if (user?.profile) {
-    setFormData((prev) => ({
-      ...prev,
-      name: `${user.profile.firstName || ""} ${user.profile.lastName || ""}`.trim(),
-      age: user.profile.age || "",
-      gender: user.profile.gender || "",
-    }));
-  }
-}, [user]);
+        if (user?.profile) {
+            setFormData((prev) => ({
+                ...prev,
+                name: `${user.profile.firstName || ""} ${user.profile.lastName || ""}`.trim(),
+                age: user.profile.age || "",
+                gender: user.profile.gender || "",
+            }));
+        }
+    }, [user]);
 
     useEffect(() => {
         setAllLocales(locales.all);
@@ -211,6 +212,8 @@ export default function RoomWantedAd() {
             return;
         }
 
+        setIsSubmitting(true);
+
         const formDataToSend = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
             if (Array.isArray(value)) {
@@ -252,6 +255,8 @@ export default function RoomWantedAd() {
         } catch (err) {
             toast.error("Something went wrong. Check console.");
             console.error(err);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -320,9 +325,13 @@ export default function RoomWantedAd() {
                             </button>
                             <button
                                 onClick={handleSubmit}
-                                className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2"
+                                disabled={isSubmitting}
+                                className={`font-medium px-5 py-3 rounded-[6px] flex items-center gap-2 ${isSubmitting
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-[#565ABF] text-white"
+                                    }`}
                             >
-                                Publish <FaArrowRightLong />
+                                {isSubmitting ? "Publishing..." : "Publish"} <FaArrowRightLong />
                             </button>
                         </div>
                     </>

@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import PromoteAdModal from "components/user/PromoteAd";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import PromotionPaymentModal from "components/user/PromotionPaymentModal"; 
+import PromotionPaymentModal from "components/user/PromotionPaymentModal";
 
 
 function StepHeader({ step }) {
@@ -103,7 +103,7 @@ export default function PostSpace() {
   const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
-  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState("10"); 
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState("10");
   const [clientSecret, setClientSecret] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [promotionLoading, setPromotionLoading] = useState(false);
@@ -390,60 +390,60 @@ export default function PostSpace() {
     }
   };
 
-const initiatePromotionPayment = async (planShort) => {
-  const planKey = planShort === "30" ? "30_days" : "10_days";
-  setPromotionLoading(true);
+  const initiatePromotionPayment = async (planShort) => {
+    const planKey = planShort === "30" ? "30_days" : "10_days";
+    setPromotionLoading(true);
 
-  try {
-    const formPayload = new FormData();
+    try {
+      const formPayload = new FormData();
 
-    const processedData = {
-      ...formData,
-      furnishing: formData.furnishing === "true",
-      smoking: formData.smoking === "true",
-      bedrooms: parseInt(formData.bedrooms, 10),
-      budget: parseFloat(formData.budget || 0),
-      size: parseFloat(formData.size || 0),
-    };
+      const processedData = {
+        ...formData,
+        furnishing: formData.furnishing === "true",
+        smoking: formData.smoking === "true",
+        bedrooms: parseInt(formData.bedrooms, 10),
+        budget: parseFloat(formData.budget || 0),
+        size: parseFloat(formData.size || 0),
+      };
 
-    Object.keys(processedData).forEach((key) => {
-      if (key === "amenities") {
-        processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
-      } else if (!["photos", "featuredImage"].includes(key)) {
-        if (key === "bedrooms" || key === "budget" || key === "size") {
-          formPayload.append(key, processedData[key].toString());
-        } else {
-          formPayload.append(key, processedData[key]);
+      Object.keys(processedData).forEach((key) => {
+        if (key === "amenities") {
+          processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
+        } else if (!["photos", "featuredImage"].includes(key)) {
+          if (key === "bedrooms" || key === "budget" || key === "size") {
+            formPayload.append(key, processedData[key].toString());
+          } else {
+            formPayload.append(key, processedData[key]);
+          }
         }
-      }
-    });
+      });
 
-    if (featured) formPayload.append("featuredImage", featured);
-    photos.forEach((photo) => formPayload.append("photos", photo));
+      if (featured) formPayload.append("featuredImage", featured);
+      photos.forEach((photo) => formPayload.append("photos", photo));
 
-    formPayload.append("promote", "true");
-    formPayload.append("plan", planKey);
+      formPayload.append("promote", "true");
+      formPayload.append("plan", planKey);
 
-    const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+      const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-    const { clientSecret } = res.data;
-    if (!clientSecret) throw new Error("No clientSecret returned from server");
+      const { clientSecret } = res.data;
+      if (!clientSecret) throw new Error("No clientSecret returned from server");
 
-    setSelectedPlanForPayment(planShort);
-    setClientSecret(clientSecret);
-    setShowPaymentModal(true);
-  } catch (err) {
-    console.error("Promotion init error:", err.response?.data || err.message);
-    toast.error(err.response?.data?.message || "Failed to initiate promotion payment");
-  } finally {
-    setPromotionLoading(false);
-  }
-};
+      setSelectedPlanForPayment(planShort);
+      setClientSecret(clientSecret);
+      setShowPaymentModal(true);
+    } catch (err) {
+      console.error("Promotion init error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Failed to initiate promotion payment");
+    } finally {
+      setPromotionLoading(false);
+    }
+  };
 
 
   const getPhotoUrl = (photo) => {
@@ -962,45 +962,45 @@ const initiatePromotionPayment = async (planShort) => {
                 </button>
               </div>
             )}
-<PromoteAdModal
-  show={showPromoteModal}
-  onClose={() => setShowPromoteModal(false)}
-  onPublishNormally={() => {
-    setShowPromoteModal(false);
-    handlePublish();
-  }}
-  onProceedToPayment={(planShort) => {
-    // planShort e.g. "10" or "30"
-    setShowPromoteModal(false);
-    initiatePromotionPayment(planShort);
-  }}
-  loading={promotionLoading}
-/>
+            <PromoteAdModal
+              show={showPromoteModal}
+              onClose={() => setShowPromoteModal(false)}
+              onPublishNormally={() => {
+                setShowPromoteModal(false);
+                handlePublish();
+              }}
+              onProceedToPayment={(planShort) => {
+                // planShort e.g. "10" or "30"
+                setShowPromoteModal(false);
+                initiatePromotionPayment(planShort);
+              }}
+              loading={promotionLoading}
+            />
 
-{/* Payment modal (Stripe Elements) */}
-{clientSecret && showPaymentModal && (
-  <Elements stripe={stripePromise} options={{ clientSecret }}>
-    <PromotionPaymentModal
-      clientSecret={clientSecret}
-      onClose={() => {
-        setShowPaymentModal(false);
-        setClientSecret(null);
-      }}
-      onSuccess={() => {
-        setShowPaymentModal(false);
-        setClientSecret(null);
-        toast.success("Payment successful! Your promoted ad will be live soon.");
-        navigate("/user/thank-you", {
-          state: {
-            title: "Payment successful",
-            subtitle: "Your promoted ad will go live after verification.",
-            goBackPath: "/user/post-an-space",
-          }
-        });
-      }}
-    />
-  </Elements>
-)}
+            {/* Payment modal (Stripe Elements) */}
+            {clientSecret && showPaymentModal && (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <PromotionPaymentModal
+                  clientSecret={clientSecret}
+                  onClose={() => {
+                    setShowPaymentModal(false);
+                    setClientSecret(null);
+                  }}
+                  onSuccess={() => {
+                    setShowPaymentModal(false);
+                    setClientSecret(null);
+                    toast.success("Payment successful! Your promoted ad will be live soon.");
+                    navigate("/user/thank-you", {
+                      state: {
+                        title: "Payment successful",
+                        subtitle: "Your promoted ad will go live after verification.",
+                        goBackPath: "/user/post-an-space",
+                      }
+                    });
+                  }}
+                />
+              </Elements>
+            )}
 
           </div>
         </div>

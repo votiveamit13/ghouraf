@@ -316,7 +316,11 @@ export default function TeamUpAd() {
                             <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="bg-[#565ABF] text-white font-medium px-5 py-3 rounded-[6px] flex items-center gap-2">
+                                className={`font-medium px-5 py-3 rounded-[6px] flex items-center gap-2 ${isSubmitting
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-[#565ABF] text-white"
+                                    }`}
+                            >
                                 {isSubmitting ? "Publishing..." : "Publish"} <FaArrowRightLong />
                             </button>
                         </div>

@@ -215,7 +215,7 @@ export default function DetailPage({ targetUserId }) {
     return <Loader fullScreen />;
   }
 
-  if (!space || space.is_deleted) {
+  if (!space || space.is_deleted || space.status === "inactive") {
     return <div className="container mt-10 mb-10 text-center h-[200px] items-center flex justify-center">No space found.</div>;
   }
 

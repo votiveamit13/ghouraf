@@ -155,7 +155,7 @@ export default function SpaceWantedDetailPage() {
         return <Loader fullScreen />;
     }
 
-    if (!spacewanted || spacewanted.is_deleted) {
+    if (!spacewanted || spacewanted.is_deleted || spacewanted.status === "inactive") {
         return <div className="container mt-10 mb-10 text-center h-[200px] items-center flex justify-center">No space wanted found.</div>;
     }
 

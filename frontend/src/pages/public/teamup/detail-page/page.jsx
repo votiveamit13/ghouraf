@@ -155,7 +155,7 @@ export default function TeamUpDetailPage() {
         return <Loader fullScreen />;
     }
 
-    if (!teamup || teamup.is_deleted) {
+    if (!teamup || teamup.is_deleted || teamup.status === "inactive") {
         return <div className="container mt-10 mb-10 text-center h-[200px] items-center flex justify-center">No team up found.</div>;
     }
 
