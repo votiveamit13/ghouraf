@@ -129,20 +129,32 @@ export const listenChats = (userId, callback) => {
     where("participants", "array-contains", userId)
   );
 
-  return onSnapshot(
-    q,
-    (snapshot) => {
+ return onSnapshot(q, async (snapshot) => {
+          const updates = [];
+
+    snapshot.docs.forEach((docSnap) => {
+      const data = docSnap.data();
+      if (!data.lastMessageTime) {
+        updates.push(
+          updateDoc(docSnap.ref, { lastMessageTime: data.createdAt || serverTimestamp() })
+        );
+      }
+    });
+
+    if (updates.length > 0) await Promise.all(updates);
       // console.log("listenChats snapshot.size =", snapshot.size);
       const chats = snapshot.docs
         .map((d) => ({ id: d.id, ...d.data() }))
         .filter((chat) => !chat.deletedFor?.includes(userId));
       // console.log("listenChats docs:", chats);
-      callback(chats);
-    },
-    (error) => {
-      console.error("listenChats onSnapshot error:", error);
-    }
-  );
+      const sorted = chats.sort((a, b) => {
+      const timeA = a.lastMessageTime?.toMillis?.() || 0;
+      const timeB = b.lastMessageTime?.toMillis?.() || 0;
+      return timeB - timeA;
+    });
+
+    callback(sorted);
+  });
 };
 
 export const setUserOnlineStatus = async (userId, isOnline) => {

@@ -266,7 +266,9 @@ const handleSelectChat = async (chat) => {
   return (
     <div className="container">
       {loadingChats ? (
+        <div className="h-[600px]">
         <Loader fullScreen={true} />
+        </div>
       ) : (
         <div className="mt-5 mb-8 h-[550px] w-full bg-white flex border rounded-lg shadow-sm">
           {/* Left panel */}
