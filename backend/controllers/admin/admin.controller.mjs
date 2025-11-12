@@ -382,20 +382,6 @@ export const updateSpaceStatus = async (req, res) => {
     space.status = status;
     await space.save();
 
-    await dbAdmin.collection("notifications").add({
-      userId: space.user._id.toString(),
-      senderId: req.user?._id || "admin",
-      title: "Your space post status was updated",
-      body: `Your post "${space.title}" is now ${status}.`,
-      meta: {
-        firstName: space.user.firstName || "",
-        lastName: space.user.lastName || "",
-        email: space.user.email || "",
-      },
-      read: false,
-      createdAt: new Date(),
-    });
-
     res.json({ message: `Space status updated to ${status}`, space });
   } catch (err) {
     console.error("Error updating space status:", err);
@@ -416,21 +402,6 @@ export const deleteSpace = async (req, res) => {
 
     space.is_deleted = true;
     await space.save();
-
-    await dbAdmin.collection("notifications").add({
-      userId: space.user._id.toString(),
-      senderId: req.user?._id || "admin",
-      title: "Your space post was deleted",
-      body: `Your post "${space.title}" has been removed by admin.`,
-      meta: {
-        firstName: space.user.firstName || "",
-        lastName: space.user.lastName || "",
-        email: space.user.email || "",
-      },
-      read: false,
-      createdAt: new Date(),
-    });
-
 
     res.json({ message: "Space deleted successfully", space });
   } catch (err) {
@@ -508,21 +479,6 @@ export const updateTeamUpStatus = async (req, res) => {
     if (teamup) {
       teamup.status = status;
       await teamup.save();
-
-      await dbAdmin.collection("notifications").add({
-        userId: teamup.user._id.toString(),
-        senderId: req.user?._id || "admin",
-        title: "Your Team Up post status was updated",
-        body: `Your Team Up post "${teamup.title}" is now ${status}.`,
-        meta: {
-          firstName: teamup.user.firstName || "",
-          lastName: teamup.user.lastName || "",
-          email: teamup.user.email || "",
-        },
-        read: false,
-        createdAt: new Date(),
-      });
-
       return res.json({ message: `Team Up status updated to ${status}`, teamup });
     }
 
@@ -530,20 +486,6 @@ export const updateTeamUpStatus = async (req, res) => {
     if (spaceWanted && spaceWanted.teamUp) {
       spaceWanted.status = status;
       await spaceWanted.save();
-
-      await dbAdmin.collection("notifications").add({
-        userId: spaceWanted.user._id.toString(),
-        senderId: req.user?._id || "admin",
-        title: "Your Team Up (Space Wanted) post status was updated",
-        body: `Your Space Wanted post "${spaceWanted.title}" is now ${status}.`,
-        meta: {
-          firstName: spaceWanted.user.firstName || "",
-          lastName: spaceWanted.user.lastName || "",
-          email: spaceWanted.user.email || "",
-        },
-        read: false,
-        createdAt: new Date(),
-      });
       return res.json({ message: `Team Up (SpaceWanted) status updated to ${status}`, spaceWanted });
     }
 
@@ -565,20 +507,6 @@ export const deleteTeamUp = async (req, res) => {
 
       teamup.is_deleted = true;
       await teamup.save();
-
-      await dbAdmin.collection("notifications").add({
-        userId: teamup.user._id.toString(),
-        senderId: req.user?._id || "admin",
-        title: "Your Team Up post was deleted",
-        body: `Your post "${teamup.title}" has been removed by admin.`,
-        meta: {
-          firstName: teamup.user.firstName || "",
-          lastName: teamup.user.lastName || "",
-          email: teamup.user.email || "",
-        },
-        read: false,
-        createdAt: new Date(),
-      });
       return res.json({ message: "Team Up deleted successfully", teamup });
     }
 
@@ -589,20 +517,6 @@ export const deleteTeamUp = async (req, res) => {
 
       spaceWanted.is_deleted = true;
       await spaceWanted.save();
-
-      await dbAdmin.collection("notifications").add({
-        userId: spaceWanted.user._id.toString(),
-        senderId: req.user?._id || "admin",
-        title: "Your Team Up (Space Wanted) post was deleted",
-        body: `Your Space Wanted post "${spaceWanted.title}" has been removed by admin.`,
-        meta: {
-          firstName: spaceWanted.user.firstName || "",
-          lastName: spaceWanted.user.lastName || "",
-          email: spaceWanted.user.email || "",
-        },
-        read: false,
-        createdAt: new Date(),
-      });
       return res.json({ message: "Team Up (SpaceWanted) deleted successfully", spaceWanted });
     }
 
@@ -671,20 +585,6 @@ export const updateSpaceWantedStatus = async (req, res) => {
     spacewanted.status = status;
     await spacewanted.save();
 
-    await dbAdmin.collection("notifications").add({
-      userId: spacewanted.user._id.toString(),
-      senderId: req.user?._id || "admin",
-      title: "Your space wanted post status was updated",
-      body: `Your post "${spacewanted.title}" is now ${status}.`,
-      meta: {
-        firstName: spacewanted.user.firstName || "",
-        lastName: spacewanted.user.lastName || "",
-        email: spacewanted.user.email || "",
-      },
-      read: false,
-      createdAt: new Date(),
-    });
-
     res.json({ message: `Space Wanted status updated to ${status}`, spacewanted });
   } catch (err) {
     console.error("Error updating space wanted status:", err);
@@ -705,20 +605,6 @@ export const deleteSpaceWanted = async (req, res) => {
 
     spacewanted.is_deleted = true;
     await spacewanted.save();
-
-    await dbAdmin.collection("notifications").add({
-      userId: spacewanted.user._id.toString(),
-      senderId: req.user?._id || "admin",
-      title: "Your space wanted post was deleted",
-      body: `Your post "${spacewanted.title}" has been removed by admin.`,
-      meta: {
-        firstName: spacewanted.user.firstName || "",
-        lastName: spacewanted.user.lastName || "",
-        email: spacewanted.user.email || "",
-      },
-      read: false,
-      createdAt: new Date(),
-    });
 
     res.json({ message: "Space Wanted deleted successfully", spacewanted });
   } catch (err) {
@@ -1062,7 +948,7 @@ export const createAd = async (req, res) => {
     const { title, url } = req.body;
     const file = req.file;
 
-    if (!title || !url || !file) {
+    if(!title || !url || !file) {
       return res.status(400).json({ message: "Title, URL, and Image are required" });
     }
 
@@ -1224,7 +1110,7 @@ export const getDashboardStats = async (req, res) => {
     const adPosts = await Ad.countDocuments();
 
     const [spaceCount, spaceWantedCount, teamUpCount] = await Promise.all([
-      Space.countDocuments({ is_deleted: { $ne: true } }),
+Space.countDocuments({ is_deleted: { $ne: true } }),
       SpaceWanted.countDocuments({ is_deleted: { $ne: true } }),
       TeamUp.countDocuments({ is_deleted: { $ne: true } }),
     ]);
@@ -1307,13 +1193,13 @@ export const getDashboardCharts = async (req, res) => {
         period === "week"
           ? { $dayOfWeek: "$createdAt" }
           : {
-            $ceil: {
-              $divide: [
-                { $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 * 24] },
-                7,
-              ],
-            },
-          };
+              $ceil: {
+                $divide: [
+                  { $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 * 24] },
+                  7,
+                ],
+              },
+            };
 
       return await Model.aggregate([
         { $match: { createdAt: { $gte: startDate } } },
@@ -1473,3 +1359,4 @@ export const updateAdminProfile = async (req, res) => {
     res.status(500).json({ message: "Failed to update admin profile" });
   }
 };
+
