@@ -4,7 +4,7 @@ export const profileValidator = Joi.object({
     section: Joi.string().valid("profile", "email", "password").required(),
   firstName: Joi.string().min(3).max(50),
   lastName: Joi.string().min(3).max(50),
-  age: Joi.number().integer().min(18).max(100),
+  age: Joi.number().integer().min(12).max(100),
   mobile: Joi.string().pattern(/^[0-9]{10}$/),
   dob: Joi.date(),
   gender: Joi.string().valid("male", "female", "other"),

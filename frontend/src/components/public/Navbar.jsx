@@ -102,6 +102,25 @@ export default function Navbar() {
 
     validateField(name, fieldValue);
   };
+  const isAtLeast12YearsOld = (dobString) => {
+    if (!dobString) return false;
+
+    const [year, month, day] = dobString.split("-").map(Number);
+    const dob = new Date(year, month - 1, day); // avoid timezone shift
+    const today = new Date();
+
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    const dayDiff = today.getDate() - dob.getDate();
+
+    // adjust if birthday hasn’t happened yet this year
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    return age >= 12;
+  };
+
 
 
   const validateField = (name, value) => {
@@ -127,7 +146,10 @@ export default function Navbar() {
 
       case "dob":
         if (!value) message = "Date of birth is required";
+        else if (!isAtLeast12YearsOld(value))
+          message = "You must be at least 12 years old to register";
         break;
+
 
       case "password":
         if (!value) message = "Password is required";
@@ -166,7 +188,12 @@ export default function Navbar() {
     }
 
     if (!form.gender) newErrors.gender = "Please select your gender";
-    if (!form.dob) newErrors.dob = "Date of birth is required";
+    if (!form.dob) {
+      newErrors.dob = "Date of birth is required";
+    } else if (!isAtLeast12YearsOld(form.dob)) {
+      newErrors.dob = "You must be at least 12 years old to register";
+    }
+
 
     if (!form.password) {
       newErrors.password = "Password is required";
@@ -989,6 +1016,9 @@ export default function Navbar() {
                     onChange={handleChange}
                     placeholder="Enter your DOB"
                     onFocus={() => setActiveField("dob")}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 12))
+                      .toISOString()
+                      .split("T")[0]}
                     className="flex-1 py-2 text-sm text-black placeholder:text-black outline-none"
                   />
                 </div>

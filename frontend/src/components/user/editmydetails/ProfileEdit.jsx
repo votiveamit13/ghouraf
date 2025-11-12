@@ -15,6 +15,24 @@ export default function ProfileEdit({ initialData, onSave }) {
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef(null);
 
+  function isAtLeast12YearsOld(dobString) {
+  if (!dobString) return false;
+  const [year, month, day] = dobString.split("-").map(Number);
+  const dob = new Date(year, month - 1, day);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age >= 12;
+}
+
+
   function calculateAge(dob) {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -64,6 +82,12 @@ export default function ProfileEdit({ initialData, onSave }) {
     } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
       newErrors.mobile = "Enter a valid 10-digit mobile number";
     }
+
+    if (!formData.dob) {
+    newErrors.dob = "Date of birth is required";
+  } else if (!isAtLeast12YearsOld(formData.dob)) {
+    newErrors.dob = "You must be at least 12 years old to register";
+  }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -200,12 +224,21 @@ export default function ProfileEdit({ initialData, onSave }) {
               name="dob"
               value={formData.dob}
               onChange={handleChange}
+              max={new Date(new Date().setFullYear(new Date().getFullYear() - 12))
+                      .toISOString()
+                      .split("T")[0]}
               className="form-control"
             />
           ) : (
             <span>{formatDisplayDate(formData.dob)}</span>
           )}
         </div>
+        {errors.dob && (
+  <span className="text-red-500 text-[12px] mt-1 ml-32">
+    {errors.dob}
+  </span>
+)}
+
 
         <div className="mt-3">
           {editMode ? (
