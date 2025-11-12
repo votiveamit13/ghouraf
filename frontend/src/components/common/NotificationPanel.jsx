@@ -1,11 +1,16 @@
 import { useEffect, useState, useRef } from "react";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy } from "firebase/firestore";
 import { db } from "../../firebase";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import defaultAvatar from "assets/img/ghouraf/default-avatar.png";
+import { useAuth } from "context/AuthContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function NotificationPanel({ userId, isMobile }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
@@ -26,23 +31,62 @@ export default function NotificationPanel({ userId, isMobile }) {
     return timestamp.toDate().toLocaleDateString();
   };
 
+  const handleNotificationClick = async (notif) => {
+    try {
+      setNotifications((prev) =>
+        prev.map((item) =>
+          item.id === notif.id ? { ...item, read: true } : item
+        )
+      );
+      const notifRef = doc(db, "notifications", notif.id);
+      await updateDoc(notifRef, { read: true });
+
+      setOpen(false);
+
+       if (notif.chatId && notif.senderId) {
+      navigate(`/user/messages/${notif.chatId}?receiverId=${notif.senderId}`);
+    }
+  } catch (error) {
+    console.error("Error updating notification:", error);
+  }
+};
+
+
   useEffect(() => {
     if (!userId) return;
-
     const q = query(
-      collection(db, "notifications", userId, "items"),
+      collection(db, "notifications"),
+      where("userId", "==", userId),
+      where("read", "==", false),
       orderBy("createdAt", "desc")
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notifs = [];
-      snapshot.forEach((doc) => notifs.push({ id: doc.id, ...doc.data() }));
+
+    const unsub = onSnapshot(q, async (snapshot) => {
+      const notifs = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const notif = { id: doc.id, ...doc.data() };
+
+          if (notif.senderId && !notif.meta) {
+            try {
+              const res = await axios.get(
+                `${process.env.REACT_APP_API_URL}/users/${notif.senderId}`
+              );
+              notif.meta = res.data;
+            } catch (err) {
+              console.error("Failed to fetch sender info", err);
+            }
+          }
+
+          return notif;
+        })
+      );
+
       setNotifications(notifs);
     });
 
-    return () => unsubscribe();
+    return () => unsub();
   }, [userId]);
-
   useEffect(() => {
     if (isMobile) return;
     const handleClickOutside = (e) => {
@@ -65,23 +109,23 @@ export default function NotificationPanel({ userId, isMobile }) {
     return notifications.map((n) => (
       <div
         key={n.id}
-        className={`px-4 py-3 border-b last:border-0 hover:bg-gray-50 cursor-pointer ${
-          !n.read ? "bg-purple-50" : "bg-white"
-        }`}
+        className={`px-4 py-3 border-b last:border-0 hover:bg-gray-50 cursor-pointer ${!n.read ? "bg-purple-50" : "bg-white"
+          }`}
         onClick={() => {
-          // Optional: navigate to related page or mark as read
+          handleNotificationClick(n);
           setOpen(false);
         }}
+
       >
         <div className="flex items-start gap-3">
           <img
             src={n.meta?.photo || defaultAvatar}
-            alt="user"
-            className="w-8 h-8 rounded-full"
+            alt={n.meta?.firstName || "user"}
+            className="w-8 h-8 rounded-full object-cover"
           />
+
           <div className="flex-1">
             <p className="text-sm text-gray-800 font-medium">{n.title}</p>
-            <p className="text-xs text-gray-600">{n.body}</p>
             <span className="text-[11px] text-gray-400">
               {timeAgo(n.createdAt)}
             </span>
@@ -151,7 +195,7 @@ export default function NotificationPanel({ userId, isMobile }) {
               Close
             </button>
           </div>
-          <div className="max-h-[350px] overflow-y-auto">
+          <div className="max-h-[650px] overflow-y-auto">
             {renderNotifications()}
           </div>
         </div>

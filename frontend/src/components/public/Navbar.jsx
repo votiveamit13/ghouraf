@@ -347,7 +347,7 @@ export default function Navbar() {
           <NavLink to="/" className="flex items-center">
             <img
               src={require("../../assets/img/theme/Ghouraf.png")}
-              className="lg:w-40 md:w-40 sm:w-80 w-60"
+              className="lg:w-40 md:w-40 sm:w-80 w-60 object-cover"
               alt="Logo"
             />
           </NavLink>
@@ -450,7 +450,7 @@ export default function Navbar() {
                         require("../../assets/img/ghouraf/default-avatar.png")
                       }
                       alt="Profile"
-                      className="w-10 h-10 rounded-full border border-gray-300"
+                      className="w-10 h-10 rounded-full border border-gray-300 object-cover"
                     />
                   </button>
 
@@ -614,7 +614,7 @@ export default function Navbar() {
                       require("../../assets/img/ghouraf/default-avatar.png")
                     }
                     alt="Profile"
-                    className="w-10 h-10 rounded-full border"
+                    className="w-10 h-10 rounded-full border object-cover"
                   />
                   <span className="font-semibold">
                     Hi, {user.profile.firstName?.split(" ")[0] || "User"}

@@ -11,9 +11,9 @@ import {
   listenMessages,
   listenChatMeta,
   sendMessage,
-  getChatId
+  getChatId,
 } from "utils/firebaseChatHelper";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import Loader from "components/common/Loader";
@@ -22,6 +22,41 @@ import { BiSolidVideoPlus } from "react-icons/bi";
 import { HiMiniDocumentPlus } from "react-icons/hi2";
 import { deleteChat } from "utils/firebaseChatHelper";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+
+export const setUserActiveChat = async (userId, chatId) => {
+  const statusRef = doc(db, "userStatus", userId);
+  await setDoc(
+    statusRef,
+    {
+      currentChat: chatId || null,
+    },
+    { merge: true }
+  );
+
+  // Mark all notifications for this chat as read when user opens the chat
+  if (chatId) {
+    const notificationsRef = collection(db, "notifications");
+    const unreadNotifsQuery = query(
+      notificationsRef,
+      where("userId", "==", userId),
+      where("chatId", "==", chatId),
+      where("read", "==", false)
+    );
+
+    const unreadNotifsSnapshot = await getDocs(unreadNotifsQuery);
+    
+    const markAsReadPromises = unreadNotifsSnapshot.docs.map(docSnap =>
+      updateDoc(doc(db, "notifications", docSnap.id), { read: true })
+    );
+
+    await Promise.all(markAsReadPromises);
+
+    const chatRef = doc(db, "chats", chatId);
+    await updateDoc(chatRef, {
+      [`unreadCount.${userId}`]: 0
+    });
+  }
+};
 
 export default function Messages() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -46,6 +81,7 @@ export default function Messages() {
   const videoInputRef = useRef(null);
   const docInputRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
+
 
   const filteredChats = chats.filter(chat => {
     const otherUserId = chat.participants.find(uid => uid !== user._id);
@@ -164,15 +200,20 @@ export default function Messages() {
     if (chats.length > 0) fetchUsers();
   }, [chats, user, userMap, apiUrl]);
 
-  const handleSelectChat = (chat) => {
-    setChatId(chat.id);
-    const otherUser = chat.participants.find(uid => uid !== user._id);
-    setReceiverId(otherUser);
-  };
+const handleSelectChat = async (chat) => {
+  await setUserActiveChat(user._id, chat.id); 
+  setChatId(chat.id);
+  const otherUser = chat.participants.find(uid => uid !== user._id);
+  setReceiverId(otherUser);
+};
 
   const handleSend = async () => {
     if (!text.trim() || !chatId || !receiverId) return;
-    await sendMessage(chatId, user._id, receiverId, text);
+    await sendMessage(chatId, user._id, receiverId, text, null, null, {
+      firstName: user.profile?.firstName,
+      lastName: user.profile?.lastName,
+      photo: user.profile?.photo,
+    });
     setText("");
   };
 
@@ -265,7 +306,7 @@ export default function Messages() {
                       <img
                         src={otherUser?.profile?.photo || defaultImage}
                         alt={otherUser?.firstName || "User"}
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 rounded-full object-cover"
                       />
                       <GoDotFill
                         fill={userStatusMap[otherUserId] ? "#27C200" : "#A1A1A1"}
@@ -295,7 +336,7 @@ export default function Messages() {
                     <img
                       src={userMap[receiverId]?.profile?.photo || defaultImage}
                       alt="Receiver"
-                      className="w-10 h-10 rounded-full mr-3"
+                      className="w-10 h-10 rounded-full mr-3 object-cover"
                     />
                     <div>
                       <h3 className="font-medium text-gray-800">
@@ -338,14 +379,14 @@ export default function Messages() {
                         <img
                           src={userMap[msg.senderId]?.profile?.photo || defaultImage}
                           alt="Sender"
-                          className="w-8 h-8 rounded-full"
+                          className="w-8 h-8 rounded-full object-cover"
                         />
                       )}
                       <div className={msg.senderId === user._id ? "text-right" : ""}>
                         <div className={`px-3 py-1 rounded-lg text-sm max-w-md ${msg.senderId === user._id ? "bg-[#F3F6FF] text-gray-800" : "bg-[#D7D7D740] text-gray-700"}`}>
                           <p className="font-semibold">{msg.senderId === user._id ? "You" : userMap[msg.senderId]?.profile?.firstName || "User"}</p>
                           {msg.fileType === "image" && (
-                            <img src={msg.fileUrl} alt="Attachment" className="max-w-[250px] rounded-md mt-2" />
+                            <img src={msg.fileUrl} alt="Attachment" className="max-w-[250px] rounded-md mt-2 object-cover" />
                           )}
                           {msg.fileType === "video" && (
                             <video src={msg.fileUrl} controls className="max-w-[250px] rounded-md mt-2" />
@@ -375,7 +416,7 @@ export default function Messages() {
                         <img
                           src={user.profile?.photo || defaultImage}
                           alt="You"
-                          className="w-8 h-8 rounded-full"
+                          className="w-8 h-8 rounded-full object-cover"
                         />
                       )}
                     </div>

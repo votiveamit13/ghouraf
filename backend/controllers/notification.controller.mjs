@@ -1,22 +1,31 @@
-import { dbAdmin, messagingAdmin } from "../config/firebase.mjs";
+import { dbAdmin } from "../config/firebase.mjs";
+import User from "../models/User.mjs";
 
 export const sendNotification = async (req, res) => {
   try {
-    const { userId, title, body } = req.body;
+    const { userId, senderId, title, body } = req.body;
 
-    if (!userId || !title || !body)
+    if (!userId || !senderId || !title || !body)
       return res.status(400).json({ error: "Missing required fields" });
 
-    await dbAdmin
-      .collection("notifications")
-      .doc(userId)
-      .collection("items")
-      .add({
-        title,
-        body,
-        createdAt: new Date(),
-        read: false,
-      });
+    const sender = await User.findById(senderId).select("profile.firstName profile.lastName profile.photo");
+    const senderMeta = sender
+      ? {
+          firstName: sender.profile?.firstName || "",
+          lastName: sender.profile?.lastName || "",
+          photo: sender.profile?.photo || "",
+        }
+      : {};
+
+    await dbAdmin.collection("notifications").add({
+      userId,
+      senderId,
+      title,
+      body,
+      meta: senderMeta,
+      read: false,
+      createdAt: new Date(),
+    });
 
     res.status(200).json({ success: true, message: "Notification sent" });
   } catch (err) {

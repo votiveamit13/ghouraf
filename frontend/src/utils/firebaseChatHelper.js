@@ -15,21 +15,21 @@ export const getChatId = async (userId1, userId2) => {
     }
   });
 
-  if (chatDoc) return chatDoc.id; 
+  if (chatDoc) return chatDoc.id;
 
   const newChat = await addDoc(chatsRef, {
-  participants: [userId1, userId2],
-  lastMessage: "",
-  lastMessageTime: serverTimestamp(),
-  unreadCount: { [userId1]: 0, [userId2]: 0 },
-  createdAt: serverTimestamp(),
-});
+    participants: [userId1, userId2],
+    lastMessage: "",
+    lastMessageTime: serverTimestamp(),
+    unreadCount: { [userId1]: 0, [userId2]: 0 },
+    createdAt: serverTimestamp(),
+  });
 
 
   return newChat.id;
 };
 
-export const sendMessage = async (chatId, senderId, receiverId, text, file = null, fileType = null) => {
+export const sendMessage = async (chatId, senderId, receiverId, text, file = null, fileType = null, senderProfile = {}) => {
   let fileUrl = null;
 
   if (file) {
@@ -56,6 +56,53 @@ export const sendMessage = async (chatId, senderId, receiverId, text, file = nul
     [`unreadCount.${receiverId}`]: increment(1),
     deletedFor: [],
   });
+
+  const statusRef = doc(db, "userStatus", receiverId);
+  const statusSnap = await getDoc(statusRef);
+  
+  if (statusSnap.exists()) {
+    const { currentChat } = statusSnap.data();
+    
+    if (currentChat === chatId) {
+      return;
+    }
+  }
+
+  const notificationsRef = collection(db, "notifications");
+  const existingNotifQuery = query(
+    notificationsRef,
+    where("userId", "==", receiverId),
+    where("senderId", "==", senderId),
+    where("chatId", "==", chatId),
+    where("read", "==", false)
+  );
+
+  const existingNotifSnapshot = await getDocs(existingNotifQuery);
+
+  if (!existingNotifSnapshot.empty) {
+    const existingNotif = existingNotifSnapshot.docs[0];
+    await updateDoc(doc(db, "notifications", existingNotif.id), {
+      text: text || (fileType ? `${fileType} sent` : ""),
+      title: `New message from ${senderProfile.firstName || "User"}`,
+      body: text || (fileType ? `${fileType} sent` : ""),
+      createdAt: serverTimestamp(),
+    });
+  } else {
+    await addDoc(notificationsRef, {
+      userId: receiverId,
+      senderId,
+      chatId,
+      title: `New message from ${senderProfile.firstName || "User"}`,
+      body: text || (fileType ? `${fileType} sent` : ""),
+      meta: {
+        firstName: senderProfile.firstName || "",
+        lastName: senderProfile.lastName || "",
+        photo: senderProfile.photo || "",
+      },
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  }
 };
 
 export const listenMessages = (chatId, callback) => {
