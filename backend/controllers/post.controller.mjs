@@ -656,11 +656,13 @@ export const toggleSavePost = async (req, res) => {
     }
 
     const post = await Model.findById(postId);
-        const existing = await SavedPost.findOne({
+
+    const existing = await SavedPost.findOne({
       user: userId,
       postId,
       postCategory,
     });
+
     if (existing) {
       await existing.deleteOne();
       return res.status(200).json({ message: "Removed from saved", saved: false });
@@ -669,7 +671,7 @@ export const toggleSavePost = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     let snapshot;
-    if (effectiveCategory === "Space") {
+    if (postCategory === "Space") {
       snapshot = {
         title: post.title,
         country: post.country,
@@ -697,14 +699,22 @@ export const toggleSavePost = async (req, res) => {
       };
     }
 
-    await savedPost.save();
-    return res.status(201).json({ message: "Saved successfully", saved: true });
+    const savedPost = new SavedPost({
+      user: userId,
+      postCategory,
+      postId,
+      snapshot,
+    });
 
+    await savedPost.save();
+
+    return res.status(201).json({ message: "Saved successfully", saved: true });
   } catch (err) {
     console.error("Toggle Save Post Error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 export const getSavedPosts = async (req, res) => {
   try {
