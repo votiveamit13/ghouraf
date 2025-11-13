@@ -8,8 +8,10 @@ import axios from "axios";
 import Loader from "components/common/Loader";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
+import { useAuth } from "context/AuthContext";
 
 export default function PlaceWanted() {
+    const { user, loading: authLoading } = useAuth();
     const apiUrl = process.env.REACT_APP_API_URL;
     const [properties, setProperties] = useState([]);
     const [page, setPage] = useState(1);
@@ -106,7 +108,12 @@ export default function PlaceWanted() {
                         </select>
                     </div>
                 </div>
-
+ {!user ? (
+          <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-500 font-medium text-lg">
+            Please login first to show the posts.
+          </div>
+        ) : (
+            <>
                 {loading ? (
                     <Loader fullScreen={false} />
                 ) : (
@@ -128,6 +135,8 @@ export default function PlaceWanted() {
                         No Space Wanted Found
                     </div>
                 )}
+                </>
+        )}
             </div>
         </div>
     );

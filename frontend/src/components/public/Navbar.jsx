@@ -273,7 +273,7 @@ export default function Navbar() {
       if (res.user) {
         toast.success("Login Successful");
         setLoginDialog(false);
-        const allowedPaths = ["/spaces", "/spaces/", "/team-up"];
+        const allowedPaths = ["/spaces", "/spaces/", "/team-up", "/place-wanted"];
         const isAllowedPath = allowedPaths.some((path) => location.pathname.startsWith(path));
         if (!isAllowedPath) {
           navigate("/user");

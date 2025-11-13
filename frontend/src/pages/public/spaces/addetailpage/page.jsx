@@ -522,6 +522,7 @@ export default function DetailPage({ targetUserId }) {
                               {person.userId.profile?.firstName}{" "}
                               {person.userId.profile?.lastName}
                             </h4>
+                            <p>Age: {person.userId.profile?.age}</p>
                           </div>
                         </div>
                         <button
@@ -576,10 +577,11 @@ export default function DetailPage({ targetUserId }) {
 
             <div className="p-4 border-t text-center">
               <button
+              disabled={user?._id === space.user?._id}
                 className={`${teamUps.some((t) => t.userId._id === userId)
                   ? "bg-[#FF0000]"
                   : "bg-[#008000]"
-                  } text-white px-4 py-3 rounded-[12px] font-medium`}
+                  } text-white px-4 py-3 rounded-[12px] font-medium ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed text-white" : ""}`}
                 onClick={handleTeamUpRequest}
               >
                 {teamUps.some((t) => t.userId._id === userId)

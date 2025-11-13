@@ -401,10 +401,10 @@ export default function MyAds() {
                                             <TfiLocationPin /> {locationString}
                                         </p>
                                         <p className="text-[15px] sm:text-[18px]">
-                                            {ad.propertyType || "Listing"} –{" "}
-                                            <span className="text-[#565ABF]">
+                                            {ad.propertyType || "Listing"}
+                                            {/* <span className="text-[#565ABF]">
                                                 {ad.available ? "Available" : "Unavailable"}
-                                            </span>
+                                            </span> */}
                                         </p>
                                         <p className="font-semibold text-[15px] sm:text-[18px]">
                                             ${ad.budget} / {ad.budgetType}
