@@ -59,7 +59,7 @@ const handleSaveProfile = async (data) => {
     };
     return (
         <>
-            <div className="container px-4 mt-5 mb-8">
+            <div className="container user-layout mt-5 mb-8">
                 <h2 className="text-[25px] font-bold text-black">Edit my details - <span className="text-[#A321A6]">{user.profile?.firstName}</span></h2>
                 <div className="mt-4">
                     <DetailsForm

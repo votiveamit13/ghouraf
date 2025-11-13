@@ -43,25 +43,25 @@ export default function SavedAds() {
         fetchSavedPosts();
     }, []);
 
-const handleAdClick = (ad) => {
-  const postId = ad.postId; 
+    const handleAdClick = (ad) => {
+        const postId = ad.postId;
 
-  switch (ad.postCategory) {
-    case "Space":
-      navigate(`/spaces/${postId}`);
-      break;
-    case "Spacewanted":
-      navigate(`/place-wanted/${postId}`);
-      break;
-    case "Teamup":
-      navigate(`/team-up/${postId}`);
-      break;
-    default:
-      toast.error("Unknown post category");
-  }
-};
+        switch (ad.postCategory) {
+            case "Space":
+                navigate(`/spaces/${postId}`);
+                break;
+            case "Spacewanted":
+                navigate(`/place-wanted/${postId}`);
+                break;
+            case "Teamup":
+                navigate(`/team-up/${postId}`);
+                break;
+            default:
+                toast.error("Unknown post category");
+        }
+    };
 
-const handleRemoveSaved = async (ad) => {
+    const handleRemoveSaved = async (ad) => {
         try {
             const res = await axios.post(
                 `${apiUrl}save`,
@@ -103,8 +103,8 @@ const handleRemoveSaved = async (ad) => {
     ];
 
     return (
-        <div className="container px-4 mt-5 mb-8">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-5">
+        <div className="container user-layout mt-5 mb-8">
+            <div className="flex flex-col lg:flex-row md:justify-between md:items-center gap-3 mb-5">
                 <div className="flex flex-wrap gap-2 text-[14px] font-semibold w-full md:max-w-xl text-black">
                     {filters.map(({ key, label }) => (
                         <button
@@ -143,35 +143,53 @@ const handleRemoveSaved = async (ad) => {
                         return (
                             <div
                                 key={ad._id}
-                                className="w-full sm:w-[48%] lg:w-[32%] border-[1px] border-[#D7D7D7] rounded-[12px] shadow-lg overflow-hidden flex flex-col p-4"
+                                className={`w-full sm:w-[48%] lg:w-[32%] border-[1px] border-[#D7D7D7] rounded-[12px] shadow-lg overflow-hidden flex flex-col p-4 relative ${ad.isDeleted ? "opacity-60 pointer-events-none" : ""
+                                    }`}
                             >
-                                <div className="relative">
-                                    <img
-                                        src={`${post?.photo?.[0]?.url || post?.photo}`}
-                                        alt={post?.title}
-                                        onClick={() => handleAdClick(ad)}
-                                        className="cursor-pointer w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
-                                    />
-                                    <span 
-                                        onClick={() => handleRemoveSaved(ad)}
-                                        className="cursor-pointer absolute top-4 right-4 bg-[#FF015E] text-white text-[13px] sm:text-[15px] font-semibold px-[12px] py-2 rounded-[4px] flex items-center gap-1">
-                                        <MdFavorite size={18} /> Saved
-                                    </span>
-                                </div>
-                                <div className="flex flex-col flex-grow text-black p-1 mt-2">
-                                    <h3 
-                                        onClick={() => handleAdClick(ad)}
-                                        className="cursor-pointer font-semibold text-[16px] sm:text-[18px] text-black">
-                                        {post?.title}
-                                    </h3>
-                                    <p className="text-[15px] sm:text-[18px] flex items-center gap-1">
-                                        <TfiLocationPin /> {locationString}
-                                    </p>
-                                    <p className="font-semibold text-[15px] sm:text-[18px]">
-                                        ₹{post?.budget} / {post?.budgetType}
-                                    </p>
-                                    <p className="text-[15px] sm:text-[18px] leading-[1.7rem]">{post?.description}</p>
-                                </div>
+                                {ad.isDeleted ? (
+                                    <div className="flex flex-col items-center justify-center h-[300px] text-center">
+                                        <h3 className="text-lg font-semibold text-gray-600 mb-2">Post Deleted</h3>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRemoveSaved(ad);
+                                            }}
+                                            className="bg-[#FF015E] text-white px-4 py-2 rounded-md text-sm"
+                                        >
+                                            Remove Saved
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="relative">
+                                            <img
+                                                src={`${post?.photo?.[0]?.url || post?.photo}`}
+                                                alt={post?.title}
+                                                onClick={() => handleAdClick(ad)}
+                                                className="cursor-pointer w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
+                                            />
+                                            <span
+                                                onClick={() => handleRemoveSaved(ad)}
+                                                className="cursor-pointer absolute top-4 right-4 bg-[#FF015E] text-white text-[13px] sm:text-[15px] font-semibold px-[12px] py-2 rounded-[4px] flex items-center gap-1">
+                                                <MdFavorite size={18} /> Saved
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col flex-grow text-black p-1 mt-2">
+                                            <h3
+                                                onClick={() => handleAdClick(ad)}
+                                                className="cursor-pointer font-semibold text-[16px] sm:text-[18px] text-black">
+                                                {post?.title}
+                                            </h3>
+                                            <p className="text-[15px] sm:text-[18px] flex items-center gap-1">
+                                                <TfiLocationPin /> {locationString}
+                                            </p>
+                                            <p className="font-semibold text-[15px] sm:text-[18px]">
+                                                ₹{post?.budget} / {post?.budgetType}
+                                            </p>
+                                            <p className="text-[15px] sm:text-[18px] leading-[1.7rem]">{post?.description}</p>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         );
                     })}

@@ -78,7 +78,7 @@ export default function WelcomeToGhouraf() {
         </div>
 
         <div className="w-full md:w-1/2">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black">
+          <h2 className="lg:text-4xl md:text-3xl text-3xl font-bold mb-2 text-black">
             Welcome to <span className="text-[#A321A6]">Ghouraf.</span>
           </h2>
           <h3 className="text-lg font-semibold mb-4 text-black">
@@ -93,7 +93,7 @@ export default function WelcomeToGhouraf() {
             platform.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div className="flex lg:flex-row md:flex-col flex-col items-start gap-6">
             <button
               onClick={() => navigate("/about-us")}
               className="px-5 py-3 bg-black text-white rounded-[12px] flex items-center gap-2 hover:bg-gray-900 transition w-full sm:w-auto justify-center"

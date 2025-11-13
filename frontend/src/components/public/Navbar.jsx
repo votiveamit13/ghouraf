@@ -665,7 +665,7 @@ export default function Navbar() {
                       e.preventDefault();
                       handleDropdownAction(() => setOpen(true));
                     }}
-                    className="flex items-center px-4 py-2 hover:text-[#565ABF]"
+                    className="flex items-center py-2 hover:text-[#565ABF]"
                   >
                     <FiPlusCircle className="mr-2" /> Post an Ad
                   </a>
@@ -867,7 +867,8 @@ export default function Navbar() {
 
       {registerDialog && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
-          <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg top-[12px]">
+          <div className="bg-white rounded-[17px] w-[90%] sm:w-[80%] md:w-[600px] lg:w-[500px] relative shadow-lg top-[12px] max-h-[90vh] overflow-y-auto no-scrollbar sm:p-1 md:p-4 lg:p-4">
+
             <button
               className="absolute top-0 right-4 text-gray-600 hover:text-black text-xl mt-2"
               onClick={() => setRegisterDialog(false)}
@@ -879,7 +880,7 @@ export default function Navbar() {
                 <h3 className="text-2xl font-semibold text-black mb-2">
                   Create Account
                 </h3>
-                <div className="d-flex justify-center align-center gap-5">
+                <div className="flex flex-col sm:flex-row lg:gap-5 md:gap-5">
                   <div className="w-full">
                     <label className="text-sm font-medium text-gray-600 mb-0">
                       First Name
@@ -937,7 +938,7 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                <div className="d-flex justify-center align-center gap-5">
+                <div className="flex flex-col sm:flex-row lg:gap-5 md:gap-5">
                   <div className="w-full">
                     <label className="text-sm font-medium text-gray-600 mb-0">
                       Email

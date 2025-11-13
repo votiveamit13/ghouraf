@@ -24,7 +24,7 @@ if (!ad) return null;
                     <img
                         src={ad.image}
                         alt={ad.title}
-                        className="w-[100%] h-[300px] object-cover rounded-md border"
+                        className="w-[100%] h-[260px] object-cover rounded-md border"
                     />
                 </div>
             </a>

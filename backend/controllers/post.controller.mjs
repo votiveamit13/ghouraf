@@ -728,12 +728,41 @@ export const getSavedPosts = async (req, res) => {
     if (postCategory) query.postCategory = postCategory;
 
     const savedPosts = await SavedPost.find(query).sort({ createdAt: -1 });
-    return res.status(200).json({ data: savedPosts });
+
+    const updatedPosts = await Promise.all(
+      savedPosts.map(async (saved) => {
+        let Model;
+        switch (saved.postCategory) {
+          case "Space":
+            Model = Space;
+            break;
+          case "Teamup":
+            Model = TeamUp;
+            break;
+          case "Spacewanted":
+            Model = SpaceWanted;
+            break;
+          default:
+            return saved;
+        }
+
+        const post = await Model.findById(saved.postId).select("is_deleted");
+        const isDeleted = !post || post.is_deleted === true;
+
+        return {
+          ...saved.toObject(),
+          isDeleted,
+        };
+      })
+    );
+
+    return res.status(200).json({ data: updatedPosts });
   } catch (err) {
-    console.error(err);
+    console.error("Get Saved Posts Error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 //MyAds
 export const getMyAds = async (req, res) => {

@@ -15,8 +15,6 @@ import PromoteAdModal from "components/user/myads/PromoteAd";
 import { useAuth } from "context/AuthContext";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-
-
 export default function MyAds() {
     const apiUrl = process.env.REACT_APP_API_URL;
     const [ads, setAds] = useState([]);
@@ -38,6 +36,7 @@ export default function MyAds() {
     const [loadingPayment, setLoadingPayment] = useState(false);
     const { user, token } = useAuth();
     const menuRefs = useRef({});
+    const [openLeftMenu, setOpenLeftMenu] = useState({});
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -210,7 +209,7 @@ export default function MyAds() {
 
 
     return (
-        <div className="container px-4 mt-5 mb-8">
+        <div className="container user-layout mt-5 mb-8">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-5">
                 <div className="w-full md:w-auto relative">
                     <input
@@ -279,12 +278,18 @@ export default function MyAds() {
                                 <div
                                     key={ad._id}
                                     ref={(el) => (menuRefs.current[ad._id] = el)}
-                                    className="relative w-full sm:w-[48%] lg:w-[32%] border border-[#D7D7D7] rounded-[12px] shadow-lg  flex flex-col p-4"
+                                    className="relative w-full sm:w-[48%] lg:w-[31.8%] border border-[#D7D7D7] rounded-[12px] shadow-lg flex flex-col p-4"
                                 >
                                     <div className="absolute top-3 right-3 z-999">
                                         <div className="relative">
                                             <button
-                                                onClick={() => setOpenMenu(openMenu === ad._id ? null : ad._id)}
+                                                onClick={(e) => {
+                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                    const shouldOpenLeft = rect.right > window.innerWidth - 180;
+                                                    setOpenLeftMenu((prev) => ({ ...prev, [ad._id]: shouldOpenLeft }));
+                                                    setOpenMenu(openMenu === ad._id ? null : ad._id);
+                                                }}
+
                                                 className="p-2 rounded-full bg-black text-white shadow-md"
                                             >
                                                 <BsThreeDots />
@@ -325,7 +330,12 @@ export default function MyAds() {
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                                             </svg>
                                                         </button>
-                                                        <div className="hidden group-hover:block absolute left-full top-0 w-36 bg-white border border-gray-200 rounded-lg shadow-lg">
+                                                        <div
+                                                            className={`hidden group-hover:block absolute top-0 ${openLeftMenu[ad._id] ? "right-full" : "left-full"
+                                                                } w-36 bg-white border border-gray-200 rounded-lg shadow-lg`}
+                                                        >
+
+
                                                             <button
                                                                 disabled={ad.available === true}
                                                                 onClick={() => {

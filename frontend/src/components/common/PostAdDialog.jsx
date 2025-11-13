@@ -13,7 +13,8 @@ export default function PostAdDialog({ open, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
     onClick={onClose}
     >
-      <div className="relative bg-white rounded-2xl shadow-lg p-4 w-[90%] max-w-4xl"
+      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-4xl p-4 sm:p-6 md:p-8
+                   max-h-[80vh] overflow-y-auto no-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -23,7 +24,7 @@ export default function PostAdDialog({ open, onClose }) {
           ✕
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="flex flex-col items-center gap-6 border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition">
             <h5 className="text-lg font-semibold text-black text-center">
               Post Place for Rent
