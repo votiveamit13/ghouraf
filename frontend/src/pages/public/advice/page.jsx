@@ -42,7 +42,7 @@ export default function Advice() {
         {advice.title}
       </h1>
       <div
-        className="max-w-none text-black"
+        className="prose max-w-none text-black"
         dangerouslySetInnerHTML={{ __html: advice.content }}
       />
       <p className="text-sm text-gray-400 mt-8 text-right">

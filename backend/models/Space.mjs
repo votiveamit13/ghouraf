@@ -42,7 +42,7 @@ const SpaceSchema = new mongoose.Schema(
     city: { type: String, required: true },
     location: String,
     description: { type: String, required: true },
-    amenities: { type: [String], required: true },
+    amenities: { type: [String] },
     featuredImage: { type: String, required: true },
     photos: [{ id: String, url: String }],
     status: { type: String, enum: ["active", "inactive"], default: "inactive" },

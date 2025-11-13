@@ -81,9 +81,9 @@ const validateStep2 = (formData, featured, errors) => {
   if (!formData.description?.trim() || formData.description.length < 5) {
     stepErrors.description = ["Description must be at least 5 characters"];
   }
-  if (!formData.amenities || formData.amenities.length === 0) {
-    stepErrors.amenities = ["At least one amenity is required"];
-  }
+  // if (!formData.amenities || formData.amenities.length === 0) {
+  //   stepErrors.amenities = ["At least one amenity is required"];
+  // }
   if (!featured) {
     stepErrors.featuredImage = ["Featured image is required"];
   }
@@ -592,7 +592,7 @@ export default function PostSpace() {
                   value={formData.smoking}
                   onChange={handleChange}
                 >
-                  <option value="">In different</option>
+                  <option value="">Indifferent</option>
                   <option value="true">Allowed</option>
                   <option value="false">Not Allowed</option>
                 </select>

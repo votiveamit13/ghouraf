@@ -21,7 +21,7 @@ export default function UserDashboard() {
       </h1>
       <div className="p-5 grid grid-cols-1 lg:grid-cols-4 gap-5 mt-5 rounded-[12px] border border-[#D7D7D7] shadow-[0px_12px_48px_0px_#0022330F]">
         <button className="align-left text-left" onClick={() => navigate("/user/messages")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[160px]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Messages</span>
@@ -30,13 +30,13 @@ export default function UserDashboard() {
                 <LuMessageSquareText size={28} color="#565ABF" />
               </div>
             </div>
-            <div className="text-[15px] text-black" >
+            <div className="text-[13px] text-black" >
               <span>Check and manage your latest messages</span>
             </div>
           </div>
         </button>
         <button className="align-left text-left" onClick={() => setOpen(true)}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[160px]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Post an Ad</span>
@@ -45,14 +45,14 @@ export default function UserDashboard() {
                 <FiPlusCircle size={28} color="#565ABF" />
               </div>
             </div>
-            <div className="text-[15px] text-black" >
+            <div className="text-[13px] text-black" >
               <span>Create an Ad post here. Spaces, Space Wanted, Team up</span>
             </div>
           </div>
         </button>
           <PostAdDialog open={open} onClose={() => setOpen(false)} />
         <button className="align-left text-left" onClick={() => navigate("/user/my-ads")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[160px]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>My ads</span>
@@ -61,13 +61,13 @@ export default function UserDashboard() {
                 <GoSync size={28} color="#565ABF" />
               </div>
             </div>
-            <div className="text-[15px] text-black" >
+            <div className="text-[13px] text-black" >
               <span>Manage your ads. Edit, upgrade, deactivate.</span>
             </div>
           </div>
         </button>
         <button className="align-left text-left" onClick={() => navigate("/user/saved-ads")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[160px]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Saved ads</span>
@@ -76,13 +76,13 @@ export default function UserDashboard() {
                 <GrFavorite size={28} color="#565ABF" />
               </div>
             </div>
-            <div className="text-[15px] text-black" >
+            <div className="text-[13px] text-black" >
               <span>View and manage your saved ads</span>
             </div>
           </div>
         </button>
                 <button className="align-left text-left" onClick={() => navigate("/user/edit-my-details")}>
-          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[160px]">
+          <div className="p-4 rounded-[10px] border-[1px] border-[#D7D7D7] bg-[#F5F5F5] h-[140px]">
             <div className="d-flex justify-between align-center">
               <div className="text-[20px] font-[500] text-black mb-3">
                 <span>Edit my details</span>
@@ -91,7 +91,7 @@ export default function UserDashboard() {
                 <FiEdit size={28} color="#565ABF" />
               </div>
             </div>
-            <div className="text-[15px] text-black" >
+            <div className="text-[13px] text-black" >
               <span>Manage your account information here</span>
             </div>
           </div>

@@ -369,7 +369,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white top-0 left-0 w-full z-20 p-[5px] shadow-lg">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto user-layout">
         <div className="flex justify-between h-20 items-center">
           <NavLink to="/" className="flex items-center">
             <img
