@@ -114,9 +114,11 @@ export default function EditPolicy() {
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                 >
-                  <option value="">Select Category</option>
-                  <option value="privacy">Privacy Policy</option>
-                  <option value="terms">Terms & Conditions</option>
+                                    <option value="">Select Category</option>
+                                    <option value="Privacy">Privacy Policy</option>
+                                    <option value="Terms">Terms & Conditions</option>
+                                    <option value="Safety">Safety & Tips</option>
+                                    <option value="Advice">Advice</option>
                 </select>
                 {errors.category && (
                   <p className="text-red-500 text-sm mt-1">{errors.category}</p>
