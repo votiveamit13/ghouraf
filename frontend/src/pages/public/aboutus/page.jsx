@@ -142,14 +142,14 @@ export default function AboutUs() {
                 </div>
             </section>
             <section className="w-full bg-white py-6 mb-6">
-                <div className="container mx-auto sm:px-6 md:px-12 lg:px-20">
+                <div className="container mx-auto sm:px-0 md:px-8 lg:px-20">
                     <div className="w-full mb-5">
                         <h2 className="text-3xl md:text-4xl font-bold text-black text-center">
                             Why use Ghouraf?
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {uses.map((item, index) => (
                             <div
                                 key={index}

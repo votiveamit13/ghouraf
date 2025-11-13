@@ -977,7 +977,6 @@ export default function PostSpace() {
               loading={promotionLoading}
             />
 
-            {/* Payment modal (Stripe Elements) */}
             {clientSecret && showPaymentModal && (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <PromotionPaymentModal

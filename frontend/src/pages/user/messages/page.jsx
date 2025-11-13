@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
+import { RiArrowLeftLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import { GoDotFill } from "react-icons/go";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -81,7 +82,22 @@ export default function Messages() {
   const videoInputRef = useRef(null);
   const docInputRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [showChatList, setShowChatList] = useState(true);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsMobileView(true);
+      } else {
+        setIsMobileView(false);
+        setShowChatList(true); 
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const filteredChats = chats.filter(chat => {
     const otherUserId = chat.participants.find(uid => uid !== user._id);
@@ -205,7 +221,14 @@ const handleSelectChat = async (chat) => {
   setChatId(chat.id);
   const otherUser = chat.participants.find(uid => uid !== user._id);
   setReceiverId(otherUser);
+  if (isMobileView) setShowChatList(false);
 };
+
+  const handleBackToList = () => {
+    setShowChatList(true);
+    setChatId(null);
+    setReceiverId(null);
+  };
 
   const handleSend = async () => {
     if (!text.trim() || !chatId || !receiverId) return;
@@ -264,7 +287,7 @@ const handleSelectChat = async (chat) => {
   };
 
   return (
-    <div className="container">
+    <div className="container user-layout">
       {loadingChats ? (
         <div className="h-[600px]">
         <Loader fullScreen={true} />
@@ -272,7 +295,8 @@ const handleSelectChat = async (chat) => {
       ) : (
         <div className="mt-5 mb-8 h-[550px] w-full bg-white flex border rounded-lg shadow-sm">
           {/* Left panel */}
-          <div className="w-1/4 border-r flex flex-col">
+          <div className={`border-r flex flex-col w-full md:w-1/4 transition-all duration-300
+              ${isMobileView ? (showChatList ? "block" : "hidden") : "block"}`}>
             <div className="p-3 border-b">
               <h1 className="mb-3 text-black font-semibold text-[20px]">
                 Messages
@@ -330,11 +354,19 @@ const handleSelectChat = async (chat) => {
           </div>
 
           {/* Right panel */}
-          <div className="flex-1 flex flex-col">
+          <div className={`flex-1 flex flex-col w-full transition-all duration-300
+              ${isMobileView ? (showChatList ? "hidden" : "block") : "block"}`}>
             {chatId && receiverId ? (
               <>
                 <div className="flex justify-between items-center px-3 border-b">
                   <div className="flex items-center py-3">
+                    {isMobileView && (
+                      <RiArrowLeftLine
+                        size={25}
+                        className="mr-3 cursor-pointer text-black"
+                        onClick={handleBackToList}
+                      />
+                    )}
                     <img
                       src={userMap[receiverId]?.profile?.photo || defaultImage}
                       alt="Receiver"
@@ -506,7 +538,7 @@ const handleSelectChat = async (chat) => {
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500">
-                Select a chat to start messaging
+                {isMobileView ? "Select a chat to start messaging" : "Select a chat to start messaging"}
               </div>
             )}
           </div>

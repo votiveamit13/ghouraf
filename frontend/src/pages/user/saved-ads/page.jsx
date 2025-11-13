@@ -143,22 +143,22 @@ export default function SavedAds() {
                         return (
                             <div
                                 key={ad._id}
-                                className={`w-full sm:w-[48%] lg:w-[32%] border-[1px] border-[#D7D7D7] rounded-[12px] shadow-lg overflow-hidden flex flex-col p-4 relative ${ad.isDeleted ? "opacity-60" : ""
-    }`}
+                                className={`w-full sm:w-[48%] lg:w-[31.8%] border-[1px] border-[#D7D7D7] rounded-[12px] shadow-lg overflow-hidden flex flex-col p-4 relative ${ad.isDeleted ? "opacity-60" : ""
+                                    }`}
 
                             >
                                 {ad.isDeleted ? (
                                     <div className="flex flex-col items-center justify-center h-[300px] text-center">
                                         <h3 className="text-lg font-semibold text-gray-600 mb-2">Post Deleted</h3>
-<button
-    onClick={(e) => {
-        e.stopPropagation();
-        handleRemoveSaved(ad);
-    }}
-    className="bg-[#FF015E] text-white px-4 py-2 rounded-md text-sm cursor-pointer pointer-events-auto"
->
-    Remove Saved
-</button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRemoveSaved(ad);
+                                            }}
+                                            className="bg-[#FF015E] text-white px-4 py-2 rounded-md text-sm cursor-pointer pointer-events-auto"
+                                        >
+                                            Remove Saved
+                                        </button>
 
                                     </div>
                                 ) : (

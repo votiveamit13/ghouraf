@@ -250,7 +250,7 @@ export default function DetailPage({ targetUserId }) {
 
   return (
     <>
-      <div className="container px-4 mt-5">
+      <div className="container user-layout mt-5">
         <button className="text-sm px-4 py-2 font-medium text-black border-[1px] border-[#AACCEE] rounded-[2px]">
           <Link to={`/spaces`} className="flex items-center gap-2">
             <FaArrowLeftLong />  Back to Ads
@@ -258,7 +258,7 @@ export default function DetailPage({ targetUserId }) {
         </button>
       </div>
 
-      <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="container user-layout mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="col-span-3 space-y-6">
           <div
             data-hs-carousel='{
@@ -370,7 +370,7 @@ export default function DetailPage({ targetUserId }) {
             </div>
           </div>
 
-          <div className="g-white mb-6 shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
+          <div className="g-white mb-6 shadow-xl border border-[#D7D7D7] rounded-[15px]">
             <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">New roommate preferences</h3>
             <div className="px-4 py-3 mt-0">
               <table className="text-sm w-full text-black">
@@ -423,8 +423,8 @@ export default function DetailPage({ targetUserId }) {
               onClick={handleMessageClick}
               disabled={user?._id === space.user?._id || messageLoading}
               className={`mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-[5px] text-white 
-    ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed" : "bg-[#565ABF]"}
-  `}
+                ${user?._id === space.user?._id ? "bg-gray-400 cursor-not-allowed" : "bg-[#565ABF]"}
+              `}
             >
               {messageLoading ?
                 <div className="flex items-center justify-center w-6 h-6">
@@ -485,10 +485,10 @@ export default function DetailPage({ targetUserId }) {
       </div>
 
       {showTeamUp && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl relative">
             <div className="flex relative justify-center items-center border-b px-5 py-3 bg-[#565ABF] rounded-t-lg">
-              <h2 className="text-white text-[20px] font-semibold text-center">Team Up for This Apartment</h2>
+              <h2 className="text-white text-[16px] md:text-[20px] font-semibold text-center">Team Up for This Apartment</h2>
               <button
                 onClick={() => setShowTeamUp(false)}
                 className="bg-black px-[6px] py-[0px] rounded-full text-white text-xl absolute right-[-10px] top-[-10px]"

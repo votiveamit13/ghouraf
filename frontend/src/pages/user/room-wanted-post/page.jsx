@@ -271,7 +271,7 @@ export default function RoomWantedAd() {
                 </h1>
             </div>
 
-            <div className="w-full container px-8 space-y-8 mt-6">
+            <div className="w-full container user-layout space-y-8 mt-6">
                 {isPreview ? (
                     <>
                         <div className="bg-white rounded-lg shadow-xl border border-gray-200">
@@ -701,7 +701,7 @@ export default function RoomWantedAd() {
 
                                 <div className="md:col-span-2 mb-4">
                                     <label className="block text-gray-700 mb-1">Upload Photos</label>
-                                    <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-1/2 rounded-[14px] relative overflow-hidden">
+                                    <div className="flex items-center gap-4 border-[1px] border-[#D7D7D7] w-full md:w-1/2 rounded-[14px] relative overflow-hidden">
                                         <input
                                             type="file"
                                             multiple

@@ -37,7 +37,7 @@ export default function SafetyTips() {
   }
 
   return (
-    <div className="container px-4 mt-5 mb-8">
+    <div className="container user-layout mt-5 mb-8">
       <h1 className="text-3xl font-semibold text-black mb-6 text-center">
         {safetyTips.title}
       </h1>

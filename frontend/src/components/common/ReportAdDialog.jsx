@@ -53,7 +53,7 @@ export default function ReportAdDialog({ show, onClose, postId, postType, token 
   };
 
   return (
-    <div className="fixed inset-0 z-[1055] flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-[1055] flex items-center justify-center bg-black/50 p-3">
       <div
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl relative animate-fadeIn"
         style={{ animation: "fadeIn 0.3s ease" }}
