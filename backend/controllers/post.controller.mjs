@@ -656,23 +656,17 @@ export const toggleSavePost = async (req, res) => {
     }
 
     const post = await Model.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    let effectiveCategory = listingPage;
-    if (listingPage === "Teamup" && postCategory === "Spacewanted" && post.teamUp === true) {
-      effectiveCategory = "Teamup";
-    }
-
-    const existing = await SavedPost.findOne({
+        const existing = await SavedPost.findOne({
       user: userId,
       postId,
-      postCategory: effectiveCategory,
+      postCategory,
     });
-
     if (existing) {
       await existing.deleteOne();
       return res.status(200).json({ message: "Removed from saved", saved: false });
     }
+
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
     let snapshot;
     if (effectiveCategory === "Space") {
@@ -702,13 +696,6 @@ export const toggleSavePost = async (req, res) => {
         photo: post.photos,
       };
     }
-
-    const savedPost = new SavedPost({
-      user: userId,
-      postCategory: effectiveCategory,
-      postId,
-      snapshot,
-    });
 
     await savedPost.save();
     return res.status(201).json({ message: "Saved successfully", saved: true });
