@@ -5,7 +5,7 @@ if (!ad) return null;
 
     return (
 
-        <div className="relative mb-4 p-4 bg-white border rounded-[12px] shadow-xl">
+        <div className="relative mb-4 p-4 bg-white border h-[310px] rounded-[12px] shadow-xl">
             <div className="absolute top-[-2px] left-[-2px] bg-yellow-300 text-black text-xs font-semibold px-2 py-1 rounded mb-2 inline-block">
                 Advertisement
             </div>
@@ -24,7 +24,7 @@ if (!ad) return null;
                     <img
                         src={ad.image}
                         alt={ad.title}
-                        className="w-[100%] h-[260px] object-cover rounded-md border"
+                        className="w-[100%] h-[220px] object-cover rounded-md border"
                     />
                 </div>
             </a>

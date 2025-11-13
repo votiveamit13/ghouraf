@@ -25,15 +25,15 @@ export default function PlaceWanted() {
     const adsPerPage = 4;
 
     useEffect(() => {
-  const parsed = queryString.parse(locationHook.search);
-  setFilters((prev) => ({
-    ...prev,
-    city: parsed.city || "",
-    state: parsed.state || "",
-    country: parsed.country || "",
-  }));
-  setPage(1);
-}, [locationHook.search]);
+        const parsed = queryString.parse(locationHook.search);
+        setFilters((prev) => ({
+            ...prev,
+            city: parsed.city || "",
+            state: parsed.state || "",
+            country: parsed.country || "",
+        }));
+        setPage(1);
+    }, [locationHook.search]);
 
     useEffect(() => {
         fetchData();
@@ -108,35 +108,35 @@ export default function PlaceWanted() {
                         </select>
                     </div>
                 </div>
- {!user ? (
-          <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-500 font-medium text-lg">
-            Please login first to show the posts.
-          </div>
-        ) : (
-            <>
-                {loading ? (
-                    <Loader fullScreen={false} />
-                ) : (
-                    <PropertyList properties={properties} ads={ads} />
-                )}
-
-                {properties.length > 0 && !loading && (
-                    <div className="text-end flex justify-end mt-5">
-                        <UserPagination
-                            currentPage={page}
-                            totalPages={totalPages}
-                            onPageChange={setPage}
-                        />
-                    </div>
-                )}
-
-                {properties.length === 0 && !loading && (
+                {!user ? (
                     <div className="text-center py-20 text-gray-500 font-medium text-lg">
-                        No Space Wanted Found
+                        Please login first to show the posts.
                     </div>
+                ) : (
+                    <>
+                        {loading ? (
+                            <Loader fullScreen={false} />
+                        ) : (
+                            <PropertyList properties={properties} ads={ads} />
+                        )}
+
+                        {properties.length > 0 && !loading && (
+                            <div className="text-end flex justify-end mt-5">
+                                <UserPagination
+                                    currentPage={page}
+                                    totalPages={totalPages}
+                                    onPageChange={setPage}
+                                />
+                            </div>
+                        )}
+
+                        {properties.length === 0 && !loading && (
+                            <div className="text-center py-20 text-gray-500 font-medium text-lg">
+                                No Space Wanted Found
+                            </div>
+                        )}
+                    </>
                 )}
-                </>
-        )}
             </div>
         </div>
     );

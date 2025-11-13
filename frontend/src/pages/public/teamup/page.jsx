@@ -67,7 +67,7 @@ export default function TeamUp() {
 
 useEffect(() => {
     const fetchData = async () => {
-      if (!userId) return;
+      // if (!userId) return;
       setLoading(true);
       try {
         const params = { page, limit: itemsPerPage, sortBy, ...filters };
@@ -132,6 +132,12 @@ useEffect(() => {
             </select>
           </div>
         </div>
+         {!user ? (
+          <div className="text-center py-20 text-gray-500 font-medium text-lg">
+            Please login first to show the posts.
+          </div>
+        ) : (
+            <>
         {loading ? (
           <Loader fullScreen={false} />
         ) : !userHasPosted ? (
@@ -148,7 +154,8 @@ useEffect(() => {
             )}
           </>
         )}
-
+</>
+        )}
       </div>
     </div>
   );
