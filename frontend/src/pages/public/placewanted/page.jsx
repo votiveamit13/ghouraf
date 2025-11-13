@@ -81,8 +81,8 @@ export default function PlaceWanted() {
     };
 
     return (
-        <div className="container px-4 mt-5 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="col-span-1 space-y-4">
+        <div className="container user-layout mt-5 mb-8 grid grid-cols-1 lg:grid-cols-4 gap-0 lg:gap-6">
+            <div className="col-span-1">
                 <SearchBar />
                 <Filters setFilters={setFilters} setPage={setPage} />
             </div>

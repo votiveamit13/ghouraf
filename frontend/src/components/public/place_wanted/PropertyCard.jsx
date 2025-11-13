@@ -92,9 +92,9 @@ export default function PropertyCard({ property }) {
     };
 
     return (
-        <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex gap-4 mb-4">
+        <div className="bg-white p-4 rounded-[12px] shadow-xl border-[1px] border-[#D7D7D7] flex flex-col md:flex-row gap-4 mb-4">
             <Link to={`/place-wanted/${property._id}`}>
-                <div className="w-[200px] h-[260px]">
+                <div className="w-full md:w-[200px] h-[260px]">
                     <img
                         src={image}
                         alt={property.title}
@@ -104,7 +104,7 @@ export default function PropertyCard({ property }) {
             </Link>
 
 
-            <div className="flex flex-col flex-grow text-[#000000]">
+            <div className="flex flex-col flex-grow w-full md:w-[450px] text-[#000000]">
                 <Link to={`/place-wanted/${property._id}`}>
                     <h3 className="font-semibold text-[20px] text-black">{property.title}</h3>
                 </Link>
@@ -125,7 +125,7 @@ export default function PropertyCard({ property }) {
 
             <div className="flex flex-col justify-between items-end text-black">
                 <span className="font-bold text-lg">${property.budget} / {property.budgetType?.toLowerCase()}</span>
-                <div className="flex gap-2 font-bold">
+                <div className="flex flex-row lg:flex-col gap-2 font-bold">
                     <button
                         onClick={handleSaveToggle}
                         className={`border-[1px] px-3 py-2 rounded-[4px] text-sm flex gap-2 items-center  

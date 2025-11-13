@@ -128,7 +128,7 @@ export default function PropertyCard({ property }) {
 
             <div className="flex flex-col justify-between items-end text-black">
                 <span className="font-bold text-lg">${property.budget} / {property.budgetType}</span>
-                <div className="flex gap-2 font-bold">
+                <div className="flex flex-row lg:flex-col gap-2 font-bold">
                     <button
                         onClick={handleSaveToggle}
                         className={`border-[1px] px-3 py-2 rounded-[4px] text-sm flex gap-2 items-center  

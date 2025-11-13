@@ -56,8 +56,8 @@ export default function Filters({ filters, setFilters, setPage }) {
   return (
     <div className="bg-white text-black rounded-[4px] border-[1px] border-[#D7D7D7] mb-4 shadow-xl">
       <div className="px-3 py-2 border-b flex justify-between items-center mb-3">
-        <h2 className="font-medium text-black text-[18px]">Filters</h2>
-        <button type="button" className="text-[18px] text-[#565ABF] underline" onClick={handleReset}>
+        <h2 className="font-medium text-black text-[16px]">Filters</h2>
+        <button type="button" className="text-[16px] text-[#565ABF] underline" onClick={handleReset}>
           Reset
         </button>
       </div>
