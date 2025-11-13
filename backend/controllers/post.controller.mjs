@@ -216,7 +216,7 @@ export const getSpaces = async (req, res) => {
       amenities,
       sortBy,
       page = 1,
-      limit = 10,
+      limit = 20,
     } = req.query;
 
     const query = {
@@ -464,7 +464,7 @@ export const getTeamUps = async (req, res) => {
       location,
       sortBy,
       page = 1,
-      limit = 10,
+      limit = 20,
     } = req.query;
 
     const query = {
@@ -1036,7 +1036,7 @@ export const getSpaceWanted = async (req, res) => {
       location,
       sortBy,
       page = 1,
-      limit = 10,
+      limit = 20,
     } = req.query;
 
     const query = {

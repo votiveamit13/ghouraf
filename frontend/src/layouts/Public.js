@@ -7,7 +7,7 @@ const Public = ({ children }) => {
     return (
         <div>
             <Navbar/>
-            <main className="pt-20 bg-white">{children}</main>
+            <main className="bg-white">{children}</main>
             <Footer />
         </div>
     );

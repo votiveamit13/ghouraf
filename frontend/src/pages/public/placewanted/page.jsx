@@ -19,7 +19,7 @@ export default function PlaceWanted() {
     const [filters, setFilters] = useState({});
     const [ads, setAds] = useState([]);
     const locationHook = useLocation();
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
     const adsPerPage = 4;
 
     useEffect(() => {

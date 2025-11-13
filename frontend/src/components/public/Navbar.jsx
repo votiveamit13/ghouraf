@@ -368,7 +368,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-white fixed top-0 left-0 w-full z-20 p-[5px] shadow-lg">
+    <nav className="bg-white top-0 left-0 w-full z-20 p-[5px] shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <NavLink to="/" className="flex items-center">
@@ -380,7 +380,7 @@ export default function Navbar() {
           </NavLink>
 
           {/* DESKTOP MENU */}
-          <div className="hidden md:flex space-x-8 relative">
+          <div className="hidden lg:flex space-x-8 relative">
             {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
               if (item === "more-info") {
                 return (
@@ -437,7 +437,7 @@ export default function Navbar() {
 
           </div>
 
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             {!user ? (
               <>
 
@@ -536,7 +536,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-purple-600 text-2xl"
@@ -549,7 +549,7 @@ export default function Navbar() {
 
       {/* MOBILE MENU */}
       {isOpen && (
-        <div className="md:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4">
+        <div className="lg:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4">
           {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
             if (item === "more-info") {
               return (
@@ -708,8 +708,7 @@ export default function Navbar() {
       )}
       {loginDialog && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg
-        sm:max-w-md md:max-w-lg">
+          <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg">
             <button
               className="absolute top-2 right-3 text-gray-600 hover:text-black text-xl"
               onClick={() => setLoginDialog(false)}
@@ -718,7 +717,7 @@ export default function Navbar() {
             </button>
 
             <form onSubmit={handleLogin}>
-              <div className="px-6 py-4 sm:px-4 sm:py-3">
+              <div className="login-padding">
                 <h3 className="text-2xl font-semibold text-black mb-4 sm:text-xl sm:mb-3">
                   Login
                 </h3>
@@ -802,7 +801,7 @@ export default function Navbar() {
                   )}
                 </button>
 
-                <div className="flex gap-4 mb-4 flex-col sm:flex-row">
+                <div className="flex gap-4 mb-4">
                   <button
                     type="button"
                     onClick={handleGoogleLogin}

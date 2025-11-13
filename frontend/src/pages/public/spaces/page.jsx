@@ -35,7 +35,7 @@ export default function Spaces() {
     amenities: [],
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
   const adsPerPage = 4;
 
   useEffect(() => {

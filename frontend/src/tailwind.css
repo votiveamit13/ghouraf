@@ -25,3 +25,24 @@
   scrollbar-width: none;
 }
 
+@media (max-width: 640px) {
+  .Toastify__toast-container--bottom-right {
+    width: 60% !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  .login-padding{
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+}
+
+.login-padding{
+  padding-left: 4rem;
+  padding-right: 4rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}

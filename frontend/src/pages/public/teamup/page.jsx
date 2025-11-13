@@ -22,7 +22,7 @@ export default function TeamUp() {
   const [userHasPosted, setUserHasPosted] = useState(true);
   const [loading, setLoading] = useState(false);
   const [ads, setAds] = useState([]);
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
   const adsPerPage = 4;
 
   const [filters, setFilters] = useState({

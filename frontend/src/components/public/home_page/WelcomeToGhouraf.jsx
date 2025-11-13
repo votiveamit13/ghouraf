@@ -42,7 +42,7 @@ export default function WelcomeToGhouraf() {
               <img
                 src={images[0]}
                 alt="About Us 1"
-                className="w-full md:w-[100%] lg:h-80 md:h-80 sm:h-50 object-cover rounded-xl shadow-md"
+                className="w-full md:w-[100%] lg:h-80 md:h-44 sm:h-50 object-cover rounded-xl shadow-md"
               />
             ) : (
               <div className="w-full h-80 bg-gray-100 flex items-center justify-center rounded-xl text-gray-400">
@@ -63,7 +63,7 @@ export default function WelcomeToGhouraf() {
                   key={i}
                   src={img}
                   alt={`About Us ${i + 2}`}
-                  className="w-full lg:h-64 md:h-64 sm:h-34 object-cover rounded-xl shadow-md"
+                  className="w-full lg:h-64 md:h-44 sm:h-34 object-cover rounded-xl shadow-md"
                 />
               ) : (
                 <div
