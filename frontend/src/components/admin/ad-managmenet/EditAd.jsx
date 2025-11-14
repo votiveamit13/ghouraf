@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../Headers/Header";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ImageResizer from "components/common/ImageCropper";
 
 export default function EditAd() {
   const { state } = useLocation();
@@ -16,7 +17,13 @@ export default function EditAd() {
     url: ad?.url || "",
     image: ad?.image || "",
   });
-  const [preview, setPreview] = useState(ad?.image ? ad.image : null);
+  const backendImg = ad?.image ? `${apiUrl}${ad.image}` : null;
+  const [preview, setPreview] = useState(backendImg);
+  const [resizeMode, setResizeMode] = useState(false);
+  const [originalImage, setOriginalImage] = useState(null);
+  const [resizeState, setResizeState] = useState({ scale: 1, position: { x: 0, y: 0 } });
+  const fileInputRef = useRef();
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -25,24 +32,14 @@ export default function EditAd() {
 
     if (name === "image") {
       const file = files[0];
-      if (file) {
-        const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
-        const fileExtension = file.name.split(".").pop().toLowerCase();
+      if (!file) return;
 
-        if (!allowedExtensions.includes(fileExtension)) {
-          setErrors({
-            ...errors,
-            image: "Only JPG, JPEG, PNG, or WEBP images are allowed.",
-          });
-          setFormData({ ...formData, image: "" });
-          setPreview(ad?.image || null);
-          return;
-        }
-
-        setErrors({ ...errors, image: "" });
-        setFormData({ ...formData, image: file });
-        setPreview(URL.createObjectURL(file));
-      }
+      const blobUrl = URL.createObjectURL(file);
+      setOriginalImage(blobUrl);
+      setPreview(blobUrl);
+      // Reset resize state for new image
+      setResizeState({ scale: 1, position: { x: 0, y: 0 } });
+      setResizeMode(true);
     } else {
       setFormData({
         ...formData,
@@ -51,10 +48,36 @@ export default function EditAd() {
     }
   };
 
+  const handleResizeSave = (blob, state) => {
+    const file = new File([blob], "resized.jpg", { type: "image/jpeg" });
+    const resizedUrl = URL.createObjectURL(file);
+
+    setPreview(resizedUrl);
+    setFormData({ ...formData, image: file });
+    // Save the resize state
+    if (state) {
+      setResizeState(state);
+    }
+    setResizeMode(false);
+  };
+
   const handleRemoveImage = () => {
     setFormData({ ...formData, image: "" });
     setPreview(null);
+    setOriginalImage(null);
+    setResizeState({ scale: 1, position: { x: 0, y: 0 } });
     setErrors({ ...errors, image: "" });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleOpenResizer = () => {
+    const imageToResize = originalImage || preview;
+    if (imageToResize) {
+      setResizeMode(true);
+    }
   };
 
   const validate = () => {
@@ -99,7 +122,6 @@ export default function EditAd() {
       setLoading(false);
     }
   };
-
 
   return (
     <>
@@ -162,40 +184,49 @@ export default function EditAd() {
                   accept=".jpg,.jpeg,.png,.webp"
                   onChange={handleChange}
                   className="form-control"
+                  ref={fileInputRef}
                 />
                 {errors.image && (
                   <p className="text-red-500 text-sm mt-1">{errors.image}</p>
                 )}
 
                 {preview && (
-                  <div className="mt-3 position-relative d-inline-block">
-                    <img
-                      src={
-                        typeof preview === "string" && !preview.startsWith("blob:")
-                          ? `${preview}`
-                          : preview
-                      }
-                      alt="Preview"
-                      className="rounded border"
-                      style={{
-                        width: "120px",
-                        height: "120px",
-                        objectFit: "cover",
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="btn btn-sm btn-danger position-absolute"
-                      style={{
-                        top: "-8px",
-                        right: "-8px",
-                        borderRadius: "50%",
-                        padding: "2px 6px",
-                      }}
-                    >
-                      ×
-                    </button>
+                  <div className="mt-3 p-3 border rounded bg-light w-full">
+                    <p className="text-black">Ad Preview</p>
+                    <div className="relative mb-4 p-4 bg-white border h-[310px] rounded-[12px] shadow-xl">
+                      <div className="absolute top-[-2px] left-[-2px] bg-yellow-300 text-black text-xs font-semibold px-2 py-1 rounded mb-2 inline-block">
+                        Advertisement
+                      </div>
+                      <h4 className="font-semibold text-[24px] text-black mb-2">
+                        {formData.title || "Ad Title Preview"}
+                      </h4>
+
+                      <div>
+                        <img
+                          src={preview}
+                          alt="Preview"
+                          className="w-[100%] h-[220px] object-cover rounded-md border"
+                        />
+                      </div>
+
+                      <div className="flex absolute top-11 right-2 gap-2">
+                        <button
+                          type="button"
+                          className="btn bg-[#565ABF] text-white w-[100px] btn-sm mt-2"
+                          onClick={handleOpenResizer}
+                        >
+                          Resize
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="btn btn-danger btn-sm mt-2"
+                        >
+                          Remove Image
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -220,6 +251,16 @@ export default function EditAd() {
           </div>
         </div>
       </div>
+      
+      {resizeMode && (
+        <ImageResizer
+          image={originalImage || preview}
+          onCancel={() => setResizeMode(false)}
+          onSave={handleResizeSave}
+          initialScale={resizeState.scale}
+          initialPosition={resizeState.position}
+        />
+      )}
     </>
   );
 }

@@ -3,41 +3,41 @@ import React, { useEffect, useRef } from "react";
 import { getSession } from "utils/sessionManager";
 
 export default function AdBanner({ ad }) {
-const apiUrl = process.env.REACT_APP_API_URL;
-  const ref = useRef();
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const ref = useRef();
 
-  useEffect(() => {
-    const sessionId = getSession();
-    const viewKey = `ad_viewed_${sessionId}_${ad._id}`;
+    useEffect(() => {
+        const sessionId = getSession();
+        const viewKey = `ad_viewed_${sessionId}_${ad._id}`;
 
-    const hasAlreadyViewed = sessionStorage.getItem(viewKey);
+        const hasAlreadyViewed = sessionStorage.getItem(viewKey);
 
-    if (hasAlreadyViewed) return;
+        if (hasAlreadyViewed) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          sessionStorage.setItem(viewKey, "true");
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    sessionStorage.setItem(viewKey, "true");
 
-          axios.post(`${apiUrl}ads/${ad._id}/view`).catch(() => {});
+                    axios.post(`${apiUrl}ads/${ad._id}/view`).catch(() => { });
 
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.6 }
-    );
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.6 }
+        );
 
-    if (ref.current) observer.observe(ref.current);
+        if (ref.current) observer.observe(ref.current);
 
-    return () => observer.disconnect();
-  }, [ad]);
+        return () => observer.disconnect();
+    }, [ad]);
 
-  const handleClick = () => {
-    axios.post(`${apiUrl}ads/${ad._id}/click`).catch(() => {});
-  };
+    const handleClick = () => {
+        axios.get(`${apiUrl}ads/${ad._id}/click`).catch(() => { });
+    };
 
     if (!ad) return null;
-    
+
     return (
 
         <div ref={ref} className="relative mb-4 p-4 bg-white border h-[310px] rounded-[12px] shadow-xl">
@@ -56,7 +56,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
                     <h4 className="font-semibold text-[24px] text-black mb-2">{ad.title}</h4>
 
                 </div>
-                <div className="">
+                <div>
                     <img
                         src={ad.image}
                         alt={ad.title}
