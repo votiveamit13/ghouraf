@@ -205,24 +205,42 @@ export const deleteUser = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    if (user.isAdmin) return res.status(403).json({ message: "Admins cannot be deleted" });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    if (user.isAdmin)
+      return res.status(403).json({ message: "Admins cannot be deleted" });
 
     if (user.firebaseUid) {
       try {
         await authAdmin.deleteUser(user.firebaseUid);
       } catch (err) {
-        console.error("Error deleting user", err);
-        return res.status(500).json({ message: "Failed to delete user", error: err.message });
+        console.error("Error deleting Firebase user", err);
+        return res.status(500).json({
+          message: "Failed to delete user",
+          error: err.message,
+        });
       }
     }
 
+    await Promise.all([
+      Space.deleteMany({ user: id }),
+      SpaceWanted.deleteMany({ user: id }),
+      TeamUp.deleteMany({ user: id }),
+    ]);
+
     await User.findByIdAndDelete(id);
 
-    res.json({ message: "User deleted successfully" });
+    return res.json({
+      message: "User and all associated posts deleted successfully",
+    });
+
   } catch (err) {
     console.error("Admin delete user error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    return res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
   }
 };
 

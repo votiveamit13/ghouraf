@@ -258,7 +258,7 @@ export default function DetailPage({ targetUserId }) {
         </button>
       </div>
 
-      <div className="container user-layout mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="container user-layout mt-4 grid grid-cols-1 lg:grid-cols-4 gap-0 lg:gap-6">
         <div className="col-span-3 space-y-6">
           <div
             data-hs-carousel='{
@@ -475,7 +475,7 @@ export default function DetailPage({ targetUserId }) {
           )}
 
           <button
-            className="bg-[#565ABF] text-white font-semibold mt-5 py-3 px-4 rounded-[12px]"
+            className="bg-[#565ABF] text-white font-semibold mt-5 py-3 px-4 rounded-[12px] mb-6 lg:mb-0"
             onClick={() => setShowTeamUp(true)}
           >
             Request to Team Up
