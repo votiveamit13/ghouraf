@@ -21,6 +21,9 @@ const AdSchema = new mongoose.Schema(
       enum: ["active", "inactive"],
       default: "active",
     },
+
+    views: { type: Number, default: 0 },
+    clicks: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

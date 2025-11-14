@@ -326,16 +326,16 @@ export default function SpaceWantedDetailPage() {
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Occupation</td>
-                                        <td>{spacewanted.occuptaion}</td>
+                                        <td>{spacewanted.occupation}</td>
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Any pets?</td>
                                         <td>{spacewanted.pets ? "Yes" : " No"}</td>
                                     </tr>
-                                    <tr>
+                                    {/* <tr>
                                         <td className="py-1 w-40 font-medium">Language</td>
                                         <td>{spacewanted.language}</td>
-                                    </tr>
+                                    </tr> */}
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Gender</td>
                                         <td>{spacewanted.gender}</td>
@@ -358,10 +358,10 @@ export default function SpaceWantedDetailPage() {
                                         <td className="py-1 w-40 font-medium">Pets Ok?</td>
                                         <td>Yes</td>
                                     </tr>
-                                    <tr>
+                                    {/* <tr>
                                         <td className="py-1 w-40 font-medium">Gender</td>
                                         <td>{spacewanted.roommatePref}</td>
-                                    </tr>
+                                    </tr> */}
                                 </tbody>
                             </table>
                         </div>

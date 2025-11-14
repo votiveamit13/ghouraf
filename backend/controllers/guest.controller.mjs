@@ -73,6 +73,16 @@ export const getPublicAds = async (req, res) => {
   }
 };
 
+export const incrementAdView = async (req, res) => {
+  try {
+    await Ad.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 export const subscribeNewsletter = async (req, res) => {
   try {
     const { email, agreedToTerms } = req.body;

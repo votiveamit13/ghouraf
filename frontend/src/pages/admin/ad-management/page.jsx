@@ -8,7 +8,7 @@ import axios from "axios";
 import { FaRegEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
-import PaginationComponent from "components/common/Pagination"; 
+import PaginationComponent from "components/common/Pagination";
 
 export default function AdManagement() {
   const navigate = useNavigate();
@@ -86,20 +86,20 @@ export default function AdManagement() {
   };
 
   const handleStatusChange = async (adId, newStatus) => {
-  try {
-    const token = localStorage.getItem("authToken");
-    await axios.put(
-      `${apiUrl}admin/updateAdStatus/${adId}`,
-      { status: newStatus },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    toast.success("Ad status updated!");
-    getAllAds(pagination.page);
-  } catch (error) {
-    console.error("Failed to update status:", error);
-    toast.error("Failed to update ad status.");
-  }
-};
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.put(
+        `${apiUrl}admin/updateAdStatus/${adId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Ad status updated!");
+      getAllAds(pagination.page);
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast.error("Failed to update ad status.");
+    }
+  };
 
 
   return (
@@ -126,6 +126,7 @@ export default function AdManagement() {
                   <th className="px-3 py-3 text-left font-semibold">URL</th>
                   <th className="px-3 py-3 text-left font-semibold">Image</th>
                   <th className="px-3 py-3 text-left font-semibold">Views</th>
+                  <th className="px-3 py-3 text-left font-semibold">Ad Click</th>
                   <th className="px-3 py-3 text-left font-semibold w-[180px]">Status</th>
                   <th className="px-3 py-3 text-center font-semibold w-[100px]">
                     Action
@@ -170,9 +171,8 @@ export default function AdManagement() {
                           style={{ width: 80, height: 80, objectFit: "cover" }}
                         />
                       </td>
-                      <td className="px-3 py-3">
-                        
-                      </td>
+                      <td className="px-3 py-3">{ad.views}</td>
+                      <td className="px-3 py-3">{ad.clicks}</td>
                       <td className="px-3 py-3">
                         <select
                           value={ad.status}

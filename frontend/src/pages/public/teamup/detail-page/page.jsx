@@ -187,7 +187,7 @@ export default function TeamUpDetailPage() {
 
     return (
         <>
-            <div className="container px-4 mt-5">
+            <div className="container user-layout mt-5">
                 <button className="text-sm px-4 py-2 font-medium text-black border-[1px] border-[#AACCEE] rounded-[2px]">
                     <Link to={`/team-up`} className="flex items-center gap-2">
                         <FaArrowLeftLong />  Back to Ads
@@ -195,12 +195,12 @@ export default function TeamUpDetailPage() {
                 </button>
             </div>
 
-            <div className="container px-4 mt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="container user-layout mt-4 grid grid-cols-1 lg:grid-cols-4 gap-0 lg:gap-6">
                 <div className="col-span-3 space-y-6">
                     <h2 className="text-[20px] text-black font-semibold">
                         {teamup.title} in {locationString}
                     </h2>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col lg:flex-row gap-0 lg:gap-4">
                         <div
                             data-hs-carousel='{
                             "loadingClasses": "opacity-0",
@@ -210,7 +210,7 @@ export default function TeamUpDetailPage() {
                             className="relative"
                         >
                             <div className="hs-carousel flex flex-col gap-2">
-                                <div className="relative grow overflow-hidden w-[592px] min-h-96 bg-white rounded-[10px]">
+                                <div className="relative grow overflow-hidden w-full lg:w-[592px] min-h-96 bg-white rounded-[10px]">
                                     <div className="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
                                         {images.map((src, idx) => (
                                             <div className="hs-carousel-slide" key={idx}>
@@ -324,10 +324,10 @@ export default function TeamUpDetailPage() {
                                         <td className="py-1 w-40 font-medium">Any pets?</td>
                                         <td>{teamup.pets ? "Yes" : "No"}</td>
                                     </tr>
-                                    <tr>
+                                    {/* <tr>
                                         <td className="py-1 w-40 font-medium">Language</td>
                                         <td>{teamup.language}</td>
-                                    </tr>
+                                    </tr> */}
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Occupation</td>
                                         <td>{teamup.occupation}</td>
@@ -366,10 +366,10 @@ export default function TeamUpDetailPage() {
                                             <td>{teamup.minAge}-{teamup.maxAge}</td>
                                         </tr>
                                     )}
-                                    <tr>
+                                    {/* <tr>
                                         <td className="py-1 w-40 font-medium">Gender</td>
                                         <td>{teamup.roommatePref}</td>
-                                    </tr>
+                                    </tr> */}
                                 </tbody>
                             </table>
                         </div>
@@ -393,7 +393,7 @@ export default function TeamUpDetailPage() {
                         })}</span></p>
                         <button onClick={handleMessageClick}
                             disabled={user?._id === teamup.user?._id || messageLoading}
-                            className={`mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-[5px] text-white 
+                            className={`mt-3 w-1/2 mx-auto lg:w-full flex items-center justify-center gap-2 py-2 rounded-[5px] text-white 
     ${user?._id === teamup.user?._id ? "bg-gray-400 cursor-not-allowed" : "bg-[#565ABF]"}
   `}
                         >
@@ -406,7 +406,7 @@ export default function TeamUpDetailPage() {
                         </button>
                     </div>
 
-                    <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px]">
+                    <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px] mb-6 lg:mb-0">
                         <h4 className="text-[18px] font-medium text-black border-b flex items-center gap-2 px-4 py-3"><BiCheckShield color="#198754" size={20} />Stay safe</h4>
                         <p className="text-[18px] text-black px-4 py-3">
                             <span className="text-[#565ABF]">TIP</span>: Always view before you pay any money.
