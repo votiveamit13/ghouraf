@@ -82,6 +82,20 @@ export const incrementAdView = async (req, res) => {
   }
 };
 
+export const handleAdClick = async (req, res) => {
+  try {
+    const ad = await Ad.findById(req.params.id);
+    if (!ad) return res.status(404).send("Ad not found");
+
+    ad.clicks += 1;
+    await ad.save();
+
+    return res.redirect(ad.url);
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+};
+
 
 export const subscribeNewsletter = async (req, res) => {
   try {
