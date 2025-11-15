@@ -26,7 +26,7 @@ function StepHeader({ step }) {
 
   return (
     <div className="relative rounded-t-2xl border border-slate-200 bg-white w-full">
-      <div className="flex items-center py-4 gap-4 ml-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center py-4 gap-4 ml-4">
         {steps.map((s, idx) => {
           const Icon = s.icon;
           const isDone = step > s.id;
@@ -65,7 +65,7 @@ function StepHeader({ step }) {
 
       <div className="h-px bg-[#E8EEF7]" />
       <div
-        className="absolute bottom-0 h-[3px] bg-[#A321A6] rounded-full transition-all duration-300 px-6"
+        className="absolute bottom-0 h-[3px] bg-[#A321A6] rounded-full transition-all duration-300 px-6 hidden md:block"
         style={{
           left: `${(step - 1) * (100 / steps.length)}%`,
           width: `${100 / steps.length}%`,
@@ -464,7 +464,7 @@ export default function PostSpace() {
         Post A Space
       </div>
 
-      <div className="max-w-4xl w-full mx-auto mt-6 mb-16">
+      <div className="md:max-w-2xl lg:max-w-4xl w-[90%] md:w-full mx-auto mt-6 mb-16">
         {!previewMode && <StepHeader step={step} />}
 
         <div className="bg-white rounded-b-2xl shadow-sm border border-t-0 border-slate-200 p-4">

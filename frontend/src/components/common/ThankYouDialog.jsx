@@ -26,7 +26,7 @@ export default function ThankYou() {
       >
         Thank You
       </div>
-      <div className="mt-5 bg-gray-50 flex items-center justify-center">
+      <div className="m-auto bg-gray-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-xl shadow-lg p-4 max-w-md w-full text-center">
           <div className="flex justify-center mb-4">
             <div>
@@ -35,7 +35,7 @@ export default function ThankYou() {
           </div>
 
           <h2 className="text-2xl font-bold mb-2 text-black">{title}</h2>
-          <p className="text-black mb-6">{subtitle}</p>
+          <p className="text-black mb-4">{subtitle}</p>
 
           <div className="flex gap-4 justify-center">
             <button

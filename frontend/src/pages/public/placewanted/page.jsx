@@ -6,9 +6,10 @@ import SearchBar from "components/public/SearchBar";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Loader from "components/common/Loader";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import queryString from "query-string";
 import { useAuth } from "context/AuthContext";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function PlaceWanted() {
     const { user, loading: authLoading } = useAuth();
@@ -23,6 +24,14 @@ export default function PlaceWanted() {
     const locationHook = useLocation();
     const itemsPerPage = 20;
     const adsPerPage = 4;
+    const [showInvalidDialog, setShowInvalidDialog] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authLoading && !user) {
+            setShowInvalidDialog(true);
+        }
+    }, [user, authLoading]);
 
     useEffect(() => {
         const parsed = queryString.parse(locationHook.search);
@@ -109,9 +118,18 @@ export default function PlaceWanted() {
                     </div>
                 </div>
                 {!user ? (
-                    <div className="text-center py-20 text-gray-500 font-medium text-lg">
-                        Please login first to show the posts.
-                    </div>
+                    <ConfirmationDialog
+                        className="navbar-confirm-dialog"
+                        show={showInvalidDialog}
+                        title="⚠️ Place Wanted"
+                        message="Please login or create an account to view the posts."
+                        onConfirm={() => { }}
+                        onCancel={() => {
+                            setShowInvalidDialog(false);
+                            navigate("/");
+                        }}
+                    />
+
                 ) : (
                     <>
                         {loading ? (

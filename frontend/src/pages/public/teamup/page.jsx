@@ -6,13 +6,14 @@ import Filters from "components/public/team_up/Filters";
 import PropertyList from "components/public/team_up/PropertyList";
 import SearchBar from "components/public/SearchBar";
 import Loader from "components/common/Loader";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import queryString from "query-string";
+import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function TeamUp() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const locationHook = useLocation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const userId = user?._id;
 
   const [page, setPage] = useState(1);
@@ -24,6 +25,14 @@ export default function TeamUp() {
   const [ads, setAds] = useState([]);
   const itemsPerPage = 20;
   const adsPerPage = 4;
+      const [showInvalidDialog, setShowInvalidDialog] = useState(false);
+      const navigate = useNavigate();
+  
+      useEffect(() => {
+          if (!authLoading && !user) {
+              setShowInvalidDialog(true);
+          }
+      }, [user, authLoading]);
 
   const [filters, setFilters] = useState({
     minValue: 0,
@@ -133,9 +142,17 @@ useEffect(() => {
           </div>
         </div>
          {!user ? (
-          <div className="text-center py-20 text-gray-500 font-medium text-lg">
-            Please login first to show the posts.
-          </div>
+                    <ConfirmationDialog
+                        className="navbar-confirm-dialog"
+                        show={showInvalidDialog}
+                        title="⚠️ Team Up"
+                        message="Please login or create an account to view the posts."
+                        onConfirm={() => { }}
+                        onCancel={() => {
+                            setShowInvalidDialog(false);
+                            navigate("/");
+                        }}
+                    />
         ) : (
             <>
         {loading ? (

@@ -59,7 +59,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-[40%] overflow-scroll h-[550px] p-4 no-scrollbar">
+      <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-[90%] md:max-w-[60%] lg:max-w-[40%] overflow-scroll h-[550px] p-4 no-scrollbar">
         <button 
           onClick={onClose} 
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
@@ -95,7 +95,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
           <button
             onClick={handleConfirm}
             disabled={!stripe || !elements || loading}
-            className="px-6 py-2 rounded-lg bg-[#4E2DD2] text-white hover:bg-[#3c21aa] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            className="px-4 py-2 rounded-lg bg-[#4E2DD2] text-white hover:bg-[#3c21aa] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           >
             {loading ? (
               <span className="flex items-center">
