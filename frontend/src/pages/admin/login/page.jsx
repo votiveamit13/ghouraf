@@ -38,7 +38,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-[500px] bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="w-[350px] md:w-[500px] bg-white rounded-xl shadow-md overflow-hidden">
         <div className="p-4 text-center">
           <img
             src={require("../../../assets/img/theme/Ghouraf.png")}
@@ -49,17 +49,17 @@ const LoginPage = () => {
             Welcome Back! Login to Continue
           </p>
         </div>
-        <div className="px-6 pb-6">
+        <div className="px-4 pb-6">
           <form onSubmit={handleSubmit}>
             {error && <div className="text-red-500 mb-3 text-sm text-center">{error}</div>}
 
-            <div className="mb-4">
+            <div className="mb-4 w-full md:w-[80%] mx-auto">
               <div className="flex items-center border border-gray-300 rounded-md px-2 py-2 bg-gray-50">
                 <MdOutlineMail size={20} className="text-gray-500 mr-2" />
                 <input
                   type="email"
                   placeholder="Email"
-                  className="flex-1 bg-transparent outline-none text-gray-700"
+                  className="flex-1 bg-transparent outline-none text-gray-700 "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -67,7 +67,7 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <div className="mb-4">
+            <div className="mb-4 w-full md:w-[80%] mx-auto">
               <div className="flex items-center border border-gray-300 rounded-md px-2 py-2 bg-gray-50">
                 <MdLockOutline size={20} className="text-gray-500 mr-2" />
                 <input
@@ -81,12 +81,14 @@ const LoginPage = () => {
               </div>
             </div>
 
+            <div className="w-full md:w-[80%] mx-auto">
             <button
               type="submit"
               className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200"
             >
               Login
             </button>
+            </div>
           </form>
         </div>
       </div>

@@ -88,10 +88,10 @@ const paginatedReports = filteredReports;
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+          <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
             <h3 className="text-lg font-semibold text-gray-800">
               Reports Management
             </h3>
@@ -105,14 +105,14 @@ const paginatedReports = filteredReports;
             <table className="min-w-full text-sm text-gray-700 table-fixed">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-3 text-left font-semibold">S. No.</th>
-                  <th className="px-3 py-3 text-left font-semibold">Post Title</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Post Title</th>
                   <th className="px-3 py-3 text-left font-semibold">Post Category</th>
                   <th className="px-3 py-3 text-left font-semibold">Report Data</th>
-                  <th className="px-3 py-3 text-left font-semibold">Reported By</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Reported By</th>
                   <th className="px-3 py-3 text-left font-semibold">Date</th>
-                  <th className="px-3 py-3 text-left font-semibold">Post Action</th>
-                  <th className="px-3 py-3 text-left font-semibold">Report Action</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Post Action</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Report Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
@@ -123,7 +123,7 @@ const paginatedReports = filteredReports;
                       <td className="px-3 py-3">{report.postId.title}</td>
                       <td className="px-3 py-3">{report.postType}</td>
                       <td className="px-3 py-3">{report.title}</td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         {report.user?.profile
                           ? `${report.user?.profile?.firstName} ${report.user?.profile?.lastName}`
                           : "—"}
@@ -245,7 +245,8 @@ const paginatedReports = filteredReports;
                       />
 
 
-                      <td className="px-3 py-3 flex gap-2">
+                                                            <td className="px-3 py-3 ">
+                                            <div className="flex items-center justify-center gap-2">
                         <IoEyeOutline
                           size={20}
                           className="cursor-pointer"
@@ -261,6 +262,7 @@ const paginatedReports = filteredReports;
                             setShowConfirm(true);
                           }}
                         />
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -297,8 +299,8 @@ const paginatedReports = filteredReports;
       />
 
       {selectedReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white w-[600px] max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-2">
+          <div className="bg-white w-[650px] max-h-[90vh] rounded-lg shadow-2xl overflow-hidden flex flex-col">
             <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">
               <h2 className="text-xl font-bold text-gray-800">
                 Report Details

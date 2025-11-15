@@ -21,8 +21,8 @@ export default function ViewDetails() {
 
     return (
         <>
-            <Header />
-            <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                     <div className="px-3 py-[20px] border-b border-gray-200 d-flex justify-between">
                         <h3 className="text-lg font-semibold text-gray-800">View Details</h3>

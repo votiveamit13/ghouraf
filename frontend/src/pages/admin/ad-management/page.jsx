@@ -104,10 +104,10 @@ export default function AdManagement() {
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-3 py-3 border-b border-gray-200 flex justify-between">
+          <div className="px-3 py-3 border-b border-gray-200 flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
             <h3 className="text-lg font-semibold text-gray-800">Ad Management</h3>
             <button
               onClick={() => navigate("/admin/ad-management/add")}
@@ -122,12 +122,12 @@ export default function AdManagement() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-3 py-3 text-left font-semibold w-[60px]">S.No</th>
-                  <th className="px-3 py-3 text-left font-semibold">Title</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Title</th>
                   <th className="px-3 py-3 text-left font-semibold">URL</th>
                   <th className="px-3 py-3 text-left font-semibold">Image</th>
                   <th className="px-3 py-3 text-left font-semibold">Views</th>
-                  <th className="px-3 py-3 text-left font-semibold">Ad Click</th>
-                  <th className="px-3 py-3 text-left font-semibold w-[180px]">Status</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Ad Click</th>
+                  <th className="px-3 py-3 text-left font-semibold">Status</th>
                   <th className="px-3 py-3 text-center font-semibold w-[100px]">
                     Action
                   </th>
@@ -152,13 +152,13 @@ export default function AdManagement() {
                       <td className="px-3 py-3">
                         {(pagination.page - 1) * 10 + (index + 1)}
                       </td>
-                      <td className="px-3 py-3">{ad.title}</td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 w-[200px] max-w-[200px] whitespace-normal break-words">{ad.title}</td>
+                      <td className="px-3 py-3 w-[180px] max-w-[180px] whitespace-normal break-words">
                         <a
                           href={ad.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-blue-600 hover:underline break-all"
+                          className="text-blue-600 hover:underline"
                         >
                           {ad.url}
                         </a>
@@ -177,7 +177,7 @@ export default function AdManagement() {
                         <select
                           value={ad.status}
                           onChange={(e) => handleStatusChange(ad._id, e.target.value)}
-                          className="block w-[75%] px-2 py-1 border-[1px] border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="block w-[100px] max-w-[100px] px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         >
                           <option value="active">Active</option>
                           <option value="inactive">Inactive</option>
@@ -222,7 +222,7 @@ export default function AdManagement() {
       </div>
 
       {showModal && selectedAd && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-2">
           <div className="bg-white rounded-lg shadow-xl max-w-xl w-full px-4 py-4 relative">
             <button
               onClick={closeModal}

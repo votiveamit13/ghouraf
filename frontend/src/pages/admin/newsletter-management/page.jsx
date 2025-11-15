@@ -68,10 +68,10 @@ export default function Newsletter() {
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-3 py-3 border-b border-gray-200 flex justify-between">
+          <div className="px-3 py-3 border-b border-gray-200 flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
             <h3 className="text-lg font-semibold text-gray-800">Newsletter Management</h3>
             <SearchFilter placeholder="Search by email..." onSearch={setSearchTerm} />
           </div>
@@ -83,7 +83,7 @@ export default function Newsletter() {
               <table className="min-w-full text-sm text-gray-700 table-fixed">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-3 text-left font-semibold">S. No.</th>
+                    <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
                     <th className="px-3 py-3 text-left font-semibold">Email Id</th>
                     <th className="px-3 py-3 text-center font-semibold">Action</th>
                   </tr>

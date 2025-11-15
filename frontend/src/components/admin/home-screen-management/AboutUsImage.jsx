@@ -191,7 +191,7 @@ const urls = [data.imagePath1, data.imagePath2, data.imagePath3].map((url) =>
         ))}
       </div>
 
-      <div className="text-right mr-3 mb-8">
+      <div className="text-right mr-3 mb-4">
         <button
           onClick={handleUpload}
           disabled={loading}

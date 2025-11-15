@@ -96,10 +96,10 @@ const paginatedUsers = filteredUsers;
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+          <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
             <h3 className="text-lg font-semibold text-gray-800">
               User Management
             </h3>
@@ -113,8 +113,8 @@ const paginatedUsers = filteredUsers;
             <table className="min-w-full text-sm text-gray-700">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-3 text-left font-semibold">S. No.</th>
-                  <th className="px-3 py-3 text-left font-semibold">
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">
                     User Name
                   </th>
                   <th className="px-3 py-3 text-left font-semibold">
@@ -131,12 +131,12 @@ const paginatedUsers = filteredUsers;
                 {paginatedUsers.map((user, index) => (
                   <tr key={user._id}>
                     <td className="px-3 py-3">{startIndex + index + 1}</td>
-                    <td className="px-3 py-3"> {user.profile?.firstName} {user.profile?.lastName}</td>
+                    <td className="px-3 py-3 whitespace-nowrap"> {user.profile?.firstName} {user.profile?.lastName}</td>
                     <td className="px-3 py-3">{user.email}</td>
                     <td className="px-3 py-3">{user.profile?.mobile}</td>
                     <td className="px-3 py-3">
                       <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-[80%] ${user.status === "active"
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-full ${user.status === "active"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                           }`}
@@ -154,7 +154,7 @@ const paginatedUsers = filteredUsers;
                         onChange={(e) =>
                           handleActionChange(user._id, e.target.value)
                         }
-                        className="block w-[50%] px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="block w-full min-w-full lg:min-w-0 px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                       >
                         <option value="unblock">Unblock</option>
                         <option value="block">Block</option>

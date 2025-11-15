@@ -125,8 +125,8 @@ export default function EditAd() {
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
             <h3 className="text-lg font-semibold text-gray-800">Edit Ad</h3>
@@ -193,11 +193,11 @@ export default function EditAd() {
                 {preview && (
                   <div className="mt-3 p-3 border rounded bg-light w-full">
                     <p className="text-black">Ad Preview</p>
-                    <div className="relative mb-4 p-4 bg-white border h-[310px] rounded-[12px] shadow-xl">
+                    <div className="relative mb-4 p-4 bg-white border min-h-[310px] h-auto rounded-[12px] shadow-xl">
                       <div className="absolute top-[-2px] left-[-2px] bg-yellow-300 text-black text-xs font-semibold px-2 py-1 rounded mb-2 inline-block">
                         Advertisement
                       </div>
-                      <h4 className="font-semibold text-[24px] text-black mb-2">
+                      <h4 className="font-semibold text-[24px] text-black mb-2 break-words">
                         {formData.title || "Ad Title Preview"}
                       </h4>
 
@@ -209,7 +209,7 @@ export default function EditAd() {
                         />
                       </div>
 
-                      <div className="flex absolute top-11 right-2 gap-2">
+                      <div className="flex absolute bottom-3 md:bottom-2 right-2 gap-2">
                         <button
                           type="button"
                           className="btn bg-[#565ABF] text-white w-[100px] btn-sm mt-2"

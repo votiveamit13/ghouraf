@@ -6,7 +6,7 @@ import { BsPostcardFill } from "react-icons/bs";
 import { TbMessageReportFilled } from "react-icons/tb";
 import { RiAdvertisementFill } from "react-icons/ri";
 
-const Header = () => {
+const Header = ({ hideStatsOnMobile = false }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -38,9 +38,10 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-cyan-500 to-blue-500 pb-8 pt-7">
-      <div className="px-[40px] mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <div className="bg-gradient-to-r from-cyan-500 to-blue-500 pb-[65px] md:pb-[100px] lg:pb-[115px] pt-[140px] md:pt-[85px]">
+      <div className="px-[20px] md:px-[40px] mx-auto max-w-7xl">
+        <div className={`grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 
+            ${hideStatsOnMobile ? "hidden sm:grid" : ""}`}>
           <div className="bg-white shadow rounded-lg p-4 flex justify-between items-center">
             <div>
               <h5 className="text-xs font-semibold text-gray-500 uppercase">

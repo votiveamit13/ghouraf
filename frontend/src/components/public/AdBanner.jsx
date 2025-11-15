@@ -40,7 +40,7 @@ export default function AdBanner({ ad }) {
 
     return (
 
-        <div ref={ref} className="relative mb-4 p-4 bg-white border h-[310px] rounded-[12px] shadow-xl">
+        <div ref={ref} className="relative mb-4 p-4 bg-white border min-h-[310px] h-auto rounded-[12px] shadow-xl">
             <div className="absolute top-[-2px] left-[-2px] bg-yellow-300 text-black text-xs font-semibold px-2 py-1 rounded mb-2 inline-block">
                 Advertisement
             </div>

@@ -61,10 +61,10 @@ const paginatedPosts = filteredPosts;
 
     return (
         <>
-            <Header />
-            <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
                 <div className="bg-white shadow rounded-lg overflow-hidden">
-                    <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+                    <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
                         <h3 className="text-lg font-semibold text-gray-800">
                             Space Wanted Management
                         </h3>
@@ -78,7 +78,7 @@ const paginatedPosts = filteredPosts;
                         <table className="min-w-full text-sm text-gray-700 table-fixed">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-3 py-3 text-left font-semibold">S. No.</th>
+                                    <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
                                     <th className="px-3 py-3 text-left font-semibold">Title</th>
                                     <th className="px-3 py-3 text-left font-semibold">Room Sizes</th>
                                     <th className="px-3 py-3 text-left font-semibold">Budget</th>
@@ -178,7 +178,8 @@ const paginatedPosts = filteredPosts;
                                                 <option value="inactive">Inactive</option>
                                             </select>
                                         </td>
-                                        <td className="px-3 py-3 flex gap-2">
+                                        <td className="px-3 py-3 ">
+                                            <div className="flex items-center justify-center gap-2">
                                             <IoEyeOutline
                                                 size={20}
                                                 className="cursor-pointer"
@@ -194,6 +195,7 @@ const paginatedPosts = filteredPosts;
                                                     setShowConfirm(true);
                                                 }}
                                             />
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -241,7 +243,7 @@ const paginatedPosts = filteredPosts;
             </div>
 
             {selectedPost && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-2">
                     <div className="bg-white w-[700px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
 
                         <div className="flex justify-between items-center px-3 py-3 border-b bg-gray-50">

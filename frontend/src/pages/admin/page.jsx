@@ -35,9 +35,9 @@ const Dashboard = () => {
     <>
       <Header />
 
-      <div className="px-[40px] mt-[-8%] w-full">
+      <div className="px-[20px] md:px-[40px] mt-[-8%] w-full mb-6 lg:mb-0">
         <div className="bg-gradient-to-r from-[#565ABF] to-[#A321A6] rounded-xl shadow p-4 w-full">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0 mb-3">
             <h2 className="text-white text-xl font-semibold">Overview</h2>
             <div className="flex space-x-2">
               {["month", "week"].map((tab) => (
@@ -56,7 +56,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="d-flex gap-5">
+          <div className="d-flex flex-col lg:flex-row gap-5">
             <ActivityChart
               title="User Activity"
               subtitle={

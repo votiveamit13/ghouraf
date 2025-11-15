@@ -78,10 +78,10 @@ export default function FaqManagement() {
     const paginatedfaqs = faqs.slice(startIndex, startIndex + pageSize);
     return (
         <>
-            <Header />
-            <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
                 <div className="bg-white shadow rounded-lg overflow-hidden">
-                    <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+                    <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
                         <h3 className="text-lg font-semibold text-gray-800">
                             FAQ Management
                         </h3>
@@ -91,7 +91,7 @@ export default function FaqManagement() {
                         <table className="min-w-full text-sm text-gray-700 table-fixed">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-3 py-3 w-12 text-left font-semibold">S. No.</th>
+                                    <th className="px-3 py-3 w-12 text-left font-semibold whitespace-nowrap">S. No.</th>
                                     <th className="px-3 py-3 w-1/4 text-left font-semibold">
                                         Question
                                     </th>
@@ -114,7 +114,7 @@ export default function FaqManagement() {
                                                 onChange={(e) =>
                                                     handleActionChange(faq._id, e.target.value)
                                                 }
-                                                className="block w-[65%] px-2 py-1 border-[1px] border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                className="block w-[100px] max-w-[100px] px-2 py-1 border-[1px] border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                             >
                                                 <option value="active">Active</option>
                                                 <option value="inactive">Inactive</option>

@@ -89,8 +89,8 @@ export default function EditPolicy() {
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                     <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
                         <h3 className="text-lg font-semibold text-gray-800">Edit Policy</h3>
@@ -174,7 +174,7 @@ export default function EditPolicy() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
                   {loading ? "Updating..." : "Update Policy"}
                 </button>

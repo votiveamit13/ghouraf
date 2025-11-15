@@ -72,7 +72,7 @@ export default function ViewPostModal({ show, report, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-2">
       <div className="bg-white w-[650px] max-h-[90vh] rounded-lg shadow-2xl overflow-hidden flex flex-col">
         <div className="flex justify-between items-center px-4 py-3 border-b bg-gray-100">
           <h2 className="text-lg font-bold text-gray-800">Post Details</h2>

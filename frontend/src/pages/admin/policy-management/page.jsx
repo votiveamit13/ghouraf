@@ -60,10 +60,10 @@ export default function PolicyManagement() {
 
   return (
     <>
-      <Header />
-      <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
                 <div className="bg-white shadow rounded-lg overflow-hidden">
-                    <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+                    <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
                         <h3 className="text-lg font-semibold text-gray-800">
               Policy Management
             </h3>
@@ -79,8 +79,8 @@ export default function PolicyManagement() {
                         <table className="min-w-full text-sm text-gray-700 table-fixed">
                             <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-3 text-left font-semibold w-[60px]">S.No</th>
-                  <th className="px-3 py-3 text-left font-semibold">Title</th>
+                  <th className="px-3 py-3 text-left font-semibold  whitespace-nowrap">S.No</th>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">Title</th>
                   <th className="px-3 py-3 text-left font-semibold">Policy Category</th>
                   <th className="px-3 py-3 text-left font-semibold">Last Updated</th>
                   <th className="px-3 py-3 text-center font-semibold w-[100px]">Action</th>
@@ -97,7 +97,7 @@ export default function PolicyManagement() {
                   paginatedPolicies.map((policy, index) => (
                     <tr key={policy._id} className="hover:bg-gray-50">
                       <td className="px-3 py-3">{startIndex + index + 1}</td>
-                      <td className="px-3 py-3">{policy.title}</td>
+                      <td className="px-3 py-3 whitespace-nowrap">{policy.title}</td>
                                             <td className="px-3 py-3 text-gray-600">
                         {policy.category || "-"}
                       </td>
@@ -108,7 +108,7 @@ export default function PolicyManagement() {
                         <div className="flex items-center justify-center gap-3">
                           <FaRegEdit
                             size={18}
-                            className="cursor-pointer text-blue-600 hover:text-blue-800"
+                            className="cursor-pointer text-gray-600"
                             onClick={() =>
                               navigate("/admin/policy-management/edit", {
                                 state: { policy },

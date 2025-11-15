@@ -75,10 +75,10 @@ const paginatedmessages = filteredMessages;
 
     return (
         <>
-            <Header />
-            <div className="px-[40px] mt-[-8%] w-full fluid position-relative">
+      <Header hideStatsOnMobile={true}/>
+      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-3 py-3 border-b border-gray-200 d-flex justify-between">
+          <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
             <h3 className="text-lg font-semibold text-gray-800">
                             Contact Form
                         </h3>
@@ -91,7 +91,7 @@ const paginatedmessages = filteredMessages;
             <table className="min-w-full text-sm text-gray-700">
               <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-3 py-3 text-left font-semibold">S. No.</th>
+                                    <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
                                     <th className="px-3 py-3 text-left font-semibold">
                                         Name
                                     </th>
@@ -111,7 +111,8 @@ const paginatedmessages = filteredMessages;
                                         <td className="px-3 py-3">{message.fullName}</td>
                                         <td className="px-3 py-3">{message.email}</td>
                                         <td className="px-3 py-3">{message.subject}</td>
-                                        <td className="px-3 py-3 flex gap-2">
+                                                              <td className="px-3 py-3">
+                        <div className="flex items-center gap-2 justify-center">
                                             <IoEyeOutline
                                                 size={20}
                                                 className="cursor-pointer"
@@ -127,6 +128,7 @@ const paginatedmessages = filteredMessages;
                                                     setConfirmOpen(true);
                                                 }}
                                             />
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -153,7 +155,7 @@ const paginatedmessages = filteredMessages;
             </div>
 
             {previewMessage && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
                     <div className="bg-white w-[600px] max-h-[80vh] rounded-lg shadow-lg overflow-y-auto">
                         <div className="flex justify-between items-center p-4 border-b">
                             <h2 className="text-lg font-semibold">{previewMessage.fullName}</h2>
