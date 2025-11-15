@@ -609,14 +609,14 @@ export default function Navbar() {
 
           {!user ? (
             <>
-              <span className="flex space-x-2">
+              <span className="flex items-center space-x-2">
                 <button
                   onClick={() => setRegisterDialog(true)}
                   className="flex items-center text-[#565ABF] hover:text-[#A321A6]"
                 >
                   <LuUserPen size={30} className="mr-1" /> Register
                 </button>
-                /
+                <span>/</span>
                 <button
                   onClick={() => setLoginDialog(true)}
                   className="text-[#565ABF] hover:text-[#A321A6]"

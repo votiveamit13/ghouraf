@@ -292,22 +292,22 @@ export default function Filters({ filters, setFilters, setPage }) {
 
 
       <div className="mb-4 px-3 py-2 text-black border-[#D7D7D7] relative" ref={dropdownRef}>
-        <label className="font-medium text-[16px]">Amenities</label>
+        <label className="font-medium text-[16px]">Interests</label>
         <div className="mt-2 w-full">
           <button
             type="button"
-            className="border-[1px] border-[#D1D5DB] w-full text-start text-black font-medium bg-white p-2 rounded-[10px]"
+            className="border-[1px] border-[#D1D5DB] w-full text-start text-[#948E8E] text-[16px] font-medium bg-white p-2 rounded-[10px]"
             onClick={() => setShowAmenities(!showAmenities)}
           >
             {filters.amenities.length > 0
               ? filters.amenities.join(", ")
-              : "Select amenities"}
+              : "Select interests"}
           </button>
 
           {showAmenities && (
             <ul
-              className="absolute z-50 w-full p-2 text-black bg-white border border-[#D7D7D7] rounded-[10px]"
-              style={{ maxHeight: "200px", overflowY: "auto" }}
+              className="absolute z-50 w-[88%] p-2 text-[#948E8E] text-[16px] bg-white border border-[#D7D7D7] rounded-[10px]"
+              style={{ maxHeight: "169px", overflowY: "auto" }}
             >
               {[
                 "Sports",
@@ -327,7 +327,7 @@ export default function Filters({ filters, setFilters, setPage }) {
                 "Cooking & Food",
                 "Volunteering / Community Work",
               ].map((amenity) => (
-                <li key={amenity} className="flex items-center py-1">
+                <li key={amenity} className="flex items-center py-1 text-[16px]">
                   <input
                     type="checkbox"
                     className="form-check-input ml-1"
