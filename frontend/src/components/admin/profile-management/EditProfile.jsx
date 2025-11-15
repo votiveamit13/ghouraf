@@ -233,7 +233,7 @@ export default function EditProfile() {
 
               <div className="mb-4">
                 <label className="form-label">Change Password <span className="text-danger">*</span></label>
-                <div className="row g-3">
+                <div className="row gap-6 md:gap-0">
                   <div className="col-md-4">
                     <input
                       type="password"
