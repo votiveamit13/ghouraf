@@ -210,7 +210,7 @@ export default function TeamUpDetailPage() {
                             className="relative"
                         >
                             <div className="hs-carousel flex flex-col gap-2">
-                                <div className="relative grow overflow-hidden w-full lg:w-[592px] min-h-96 bg-white rounded-[10px]">
+                                <div className="relative grow overflow-hidden w-full lg:w-[390px] min-h-96 bg-white rounded-[10px]">
                                     <div className="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
                                         {images.map((src, idx) => (
                                             <div className="hs-carousel-slide" key={idx}>
@@ -408,9 +408,11 @@ export default function TeamUpDetailPage() {
 
                     <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px] mb-6 lg:mb-0">
                         <h4 className="text-[18px] font-medium text-black border-b flex items-center gap-2 px-4 py-3"><BiCheckShield color="#198754" size={20} />Stay safe</h4>
-                        <p className="text-[18px] text-black px-4 py-3">
-                            <span className="text-[#565ABF]">TIP</span>: Always view before you pay any money.
-                        </p>
+              <p className="text-[18px] text-black px-4 py-3">
+    <a href="/safety-tips" className="text-[#565ABF]">
+      Read our safety & tips guide →
+    </a>
+  </p>
                         <div className="px-4 mt-0 mb-4">
                             <button
                                 onClick={() => {

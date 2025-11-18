@@ -121,8 +121,6 @@ export default function Navbar() {
     return age >= 12;
   };
 
-
-
   const validateField = (name, value) => {
     let message = "";
 
@@ -271,7 +269,7 @@ export default function Navbar() {
       }
 
       if (res.user) {
-        toast.success("Login Successful");
+        // toast.success("Login Successful");
         setLoginDialog(false);
         const allowedPaths = ["/spaces", "/spaces/", "/team-up", "/place-wanted"];
         const isAllowedPath = allowedPaths.some((path) => location.pathname.startsWith(path));
@@ -319,7 +317,7 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     navigate("/");
-    toast.info("Logout Successful");
+    // toast.info("Logout Successful");
   };
 
   const handleGoogleLogin = async () => {
@@ -536,20 +534,48 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center space-x-4">
+            {user && (
+              <>
+                <NotificationPanel userId={user?._id} isMobile={true} />
+              </>
+            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-purple-600 text-2xl"
             >
-              {isOpen ? <HiX size={40} /> : <HiMenu size={40} />}
+              <HiMenu size={40} />
             </button>
           </div>
         </div>
       </div>
 
       {/* MOBILE MENU */}
-      {isOpen && (
-        <div className="lg:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4">
+      <div
+        className={`
+    fixed inset-0 z-[999] bg-white transform transition-transform duration-300 lg:hidden
+    ${isOpen ? "translate-x-0" : "translate-x-full"}
+  `}
+      >
+        <div className="px-4 py-2 space-y-4 h-full overflow-y-auto relative">
+          <div className="flex items-center justify-between">
+            <NavLink to="/" className="flex items-center">
+              <img
+                src={require("../../assets/img/theme/Ghouraf.png")}
+                className="lg:w-40 md:w-40 sm:w-80 w-60 object-cover"
+                alt="Logo"
+              />
+            </NavLink>
+
+            {/* CLOSE BUTTON */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-[#565ABF] text-3xl"
+            >
+              <HiX size={40} />
+            </button>
+          </div>
+          {/* <div className="lg:hidden bg-white shadow-lg px-4 pb-4 pt-4 space-y-4"> */}
           {["spaces", "place-wanted", "team-up", "more-info"].map((item) => {
             if (item === "more-info") {
               return (
@@ -611,21 +637,25 @@ export default function Navbar() {
             <>
               <span className="flex items-center space-x-2">
                 <button
-                  onClick={() => setRegisterDialog(true)}
+                  onClick={() => { setIsOpen(false); setRegisterDialog(true); }}
                   className="flex items-center text-[#565ABF] hover:text-[#A321A6]"
                 >
                   <LuUserPen size={30} className="mr-1" /> Register
                 </button>
                 <span>/</span>
                 <button
-                  onClick={() => setLoginDialog(true)}
+                  onClick={() => { setIsOpen(false); setLoginDialog(true); }}
                   className="text-[#565ABF] hover:text-[#A321A6]"
                 >
                   Login
                 </button>
               </span>
-              <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+              {/* <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                 <IoIosAddCircleOutline className="mr-1 text-lg" /> Post Ad
+              </button> */}
+              <button className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition" onClick={() => { setIsOpen(false); setOpen(true); }}>
+                <IoIosAddCircleOutline className="mr-1 text-lg" />
+                <span className="ml-2 pl-2 border-l border-white">Post Ad</span>
               </button>
             </>
           ) : (
@@ -646,7 +676,7 @@ export default function Navbar() {
                   <span className="font-semibold">
                     Hi, {user.profile.firstName?.split(" ")[0] || "User"}
                   </span>
-                  <NotificationPanel userId={user?._id} isMobile={true} />
+                  {/* <NotificationPanel userId={user?._id} isMobile={true} /> */}
                 </div>
                 <span>{mobileDropdownOpen ? "▲" : "▼"}</span>
               </div>
@@ -655,7 +685,7 @@ export default function Navbar() {
                 <div className="mt-3 space-y-2 pl-2">
                   <a href="/user"
                     className="flex items-center py-1 hover:text-[#565ABF]"
-                    onClick={() => handleDropdownAction()}
+                    onClick={() => { setIsOpen(false); handleDropdownAction(); }}
                   >
                     <LuUserRound className="mr-2" /> My Account
                   </a>
@@ -663,6 +693,7 @@ export default function Navbar() {
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
+                      setIsOpen(false);
                       handleDropdownAction(() => setOpen(true));
                     }}
                     className="flex items-center py-2 hover:text-[#565ABF]"
@@ -672,30 +703,30 @@ export default function Navbar() {
 
                   <a href="/user/my-ads"
                     className="flex items-center py-1 hover:text-[#565ABF]"
-                    onClick={() => handleDropdownAction()}
+                    onClick={() => { setIsOpen(false); handleDropdownAction(); }}
                   >
                     <GoSync className="mr-2" /> My Ads
                   </a>
                   <a href="/user/saved-ads"
                     className="flex items-center py-1 hover:text-[#565ABF]"
-                    onClick={() => handleDropdownAction()}
+                    onClick={() => { setIsOpen(false); handleDropdownAction(); }}
                   >
                     <GrFavorite className="mr-2" /> Saved Ads
                   </a>
                   <a href="/user/messages"
                     className="flex items-center py-1 hover:text-[#565ABF]"
-                    onClick={() => handleDropdownAction()}
+                    onClick={() => { setIsOpen(false); handleDropdownAction(); }}
                   >
                     <LuMessageSquareText className="mr-2" /> Messages
                   </a>
                   <a href="/user/edit-my-details"
                     className="flex items-center py-1 hover:text-[#565ABF]"
-                    onClick={() => handleDropdownAction()}
+                    onClick={() => { setIsOpen(false); handleDropdownAction(); }}
                   >
                     <FiEdit className="mr-2" /> Edit My Details
                   </a>
                   <button
-                    onClick={() => handleDropdownAction(handleLogout)}
+                    onClick={() => { setIsOpen(false); handleDropdownAction(handleLogout); }}
                     className="flex items-center w-full py-1 hover:text-[#565ABF]"
                   >
                     <LuLogOut className="mr-2" /> Logout
@@ -705,7 +736,7 @@ export default function Navbar() {
             </div>
           )}
         </div>
-      )}
+      </div>
       {loginDialog && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-[17px] w-full max-w-lg relative shadow-lg">

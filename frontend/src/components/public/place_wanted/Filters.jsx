@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Filters({ setFilters: setParentFilters, setPage }) {
+   const isMobile = typeof window !== "undefined" && window.innerWidth <= 1024;
+    const [collapsed, setCollapsed] = useState(isMobile);
   const [showAmenities, setShowAmenities] = useState(false);
   const dropdownRef = useRef(null);
   const defaultFilters = {
@@ -62,15 +64,32 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
     <div className="bg-white text-black rounded-[4px] border-[1px] border-[#D7D7D7] mb-4 shadow-xl">
       <div className="px-3 py-2 border-b flex justify-between items-center mb-3">
         <h2 className="font-medium text-black text-[16px]">Filters</h2>
-        <button
-          type="button"
-          className="text-[16px] text-[#565ABF] underline"
-          onClick={handleReset}
-        >
-          Reset
-        </button>
+<div className="flex items-center space-x-2">
+<button
+            type="button"
+            className="text-[16px] text-[#565ABF] underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleReset();
+            }}
+          >
+            Reset
+          </button>
+
+          {isMobile && (
+            <button
+              type="button"
+              className="text-[18px]"
+              onClick={() => setCollapsed(!collapsed)}
+            >
+              {collapsed ? "▼" : "▲"}
+            </button>
+          )}
+        </div>
       </div>
 
+      {(!isMobile || !collapsed) && (
+        <>
       <div className="mb-4 px-3 py-2 text-black border-b border-[#D7D7D7]">
         <label className="font-medium text-[16px]">Budget</label>
         <div className="border border-[#D7D7D7] rounded-[7px] flex justify-between items-center max-w-[70%] mx-auto px-2 py-2 mt-2 text-sm">
@@ -371,7 +390,8 @@ onChange={() => handleFilterChange("roommatePref", opt.val)}
           )}
         </div>
       </div>
-
+</>
+      )}
     </div>
   );
 }

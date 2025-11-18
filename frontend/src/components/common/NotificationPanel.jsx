@@ -124,7 +124,7 @@ const renderNotifications = () => {
     return (
       <div
         key={n.id}
-        className={`px-4 py-3 border-b last:border-0 hover:bg-gray-50 cursor-pointer ${
+        className={`px-2 py-2 border-b last:border-0 hover:bg-gray-50 cursor-pointer ${
           !n.read ? "bg-purple-50" : "bg-white"
         }`}
         onClick={() => {
@@ -211,7 +211,7 @@ const renderNotifications = () => {
 
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
-          <div className="flex justify-between items-center border-b px-4 py-2">
+          <div className="flex justify-between items-center border-b px-2 py-2">
             <h3 className="text-sm font-semibold text-gray-700">
               Notifications
             </h3>
@@ -222,7 +222,7 @@ const renderNotifications = () => {
               Close
             </button>
           </div>
-          <div className="max-h-[650px] overflow-y-auto">
+          <div className="max-h-[400px] overflow-y-auto">
             {renderNotifications()}
           </div>
         </div>

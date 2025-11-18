@@ -18,7 +18,7 @@ export default function PropertyList({ properties = [], ads = [] }) {
   const orderedAds = [...ads];
 
   let adIndex = 0;
-  let insertPosition = 2;
+  let insertPosition = Math.floor(Math.random() * 6) + 2;
 
   while (adIndex < orderedAds.length) {
     if (insertPosition <= propertiesWithAds.length + adIndex) {
@@ -29,7 +29,7 @@ export default function PropertyList({ properties = [], ads = [] }) {
           ad: orderedAds[adIndex] 
         });
         adIndex++;
-        insertPosition += 3;
+        insertPosition += Math.floor(Math.random() * 6) + 2;
       } else {
         insertPosition++;
       }

@@ -438,9 +438,11 @@ export default function DetailPage({ targetUserId }) {
 
           <div className="bg-white shadow-xl border border-[#D7D7D7] rounded-[4px]">
             <h4 className="text-[18px] font-medium text-black border-b flex items-center gap-2 px-4 py-3"><BiCheckShield color="#198754" size={20} />Stay safe</h4>
-            <p className="text-[18px] text-black px-4 py-3">
-              <span className="text-[#565ABF]">TIP</span>: Always view before you pay any money.
-            </p>
+              <p className="text-[18px] text-black px-4 py-3">
+    <a href="/safety-tips" className="text-[#565ABF]">
+      Read our safety & tips guide →
+    </a>
+  </p>
             <div className="px-4 mt-0 mb-4">
               <button
                 onClick={() => {

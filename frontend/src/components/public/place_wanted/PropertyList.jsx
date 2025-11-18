@@ -17,7 +17,7 @@ export default function PropertyList({ properties = [], ads = [] }) {
     const finalList = [...promoted];
 
     let adIndex = 0;
-    let insertPosition = 2;
+    let insertPosition = Math.floor(Math.random() * 6) + 2;
     const propertiesWithAds = [...normal];
 
     while (adIndex < ads.length) {
@@ -26,7 +26,7 @@ export default function PropertyList({ properties = [], ads = [] }) {
             if (!prevItemIsAd) {
                 propertiesWithAds.splice(insertPosition, 0, { isAd: true, ad: ads[adIndex] });
                 adIndex++;
-                insertPosition += 3;
+                insertPosition += Math.floor(Math.random() * 6) + 2;
             } else {
                 insertPosition++;
             }
