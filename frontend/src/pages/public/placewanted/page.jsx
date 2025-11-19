@@ -25,9 +25,7 @@ export default function PlaceWanted() {
     const itemsPerPage = 20;
     const adsPerPage = 4;
     const navigate = useNavigate();
-     const [userHasPosted, setUserHasPosted] = useState(true);
     const [showInvalidDialog, setShowInvalidDialog] = useState(false);
-    const [showNoPostDialog, setShowNoPostDialog] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -47,39 +45,10 @@ export default function PlaceWanted() {
     }, [locationHook.search]);
 
     useEffect(() => {
-        const checkHasPosted = async () => {
-            if (!user?._id) return;
-
-            try {
-                const res = await axios.get(`${apiUrl}spacewanted`, {
-                    params: { userId: user._id }
-                });
-
-                const userPosts = res.data.data.filter(
-                    (item) => item.user?._id === user._id
-                );
-
-                if (userPosts.length === 0) {
-                    setUserHasPosted(false);
-                    setShowNoPostDialog(true); // show popup
-                } else {
-                    setUserHasPosted(true);
-                }
-            } catch (err) {
-                setUserHasPosted(false);
-                setShowNoPostDialog(true);
-            }
-        };
-
-        if (user) checkHasPosted();
-    }, [user]);
-
-useEffect(() => {
-        if (!userHasPosted) return;
         fetchData();
-    }, [page, sortBy, filters, userHasPosted]);
+    }, [page, sortBy, filters]);
 
-    const fetchData = async () => {
+   const fetchData = async () => {
         setLoading(true);
         try {
             const propertyParams = {
@@ -122,6 +91,7 @@ useEffect(() => {
         }
     };
 
+
     return (
         <div className="container user-layout mt-5 mb-8 grid grid-cols-1 lg:grid-cols-4 gap-0 lg:gap-6">
             <div className="col-span-1">
@@ -148,35 +118,20 @@ useEffect(() => {
                         </select>
                     </div>
                 </div>
-               {!user && (
+                {!user ? (
                     <ConfirmationDialog
                         className="navbar-confirm-dialog"
                         show={showInvalidDialog}
                         title="⚠️ Place Wanted"
                         message="Please login or create an account to view the posts."
-                        onConfirm={() => {}}
+                        onConfirm={() => { }}
                         onCancel={() => {
                             setShowInvalidDialog(false);
                             navigate("/");
                         }}
                     />
-                )}
 
-                {user && (
-                    <ConfirmationDialog
-                        // className="navbar-confirm-dialog"
-                        show={showNoPostDialog}
-                        title="⚠️ Place Wanted"
-                        message="You haven’t posted any Place Wanted yet. Please post first. Want to post?"
-                        onConfirm={() => navigate("/user/place-wanted-ad")}
-                        onCancel={() => {
-                            setShowNoPostDialog(false);
-                            navigate("/");
-                        }}
-                    />
-                )}
-
-                {user && userHasPosted && (
+                ) : (
                     <>
                         {loading ? (
                             <Loader fullScreen={false} />

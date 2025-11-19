@@ -15,7 +15,7 @@ export default function TeamUp() {
   const locationHook = useLocation();
   const { user, loading: authLoading } = useAuth();
   const userId = user?._id;
-
+  const [showNoPostDialog, setShowNoPostDialog] = useState(false);
   const [page, setPage] = useState(1);
   const [teamups, setTeamups] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -25,14 +25,14 @@ export default function TeamUp() {
   const [ads, setAds] = useState([]);
   const itemsPerPage = 20;
   const adsPerPage = 4;
-      const [showInvalidDialog, setShowInvalidDialog] = useState(false);
-      const navigate = useNavigate();
-  
-      useEffect(() => {
-          if (!authLoading && !user) {
-              setShowInvalidDialog(true);
-          }
-      }, [user, authLoading]);
+  const [showInvalidDialog, setShowInvalidDialog] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setShowInvalidDialog(true);
+    }
+  }, [user, authLoading]);
 
   const [filters, setFilters] = useState({
     minValue: 0,
@@ -60,21 +60,23 @@ export default function TeamUp() {
   }, [locationHook.search]);
 
   useEffect(() => {
-  const checkHasPosted = async () => {
-    if (!userId) return;
-    try {
-      const res = await axios.get(`${apiUrl}teamups`, { params: { userId } });
-      const userPosts = res.data.data.filter(item => item.user?._id === userId);
-      setUserHasPosted(userPosts.length > 0);
-    } catch (err) {
-      setUserHasPosted(false);
-    }
-  };
-  checkHasPosted();
-}, [userId]);
+    const checkHasPosted = async () => {
+      if (!userId) return;
+      try {
+        const res = await axios.get(`${apiUrl}teamups`, { params: { userId } });
+        const userPosts = res.data.data.filter(item => item.user?._id === userId);
+        setUserHasPosted(userPosts.length > 0);
+        setShowNoPostDialog(true);
+      } catch (err) {
+        setUserHasPosted(false);
+        setShowNoPostDialog(true);
+      }
+    };
+    checkHasPosted();
+  }, [userId]);
 
 
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       // if (!userId) return;
       setLoading(true);
@@ -123,7 +125,7 @@ useEffect(() => {
       </div>
 
       <div className="col-span-3">
-                <div className="flex items-center justify-end text-black mb-2 gap-2">
+        <div className="flex items-center justify-end text-black mb-2 gap-2">
           <div>Sort by:</div>
           <div>
             <select
@@ -141,37 +143,45 @@ useEffect(() => {
             </select>
           </div>
         </div>
-         {!user ? (
-                    <ConfirmationDialog
-                        className="navbar-confirm-dialog"
-                        show={showInvalidDialog}
-                        title="⚠️ Team Up"
-                        message="Please login or create an account to view the posts."
-                        onConfirm={() => { }}
-                        onCancel={() => {
-                            setShowInvalidDialog(false);
-                            navigate("/");
-                        }}
-                    />
-        ) : (
-            <>
-        {loading ? (
-          <Loader fullScreen={false} />
-        ) : !userHasPosted ? (
-          <div className="text-center py-20 text-gray-500 font-medium text-lg">
-            You haven’t posted any Team Up yet.<br />Please post first to view other members posts
-          </div>
+        {!user ? (
+          <ConfirmationDialog
+            className="navbar-confirm-dialog"
+            show={showInvalidDialog}
+            title="⚠️ Team Up"
+            message="Please login or create an account to view the posts."
+            onConfirm={() => { }}
+            onCancel={() => {
+              setShowInvalidDialog(false);
+              navigate("/");
+            }}
+          />
         ) : (
           <>
-            <PropertyList properties={teamups} ads={ads} />
-            {teamups.length > 0 && (
-              <div className="text-end flex justify-end mt-5">
-                <UserPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-              </div>
+            {loading ? (
+              <Loader fullScreen={false} />
+            ) : !userHasPosted ? (
+              <ConfirmationDialog
+                // className="navbar-confirm-dialog"
+                show={showNoPostDialog}
+                title="⚠️ Team Up"
+                message="You haven’t posted any Team Up yet. Please post first. Want to post?"
+                onConfirm={() => navigate("/user/team-up-post")}
+                onCancel={() => {
+                  setShowNoPostDialog(false);
+                  navigate("/");
+                }}
+              />
+            ) : (
+              <>
+                <PropertyList properties={teamups} ads={ads} />
+                {teamups.length > 0 && (
+                  <div className="text-end flex justify-end mt-5">
+                    <UserPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+                  </div>
+                )}
+              </>
             )}
           </>
-        )}
-</>
         )}
       </div>
     </div>
