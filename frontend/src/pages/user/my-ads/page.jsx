@@ -389,11 +389,20 @@ export default function MyAds() {
                                         </div>
                                     </div>
 
-                                    <img
-                                        src={ad.featuredImage || ad.photos?.[0]?.url || "/assets/img/default.jpg"}
-                                        alt={ad.title}
-                                        className="w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
-                                    />
+                                    <div className="relative w-full">
+                                        <img
+                                            src={ad.featuredImage || ad.photos?.[0]?.url || "/assets/img/default.jpg"}
+                                            alt={ad.title}
+                                            className="w-full h-[220px] sm:h-[260px] lg:h-[280px] object-cover rounded-[10px]"
+                                        />
+
+                                        {ad.status === "inactive" && (
+                                            <span className="absolute top-0 left-0 bg-yellow-500 text-white text-sm font-semibold py-1 px-3 rounded-md shadow">
+                                                Under Review
+                                            </span>
+                                        )}
+                                    </div>
+
 
                                     <div className="flex flex-col flex-grow text-black p-1 mt-2">
                                         <h3 className="font-semibold text-[16px] sm:text-[18px] text-black">{ad.title}</h3>

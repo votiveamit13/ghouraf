@@ -117,7 +117,7 @@ export default function RoomWantedAd() {
         }
 
         if (!formData.propertyType) newErrors.propertyType = "Space Wanted Type is required";
-        if (!formData.roomSize) newErrors.roomSize = "Space Size is required";
+        if (!formData.roomSize) newErrors.roomSize = "Minimum Space Size is required";
 
         if (!formData.country) newErrors.country = "Country is required";
         if (!formData.state) newErrors.state = "State is required";
@@ -358,7 +358,7 @@ export default function RoomWantedAd() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-gray-700">Space Size</label>
+                                    <label className="block text-gray-700">Minimum Space Size</label>
                                     <input
                                         type="text"
                                         className={getInputClass("roomSize")}

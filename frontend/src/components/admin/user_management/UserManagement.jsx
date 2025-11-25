@@ -9,6 +9,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+import ExportData from "../export-data/ExportData";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -26,7 +27,7 @@ const UserManagement = () => {
         const res = await axios.get(`${apiUrl}/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-                const sortedUsers = res.data.sort(
+        const sortedUsers = res.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setUsers(sortedUsers);
@@ -58,24 +59,24 @@ const UserManagement = () => {
     }
   };
 
-const pageSize = 10;
-const startIndex = (currentPage - 1) * pageSize;
-const pageData = users.slice(startIndex, startIndex + pageSize);
+  const pageSize = 10;
+  const startIndex = (currentPage - 1) * pageSize;
+  const pageData = users.slice(startIndex, startIndex + pageSize);
 
-const filteredUsers = useMemo(() => {
-  const term = searchTerm.toLowerCase();
-  return pageData.filter((user) => {
-    const fullName = `${user.profile?.firstName || ""} ${user.profile?.lastName || ""}`;
-    const email = user.email || "";
-    return (
-      fullName.toLowerCase().includes(term) ||
-      email.toLowerCase().includes(term)
-    );
-  });
-}, [searchTerm, pageData]);
+  const filteredUsers = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return pageData.filter((user) => {
+      const fullName = `${user.profile?.firstName || ""} ${user.profile?.lastName || ""}`;
+      const email = user.email || "";
+      return (
+        fullName.toLowerCase().includes(term) ||
+        email.toLowerCase().includes(term)
+      );
+    });
+  }, [searchTerm, pageData]);
 
-const totalPages = Math.ceil(users.length / pageSize);
-const paginatedUsers = filteredUsers;
+  const totalPages = Math.ceil(users.length / pageSize);
+  const paginatedUsers = filteredUsers;
 
 
   const handleDelete = async () => {
@@ -96,17 +97,34 @@ const paginatedUsers = filteredUsers;
 
   return (
     <>
-      <Header hideStatsOnMobile={true}/>
+      <Header hideStatsOnMobile={true} />
       <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">
-              User Management
-            </h3>
-            <SearchFilter
-              placeholder="Search by name or email..."
-              onSearch={setSearchTerm}
-            />
+            <div className="w-50">
+              <h3 className="text-lg font-semibold text-gray-800">
+                User Management
+              </h3>
+            </div>
+            <div className="flex items-center gap-2 w-50 justify-end">
+              <ExportData
+                data={users}
+                filename="Users"
+                columns={[
+                  { label: "First Name", key: "profile.firstName" },
+                  { label: "Last Name", key: "profile.lastName" },
+                  { label: "Email", key: "email" },
+                  { label: "Mobile", key: "profile.mobile" },
+                  { label: "Status", key: "status" },
+                  { label: "Created At", key: "createdAt" },
+                ]}
+              />
+
+              <SearchFilter
+                placeholder="Search by name or email..."
+                onSearch={setSearchTerm}
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto">

@@ -8,6 +8,7 @@ import axios from "axios";
 import PhotoSlider from "components/common/Slider";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+import ExportData from "../export-data/ExportData";
 
 export default function TeamUps() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -35,44 +36,83 @@ export default function TeamUps() {
         fetchTeamUp();
     }, [apiUrl]);
 
-const pageSize = 10;
-const startIndex = (currentPage - 1) * pageSize;
+    const pageSize = 10;
+    const startIndex = (currentPage - 1) * pageSize;
 
-const pageData = teamup.slice(startIndex, startIndex + pageSize);
+    const pageData = teamup.slice(startIndex, startIndex + pageSize);
 
-const filteredPosts = useMemo(() => {
-    const term = searchTerm.toLowerCase();
-    return pageData.filter((post) => {
-        const title = post.title || "";
-        const posterName =
-            post.user?.profile
-                ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
-                : post.name || "";
+    const filteredPosts = useMemo(() => {
+        const term = searchTerm.toLowerCase();
+        return pageData.filter((post) => {
+            const title = post.title || "";
+            const posterName =
+                post.user?.profile
+                    ? `${post.user.profile.firstName} ${post.user.profile.lastName}`
+                    : post.name || "";
 
-        return (
-            title.toLowerCase().includes(term) ||
-            posterName.toLowerCase().includes(term)
-        );
-    });
-}, [searchTerm, pageData]);
+            return (
+                title.toLowerCase().includes(term) ||
+                posterName.toLowerCase().includes(term)
+            );
+        });
+    }, [searchTerm, pageData]);
 
-const totalPages = Math.ceil(teamup.length / pageSize);
-const paginatedPosts = filteredPosts;
+    const totalPages = Math.ceil(teamup.length / pageSize);
+    const paginatedPosts = filteredPosts;
 
 
     return (
         <>
-      <Header hideStatsOnMobile={true}/>
-      <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
+            <Header hideStatsOnMobile={true} />
+            <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                     <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800">
-                            Team Ups Management
-                        </h3>
-                        <SearchFilter
-                            placeholder="Search by title or posted by..."
-                            onSearch={setSearchTerm}
-                        />
+                        <div className="w-50">
+                            <h3 className="text-lg font-semibold text-gray-800">
+                                Team Ups Management
+                            </h3>
+                        </div>
+
+                        <div className="flex items-center gap-2 w-50 justify-end">
+                            <ExportData
+                                data={teamup}
+                                filename="Team Up"
+                                columns={[
+                                    { label: "Title", key: "title" },
+
+                                    {
+                                        label: "Budget",
+                                        key: ["budget", "budgetType"],
+                                        format: (v) => `${v[0]} ${v[1]}`
+                                    },
+
+                                    {
+                                        label: "Posted By",
+                                        key: ["user.profile.firstName", "user.profile.lastName"],
+                                        format: (v) => `${v[0]} ${v[1]}`
+                                    },
+
+                                    {
+                                        label: "Availability",
+                                        key: "available",
+                                        format: (v) => (v ? "Available" : "Not Available")
+                                    },
+
+                                    {
+                                        label: "Promotion",
+                                        key: "promotion.isPromoted",
+                                        format: (v) => (v ? "Promoted" : "Not Promoted")
+                                    },
+
+                                    { label: "Status", key: "status" },
+                                ]}
+                            />
+
+                            <SearchFilter
+                                placeholder="Search by title or posted by..."
+                                onSearch={setSearchTerm}
+                            />
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -181,22 +221,22 @@ const paginatedPosts = filteredPosts;
                                         </td>
                                         <td className="px-3 py-3 ">
                                             <div className="flex items-center justify-center gap-2">
-                                            <IoEyeOutline
-                                                size={20}
-                                                className="cursor-pointer"
-                                                color="#A321A6"
-                                                onClick={() => setSelectedPost(post)}
-                                            />
-                                            <RiDeleteBinLine
-                                                size={20}
-                                                className="cursor-pointer"
-                                                color="red"
-                                                onClick={() => {
-                                                    setSpaceToDelete(post);
-                                                    setShowConfirm(true);
-                                                }}
-                                            />
-</div>
+                                                <IoEyeOutline
+                                                    size={20}
+                                                    className="cursor-pointer"
+                                                    color="#A321A6"
+                                                    onClick={() => setSelectedPost(post)}
+                                                />
+                                                <RiDeleteBinLine
+                                                    size={20}
+                                                    className="cursor-pointer"
+                                                    color="red"
+                                                    onClick={() => {
+                                                        setSpaceToDelete(post);
+                                                        setShowConfirm(true);
+                                                    }}
+                                                />
+                                            </div>
 
                                         </td>
                                     </tr>

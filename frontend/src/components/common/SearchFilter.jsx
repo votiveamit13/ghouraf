@@ -14,7 +14,7 @@ const SearchFilter = ({
   };
 
   return (
-    <div className={`w-full sm:w-1/3 ${className}`}>
+    <div className={`w-full sm:w-1/2 ${className}`}>
       <input
         type="text"
         value={query}
