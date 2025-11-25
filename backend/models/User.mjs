@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const ProfileSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
-  age: Number,
+  // age: Number,
   mobile: Number,
   gender: { type: String, enum: ["male", "female"], index: true },
   dob: Date,
@@ -15,6 +15,25 @@ const ProfileSchema = new mongoose.Schema({
   lifestyleTags: [String],
   photo: String,
 });
+
+ProfileSchema.virtual("age").get(function () {
+  if (!this.dob) return null;
+
+  const dob = new Date(this.dob);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+
+  return age;
+});
+
+ProfileSchema.set("toJSON", { virtuals: true });
+ProfileSchema.set("toObject", { virtuals: true });
 
 const userSchema = new mongoose.Schema(
   {
@@ -44,6 +63,7 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
       transform: function (doc, ret) {
         delete ret.__v;
         delete ret.password;
@@ -51,6 +71,7 @@ const userSchema = new mongoose.Schema(
       },
     },
     toObject: {
+       virtuals: true,
       transform: function (doc, ret) {
         delete ret.__v;
         delete ret.password;

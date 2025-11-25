@@ -4,6 +4,7 @@ import { FiPhoneCall } from "react-icons/fi";
 import { LuMailOpen } from "react-icons/lu";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
 
 export default function Footer() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -58,21 +59,28 @@ export default function Footer() {
       <div className="container mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Office Address */}
         <div>
-          <h3 className="text-white font-semibold mb-4">Office Address</h3>
+          <NavLink to="/" className="flex items-center">
+            <img
+              src={require("../../assets/img/theme/Ghouraf.png")}
+              className="lg:w-60 md:w-60 sm:w-80 w-60 object-cover"
+              alt="Logo"
+            />
+          </NavLink>
+          {/* <h3 className="text-white font-semibold mb-4">Office Address</h3>
           <p className="text-sm mb-1">Head office:</p>
-          <p className="text-sm font-semibold">Address Will Goes Here</p>
+          <p className="text-sm font-semibold">Address Will Goes Here</p> */}
         </div>
 
         {/* Contact */}
         <div>
           <h3 className="text-white font-semibold mb-4">Contact</h3>
-          <div className="mb-3 flex items-center gap-3">
+          {/* <div className="mb-3 flex items-center gap-3">
             <FiPhoneCall size={32} />
             <div>
               <p className="text-sm">Hotline:</p>
               <p className="text-sm font-semibold">(+012) 345-67890</p>
             </div>
-          </div>
+          </div> */}
           <div className="flex items-center gap-3">
             <LuMailOpen size={32} />
             <div>
@@ -138,14 +146,14 @@ export default function Footer() {
 
       {/* Footer Bottom */}
       <div className="pt-6 flex flex-row md:flex-row items-center justify-between max-w-7xl mx-auto lg:px-6 md:px-6 sm:px-2 px-4">
-        <p className="text-white font-semibold">Ghouraf</p>
+        <p className="text-white font-semibold"></p>
         <div className="flex space-x-4">
-          <a href="/" className="w-8 h-8 flex items-center justify-center">
+          {/* <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaFacebookF />
           </a>
           <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaTwitter />
-          </a>
+          </a> */}
           <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaInstagram />
           </a>

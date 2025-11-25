@@ -70,20 +70,20 @@ export default function ContactUs() {
                     <div className="md:col-span-2 border-r p-5">
                         <h2 className="text-xl font-semibold mb-5 text-black">Contact Info</h2>
                         <ul className="space-y-4 text-gray-700">
-                            <li className="flex gap-3">
+                            {/* <li className="flex gap-3">
                                 <span className="text-[#A321A6] text-lg"><FiPhoneCall /></span>
                                 <span className="text-[#464D61]">(012) 345-6789</span>
-                            </li>
+                            </li> */}
                             <li className="flex gap-3">
                                 <span className="text-[#A321A6] text-lg"><TfiEmail /></span>
                                 <span className="text-[#464D61]">
                                     support@ghouraf.com <br /> info@ghouraf.com
                                 </span>
                             </li>
-                            <li className="flex gap-3">
+                            {/* <li className="flex gap-3">
                                 <span className="text-[#A321A6] text-lg"><PiMapPinLine /></span>
                                 <span className="text-[#464D61]">Your Address Will Goes Here 452005</span>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
 
