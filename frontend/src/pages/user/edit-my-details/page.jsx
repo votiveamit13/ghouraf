@@ -14,7 +14,7 @@ export default function EditMyDetails() {
     const initialProfile = {
         photo: `${user.profile?.photo}`,
         gender: `${user.profile?.gender}`,
-        age: 28,
+        // age: 28,
         mobile: `${user.profile?.mobile || ""}`,
         dob: `${user.profile?.dob}`,
     };
@@ -25,7 +25,9 @@ const handleSaveProfile = async (data) => {
     const formData = new FormData();
 
     for (const key in data) {
-      formData.append(key, data[key]);
+      if (key !== "age") {
+        formData.append(key, data[key]);
+      }
     }
 
     formData.append("section", "profile");

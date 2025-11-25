@@ -416,7 +416,7 @@ export const updateProfile = async (req, res) => {
       const allowed = [
         "firstName",
         "lastName",
-        "age",
+        // "age",
         "mobile",
         "gender",
         "dob",
