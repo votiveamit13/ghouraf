@@ -421,8 +421,14 @@ export const createTeamUp = async (req, res) => {
       });
     }
 
+if (req.body.amenities) {
     if (typeof req.body.amenities === "string") {
-    req.body.amenities = JSON.parse(req.body.amenities);
+        try {
+            req.body.amenities = JSON.parse(req.body.amenities);
+        } catch (e) {
+            req.body.amenities = [];
+        }
+    }
 }
 
     const teamUpData = {
