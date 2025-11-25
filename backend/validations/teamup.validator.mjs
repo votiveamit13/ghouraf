@@ -16,7 +16,11 @@ export const createTeamUpSchema = Joi.object({
   // moveInDate: Joi.date().optional(),
   period: Joi.string().optional(),
 
-  amenities: Joi.array().items(Joi.string()).required(),
+  amenities: Joi.alternatives().try(
+  Joi.array().items(Joi.string()),
+  Joi.string()
+).required(),
+
 
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
