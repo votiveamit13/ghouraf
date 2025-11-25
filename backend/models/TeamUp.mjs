@@ -33,7 +33,11 @@ const TeamUpSchema = new mongoose.Schema({
   budgetType: { type: String, enum: budgetType, required: true },
   // moveInDate: { type: Date },
   period: { type: String },
-  amenities: [{ type: String, required: true }],
+  amenities: {
+  type: [String],
+  default: [],
+  required: true
+},
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   age: { type: Number },
