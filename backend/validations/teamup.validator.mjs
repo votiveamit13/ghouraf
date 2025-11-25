@@ -30,9 +30,9 @@ export const createTeamUpSchema = Joi.object({
   occupationPreference: Joi.string().optional(),
   occupation: Joi.string().optional(),
 
-  smoke: Joi.boolean().required(),
+  smoke: Joi.boolean().optional(),
   pets: Joi.boolean().required(),
-  petsPreference: Joi.boolean().required(),
+  petsPreference: Joi.boolean().optional(),
 
   // language: Joi.string().optional(),
   // languagePreference: Joi.string().optional(),

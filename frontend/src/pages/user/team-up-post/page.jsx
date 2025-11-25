@@ -90,9 +90,9 @@ export default function TeamUpAd() {
         if (!formData.amenities || formData.amenities.length === 0) {
             newErrors.amenities = "Select at least one amenity";
         }
-        if (!formData.smoke) newErrors.smoke = "Select smoking category";
+        // if (!formData.smoke) newErrors.smoke = "Select smoking category";
         if (!formData.pets) newErrors.pets = "Select pet category";
-        if (!formData.petsPreference) newErrors.petsPreference = "Select pet preference category";
+        // if (!formData.petsPreference) newErrors.petsPreference = "Select pet preference category";
         // if (!formData.roommatePref) newErrors.roommatePref = "Select roommate preference";
         if (!formData.description) newErrors.description = "Description is required";
         if (!selectedFiles || selectedFiles.length === 0) {
