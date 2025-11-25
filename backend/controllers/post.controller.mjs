@@ -421,16 +421,22 @@ export const createTeamUp = async (req, res) => {
       });
     }
 
+    if (typeof req.body.amenities === "string") {
+    req.body.amenities = JSON.parse(req.body.amenities);
+}
+
     const teamUpData = {
       ...req.body,
       user: req.user._id,
       photos: uploadedPhotos,
     };
 
-    ["smoke", "pets", "petsPreference"].forEach((field) => {
-      if (teamUpData[field] === "true") teamUpData[field] = true;
-      if (teamUpData[field] === "false") teamUpData[field] = false;
-    });
+["smoke", "pets", "petsPreference"].forEach((field) => {
+  if (teamUpData[field] === "true") teamUpData[field] = true;
+  if (teamUpData[field] === "false") teamUpData[field] = false;
+  if (teamUpData[field] === "") teamUpData[field] = null;
+});
+
 
     const newPost = await TeamUp.create(teamUpData);
 

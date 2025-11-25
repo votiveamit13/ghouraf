@@ -181,13 +181,16 @@ export default function TeamUpAd() {
 
             const formPayload = new FormData();
 
-            Object.keys(formData).forEach(key => {
-                if (Array.isArray(formData[key])) {
-                    formData[key].forEach(value => formPayload.append(key, value));
-                } else {
-                    formPayload.append(key, formData[key]);
-                }
-            });
+Object.keys(formData).forEach(key => {
+    if (key === "amenities") {
+        formPayload.append(key, JSON.stringify(formData[key]));
+    } else if (Array.isArray(formData[key])) {
+        formData[key].forEach(v => formPayload.append(key, v));
+    } else {
+        formPayload.append(key, formData[key]);
+    }
+});
+
 
             selectedFiles.forEach(file => {
                 formPayload.append("photos", file);
