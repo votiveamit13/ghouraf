@@ -421,20 +421,15 @@ export const createTeamUp = async (req, res) => {
       });
     }
 
-// Force amenities to always be an array
-if (!Array.isArray(req.body.amenities)) {
-    // If string => make array
-    if (typeof req.body.amenities === "string" && req.body.amenities !== "") {
+if (req.body.amenities) {
+    if (typeof req.body.amenities === "string") {
         try {
             req.body.amenities = JSON.parse(req.body.amenities);
-        } catch {
-            req.body.amenities = [req.body.amenities];
+        } catch (e) {
+            req.body.amenities = [];
         }
-    } else {
-        req.body.amenities = [];
     }
 }
-
 
     const teamUpData = {
       ...req.body,
