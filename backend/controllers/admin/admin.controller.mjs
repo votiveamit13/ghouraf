@@ -470,7 +470,7 @@ export const updateSpaceStatus = async (req, res) => {
 
     await sendPostUpdateEmail(
       space.user.email,
-      space.user.firstName,
+      space.user.profile.firstName,
       space.title,
       `Your post <b>${space.title}</b> is now <b>${status}</b>.`
     );
@@ -514,7 +514,7 @@ export const deleteSpace = async (req, res) => {
 
     await sendPostUpdateEmail(
       space.user.email,
-      space.user.firstName,
+      space.user.profile.firstName,
       space.title,
       `Your post <b>${space.title}</b> has been <span style="color:red;">deleted</span> by admin.`
     );
@@ -616,7 +616,7 @@ export const updateTeamUpStatus = async (req, res) => {
 
       await sendPostUpdateEmail(
         teamup.user.email,
-        teamup.user.firstName,
+        teamup.user.profile.firstName,
         teamup.title,
         `Your post <b>${teamup.title}</b> is now <b>${status}</b>.`
       );
@@ -647,7 +647,7 @@ export const updateTeamUpStatus = async (req, res) => {
 
       await sendPostUpdateEmail(
         spaceWanted.user.email,
-        spaceWanted.user.firstName,
+        spaceWanted.user.profile.firstName,
         spaceWanted.title,
         `Your post <b>${spaceWanted.title}</b> is now <b>${status}</b>.`
       );
@@ -691,7 +691,7 @@ export const deleteTeamUp = async (req, res) => {
 
       await sendPostUpdateEmail(
         teamup.user.email,
-        teamup.user.firstName,
+        teamup.user.profile.firstName,
         teamup.title,
         `Your post <b>${teamup.title}</b> has been <span style="color:red;">deleted</span> by admin.`
       );
@@ -725,7 +725,7 @@ export const deleteTeamUp = async (req, res) => {
 
       await sendPostUpdateEmail(
         spaceWanted.user.email,
-        spaceWanted.user.firstName,
+        spaceWanted.user.profile.firstName,
         spaceWanted.title,
         `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">deleted</span> by admin.`
       );
@@ -815,7 +815,7 @@ export const updateSpaceWantedStatus = async (req, res) => {
 
     await sendPostUpdateEmail(
       spacewanted.user.email,
-      spacewanted.user.firstName,
+      spacewanted.user.profile.firstName,
       spacewanted.title,
       `Your post <b>${spacewanted.title}</b> is now <b>${status}</b>.`
     );
@@ -859,7 +859,7 @@ export const deleteSpaceWanted = async (req, res) => {
 
     await sendPostUpdateEmail(
       spacewanted.user.email,
-      spacewanted.user.firstName,
+      spacewanted.user.profile.firstName,
       spacewanted.title,
       `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">deleted</span> by admin.`
     );
