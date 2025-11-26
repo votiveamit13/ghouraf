@@ -446,7 +446,7 @@ export const updateSpaceStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    const space = await Space.findById(id);
+    const space = await Space.findById(id).populate("user");
     if (!space) return res.status(404).json({ message: "Space not found" });
 
     space.status = status;
@@ -486,7 +486,7 @@ export const deleteSpace = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const space = await Space.findById(id);
+    const space = await Space.findById(id).populate("user");
     if (!space) return res.status(404).json({ message: "Space not found" });
 
     if (space.is_deleted) {
@@ -593,7 +593,7 @@ export const updateTeamUpStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    let teamup = await TeamUp.findById(id);
+    let teamup = await TeamUp.findById(id).populate("user");
     if (teamup) {
       teamup.status = status;
       await teamup.save();
@@ -624,7 +624,7 @@ export const updateTeamUpStatus = async (req, res) => {
       return res.json({ message: `Team Up status updated to ${status}`, teamup });
     }
 
-    let spaceWanted = await SpaceWanted.findById(id);
+    let spaceWanted = await SpaceWanted.findById(id).populate("user");
     if (spaceWanted && spaceWanted.teamUp) {
       spaceWanted.status = status;
       await spaceWanted.save();
@@ -665,7 +665,7 @@ export const deleteTeamUp = async (req, res) => {
   try {
     const { id } = req.params;
 
-    let teamup = await TeamUp.findById(id);
+    let teamup = await TeamUp.findById(id).populate("user");
     if (teamup) {
       if (teamup.is_deleted)
         return res.status(400).json({ message: "Team Up already deleted" });
@@ -699,7 +699,7 @@ export const deleteTeamUp = async (req, res) => {
       return res.json({ message: "Team Up deleted successfully", teamup });
     }
 
-    let spaceWanted = await SpaceWanted.findById(id);
+    let spaceWanted = await SpaceWanted.findById(id).populate("user");
     if (spaceWanted && spaceWanted.teamUp) {
       if (spaceWanted.is_deleted)
         return res.status(400).json({ message: "Team Up already deleted" });
@@ -791,7 +791,7 @@ export const updateSpaceWantedStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    const spacewanted = await SpaceWanted.findById(id);
+    const spacewanted = await SpaceWanted.findById(id).populate("user");
     if (!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
 
     spacewanted.status = status;
@@ -831,7 +831,7 @@ export const deleteSpaceWanted = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const spacewanted = await SpaceWanted.findById(id);
+    const spacewanted = await SpaceWanted.findById(id).populate("user");
     if (!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
 
     if (spacewanted.is_deleted) {
