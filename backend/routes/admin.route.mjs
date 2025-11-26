@@ -17,8 +17,6 @@ import {
     getAllNewsletters, deleteNewsletter,
     getAdminProfile,
     updateAdminProfile,
-    sendNewsletterToAll,
-    sendNewsletterToSelected,
     sendNewsletterToSingle,
     sendNewsletterBulk
 } from "../controllers/admin/admin.controller.mjs";

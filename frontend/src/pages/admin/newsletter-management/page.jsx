@@ -83,7 +83,7 @@ export default function Newsletter() {
       } else {
         // Send to all
         await axios.post(
-          `${apiUrl}admin/newsletter/send-all`,
+          `${apiUrl}admin/newsletter/send-bulk`,
           { subject, html: htmlMessage },
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
