@@ -18,12 +18,63 @@ import Ad from "../../models/Ad.mjs";
 import { AboutUsImage } from "../../models/AboutUsImage.mjs";
 import Newsletter from "../../models/Newsletter.mjs";
 import { dbAdmin } from "../../config/firebase.mjs";
+import { sendEmail } from "../utils/email.mjs";
 
 const modelMap = {
   Space,
   SpaceWanted,
   TeamUp,
 };
+
+const sendPostUpdateEmail = async (to, firstName, title, body) => {
+  await sendEmail({
+    to,
+    subject: "Update on your Ghouraf Post",
+    html: `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <title>Post Update</title>
+      </head>
+      <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f4;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#f4f4f4">
+          <tr>
+            <td align="center" style="padding:40px 0;">
+              <table width="600" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <tr>
+                  <td align="center" bgcolor="#A321A6" style="padding:20px;">
+                    <h1 style="color:#ffffff; margin:0; font-size:24px;">Ghouraf Notification</h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:30px; color:#333333; font-size:16px; line-height:1.5;">
+                    <p>Hi <b>${firstName}</b>,</p>
+
+                    <p>${body}</p>
+
+                    <p style="margin-top:25px;">Post Title:</p>
+                    <p style="font-weight:bold; color:#A321A6;">${title}</p>
+
+                    <p style="margin-top:20px;">If you have any questions, feel free to contact support.</p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" bgcolor="#f4f4f4" style="padding:15px; font-size:12px; color:#666;">
+                    Ghouraf. All rights reserved.
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>`
+  });
+};
+
 
 export const login = async (req, res) => {
   try {
@@ -417,6 +468,13 @@ export const updateSpaceStatus = async (req, res) => {
       createdAt: new Date(),
     });
 
+    await sendPostUpdateEmail(
+      space.user.email,
+      space.user.firstName,
+      space.title,
+      `Your post <b>${space.title}</b> is now <b>${status}</b>.`
+    );
+
     res.json({ message: `Space status updated to ${status}`, space });
   } catch (err) {
     console.error("Error updating space status:", err);
@@ -453,6 +511,14 @@ export const deleteSpace = async (req, res) => {
       read: false,
       createdAt: new Date(),
     });
+
+    await sendPostUpdateEmail(
+      space.user.email,
+      space.user.firstName,
+      space.title,
+      `Your post <b>${space.title}</b> has been <span style="color:red;">deleted</span> by admin.`
+    );
+
 
 
     res.json({ message: "Space deleted successfully", space });
@@ -548,6 +614,13 @@ export const updateTeamUpStatus = async (req, res) => {
         createdAt: new Date(),
       });
 
+      await sendPostUpdateEmail(
+        teamup.user.email,
+        teamup.user.firstName,
+        teamup.title,
+        `Your post <b>${teamup.title}</b> is now <b>${status}</b>.`
+      );
+
       return res.json({ message: `Team Up status updated to ${status}`, teamup });
     }
 
@@ -571,6 +644,13 @@ export const updateTeamUpStatus = async (req, res) => {
         read: false,
         createdAt: new Date(),
       });
+
+      await sendPostUpdateEmail(
+        spaceWanted.user.email,
+        spaceWanted.user.firstName,
+        spaceWanted.title,
+        `Your post <b>${spaceWanted.title}</b> is now <b>${status}</b>.`
+      );
       return res.json({ message: `Team Up (SpaceWanted) status updated to ${status}`, spaceWanted });
     }
 
@@ -608,6 +688,14 @@ export const deleteTeamUp = async (req, res) => {
         read: false,
         createdAt: new Date(),
       });
+
+      await sendPostUpdateEmail(
+        teamup.user.email,
+        teamup.user.firstName,
+        teamup.title,
+        `Your post <b>${teamup.title}</b> has been <span style="color:red;">deleted</span> by admin.`
+      );
+
       return res.json({ message: "Team Up deleted successfully", teamup });
     }
 
@@ -634,6 +722,13 @@ export const deleteTeamUp = async (req, res) => {
         read: false,
         createdAt: new Date(),
       });
+
+      await sendPostUpdateEmail(
+        spaceWanted.user.email,
+        spaceWanted.user.firstName,
+        spaceWanted.title,
+        `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">deleted</span> by admin.`
+      );
       return res.json({ message: "Team Up (SpaceWanted) deleted successfully", spaceWanted });
     }
 
@@ -718,6 +813,13 @@ export const updateSpaceWantedStatus = async (req, res) => {
       createdAt: new Date(),
     });
 
+    await sendPostUpdateEmail(
+      spacewanted.user.email,
+      spacewanted.user.firstName,
+      spacewanted.title,
+      `Your post <b>${spacewanted.title}</b> is now <b>${status}</b>.`
+    );
+
     res.json({ message: `Space Wanted status updated to ${status}`, spacewanted });
   } catch (err) {
     console.error("Error updating space wanted status:", err);
@@ -754,6 +856,13 @@ export const deleteSpaceWanted = async (req, res) => {
       read: false,
       createdAt: new Date(),
     });
+
+    await sendPostUpdateEmail(
+      spacewanted.user.email,
+      spacewanted.user.firstName,
+      spacewanted.title,
+      `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">deleted</span> by admin.`
+    );
 
     res.json({ message: "Space Wanted deleted successfully", spacewanted });
   } catch (err) {

@@ -226,6 +226,7 @@ Object.keys(formData).forEach(key => {
                     toast.error(data.message || "Something went wrong");
                 }
             } else {
+                toast.success("Ad submitted successfully!");
                 navigate("/user/thank-you", {
                     state: {
                         title: "Your ad was successfully submitted",

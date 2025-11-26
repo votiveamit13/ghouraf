@@ -922,6 +922,7 @@ export const updateAd = async (req, res) => {
       updatedData.petsPreference = updatedData.petsPreference === "true";
     }
 
+    updatedData.status = "inactive";
     const updatedAd = await Model.findByIdAndUpdate(id, updatedData, {
       new: true,
       runValidators: true

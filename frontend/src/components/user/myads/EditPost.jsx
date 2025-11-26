@@ -10,7 +10,7 @@ const PROPERTY_TYPES = ["Room", "Apartment"];
 const BUDGET_TYPES = ["Month", "Week"];
 const PERSONAL_INFO_TYPES = ["Landlord", "Agent", "Flatmate"];
 const ROOMS_AVAILABLE_FOR = ["any gender", "male", "female"];
-const BEDROOMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const BEDROOMS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const AMENITIES_LIST = [
   "Fully Furnished",
   "High-Speed Wi-Fi",
@@ -681,7 +681,7 @@ const handleSubmit = async (e) => {
       },
     });
 
-    toast.success("Ad updated successfully!");
+    toast.success("Your post was edited successfully! This post will undergo a review process and will be published once approved.");
     onUpdated?.();
     onClose?.();
 
@@ -729,7 +729,9 @@ const handleSubmit = async (e) => {
           },
         });
         
-        toast.success("Ad updated successfully!");
+        toast.success(
+  "Your post was edited successfully! This post will undergo a review process and will be published once approved."
+);
         onUpdated?.();
         onClose?.();
         return;
