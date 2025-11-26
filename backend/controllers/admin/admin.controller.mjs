@@ -18,7 +18,7 @@ import Ad from "../../models/Ad.mjs";
 import { AboutUsImage } from "../../models/AboutUsImage.mjs";
 import Newsletter from "../../models/Newsletter.mjs";
 import { dbAdmin } from "../../config/firebase.mjs";
-import { sendEmail } from "../utils/email.mjs";
+import { sendEmail } from "../../utils/email.mjs";
 
 const modelMap = {
   Space,
