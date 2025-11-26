@@ -861,7 +861,7 @@ export const deleteSpaceWanted = async (req, res) => {
       spacewanted.user.email,
       spacewanted.user.profile.firstName,
       spacewanted.title,
-      `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">deleted</span> by admin.`
+      `Your post <b>${spacewanted.title}</b> has been <span style="color:red;">deleted</span> by admin.`
     );
 
     res.json({ message: "Space Wanted deleted successfully", spacewanted });
