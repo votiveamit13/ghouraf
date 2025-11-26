@@ -8,6 +8,7 @@ import ConfirmationDialog from "components/common/ConfirmationDialog";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ViewPostModal from "components/admin/post_management/report-management/ViewPost";
+import ExportData from "components/admin/export-data/ExportData";
 
 export default function ReportList() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -41,27 +42,27 @@ export default function ReportList() {
   }, [apiUrl]);
 
 
-const pageSize = 10;
-const startIndex = (currentPage - 1) * pageSize;
+  const pageSize = 10;
+  const startIndex = (currentPage - 1) * pageSize;
 
-const pageData = reports.slice(startIndex, startIndex + pageSize);
+  const pageData = reports.slice(startIndex, startIndex + pageSize);
 
-const filteredReports = useMemo(() => {
-  const term = searchTerm.toLowerCase();
+  const filteredReports = useMemo(() => {
+    const term = searchTerm.toLowerCase();
 
-  return pageData.filter((r) => {
-    const category = r.postType?.toLowerCase() || "";
-    const reportedBy = `${r.user?.profile?.firstName || ""} ${r.user?.profile?.lastName || ""}`.toLowerCase();
+    return pageData.filter((r) => {
+      const category = r.postType?.toLowerCase() || "";
+      const reportedBy = `${r.user?.profile?.firstName || ""} ${r.user?.profile?.lastName || ""}`.toLowerCase();
 
-    return (
-      category.includes(term) ||
-      reportedBy.includes(term)
-    );
-  });
-}, [searchTerm, pageData]);
+      return (
+        category.includes(term) ||
+        reportedBy.includes(term)
+      );
+    });
+  }, [searchTerm, pageData]);
 
-const totalPages = Math.ceil(reports.length / pageSize);
-const paginatedReports = filteredReports;
+  const totalPages = Math.ceil(reports.length / pageSize);
+  const paginatedReports = filteredReports;
 
 
   const handleDelete = async () => {
@@ -88,17 +89,43 @@ const paginatedReports = filteredReports;
 
   return (
     <>
-      <Header hideStatsOnMobile={true}/>
+      <Header hideStatsOnMobile={true} />
       <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Reports Management
-            </h3>
-            <SearchFilter
-              placeholder="Search by post category, reported by..."
-              onSearch={setSearchTerm}
-            />
+            <div className="w-50">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Reports Management
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-2 w-50 justify-end">
+              <ExportData
+                data={reports}
+                filename="Reports"
+                columns={[
+                  { label: "Report Title", key: "title" },
+                  { label: "Post Title", key: "postId.title" },
+                  { label: "Post Category", key: "postType" },
+                  { label: "Reason", key: "reason" },
+                  {
+                    label: "Reported By",
+                    key: ["user.profile.firstName", "user.profile.lastName"],
+                    format: (v) => `${v[0] || ""} ${v[1] || ""}`.trim(),
+                  },
+                  {
+                    label: "Date",
+                    key: "createdAt",
+                    format: (v) => new Date(v).toLocaleDateString(),
+                  },
+                ]}
+              />
+
+              <SearchFilter
+                placeholder="Search by post category, reported by..."
+                onSearch={setSearchTerm}
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -201,8 +228,8 @@ const paginatedReports = filteredReports;
                               <option
                                 disabled={report.postId.status === "active"}
                                 className={`${report.postId.status === "active"
-                                    ? "text-green-600 font-semibold bg-green-50"
-                                    : ""
+                                  ? "text-green-600 font-semibold bg-green-50"
+                                  : ""
                                   }`}
                               >
                                 Active
@@ -214,10 +241,10 @@ const paginatedReports = filteredReports;
                                 report.postId.status === "inactive" || report.postId.is_deleted
                               }
                               className={`${report.postId.status === "inactive"
-                                  ? "text-red-600 font-semibold bg-red-50"
-                                  : report.postId.is_deleted
-                                    ? "text-gray-400 opacity-60"
-                                    : ""
+                                ? "text-red-600 font-semibold bg-red-50"
+                                : report.postId.is_deleted
+                                  ? "text-gray-400 opacity-60"
+                                  : ""
                                 }`}
                             >
                               Inactive
@@ -245,23 +272,23 @@ const paginatedReports = filteredReports;
                       />
 
 
-                                                            <td className="px-3 py-3 ">
-                                            <div className="flex items-center justify-center gap-2">
-                        <IoEyeOutline
-                          size={20}
-                          className="cursor-pointer"
-                          color="#A321A6"
-                          onClick={() => setSelectedReport(report)}
-                        />
-                        <RiDeleteBinLine
-                          size={20}
-                          className="cursor-pointer"
-                          color="red"
-                          onClick={() => {
-                            setReportToDelete(report);
-                            setShowConfirm(true);
-                          }}
-                        />
+                      <td className="px-3 py-3 ">
+                        <div className="flex items-center justify-center gap-2">
+                          <IoEyeOutline
+                            size={20}
+                            className="cursor-pointer"
+                            color="#A321A6"
+                            onClick={() => setSelectedReport(report)}
+                          />
+                          <RiDeleteBinLine
+                            size={20}
+                            className="cursor-pointer"
+                            color="red"
+                            onClick={() => {
+                              setReportToDelete(report);
+                              setShowConfirm(true);
+                            }}
+                          />
                         </div>
                       </td>
                     </tr>

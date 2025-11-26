@@ -1600,8 +1600,6 @@ export const sendNewsletterBulk = async (req, res) => {
   }
 };
 
-
-
 //admin profile
 export const getAdminProfile = async (req, res) => {
   try {

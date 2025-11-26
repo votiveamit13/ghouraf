@@ -1,4 +1,5 @@
 import axios from "axios";
+import ExportData from "components/admin/export-data/ExportData";
 import Header from "components/admin/Headers/Header";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import PaginationComponent from "components/common/Pagination";
@@ -9,20 +10,20 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 
 export default function ContactForm() {
-    const [messages, setMessages] = useState([]);
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-      const [confirmOpen, setConfirmOpen] = useState(false);
-    const [previewMessage, setPreviewMessage] = useState(null);
-const [selectedMessage, setSelectedMessage] = useState(null);
-    const pageSize = 10;
+  const [messages, setMessages] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [previewMessage, setPreviewMessage] = useState(null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const pageSize = 10;
 
-    const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("authToken");
 
 
-    useEffect(() => {
-        const fetchMessages = async () => {
+  useEffect(() => {
+    const fetchMessages = async () => {
       try {
         const res = await axios.get(`${apiUrl}/admin/messages`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -35,152 +36,173 @@ const [selectedMessage, setSelectedMessage] = useState(null);
     fetchMessages();
   }, [token, apiUrl]);
 
-const startIndex = (currentPage - 1) * pageSize;
+  const startIndex = (currentPage - 1) * pageSize;
 
-const pageData = messages.slice(startIndex, startIndex + pageSize);
+  const pageData = messages.slice(startIndex, startIndex + pageSize);
 
-const filteredMessages = useMemo(() => {
-  const term = searchTerm.toLowerCase();
-  return pageData.filter((message) => {
-    const fullName = message.fullName?.toLowerCase() || "";
-    const email = message.email?.toLowerCase() || "";
+  const filteredMessages = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return pageData.filter((message) => {
+      const fullName = message.fullName?.toLowerCase() || "";
+      const email = message.email?.toLowerCase() || "";
 
-    return (
-      fullName.includes(term) ||
-      email.includes(term)
-    );
-  });
-}, [pageData, searchTerm]);
+      return (
+        fullName.includes(term) ||
+        email.includes(term)
+      );
+    });
+  }, [pageData, searchTerm]);
 
-const totalPages = Math.ceil(messages.length / pageSize);
-const paginatedmessages = filteredMessages;
-
-
-    const handleDelete = async () => {
-      try {
-        await axios.delete(`${apiUrl}/admin/message/${selectedMessage._id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setMessages(prev => prev.filter(u => u._id !== selectedMessage._id));
-        toast.success("Message deleted successfully");
-      } catch (err) {
-        console.error("Error deleting message", err);
-        toast.error("Failed to delete message");
-      } finally {
-        setConfirmOpen(false);
-        setSelectedMessage(null);
-      }
-    };
+  const totalPages = Math.ceil(messages.length / pageSize);
+  const paginatedmessages = filteredMessages;
 
 
-    return (
-        <>
-      <Header hideStatsOnMobile={true}/>
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${apiUrl}/admin/message/${selectedMessage._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessages(prev => prev.filter(u => u._id !== selectedMessage._id));
+      toast.success("Message deleted successfully");
+    } catch (err) {
+      console.error("Error deleting message", err);
+      toast.error("Failed to delete message");
+    } finally {
+      setConfirmOpen(false);
+      setSelectedMessage(null);
+    }
+  };
+
+
+  return (
+    <>
+      <Header hideStatsOnMobile={true} />
       <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="px-3 py-3 border-b border-gray-200 d-flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">
-                            Contact Form
-                        </h3>
-                        <SearchFilter
-                            placeholder="Search by name or email..."
-                            onSearch={setSearchTerm}
-                        />
-                    </div>
-                     <div className="overflow-x-auto">
-            <table className="min-w-full text-sm text-gray-700">
-              <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
-                                    <th className="px-3 py-3 text-left font-semibold">
-                                        Name
-                                    </th>
-                                    <th className="px-3 py-3 text-left font-semibold">
-                                        Email
-                                    </th>
-                                    <th className="px-3 py-3 text-left font-semibold">
-                                        Subject
-                                    </th>
-                                    <th className="px-3 py-3 text-left font-semibold">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
-                                {paginatedmessages.map((message, index) => (
-                                    <tr key={message.id}>
-                                        <td className="px-3 py-3">{startIndex + index + 1}</td>
-                                        <td className="px-3 py-3">{message.fullName}</td>
-                                        <td className="px-3 py-3">{message.email}</td>
-                                        <td className="px-3 py-3">{message.subject}</td>
-                                                              <td className="px-3 py-3">
-                        <div className="flex items-center gap-2 justify-center">
-                                            <IoEyeOutline
-                                                size={20}
-                                                className="cursor-pointer"
-                                                color="#A321A6"
-                                                onClick={() => setPreviewMessage(message)}
-                                            />
-                                            <RiDeleteBinLine
-                                                size={20}
-                                                className="cursor-pointer"
-                                                color="red"
-                                                onClick={() => {
-                                                    setSelectedMessage(message);
-                                                    setConfirmOpen(true);
-                                                }}
-                                            />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                              <ConfirmationDialog
-                                show={confirmOpen}
-                                title="Delete Message"
-                                message={`Are you sure you want to delete the message`}
-                                onConfirm={handleDelete}
-                                onCancel={() => setConfirmOpen(false)}
-                              />
-
-                    <div className="px-6 py-4 border-t border-gray-200">
-                        <PaginationComponent
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={(page) => setCurrentPage(page)}
-                        />
-                    </div>
-                </div>
+            <div className="w-50">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Contact Form
+              </h3>
             </div>
 
-            {previewMessage && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
-                    <div className="bg-white w-[600px] max-h-[80vh] rounded-lg shadow-lg overflow-y-auto">
-                        <div className="flex justify-between items-center p-4 border-b">
-                            <h2 className="text-lg font-semibold">{previewMessage.fullName}</h2>
-                            <button
-                                className="text-gray-500 hover:text-gray-800"
-                                onClick={() => setPreviewMessage(null)}
-                            >
-                                ✕
-                            </button>
-                        </div>
+            <div className="flex items-center gap-2 w-50 justify-end">
+              <ExportData
+                data={messages}
+                filename="Contact Forms"
+                columns={[
+                  { label: "Full Name", key: "fullName" },
+                  { label: "Email", key: "email" },
+                  { label: "Subject", key: "subject" },
+                  { label: "Message", key: "message" },
+                  {
+                    label: "Date",
+                    key: "createdAt",
+                    format: (v) => new Date(v).toLocaleDateString(),
+                  },
+                ]}
+              />
 
-                        <div className="p-4 space-y-4">
-                            <p>
-                                <strong>Email:</strong> {previewMessage.email}
-                            </p>
-                            <p>
-                                <strong>Subject:</strong> {previewMessage.subject}
-                            </p>
-                            <p>
-                                <strong>Message:</strong> {previewMessage.message}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+              <SearchFilter
+                placeholder="Search by name or email..."
+                onSearch={setSearchTerm}
+              />
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-gray-700">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">S. No.</th>
+                  <th className="px-3 py-3 text-left font-semibold">
+                    Name
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold">
+                    Email
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold">
+                    Subject
+                  </th>
+                  <th className="px-3 py-3 text-left font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {paginatedmessages.map((message, index) => (
+                  <tr key={message.id}>
+                    <td className="px-3 py-3">{startIndex + index + 1}</td>
+                    <td className="px-3 py-3">{message.fullName}</td>
+                    <td className="px-3 py-3">{message.email}</td>
+                    <td className="px-3 py-3">{message.subject}</td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-2 justify-center">
+                        <IoEyeOutline
+                          size={20}
+                          className="cursor-pointer"
+                          color="#A321A6"
+                          onClick={() => setPreviewMessage(message)}
+                        />
+                        <RiDeleteBinLine
+                          size={20}
+                          className="cursor-pointer"
+                          color="red"
+                          onClick={() => {
+                            setSelectedMessage(message);
+                            setConfirmOpen(true);
+                          }}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <ConfirmationDialog
+            show={confirmOpen}
+            title="Delete Message"
+            message={`Are you sure you want to delete the message`}
+            onConfirm={handleDelete}
+            onCancel={() => setConfirmOpen(false)}
+          />
+
+          <div className="px-6 py-4 border-t border-gray-200">
+            <PaginationComponent
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {previewMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
+          <div className="bg-white w-[600px] max-h-[80vh] rounded-lg shadow-lg overflow-y-auto">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">{previewMessage.fullName}</h2>
+              <button
+                className="text-gray-500 hover:text-gray-800"
+                onClick={() => setPreviewMessage(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <p>
+                <strong>Email:</strong> {previewMessage.email}
+              </p>
+              <p>
+                <strong>Subject:</strong> {previewMessage.subject}
+              </p>
+              <p>
+                <strong>Message:</strong> {previewMessage.message}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
