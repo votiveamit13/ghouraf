@@ -1548,6 +1548,60 @@ export const deleteNewsletter = async (req, res) => {
   }
 };
 
+export const sendNewsletterToSingle = async (req, res) => {
+  try {
+    const { email, subject, html } = req.body;
+
+    if (!email || !subject || !html) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const subscribed = await Newsletter.findOne({ email });
+    if (!subscribed) return res.status(404).json({ message: "Email not found in newsletter list" });
+
+    await sendEmail({
+      to: email,
+      subject,
+      html,
+    });
+
+    res.json({ message: `Newsletter sent to ${email}` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to send newsletter" });
+  }
+};
+
+export const sendNewsletterBulk = async (req, res) => {
+  try {
+    const { subject, html } = req.body;
+
+    if (!subject || !html) {
+      return res.status(400).json({ message: "Subject and HTML body are required" });
+    }
+
+    const subscribers = await Newsletter.find().select("email");
+    if (subscribers.length === 0)
+      return res.status(404).json({ message: "No newsletter subscribers found" });
+
+    for (const sub of subscribers) {
+      await sendEmail({
+        to: sub.email,
+        subject,
+        html,
+      });
+    }
+
+    res.json({ message: `Newsletter sent to ${subscribers.length} subscribers` });
+  } catch (error) {
+    console.error("Bulk newsletter error:", error);
+  
+    res.status(500).json({ message: "Failed to send bulk newsletter" });
+  }
+};
+
+
+
 //admin profile
 export const getAdminProfile = async (req, res) => {
   try {

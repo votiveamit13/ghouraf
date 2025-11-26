@@ -16,7 +16,11 @@ import {
     getDashboardStats, getDashboardCharts,
     getAllNewsletters, deleteNewsletter,
     getAdminProfile,
-    updateAdminProfile
+    updateAdminProfile,
+    sendNewsletterToAll,
+    sendNewsletterToSelected,
+    sendNewsletterToSingle,
+    sendNewsletterBulk
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -77,6 +81,8 @@ router.get("/stats", adminAuth, getDashboardStats);
 router.get("/charts", adminAuth, getDashboardCharts);
 router.get("/newsletter", adminAuth, getAllNewsletters);
 router.delete("/newsletter/:id", adminAuth, deleteNewsletter);
+router.post("/newsletter/send-bulk", adminAuth, sendNewsletterBulk);
+router.post("/newsletter/send-single", adminAuth, sendNewsletterToSingle);
 router.get("/profile", adminAuth, getAdminProfile);
 router.put("/edit-profile", adminAuth, upload.single("image"), updateAdminProfile);
 
