@@ -147,7 +147,7 @@ export default function TeamUp() {
           <ConfirmationDialog
             className="navbar-confirm-dialog"
             show={showInvalidDialog}
-            title="⚠️ Team Up"
+            title="Team Up"
             message="Please login or create an account to view the posts."
             onConfirm={() => { }}
             onCancel={() => {
@@ -163,7 +163,7 @@ export default function TeamUp() {
               <ConfirmationDialog
                 // className="navbar-confirm-dialog"
                 show={showNoPostDialog}
-                title="⚠️ Team Up"
+                title="Team Up"
                 message="You haven’t posted any Team Up yet. Please post first. Want to post?"
                 onConfirm={() => navigate("/user/team-up-post")}
                 onCancel={() => {

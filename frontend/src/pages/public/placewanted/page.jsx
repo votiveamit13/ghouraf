@@ -122,7 +122,7 @@ export default function PlaceWanted() {
                     <ConfirmationDialog
                         className="navbar-confirm-dialog"
                         show={showInvalidDialog}
-                        title="⚠️ Place Wanted"
+                        title="Place Wanted"
                         message="Please login or create an account to view the posts."
                         onConfirm={() => { }}
                         onCancel={() => {
