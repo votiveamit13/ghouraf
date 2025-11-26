@@ -13,51 +13,19 @@ import {
   listenChatMeta,
   sendMessage,
   getChatId,
+  setUserActiveChat,
+  deleteChat,
+  markChatNotificationsAsRead,
+  clearUserActiveChat // Add this import
 } from "utils/firebaseChatHelper";
-import { doc, onSnapshot, setDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase";
 import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import Loader from "components/common/Loader";
 import { MdAddAPhoto } from "react-icons/md";
 import { BiSolidVideoPlus } from "react-icons/bi";
 import { HiMiniDocumentPlus } from "react-icons/hi2";
-import { deleteChat } from "utils/firebaseChatHelper";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
-
-export const setUserActiveChat = async (userId, chatId) => {
-  const statusRef = doc(db, "userStatus", userId);
-  await setDoc(
-    statusRef,
-    {
-      currentChat: chatId || null,
-    },
-    { merge: true }
-  );
-
-  // Mark all notifications for this chat as read when user opens the chat
-  if (chatId) {
-    const notificationsRef = collection(db, "notifications");
-    const unreadNotifsQuery = query(
-      notificationsRef,
-      where("userId", "==", userId),
-      where("chatId", "==", chatId),
-      where("read", "==", false)
-    );
-
-    const unreadNotifsSnapshot = await getDocs(unreadNotifsQuery);
-    
-    const markAsReadPromises = unreadNotifsSnapshot.docs.map(docSnap =>
-      updateDoc(doc(db, "notifications", docSnap.id), { read: true })
-    );
-
-    await Promise.all(markAsReadPromises);
-
-    const chatRef = doc(db, "chats", chatId);
-    await updateDoc(chatRef, {
-      [`unreadCount.${userId}`]: 0
-    });
-  }
-};
 
 export default function Messages() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -99,6 +67,36 @@ export default function Messages() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Clear active chat when component unmounts or user changes
+  useEffect(() => {
+    return () => {
+      if (user?._id) {
+        clearUserActiveChat(user._id);
+      }
+    };
+  }, [user?._id]);
+
+  // Handle page visibility changes
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // User switched tabs or minimized window
+        clearUserActiveChat(user._id);
+      } else if (chatId) {
+        // User came back to the tab and was in a chat
+        setUserActiveChat(user._id, chatId);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user?._id, chatId]);
+
   const filteredChats = chats.filter(chat => {
     const otherUserId = chat.participants.find(uid => uid !== user._id);
     const otherUser = userMap[otherUserId];
@@ -108,25 +106,15 @@ export default function Messages() {
     return fullName.includes(searchQuery.toLowerCase());
   });
 
-
   useEffect(() => {
-    // console.log("Messages: user value:", user);
-    // if (!user) {
-    //   // console.log("Messages: no user yet - not subscribing");
-    //   return;
-    // }
-    // console.log("Messages: subscribing listenChats for", user._id);
-
     setLoadingChats(true);
 
     const unsubscribe = listenChats(user._id, (fetchedChats) => {
-      // console.log("listenChats -> callback got", fetchedChats);
       setChats(fetchedChats);
       setLoadingChats(false);
     });
 
     return () => {
-      // console.log("Messages: unsubscribing listenChats");
       unsubscribe && unsubscribe();
     };
   }, [user]);
@@ -146,6 +134,7 @@ export default function Messages() {
           const newChatId = await getChatId(user._id, receiverIdFromQuery);
           setChatId(newChatId);
           setReceiverId(receiverIdFromQuery);
+          await setUserActiveChat(user._id, newChatId);
         } else {
           handleSelectChat(existingChat);
         }
@@ -153,12 +142,11 @@ export default function Messages() {
     };
 
     selectChat();
-
   }, [chats, user, receiverIdFromQuery, userMap]);
-
 
   useEffect(() => {
     if (!chatId) return;
+    
     const unsubscribeMsgs = listenMessages(chatId, setMessages);
     const unsubscribeMeta = listenChatMeta(chatId, setChatMeta);
 
@@ -167,6 +155,17 @@ export default function Messages() {
       unsubscribeMeta();
     };
   }, [chatId]);
+
+  // Mark notifications as read when user is actively viewing a chat
+  useEffect(() => {
+    if (!chatId || !user?._id) return;
+
+    const markNotificationsAsRead = async () => {
+      await markChatNotificationsAsRead(user._id, chatId);
+    };
+
+    markNotificationsAsRead();
+  }, [chatId, user?._id]);
 
   useEffect(() => {
     if (!chats || chats.length === 0) return;
@@ -216,18 +215,19 @@ export default function Messages() {
     if (chats.length > 0) fetchUsers();
   }, [chats, user, userMap, apiUrl]);
 
-const handleSelectChat = async (chat) => {
-  await setUserActiveChat(user._id, chat.id); 
-  setChatId(chat.id);
-  const otherUser = chat.participants.find(uid => uid !== user._id);
-  setReceiverId(otherUser);
-  if (isMobileView) setShowChatList(false);
-};
+  const handleSelectChat = async (chat) => {
+    await setUserActiveChat(user._id, chat.id);
+    setChatId(chat.id);
+    const otherUser = chat.participants.find(uid => uid !== user._id);
+    setReceiverId(otherUser);
+    if (isMobileView) setShowChatList(false);
+  };
 
-  const handleBackToList = () => {
+  const handleBackToList = async () => {
     setShowChatList(true);
     setChatId(null);
     setReceiverId(null);
+    await clearUserActiveChat(user._id); // Clear active chat when going back to list
   };
 
   const handleSend = async () => {
@@ -266,6 +266,7 @@ const handleSelectChat = async (chat) => {
         setChatId(null);
         setReceiverId(null);
         setMessages([]);
+        await clearUserActiveChat(user._id);
       }
     }
 
@@ -282,7 +283,11 @@ const handleSelectChat = async (chat) => {
     const file = e.target.files[0];
     if (!file || !chatId || !receiverId) return;
 
-    await sendMessage(chatId, user._id, receiverId, "", file, type);
+    await sendMessage(chatId, user._id, receiverId, "", file, type, {
+      firstName: user.profile?.firstName,
+      lastName: user.profile?.lastName,
+      photo: user.profile?.photo,
+    });
     setShowAttach(false);
   };
 
@@ -290,7 +295,7 @@ const handleSelectChat = async (chat) => {
     <div className="container user-layout">
       {loadingChats ? (
         <div className="h-[600px]">
-        <Loader fullScreen={true} />
+          <Loader fullScreen={true} />
         </div>
       ) : (
         <div className="mt-5 mb-8 h-[550px] w-full bg-white flex border rounded-lg shadow-sm">
@@ -350,7 +355,6 @@ const handleSelectChat = async (chat) => {
                 );
               })}
             </div>
-
           </div>
 
           {/* Right panel */}
@@ -465,11 +469,11 @@ const handleSelectChat = async (chat) => {
                   className="flex items-center border-t p-3 gap-2"
                 >
                   <div className="relative flex-1">
-                    {/* <AiOutlinePlus
+                    <AiOutlinePlus
                       size={30}
                       onClick={() => setShowAttach(!showAttach)}
                       className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
-                    /> */}
+                    />
 
                     {showAttach && (
                       <div className="absolute bottom-12 left-0 bg-white shadow-md rounded-md z-10 w-40">
@@ -534,7 +538,6 @@ const handleSelectChat = async (chat) => {
                     <TbSend2 size={28} />
                   </button>
                 </form>
-
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -544,7 +547,6 @@ const handleSelectChat = async (chat) => {
           </div>
         </div>
       )}
-
     </div>
   );
 }

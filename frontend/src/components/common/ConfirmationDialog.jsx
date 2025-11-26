@@ -1,6 +1,7 @@
 import React from "react";
+import Loader from "./Loader";
 
-const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel, className = "" }) => {
+const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel, loading = false, className = "" }) => {
   if (!show) return null;
 
   return (
@@ -30,10 +31,11 @@ const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel, classNa
             Cancel
           </button>
           <button
-            onClick={onConfirm}
+            onClick={!loading ? onConfirm : undefined}
+            disabled={loading}
             className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
           >
-            Confirm
+            {loading ? <Loader /> : "Confirm"}
           </button>
         </div>
       </div>

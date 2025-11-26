@@ -49,24 +49,33 @@ export const sendMessage = async (chatId, senderId, receiverId, text, file = nul
     fileType: fileType || null,
   });
 
+  const statusRef = doc(db, "userStatus", receiverId);
+  const statusSnap = await getDoc(statusRef);
+  
   const chatRef = doc(db, "chats", chatId);
+  
+  // Only increment unread count if receiver is NOT viewing this chat
+  if (statusSnap.exists()) {
+    const { currentChat } = statusSnap.data();
+    
+    if (currentChat === chatId) {
+      // Receiver is viewing this chat - update last message but don't increment unread count
+      await updateDoc(chatRef, {
+        lastMessage: text || (fileType ? `${fileType} sent` : ""),
+        lastMessageTime: serverTimestamp(),
+        deletedFor: [],
+      });
+      return; // Exit early, no notification needed
+    }
+  }
+
+  // Receiver is NOT viewing this chat - increment unread count and send notification
   await updateDoc(chatRef, {
     lastMessage: text || (fileType ? `${fileType} sent` : ""),
     lastMessageTime: serverTimestamp(),
     [`unreadCount.${receiverId}`]: increment(1),
     deletedFor: [],
   });
-
-  const statusRef = doc(db, "userStatus", receiverId);
-  const statusSnap = await getDoc(statusRef);
-  
-  if (statusSnap.exists()) {
-    const { currentChat } = statusSnap.data();
-    
-    if (currentChat === chatId) {
-      return;
-    }
-  }
 
   const notificationsRef = collection(db, "notifications");
   const existingNotifQuery = query(
@@ -207,5 +216,83 @@ export const deleteChat = async (chatId, userId) => {
   } catch (err) {
     console.error("Failed to delete chat:", err);
     return false;
+  }
+};
+
+export const setUserActiveChat = async (userId, chatId) => {
+  const statusRef = doc(db, "userStatus", userId);
+  await setDoc(
+    statusRef,
+    {
+      currentChat: chatId || null,
+    },
+    { merge: true }
+  );
+
+  // Only mark notifications as read if user is actively viewing a chat
+  if (chatId) {
+    await markChatNotificationsAsRead(userId, chatId);
+  }
+};
+
+export const markChatNotificationsAsRead = async (userId, chatId) => {
+  try {
+    const notificationsRef = collection(db, "notifications");
+    const unreadNotifsQuery = query(
+      notificationsRef,
+      where("userId", "==", userId),
+      where("chatId", "==", chatId),
+      where("read", "==", false)
+    );
+
+    const unreadNotifsSnapshot = await getDocs(unreadNotifsQuery);
+    
+    const markAsReadPromises = unreadNotifsSnapshot.docs.map(docSnap =>
+      updateDoc(doc(db, "notifications", docSnap.id), { read: true })
+    );
+
+    await Promise.all(markAsReadPromises);
+
+    // Reset unread count for this chat
+    const chatRef = doc(db, "chats", chatId);
+    await updateDoc(chatRef, {
+      [`unreadCount.${userId}`]: 0
+    });
+  } catch (error) {
+    console.error("Error marking chat notifications as read:", error);
+  }
+};
+
+export const markMessageAsRead = async (messageId, chatId, userId) => {
+  try {
+    const messageRef = doc(db, "messages", chatId, "chatMessages", messageId);
+    await updateDoc(messageRef, {
+      read: true
+    });
+
+    // Also update the unread count
+    const chatRef = doc(db, "chats", chatId);
+    await updateDoc(chatRef, {
+      [`unreadCount.${userId}`]: increment(-1)
+    });
+  } catch (error) {
+    console.error("Error marking message as read:", error);
+  }
+};
+
+// Add this function to your existing firebaseChatHelper.js
+export const clearUserActiveChat = async (userId) => {
+  try {
+    const statusRef = doc(db, "userStatus", userId);
+    await setDoc(
+      statusRef,
+      {
+        currentChat: null,
+      },
+      { merge: true }
+    );
+    console.log(`Cleared active chat for user: ${userId}`);
+  } catch (error) {
+    console.error("Error clearing active chat:", error);
   }
 };

@@ -37,12 +37,14 @@ import PrivacyPolicy from "pages/public/privacypolicy/page";
 import TermsConditions from "pages/public/termsandconditions/page";
 import SafetyTips from "pages/public/safetytips/page";
 import Advice from "pages/public/advice/page";
+import { ActiveChatManager } from "components/user/ActiveChatManage";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
     <AuthProvider>
       <AdminAuthProvider>
+        <ActiveChatManager/>
       <Routes>
           <Route path="/admin/login" element={<LoginPage />} />
           <Route
