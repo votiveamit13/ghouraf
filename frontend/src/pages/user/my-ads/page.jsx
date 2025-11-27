@@ -268,7 +268,7 @@ export default function MyAds() {
                     <Loader />
                 </div>
             ) : (
-                <div className="flex flex-wrap gap-6 justify-start">
+                <div className="flex flex-wrap gap-3 justify-start">
                     {ads.length > 0 ? (
                         ads.map((ad) => {
                             const city = ad.city === "NA" ? "" : ad.city;

@@ -9,6 +9,8 @@ import PhotoSlider from "components/common/Slider";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import ExportData from "../export-data/ExportData";
+import Loader from "components/common/Loader";
+import { getFullLocation } from "utils/locationHelper";
 
 export default function TeamUps() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -18,7 +20,10 @@ export default function TeamUps() {
     const [selectedPost, setSelectedPost] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const [spaceToDelete, setSpaceToDelete] = useState(null);
-
+const [loading, setLoading] = useState(false);
+const locationString = selectedPost
+  ? getFullLocation(selectedPost.city === "NA" ? "" : selectedPost.city, selectedPost.state, selectedPost.country)
+  : "";
 
     useEffect(() => {
         const fetchTeamUp = async () => {
@@ -151,6 +156,7 @@ export default function TeamUps() {
                                                 value={post.promotion?.isPromoted ? "true" : "false"}
                                                 onChange={async (e) => {
                                                     const promote = e.target.value === "true";
+                                                    setLoading(true);
                                                     try {
                                                         const token = localStorage.getItem("authToken");
                                                         await axios.patch(
@@ -180,7 +186,9 @@ export default function TeamUps() {
                                                     } catch (err) {
                                                         console.error("Failed to update promotion:", err);
                                                         toast.error("Failed to update promotion. Try again.");
-                                                    }
+                                                    } finally {
+    setLoading(false);
+  }
                                                 }}
                                             >
                                                 <option value="true">Promote</option>
@@ -193,6 +201,7 @@ export default function TeamUps() {
                                                 value={post.status}
                                                 onChange={async (e) => {
                                                     const newStatus = e.target.value;
+                                                    setLoading(true);
                                                     try {
                                                         const token = localStorage.getItem("authToken");
                                                         await axios.patch(
@@ -211,7 +220,9 @@ export default function TeamUps() {
                                                     } catch (err) {
                                                         console.error("Failed to update status:", err);
                                                         toast.error("Failed to update status. Try again.");
-                                                    }
+                                                    } finally {
+    setLoading(false);
+  }
                                                 }}
                                                 className="border px-2 py-1 rounded"
                                             >
@@ -316,28 +327,28 @@ export default function TeamUps() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                                <p><span className="text-black">Country:</span> {selectedPost.country}</p>
-                                <p><span className="text-black">State:</span> {selectedPost.state}</p>
-                                <p><span className="text-black">City:</span> {selectedPost.city}</p>
+                                <p><span className="text-black">Location:</span> {locationString}</p>
+                                {/* <p><span className="text-black">State:</span> {selectedPost.state}</p>
+                                <p><span className="text-black">City:</span> {selectedPost.city}</p> */}
                                 {/* <p><span className="text-black">Zip:</span> {selectedPost.zip}</p> */}
                                 <p><span className="text-black">Budget:</span> ${selectedPost.budget} {selectedPost.budgetType}</p>
                                 {/* <p><span className="text-black">Move-in Date:</span> {selectedPost.moveInDate ? new Date(selectedPost.moveInDate).toLocaleDateString() : "N/A"}</p> */}
-                                <p><span className="text-black">Duration:</span> {selectedPost.period || "N/A"}</p>
+                                <p><span className="text-black">Duration of stay:</span> {selectedPost.period || "N/A"}</p>
                                 <p><span className="text-black">Property Status:</span> {selectedPost.status}</p>
                                 <p><span className="text-black">Availability:</span>{" "}
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${selectedPost.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                         {selectedPost.available ? "Available" : "Not Available"}
                                     </span>
                                 </p>
-                                <p><span className="text-black">Size:</span> {selectedPost.size ? `${selectedPost.size} sqft` : "N/A"}</p>
-                                <p><span className="text-black">Furnishing:</span> {selectedPost.furnishing ? "Yes" : "No"}</p>
+                                {/* <p><span className="text-black">Size:</span> {selectedPost.size ? `${selectedPost.size} sqft` : "N/A"}</p> */}
+                                {/* <p><span className="text-black">Furnishing:</span> {selectedPost.furnishing ? "Yes" : "No"}</p> */}
                                 <p><span className="text-black">Smoking:</span> {selectedPost.smoke ? "Allowed" : "Not Allowed"}</p>
                                 <p><span className="text-black">Pets:</span> {selectedPost.pets ? "Yes" : "No"}</p>
                                 <p><span className="text-black">Pets Preference:</span> {selectedPost.petsPreference ? "Yes" : "No"}</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                                <p><span className="text-black">Gender Preference:</span> {selectedPost.gender}</p>
+                                {/* <p><span className="text-black">Gender Preference:</span> {selectedPost.gender}</p> */}
                                 {/* <p><span className="text-black">Roommate Preference:</span> {selectedPost.roommatePref}</p> */}
                                 <p><span className="text-black">Age Range:</span> {selectedPost.minAge || "-"} - {selectedPost.maxAge || "-"}</p>
                                 <p><span className="text-black">Occupation Preference:</span> {selectedPost.occupationPreference || "N/A"}</p>
@@ -346,8 +357,9 @@ export default function TeamUps() {
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <p><span className="text-black">Full Name:</span> {selectedPost.firstName} {selectedPost.lastName}</p>
                                 <p><span className="text-black">Age:</span> {selectedPost.age || "N/A"}</p>
+                                <p><span className="text-black">Gender:</span> {selectedPost.gender}</p>
                                 <p><span className="text-black">Occupation:</span> {selectedPost.occupation || "N/A"}</p>
-                                <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p>
+                                {/* <p><span className="text-black">Language:</span> {selectedPost.language || "N/A"}</p> */}
                                 {/* <p><span className="text-black">Preferred Language:</span> {selectedPost.languagePreference || "N/A"}</p> */}
                             </div>
 
@@ -376,6 +388,7 @@ export default function TeamUps() {
                     </div>
                 </div>
             )}
+            {loading && <Loader fullScreen={true} />}
         </>
     );
 }

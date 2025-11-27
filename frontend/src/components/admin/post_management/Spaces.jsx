@@ -9,6 +9,8 @@ import PhotoSlider from "components/common/Slider";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import ExportData from "../export-data/ExportData";
+import Loader from "components/common/Loader";
+import { getFullLocation } from "utils/locationHelper";
 
 export default function Spaces() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -18,6 +20,10 @@ export default function Spaces() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [spaceToDelete, setSpaceToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const locationString = selectedPost
+    ? getFullLocation(selectedPost.city === "NA" ? "" : selectedPost.city, selectedPost.state, selectedPost.country)
+    : "";
 
 
   useEffect(() => {
@@ -150,6 +156,7 @@ export default function Spaces() {
                         value={post.promotion?.isPromoted ? "true" : "false"}
                         onChange={async (e) => {
                           const promote = e.target.value === "true";
+                          setLoading(true);
                           try {
                             const token = localStorage.getItem("authToken");
                             await axios.patch(
@@ -179,6 +186,8 @@ export default function Spaces() {
                           } catch (err) {
                             console.error("Failed to update promotion:", err);
                             toast.error("Failed to update promotion. Try again.");
+                          } finally {
+                            setLoading(false);
                           }
                         }}
                       >
@@ -192,6 +201,7 @@ export default function Spaces() {
                         value={post.status}
                         onChange={async (e) => {
                           const newStatus = e.target.value;
+                          setLoading(true);
                           try {
                             const token = localStorage.getItem("authToken");
                             await axios.patch(
@@ -210,6 +220,8 @@ export default function Spaces() {
                           } catch (err) {
                             console.error("Failed to update status:", err);
                             toast.error("Failed to update status. Try again.");
+                          } finally {
+                            setLoading(false);
                           }
                         }}
                         className="border px-2 py-1 rounded"
@@ -320,6 +332,8 @@ export default function Spaces() {
                 <p><span className=" text-black">Size:</span> {selectedPost.size} sqft</p>
                 <p><span className=" text-black">Furnishing:</span> {selectedPost.furnishing ? "Yes" : "No"}</p>
                 <p><span className=" text-black">Smoking:</span> {selectedPost.smoking ? "Allowed" : "Not Allowed"}</p>
+                <p><span className=" text-black">Number of bedrooms:</span> {selectedPost.bedrooms}</p>
+                <p><span className=" text-black">Location:</span> {locationString}</p>
               </div>
 
               {selectedPost.amenities?.length > 0 && (
@@ -349,6 +363,7 @@ export default function Spaces() {
         </div>
       )}
 
+      {loading && <Loader fullScreen={true} />}
 
     </>
   );

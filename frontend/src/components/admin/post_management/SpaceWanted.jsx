@@ -9,6 +9,8 @@ import PhotoSlider from "components/common/Slider";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import ExportData from "../export-data/ExportData";
+import Loader from "components/common/Loader";
+import { getFullLocation } from "utils/locationHelper";
 
 export default function SpaceWanted() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -18,7 +20,10 @@ export default function SpaceWanted() {
     const [selectedPost, setSelectedPost] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const [spaceToDelete, setSpaceToDelete] = useState(null);
-
+const [loading, setLoading] = useState(false);
+const locationString = selectedPost
+  ? getFullLocation(selectedPost.city === "NA" ? "" : selectedPost.city, selectedPost.state, selectedPost.country)
+  : "";
 
     useEffect(() => {
         const fetchSpaceWanted = async () => {
@@ -152,6 +157,7 @@ export default function SpaceWanted() {
                                                 value={post.promotion?.isPromoted ? "true" : "false"}
                                                 onChange={async (e) => {
                                                     const promote = e.target.value === "true";
+                                                    setLoading(true);
                                                     try {
                                                         const token = localStorage.getItem("authToken");
                                                         await axios.patch(
@@ -181,7 +187,9 @@ export default function SpaceWanted() {
                                                     } catch (err) {
                                                         console.error("Failed to update promotion:", err);
                                                         toast.error("Failed to update promotion. Try again.");
-                                                    }
+                                                    } finally {
+    setLoading(false);
+  }
                                                 }}
                                             >
                                                 <option value="true">Promote</option>
@@ -194,6 +202,7 @@ export default function SpaceWanted() {
                                                 value={post.status}
                                                 onChange={async (e) => {
                                                     const newStatus = e.target.value;
+                                                    setLoading(true);
                                                     try {
                                                         const token = localStorage.getItem("authToken");
                                                         await axios.patch(
@@ -212,7 +221,9 @@ export default function SpaceWanted() {
                                                     } catch (err) {
                                                         console.error("Failed to update status:", err);
                                                         toast.error("Failed to update status. Try again.");
-                                                    }
+                                                    } finally {
+    setLoading(false);
+  }
                                                 }}
                                                 className="border px-2 py-1 rounded"
                                             >
@@ -314,20 +325,20 @@ export default function SpaceWanted() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                                <p><span className="text-black">Country:</span> {selectedPost.country}</p>
-                                <p><span className="text-black">State:</span> {selectedPost.state}</p>
-                                <p><span className="text-black">City:</span> {selectedPost.city}</p>
+                                <p><span className="text-black">Location:</span> {locationString}</p>
+                                {/* <p><span className="text-black">State:</span> {selectedPost.state}</p>
+                                <p><span className="text-black">City:</span> {selectedPost.city}</p> */}
                                 {/* <p><span className="text-black">Zip:</span> {selectedPost.zip}</p> */}
-                                <p><span className="text-black">Property Type:</span> {selectedPost.propertyType}</p>
-                                <p><span className="text-black">Room Size:</span> {selectedPost.roomSize}</p>
+                                <p><span className="text-black">Space Wanted Type:</span> {selectedPost.propertyType}</p>
+                                <p><span className="text-black">Minimum Space Size:</span> {selectedPost.roomSize}</p>
                                 <p>
                                     <span className="text-black">Budget:</span> ${selectedPost.budget} {selectedPost.budgetType}
                                 </p>
                                 <p>
                                     <span className="text-black">Move-in Date:</span>{" "}
-                                    {selectedPost.moveInDate ? new Date(selectedPost.moveInDate).toLocaleDateString() : "N/A"}
+                                    {selectedPost.moveInDate}
                                 </p>
-                                <p><span className="text-black">Period:</span> {selectedPost.period}</p>
+                                <p><span className="text-black">Duration of stay:</span> {selectedPost.period}</p>
                                 <p>
                                     <span className="text-black">Availability:</span>{" "}
                                     <span
@@ -377,7 +388,7 @@ export default function SpaceWanted() {
                     </div>
                 </div>
             )}
-
+{loading && <Loader fullScreen={true} />}
         </>
     );
 }

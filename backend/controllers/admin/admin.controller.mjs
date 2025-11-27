@@ -427,7 +427,7 @@ export const getAllSpaces = async (req, res) => {
     const spaces = await Space.find({ is_deleted: false })
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .select(
-        "title propertyType budget budgetType user available status createdAt description size furnishing smoking amenities featuredImage photos promotion"
+        "title propertyType budget budgetType user available status createdAt description size furnishing smoking bedrooms city state country amenities  featuredImage photos promotion"
       );
 
     res.json(spaces);

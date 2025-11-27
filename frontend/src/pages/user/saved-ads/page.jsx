@@ -135,7 +135,7 @@ export default function SavedAds() {
             {loading ? (
                 <Loader />
             ) : displayedAds.length > 0 ? (
-                <div className="flex flex-wrap gap-6 justify-start">
+                <div className="flex flex-wrap gap-3 justify-start">
                     {displayedAds.map((ad) => {
                         const post = ad.snapshot;
                         const city = post.city === "NA" ? "" : post.city;

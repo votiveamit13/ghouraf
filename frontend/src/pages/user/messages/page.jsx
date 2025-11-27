@@ -59,7 +59,7 @@ export default function Messages() {
         setIsMobileView(true);
       } else {
         setIsMobileView(false);
-        setShowChatList(true); 
+        setShowChatList(true);
       }
     };
     handleResize();
@@ -67,7 +67,6 @@ export default function Messages() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Clear active chat when component unmounts or user changes
   useEffect(() => {
     return () => {
       if (user?._id) {
@@ -76,16 +75,13 @@ export default function Messages() {
     };
   }, [user?._id]);
 
-  // Handle page visibility changes
   useEffect(() => {
     if (!user?._id) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // User switched tabs or minimized window
         clearUserActiveChat(user._id);
       } else if (chatId) {
-        // User came back to the tab and was in a chat
         setUserActiveChat(user._id, chatId);
       }
     };
@@ -146,7 +142,7 @@ export default function Messages() {
 
   useEffect(() => {
     if (!chatId) return;
-    
+
     const unsubscribeMsgs = listenMessages(chatId, setMessages);
     const unsubscribeMeta = listenChatMeta(chatId, setChatMeta);
 
@@ -156,7 +152,6 @@ export default function Messages() {
     };
   }, [chatId]);
 
-  // Mark notifications as read when user is actively viewing a chat
   useEffect(() => {
     if (!chatId || !user?._id) return;
 
@@ -227,7 +222,7 @@ export default function Messages() {
     setShowChatList(true);
     setChatId(null);
     setReceiverId(null);
-    await clearUserActiveChat(user._id); // Clear active chat when going back to list
+    await clearUserActiveChat(user._id);
   };
 
   const handleSend = async () => {
@@ -442,13 +437,18 @@ export default function Messages() {
                           <p className="leading-[20px]">{msg.text}</p>
                         </div>
                         <span className="text-xs text-gray-400">
-                          {msg.timestamp?.toDate
-                            ? msg.timestamp
-                              .toDate()
-                              .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
-                              .toUpperCase()
-                            : ""}
+                          {msg.timestamp?.toDate &&
+                            msg.timestamp.toDate().toLocaleString([], {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                          }
                         </span>
+
                       </div>
                       {msg.senderId === user._id && (
                         <img

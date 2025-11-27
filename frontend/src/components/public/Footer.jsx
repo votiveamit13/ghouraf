@@ -56,7 +56,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-black text-gray-300 pt-12 pb-3">
-      <div className="container mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="container mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-4 gap-10 mb-3">
         {/* Office Address */}
         <div>
           <NavLink to="/" className="flex items-center">
@@ -69,8 +69,19 @@ export default function Footer() {
           {/* <h3 className="text-white font-semibold mb-4">Office Address</h3>
           <p className="text-sm mb-1">Head office:</p>
           <p className="text-sm font-semibold">Address Will Goes Here</p> */}
+        
+                <div className="flex space-x-4">
+          {/* <a href="/" className="w-8 h-8 flex items-center justify-center">
+            <FaFacebookF />
+          </a>
+          <a href="/" className="w-8 h-8 flex items-center justify-center">
+            <FaTwitter />
+          </a> */}
+          <a href="/" className="w-8 h-8 flex items-center justify-center">
+            <FaInstagram />
+          </a>
         </div>
-
+        </div>
         {/* Contact */}
         <div>
           <h3 className="text-white font-semibold mb-4">Contact</h3>
@@ -145,20 +156,20 @@ export default function Footer() {
       </div>
 
       {/* Footer Bottom */}
-      <div className="pt-6 flex flex-row md:flex-row items-center justify-between max-w-7xl mx-auto lg:px-6 md:px-6 sm:px-2 px-4">
+      {/* <div className="pt-6 flex flex-row md:flex-row items-center justify-between max-w-7xl mx-auto lg:px-6 md:px-6 sm:px-2 px-4">
         <p className="text-white font-semibold"></p>
         <div className="flex space-x-4">
-          {/* <a href="/" className="w-8 h-8 flex items-center justify-center">
+          <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaFacebookF />
           </a>
           <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaTwitter />
-          </a> */}
+          </a>
           <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaInstagram />
           </a>
         </div>
-      </div>
+      </div> */}
     </footer>
   );
 }
