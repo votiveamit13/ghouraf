@@ -31,7 +31,7 @@ const PromotionPaymentModal = ({ clientSecret, onClose, onSuccess }) => {
         setMessage(error.message);
         toast.error(error.message || "An unexpected error occurred.");
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        toast.success("Payment successful! Finalizing your promoted ad...");
+        // toast.success("Payment successful! Finalizing your promoted ad...");
         onSuccess();
       } else {
         setMessage("Payment processing...");
