@@ -239,6 +239,9 @@ export default function DetailPage({ targetUserId }) {
       setMessageLoading(true);
       const chatId = await getChatId(user._id, space.user._id);
       navigate(`/user/messages/${chatId}?receiverId=${space.user._id}`);
+      setTimeout(() => {
+      navigate("/user/messages", { replace: true });
+    }, 50);
     } catch (error) {
       console.error("Error opening chat:", error);
     } finally {

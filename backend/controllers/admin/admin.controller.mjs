@@ -516,7 +516,7 @@ export const deleteSpace = async (req, res) => {
       space.user.email,
       space.user.profile.firstName,
       space.title,
-      `Your post <b>${space.title}</b> has been <span style="color:red;">deleted</span> by admin for not abiding with the terms and conditions of Ghouraf.`
+      `Your post <b>${space.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
     );
 
 
@@ -693,7 +693,7 @@ export const deleteTeamUp = async (req, res) => {
         teamup.user.email,
         teamup.user.profile.firstName,
         teamup.title,
-        `Your post <b>${teamup.title}</b> has been <span style="color:red;">deleted</span> by admin for not abiding with the terms and conditions of Ghouraf.`
+        `Your post <b>${teamup.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
       );
 
       return res.json({ message: "Team Up deleted successfully", teamup });
@@ -727,7 +727,7 @@ export const deleteTeamUp = async (req, res) => {
         spaceWanted.user.email,
         spaceWanted.user.profile.firstName,
         spaceWanted.title,
-        `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">deleted</span> by admin for not abiding with the terms and conditions of Ghouraf.`
+        `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
       );
       return res.json({ message: "Team Up (SpaceWanted) deleted successfully", spaceWanted });
     }
@@ -861,7 +861,7 @@ export const deleteSpaceWanted = async (req, res) => {
       spacewanted.user.email,
       spacewanted.user.profile.firstName,
       spacewanted.title,
-      `Your post <b>${spacewanted.title}</b> has been <span style="color:red;">deleted</span> by admin for not abiding with the terms and conditions of Ghouraf.`
+      `Your post <b>${spacewanted.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
     );
 
     res.json({ message: "Space Wanted deleted successfully", spacewanted });

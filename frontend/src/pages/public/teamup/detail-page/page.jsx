@@ -178,6 +178,9 @@ export default function TeamUpDetailPage() {
             setMessageLoading(true);
             const chatId = await getChatId(user._id, teamup.user._id);
             navigate(`/user/messages/${chatId}?receiverId=${teamup.user._id}`);
+            setTimeout(() => {
+      navigate("/user/messages", { replace: true });
+    }, 50);
         } catch (error) {
             console.error("Error opening chat:", error);
         } finally {

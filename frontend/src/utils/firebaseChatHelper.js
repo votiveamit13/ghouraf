@@ -63,6 +63,7 @@ export const sendMessage = async (chatId, senderId, receiverId, text, file = nul
       await updateDoc(chatRef, {
         lastMessage: text || (fileType ? `${fileType} sent` : ""),
         lastMessageTime: serverTimestamp(),
+        timestamp: serverTimestamp(), 
         deletedFor: [],
       });
       return; // Exit early, no notification needed
@@ -73,6 +74,7 @@ export const sendMessage = async (chatId, senderId, receiverId, text, file = nul
   await updateDoc(chatRef, {
     lastMessage: text || (fileType ? `${fileType} sent` : ""),
     lastMessageTime: serverTimestamp(),
+    timestamp: serverTimestamp(), 
     [`unreadCount.${receiverId}`]: increment(1),
     deletedFor: [],
   });

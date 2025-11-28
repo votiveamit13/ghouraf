@@ -178,6 +178,9 @@ export default function SpaceWantedDetailPage() {
             setMessageLoading(true);
             const chatId = await getChatId(user._id, spacewanted.user._id);
             navigate(`/user/messages/${chatId}?receiverId=${spacewanted.user._id}`);
+            setTimeout(() => {
+      navigate("/user/messages", { replace: true });
+    }, 50);
         } catch (error) {
             console.error("Error opening chat:", error);
         } finally {

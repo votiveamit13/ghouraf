@@ -52,6 +52,7 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileView, setIsMobileView] = useState(false);
   const [showChatList, setShowChatList] = useState(true);
+const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -225,15 +226,29 @@ export default function Messages() {
     await clearUserActiveChat(user._id);
   };
 
-  const handleSend = async () => {
-    if (!text.trim() || !chatId || !receiverId) return;
-    await sendMessage(chatId, user._id, receiverId, text, null, null, {
+const handleSend = async () => {
+  if (!text.trim() || !chatId || !receiverId) return;
+
+  const messageText = text; // store user-typed text
+  setText("");              // 🔥 instantly clear input (fixes glitch)
+  setSending(true);
+
+  try {
+    await sendMessage(chatId, user._id, receiverId, messageText, null, null, {
       firstName: user.profile?.firstName,
       lastName: user.profile?.lastName,
       photo: user.profile?.photo,
     });
-    setText("");
-  };
+  } catch (error) {
+    console.error("Message sending failed:", error);
+
+    // optional: restore message if send fails
+    setText(messageText);
+  } finally {
+    setSending(false);
+  }
+};
+
 
   useEffect(() => {
     if (!messagesEndRef.current) return;
@@ -436,18 +451,22 @@ export default function Messages() {
                           )}
                           <p className="leading-[20px]">{msg.text}</p>
                         </div>
-                        <span className="text-xs text-gray-400">
-                          {msg.timestamp?.toDate &&
-                            msg.timestamp.toDate().toLocaleString([], {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            })
-                          }
-                        </span>
+<span className="text-xs text-gray-400">
+  {sending && msg.senderId === user._id && !msg.timestamp ? (
+    <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+  ) : (
+    msg.timestamp?.toDate &&
+    msg.timestamp.toDate().toLocaleString([], {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+  )}
+</span>
+
 
                       </div>
                       {msg.senderId === user._id && (
@@ -531,12 +550,14 @@ export default function Messages() {
                       className="w-full pl-[35px] pr-4 py-2 text-[15px]"
                     />
                   </div>
-                  <button
-                    type="submit"
-                    className="bg-black text-white px-3 py-2 rounded-[5px] flex items-center justify-center"
-                  >
-                    <TbSend2 size={28} />
-                  </button>
+<button
+  type="submit"
+  disabled={sending}
+  className="bg-black text-white px-3 py-2 rounded-[5px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  <TbSend2 size={28} />
+</button>
+
                 </form>
               </>
             ) : (
