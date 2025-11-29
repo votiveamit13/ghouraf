@@ -8,6 +8,7 @@ import guestRoutes from "./routes/guest.route.mjs";
 import postRoutes from "./routes/post.route.mjs";
 import promotionRoutes from "./routes/promotion.routes.mjs";
 import notificationRoutes from "./routes/notification.route.mjs";
+import emailRoutes from "./routes/email.route.mjs";
 import dbConnection from "./config/db.connection.mjs";
 import User from "./models/User.mjs";
 import helmet from "helmet";
@@ -50,7 +51,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/admin", adminRoutes);
 
-app.use("/api", userRoutes, guestRoutes, postRoutes);
+app.use("/api", userRoutes, guestRoutes, postRoutes, emailRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 dbConnection().then(async () => {

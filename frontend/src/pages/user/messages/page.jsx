@@ -18,7 +18,7 @@ import {
   markChatNotificationsAsRead,
   clearUserActiveChat // Add this import
 } from "utils/firebaseChatHelper";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase";
 import defaultImage from "assets/img/ghouraf/default-avatar.png";
 import Loader from "components/common/Loader";
@@ -26,6 +26,7 @@ import { MdAddAPhoto } from "react-icons/md";
 import { BiSolidVideoPlus } from "react-icons/bi";
 import { HiMiniDocumentPlus } from "react-icons/hi2";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
+import axios from "axios";
 
 export default function Messages() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -239,6 +240,24 @@ const handleSend = async () => {
       lastName: user.profile?.lastName,
       photo: user.profile?.photo,
     });
+
+     const receiverStatusRef = doc(db, "userStatus", receiverId);
+    const receiverStatusSnap = await getDoc(receiverStatusRef);
+
+    const receiverIsInsideChat =
+      receiverStatusSnap.exists() &&
+      receiverStatusSnap.data().activeChatId === chatId;
+
+    if (!receiverIsInsideChat) {
+      // 3️⃣ trigger email via backend
+      const receiver = userMap[receiverId];
+
+      await axios.post(`${apiUrl}chat-message`, {
+        toEmail: receiver?.email,
+        senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+        messagePreview: messageText.slice(0, 80) + "...",
+      });
+    }
   } catch (error) {
     console.error("Message sending failed:", error);
 

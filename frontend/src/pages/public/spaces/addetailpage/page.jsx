@@ -527,7 +527,7 @@ export default function DetailPage({ targetUserId }) {
                               {person.userId.profile?.firstName}{" "}
                               {person.userId.profile?.lastName}
                             </h4>
-                            <p>Age: {person.userId.profile?.age}</p>
+                            {/* <p>Age: {person.userId.profile?.age}</p> */}
                           </div>
                         </div>
                         <button
