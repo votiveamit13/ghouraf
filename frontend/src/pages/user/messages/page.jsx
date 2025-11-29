@@ -252,11 +252,13 @@ const handleSend = async () => {
       // 3️⃣ trigger email via backend
       const receiver = userMap[receiverId];
 
-      await axios.post(`${apiUrl}chat-message`, {
-        toEmail: receiver?.email,
-        senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
-        messagePreview: messageText.slice(0, 80) + "...",
-      });
+await axios.post(`${apiUrl}chat-message`, {
+  toEmail: receiver?.email,
+  receiverFirstName: receiver?.profile?.firstName,
+  senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+  messagePreview: messageText.slice(0, 80) + "...",
+});
+
     }
   } catch (error) {
     console.error("Message sending failed:", error);

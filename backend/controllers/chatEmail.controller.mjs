@@ -2,7 +2,8 @@ import { sendEmail } from "../utils/email.mjs";
 
 export const sendChatEmail = async (req, res) => {
   try {
-    const { toEmail, senderName, messagePreview } = req.body;
+    const { toEmail, senderName, messagePreview, receiverFirstName } = req.body;
+
 
     if (!toEmail || !senderName || !messagePreview) {
       return res.status(400).json({ error: "Missing fields" });
