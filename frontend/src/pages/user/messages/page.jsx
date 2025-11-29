@@ -248,18 +248,32 @@ const handleSend = async () => {
       receiverStatusSnap.exists() &&
       receiverStatusSnap.data().activeChatId === chatId;
 
-    if (!receiverIsInsideChat) {
-      // 3️⃣ trigger email via backend
-      const receiver = userMap[receiverId];
+if (!receiverIsInsideChat) {
+  const receiver = userMap[receiverId];
 
-await axios.post(`${apiUrl}chat-message`, {
-  toEmail: receiver?.email,
-  receiverFirstName: receiver?.profile?.firstName,
-  senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
-  messagePreview: messageText.slice(0, 80) + "...",
-});
+  // console.log("📧 Attempting to call backend email API...");
+  // console.log("📡 API URL:", `${apiUrl}chat-message`);
+  // console.log("📨 Payload:", {
+  //   toEmail: receiver?.email,
+  //   receiverFirstName: receiver?.profile?.firstName,
+  //   senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+  //   messagePreview: messageText.slice(0, 80) + "...",
+  // });
 
-    }
+  try {
+    const res = await axios.post(`${apiUrl}chat-message`, {
+      toEmail: receiver?.email,
+      receiverFirstName: receiver?.profile?.firstName,
+      senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+      messagePreview: messageText.slice(0, 80) + "...",
+    });
+
+    console.log("📬 Backend response:", res.data);
+  } catch (err) {
+    console.log("❌ Email API failed:", err);
+  }
+}
+
   } catch (error) {
     console.error("Message sending failed:", error);
 

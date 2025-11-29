@@ -44,24 +44,27 @@ export default function NotificationPanel({ userId, isMobile }) {
 
       setOpen(false);
 
-       if (notif.chatId && notif.senderId) {
-      navigate(`/user/messages/${notif.chatId}?receiverId=${notif.senderId}`);
-    }
-    if (notif.meta?.postCategory && notif.meta?.postId) {
-      const { postCategory, postId } = notif.meta;
-
-      if (postCategory === "Space") {
-        navigate(`/spaces/${postId}`);
-      } else if (postCategory === "Spacewanted") {
-        navigate(`/place-wanted/${postId}`);
-      } else if (postCategory === "Teamup") {
-        navigate(`/team-up/${postId}`);
+      if (notif.chatId && notif.senderId) {
+        navigate(`/user/messages/${notif.chatId}?receiverId=${notif.senderId}`);
+        setTimeout(() => {
+          navigate("/user/messages", { replace: true });
+        }, 50);
       }
+      if (notif.meta?.postCategory && notif.meta?.postId) {
+        const { postCategory, postId } = notif.meta;
+
+        if (postCategory === "Space") {
+          navigate(`/spaces/${postId}`);
+        } else if (postCategory === "Spacewanted") {
+          navigate(`/place-wanted/${postId}`);
+        } else if (postCategory === "Teamup") {
+          navigate(`/team-up/${postId}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating notification:", error);
     }
-  } catch (error) {
-    console.error("Error updating notification:", error);
-  }
-};
+  };
 
 
   useEffect(() => {
@@ -110,57 +113,56 @@ export default function NotificationPanel({ userId, isMobile }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobile]);
 
-const renderNotifications = () => {
-  if (notifications.length === 0)
-    return (
-      <p className="text-center text-gray-500 py-4">
-        No notifications yet
-      </p>
-    );
+  const renderNotifications = () => {
+    if (notifications.length === 0)
+      return (
+        <p className="text-center text-gray-500 py-4">
+          No notifications yet
+        </p>
+      );
 
-  return notifications.map((n) => {
-    const isPostNotif = !n.chatId;
+    return notifications.map((n) => {
+      const isPostNotif = !n.chatId;
 
-    return (
-      <div
-        key={n.id}
-        className={`px-2 py-2 border-b last:border-0 hover:bg-gray-50 cursor-pointer ${
-          !n.read ? "bg-purple-50" : "bg-white"
-        }`}
-        onClick={() => {
-          handleNotificationClick(n);
-          setOpen(false);
-        }}
-      >
-        <div className="flex items-start gap-3">
-          {isPostNotif ? (
-            <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
-              <MdNotificationsActive className="text-[#A321A6]" size={20} />
-            </div>
-          ) : (
-            <img
-              src={n.meta?.photo || defaultAvatar}
-              alt={n.meta?.firstName || "user"}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-          )}
-
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-800">
-              {n.title}
-            </p>
-            {isPostNotif && (
-              <p className="text-xs text-gray-600 mt-1">{n.body}</p>
+      return (
+        <div
+          key={n.id}
+          className={`px-2 py-2 border-b last:border-0 hover:bg-gray-50 cursor-pointer ${!n.read ? "bg-purple-50" : "bg-white"
+            }`}
+          onClick={() => {
+            handleNotificationClick(n);
+            setOpen(false);
+          }}
+        >
+          <div className="flex items-start gap-3">
+            {isPostNotif ? (
+              <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
+                <MdNotificationsActive className="text-[#A321A6]" size={20} />
+              </div>
+            ) : (
+              <img
+                src={n.meta?.photo || defaultAvatar}
+                alt={n.meta?.firstName || "user"}
+                className="w-8 h-8 rounded-full object-cover"
+              />
             )}
-            <span className="text-[11px] text-gray-400 block mt-1">
-              {timeAgo(n.createdAt)}
-            </span>
+
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-800">
+                {n.title}
+              </p>
+              {isPostNotif && (
+                <p className="text-xs text-gray-600 mt-1">{n.body}</p>
+              )}
+              <span className="text-[11px] text-gray-400 block mt-1">
+                {timeAgo(n.createdAt)}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    );
-  });
-};
+      );
+    });
+  };
 
   if (isMobile) {
     return (

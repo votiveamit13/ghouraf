@@ -38,10 +38,12 @@ import TermsConditions from "pages/public/termsandconditions/page";
 import SafetyTips from "pages/public/safetytips/page";
 import Advice from "pages/public/advice/page";
 import { ActiveChatManager } from "components/user/ActiveChatManage";
+import ScrollToTop from "components/ScrollToTop";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
+  <ScrollToTop />
     <AuthProvider>
       <AdminAuthProvider>
         <ActiveChatManager/>
