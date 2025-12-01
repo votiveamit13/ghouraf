@@ -8,9 +8,9 @@ import { AiOutlineFileSearch } from "react-icons/ai";
 import { PiUserCircle } from "react-icons/pi";
 import { TbHomeSearch } from "react-icons/tb";
 import { LiaUsersSolid } from "react-icons/lia";
-import whyuse1 from "assets/img/ghouraf/whyuse1.png";
-import whyuse2 from "assets/img/ghouraf/whyuse2.png";
-import whyuse3 from "assets/img/ghouraf/whyuse3.png";
+// import whyuse1 from "assets/img/ghouraf/whyuse1.png";
+// import whyuse2 from "assets/img/ghouraf/whyuse2.png";
+// import whyuse3 from "assets/img/ghouraf/whyuse3.png";
 
 export default function AboutUs() {
     const features = [
@@ -144,7 +144,7 @@ export default function AboutUs() {
                     </div>
                 </div>
             </section>
-            {/* <section className="w-full bg-white py-6 mb-6">
+            <section className="w-full bg-white py-6 mb-6">
                 <div className="container mx-auto sm:px-0 md:px-8 lg:px-20">
                     <div className="w-full mb-5">
                         <h2 className="text-3xl md:text-4xl font-bold text-black text-center">
@@ -173,8 +173,8 @@ export default function AboutUs() {
                         ))}
                     </div>
                 </div>
-            </section> */}
-                <section className="w-full bg-gradient-to-b from-[#565ABF] to-[#A321A6] py-6">
+            </section>
+                {/* <section className="w-full bg-gradient-to-b from-[#565ABF] to-[#A321A6] py-6">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
           Why Use Ghouraf
@@ -212,7 +212,7 @@ export default function AboutUs() {
           </div>
         </div>
       </div>
-    </section>
+    </section> */}
         </>
     );
 }
