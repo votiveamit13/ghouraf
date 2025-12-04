@@ -83,6 +83,12 @@ export default function TeamUp() {
       try {
         const params = { page, limit: itemsPerPage, sortBy, ...filters };
 
+            if (params.amenities && Array.isArray(params.amenities) && params.amenities.length > 0) {
+      params.amenities = params.amenities.join(',');
+    } else if (params.amenities && params.amenities.length === 0) {
+      delete params.amenities;
+    }
+
         Object.keys(params).forEach((key) => {
           if (
             params[key] === "all" ||
