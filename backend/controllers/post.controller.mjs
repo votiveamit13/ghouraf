@@ -519,10 +519,18 @@ export const getTeamUps = async (req, res) => {
       if (maxAge) query.age.$lte = Number(maxAge);
     }
 
-    if (req.query.amenities) {
-      const amenities = req.query.amenities.split(',');
-      query.amenities = { $all: amenities };
-    }
+if (req.query.amenities) {
+  let amenities = [];
+
+  if (Array.isArray(req.query.amenities)) {
+    amenities = req.query.amenities; // already array
+  } else {
+    amenities = req.query.amenities.split(','); // string -> array
+  }
+
+  query.amenities = { $all: amenities };
+}
+
 
     await TeamUp.updateMany(
       {
