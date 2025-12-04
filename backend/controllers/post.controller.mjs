@@ -519,9 +519,9 @@ export const getTeamUps = async (req, res) => {
       if (maxAge) query.age.$lte = Number(maxAge);
     }
 
-    if (amenities) {
-      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
-      query.amenities = { $all: amenitiesArray };
+    if (req.query.amenities) {
+      const amenities = req.query.amenities.split(',');
+      query.amenities = { $all: amenities };
     }
 
     await TeamUp.updateMany(

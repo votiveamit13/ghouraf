@@ -13,9 +13,9 @@ export default function LookingFor() {
             <h3 className="text-[20px] text-white font-semibold mb-3">
               Looking For The <br /> New Room?
             </h3>
-            <p className="text-sm mb-3">
+            {/* <p className="text-sm mb-3">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.
-            </p>
+            </p> */}
             <button className="bg-white text-black px-4 py-2 rounded-[12px] font-medium flex items-center gap-2 md:mx-0 shadow"
               onClick={() => navigate("/user/place-wanted-ad")}
             >
@@ -36,9 +36,9 @@ export default function LookingFor() {
             <h3 className="text-lg text-white font-semibold mb-3">
               Want To Add <br /> Your Property?
             </h3>
-            <p className="text-sm mb-3">
+            {/* <p className="text-sm mb-3">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.
-            </p>
+            </p> */}
             <button className="bg-white text-black px-4 py-2 rounded-[12px] font-medium flex items-center gap-2 md:mx-0 shadow"
               onClick={() => navigate("user/post-an-space")}
             >

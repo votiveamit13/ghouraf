@@ -346,22 +346,22 @@ export default function Filters({ filters, setFilters, setPage }) {
                 "Cooking & Food",
                 "Volunteering / Community Work",
               ].map((amenity) => (
-                <li key={amenity} className="flex items-center py-1 text-[16px]">
-                  <input
-                    type="checkbox"
-                    className="form-check-input ml-1"
-                    id={amenity}
-                    checked={filters.amenities.includes(amenity)}
-                    onChange={() => {
-                      const selected = filters.amenities.includes(amenity)
-                        ? filters.amenities.filter((a) => a !== amenity)
-                        : [...filters.amenities, amenity];
-                      handleFilterChange("amenities", selected);
-                    }}
-                  />
-                  <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
-                    {amenity}
-                  </label>
+                    <li key={amenity} className="flex items-center py-1 text-[16px]">
+                      <input
+                        type="checkbox"
+                        className="form-check-input ml-1"
+                        id={amenity}
+                        checked={filters?.amenities?.includes(amenity)}
+                        onChange={() => {
+                          const selected = filters.amenities.includes(amenity)
+                            ? filters.amenities.filter((a) => a !== amenity)
+                            : [...filters.amenities, amenity];
+                          handleFilterChange("amenities", selected);
+                        }}
+                      />
+                      <label className="form-check-label ml-4 cursor-pointer" htmlFor={amenity}>
+                        {amenity}
+                      </label>
                 </li>
               ))}
             </ul>
