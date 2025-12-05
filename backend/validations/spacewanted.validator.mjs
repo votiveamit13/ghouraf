@@ -27,12 +27,17 @@ export const createSpaceWantedSchema = Joi.object({
     .messages({
       "string.empty": "Space Wanted Type is required",
     }),
-
-  roomSize: Joi.string()
-    .required()
-    .messages({
-      "string.empty": "Space Size is required",
-    }),
+roomSize: Joi.number()
+  .required()
+  .positive()
+  .min(1)
+  .messages({
+    "number.base": "Space Size must be a number",
+    "number.empty": "Space Size is required",
+    "number.positive": "Space Size must be a positive number",
+    "number.min": "Space Size must be at least 1",
+    "any.required": "Space Size is required",
+  }),
 
   country: Joi.string()
     .required()
