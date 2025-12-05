@@ -1172,7 +1172,7 @@ export const getSpaceWanted = async (req, res) => {
 
     const spaceWanted = await SpaceWanted.find(query)
       .select(
-        "title postCategory budget budgetType propertyType description amenities roomSize occupation age period country state city photos status available is_deleted"
+        "title postCategory budget budgetType propertyType description amenities roomSize occupation age period country state city photos status available is_deleted promotion"
       )
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort(sortOption)

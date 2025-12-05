@@ -238,16 +238,28 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
           <input
             type="number"
             min="0"
+            onKeyDown={(e) => {
+              if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+            }}
             value={filters.minSize || ""}
-            onChange={(e) => handleFilterChange("minSize", e.target.value ? Number(e.target.value) : "")}
+            onChange={(e) => {
+              let val = e.target.value.replace(/\D/g, "");
+              handleFilterChange("minSize", val);
+            }}
             placeholder="Min m²"
             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
           />
           <input
             type="number"
             min="0"
+            onKeyDown={(e) => {
+              if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+            }}
             value={filters.maxSize || ""}
-            onChange={(e) => handleFilterChange("maxSize", e.target.value ? Number(e.target.value) : "")}
+            onChange={(e) => {
+              let val = e.target.value.replace(/\D/g, "");
+              handleFilterChange("maxSize", val);
+            }}
             placeholder="Max m²"
             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
           />

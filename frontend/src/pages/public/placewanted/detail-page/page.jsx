@@ -282,9 +282,18 @@ export default function SpaceWantedDetailPage() {
                             <table className="text-sm w-full text-black">
                                 <tbody>
                                     <tr>
+                                        <td className="py-1 w-40 font-medium">Space Wanted Type</td>
+                                        <td>{spacewanted.propertyType}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-1 w-40 font-medium">Minimum Space Size</td>
+                                        <td>{spacewanted.roomSize}</td>
+                                    </tr>
+                                    <tr>
                                         <td className="py-1 w-40 font-medium">Available</td>
                                         <td>Now</td>
                                     </tr>
+                                    
                                     {/* <tr>
                                         <td className="py-1 w-40 font-medium">Minimum term</td>
                                         <td>None</td>
