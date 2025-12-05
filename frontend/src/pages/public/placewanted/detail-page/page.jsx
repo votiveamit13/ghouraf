@@ -277,7 +277,7 @@ export default function SpaceWantedDetailPage() {
                     </div>
 
                     <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
-                        <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">Availability</h3>
+                        <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">Basic Details</h3>
                         <div className="px-4 py-3 mt-0">
                             <table className="text-sm w-full text-black">
                                 <tbody>
@@ -289,10 +289,10 @@ export default function SpaceWantedDetailPage() {
                                         <td className="py-1 w-40 font-medium">Minimum Space Size</td>
                                         <td>{spacewanted.roomSize}</td>
                                     </tr>
-                                    <tr>
+                                    {/* <tr>
                                         <td className="py-1 w-40 font-medium">Available</td>
                                         <td>Now</td>
-                                    </tr>
+                                    </tr> */}
                                     
                                     {/* <tr>
                                         <td className="py-1 w-40 font-medium">Minimum term</td>
