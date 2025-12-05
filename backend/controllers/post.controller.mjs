@@ -1112,11 +1112,16 @@ export const getSpaceWanted = async (req, res) => {
       query.period = period;
     }
 
-    if (minSize || maxSize) {
-      query.roomSize = {};
-      if (minSize) query.roomSize.$gte = Number(minSize);
-      if (maxSize) query.roomSize.$lte = Number(maxSize);
-    }
+ if (minSize !== undefined && minSize !== "") {
+  query.roomSize = query.roomSize || {};
+  query.roomSize.$gte = Number(minSize);
+}
+
+if (maxSize !== undefined && maxSize !== "") {
+  query.roomSize = query.roomSize || {};
+  query.roomSize.$lte = Number(maxSize);
+}
+
 
     // if (roommatePref && roommatePref !== "any") {
     //   query.roommatePref = roommatePref;

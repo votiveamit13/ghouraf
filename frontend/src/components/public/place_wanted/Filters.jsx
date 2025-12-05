@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Filters({ setFilters: setParentFilters, setPage }) {
-   const isMobile = typeof window !== "undefined" && window.innerWidth <= 1024;
-    const [collapsed, setCollapsed] = useState(isMobile);
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 1024;
+  const [collapsed, setCollapsed] = useState(isMobile);
   const [showAmenities, setShowAmenities] = useState(false);
   const dropdownRef = useRef(null);
   const defaultFilters = {
@@ -239,7 +239,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
             type="number"
             min="0"
             value={filters.minSize || ""}
-            onChange={(e) => handleFilterChange("minSize", e.target.value)}
+            onChange={(e) => handleFilterChange("minSize", e.target.value ? Number(e.target.value) : "")}
             placeholder="Min m²"
             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
           />
@@ -247,7 +247,7 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
             type="number"
             min="0"
             value={filters.maxSize || ""}
-            onChange={(e) => handleFilterChange("maxSize", e.target.value)}
+            onChange={(e) => handleFilterChange("maxSize", e.target.value ? Number(e.target.value) : "")}
             placeholder="Max m²"
             className="border-[1px] border-[#D1D5DB] p-2 w-full rounded-[10px] text-[#948E8E]"
           />
