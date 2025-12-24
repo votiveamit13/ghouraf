@@ -56,7 +56,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-black text-gray-300 pt-12 pb-3">
-      <div className="container mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-4 gap-10 mb-3">
+      <div className="container mx-auto lg:px-6 md:px-6 sm:px-2 px-4 grid grid-cols-1 md:grid-cols-3 gap-10 mb-3">
         {/* Office Address */}
         <div>
           <NavLink to="/" className="flex items-center">
@@ -83,15 +83,15 @@ export default function Footer() {
         </div>
         </div>
         {/* Contact */}
-        <div>
+        {/* <div>
           <h3 className="text-white font-semibold mb-4">Contact</h3>
-          {/* <div className="mb-3 flex items-center gap-3">
+          <div className="mb-3 flex items-center gap-3">
             <FiPhoneCall size={32} />
             <div>
               <p className="text-sm">Hotline:</p>
               <p className="text-sm font-semibold">(+012) 345-67890</p>
             </div>
-          </div> */}
+          </div>
           <div className="flex items-center gap-3">
             <LuMailOpen size={32} />
             <div>
@@ -99,7 +99,7 @@ export default function Footer() {
               <p className="text-sm font-semibold">ghouraf@info.com</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Our Company */}
         <div>

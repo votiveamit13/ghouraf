@@ -297,7 +297,7 @@ export default function MyAds() {
 
                                             {openMenu === ad._id && (
                                                 <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-[15px] shadow-lg z-10">
-                                                    <button
+                                                    {/* <button
                                                         className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b"
                                                         onClick={() => {
                                                             handleEdit(ad._id);
@@ -305,7 +305,7 @@ export default function MyAds() {
                                                         }}
                                                     >
                                                         Edit
-                                                    </button>
+                                                    </button> */}
                                                     <button
                                                         className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b"
                                                         onClick={() => {

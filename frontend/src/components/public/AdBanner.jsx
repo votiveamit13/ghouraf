@@ -36,6 +36,11 @@ export default function AdBanner({ ad }) {
         axios.get(`${apiUrl}ads/${ad._id}/click`).catch(() => { });
     };
 
+    const getAdUrl = (url) => {
+        if (!url) return "#";
+        return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    };
+
     if (!ad) return null;
 
     return (
@@ -46,9 +51,9 @@ export default function AdBanner({ ad }) {
             </div>
 
             <a
-                href={ad.url}
+                href={getAdUrl(ad.url)}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-blue-600 break-all"
                 onClick={handleClick}
             >

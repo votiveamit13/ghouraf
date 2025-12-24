@@ -1,7 +1,7 @@
 import heroImage from "assets/img/ghouraf/hero-section.jpg";
-import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
-import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
-import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
+// import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
+// import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
+// import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { MdOutlineApartment, MdRealEstateAgent, MdMeetingRoom } from "react-icons/md";
 import { AiOutlineFileSearch } from "react-icons/ai";
@@ -94,7 +94,7 @@ export default function AboutUs() {
                         </p>
                     </div>
 
-                    <div className="w-full md:w-1/2">
+                    {/* <div className="w-full md:w-1/2">
                         <div className="grid grid-cols-2 gap-6 w-full">
                             <img
                                 src={flatmate1}
@@ -117,7 +117,7 @@ export default function AboutUs() {
                                 className="w-full md:h-[155px] h-55 object-cover rounded-xl shadow-md"
                             />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </section>
             <section className="w-full bg-[#DDDBDB78] py-6">

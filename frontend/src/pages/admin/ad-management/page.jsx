@@ -101,10 +101,16 @@ export default function AdManagement() {
     }
   };
 
+  const getAdUrl = (url) => {
+    if (!url) return "#";
+    return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+  };
+
+
 
   return (
     <>
-      <Header hideStatsOnMobile={true}/>
+      <Header hideStatsOnMobile={true} />
       <div className="px-[20px] md:px-[40px] mt-[-12%] md:mt-[-8%] w-full fluid position-relative mb-4">
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="px-3 py-3 border-b border-gray-200 flex flex-col md:flex-row gap-2 md:gap-0 justify-between">
@@ -155,13 +161,14 @@ export default function AdManagement() {
                       <td className="px-3 py-3 w-[200px] max-w-[200px] whitespace-normal break-words">{ad.title}</td>
                       <td className="px-3 py-3 w-[180px] max-w-[180px] whitespace-normal break-words">
                         <a
-                          href={ad.url}
+                          href={getAdUrl(ad.url)}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
                         >
                           {ad.url}
                         </a>
+
                       </td>
                       <td className="px-3 py-3">
                         <img
@@ -243,9 +250,9 @@ export default function AdManagement() {
               <p className="text-black text-left break-all">
                 <strong>URL:</strong>&nbsp;
                 <a
-                  href={selectedAd.url}
+                  href={getAdUrl(selectedAd.url)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
                   {selectedAd.url}

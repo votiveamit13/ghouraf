@@ -25,7 +25,7 @@ const SPACEWANTED_PROPERTY_TYPES = ["Room", "Apartment"];
 const SPACEWANTED_BUDGET_TYPES = ["Month", "Week"];
 const SPACEWANTED_PERIODS = ["Short term", "Long term"];
 const SPACEWANTED_MOVE_IN_DATES = ["As soon as possible", "In a week time", "In a month time"];
-const SPACEWANTED_GENDERS = ["Male", "Female"];
+const SPACEWANTED_GENDERS = ["male", "female"];
 const SPACEWANTED_OCCUPATIONS = ["Student", "Professional"];
 const SPACEWANTED_SMOKE_OPTIONS = ["Yes", "No", "Sometimes"];
 const SPACEWANTED_PETS_OPTIONS = ["Yes", "No"];
@@ -45,7 +45,7 @@ const SPACEWANTED_AMENITIES = [
 const TEAMUP_BUDGET_TYPES = ["Month", "Week"];
 const TEAMUP_PERIODS = ["Short Term", "Long Term"];
 const TEAMUP_GENDERS = ["any gender", "male", "female"];
-const TEAMUP_OCCUPATION_PREFERENCES = ["Student", "Professionals"];
+const TEAMUP_OCCUPATION_PREFERENCES = ["Student", "Professional"];
 const TEAMUP_AMENITIES = [
   "Sports",
   "Music",
@@ -376,7 +376,7 @@ export default function EditPost({ show, onClose, ad, onUpdated }) {
       newErrors.age = ["Age cannot exceed 100"];
     }
     if (!SPACEWANTED_GENDERS.includes(formData.gender)) {
-      newErrors.gender = ["Gender must be either 'Male' or 'Female'"];
+      newErrors.gender = ["Gender must be either 'male' or 'female'"];
     }
     if (!SPACEWANTED_OCCUPATIONS.includes(formData.occupation)) {
       newErrors.occupation = ["Occupation must be 'Student' or 'Professional'"];
