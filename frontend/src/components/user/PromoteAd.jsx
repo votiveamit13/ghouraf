@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import promote from "../../assets/img/ghouraf/promote.png";
 import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const PromoteAdModal = ({ show, onClose, onPublishNormally, onProceedToPayment, loading }) => {
+const PromoteAdModal = ({ show, onClose, onPublishNormally,  onProceedToPayment, loading }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [plans, setPlans] = useState([]);
@@ -74,7 +75,7 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, onProceedToPayment, 
         <div className="flex flex-col gap-3">
 <button
   disabled={loading || !selectedPlanId}
-  onClick={() => onProceed(selectedPlanId)}
+  onClick={() => onProceedToPayment(selectedPlanId)}
   className="bg-[#4E2DD2] text-white py-2.5 px-4 rounded-lg"
 >
   {loading ? "Processing..." : "Proceed To Promotion Payment"}

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import promote from "../../../assets/img/ghouraf/promote.png";
 import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const PromoteAdModal = ({ show, onClose, onProceed,  loading }) => {
@@ -25,7 +26,7 @@ const PromoteAdModal = ({ show, onClose, onProceed,  loading }) => {
 
   
   const handleProceed = () => {
-    onProceed(selectedPlan);
+    onProceed(selectedPlanId);
   };
 
   return (

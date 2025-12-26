@@ -7,7 +7,8 @@ import {
   requestTeamUp, getSpaceTeamUps, removeTeamUp,
   updateAd, updateAdAvailability, deleteAd,
   handleStripeWebhook,
-  createReport
+  createReport,
+  getActivePromotionOptions
 } from "../controllers/post.controller.mjs";
 import { auth } from "../middleware/auth.mjs";
 import { validate } from "../middleware/validate.mjs";
