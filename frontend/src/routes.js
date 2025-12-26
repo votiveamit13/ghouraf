@@ -31,6 +31,8 @@ import ViewProfile from "components/admin/profile-management/ViewProfile";
 import EditProfile from "components/admin/profile-management/EditProfile";
 import PaymentOptions from "pages/admin/promotion-management/payment-options/page";
 import PromotedList from "pages/admin/promotion-management/promoted-list/page";
+import AddPlan from "components/admin/promotion-management/AddPlan";
+import EditPlan from "components/admin/promotion-management/EditPlan";
 
 export const adminRoutes = [
   {
@@ -151,6 +153,18 @@ export const adminRoutes = [
         layout: "/admin",
       },
     ]
+  },
+    {
+    path: "/promotion-management/add",
+    component: <AddPlan />,
+    layout: "/admin",
+    showInSidebar: false
+  },
+  {
+    path: "/promotion-management/edit",
+    component: <EditPlan />,
+    layout: "/admin",
+    showInSidebar: false
   },
     {
     name: "Ad Management",
