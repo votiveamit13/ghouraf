@@ -69,7 +69,7 @@ const durationDays = promotionPlan.plan;
         planDays: promotionPlan.plan.toString(),
         amountUSD: promotionPlan.amountUSD.toString(),
         userId: userId.toString(),
-      }
+      },
       success_url: `${process.env.FRONTEND_URL}/user/my-ads?payment=success`,
       cancel_url: `${process.env.FRONTEND_URL}/user/my-ads?payment=cancel`,
     });
