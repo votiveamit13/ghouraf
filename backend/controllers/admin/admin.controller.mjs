@@ -19,6 +19,7 @@ import { AboutUsImage } from "../../models/AboutUsImage.mjs";
 import Newsletter from "../../models/Newsletter.mjs";
 import { dbAdmin } from "../../config/firebase.mjs";
 import { sendEmail } from "../../utils/email.mjs";
+import PromotionOption from "../../models/PromotionOption.mjs";
 
 const modelMap = {
   Space,
@@ -1748,5 +1749,59 @@ export const getPromotedPosts = async (req, res) => {
       success: false,
       message: "Failed to fetch promoted posts",
     });
+  }
+};
+
+export const getPromotionOptions = async (req, res) => {
+  try {
+    const options = await PromotionOption.find().sort({ plan: 1 });
+    res.json(options);
+  } catch (err) {
+    console.error("Error fetching promotion options:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const addPromotionOption = async (req, res) => {
+  try {
+    const { plan, amountUSD } = req.body;
+    if (!plan || !amountUSD) return res.status(400).json({ message: "Plan and amount are required" });
+
+    const newOption = new PromotionOption({ plan, amountUSD });
+    await newOption.save();
+    res.status(201).json({ message: "Promotion plan added successfully", option: newOption });
+  } catch (err) {
+    console.error("Error adding promotion option:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updatePromotionOption = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { plan, amountUSD, status } = req.body;
+    const option = await PromotionOption.findById(id);
+    if (!option) return res.status(404).json({ message: "Plan not found" });
+
+    option.plan = plan ?? option.plan;
+    option.amountUSD = amountUSD ?? option.amountUSD;
+    option.status = status ?? option.status;
+    await option.save();
+
+    res.json({ message: "Promotion plan updated successfully", option });
+  } catch (err) {
+    console.error("Error updating promotion option:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deletePromotionOption = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await PromotionOption.findByIdAndDelete(id);
+    res.json({ message: "Promotion plan deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting promotion option:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };

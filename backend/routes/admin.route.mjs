@@ -19,7 +19,11 @@ import {
     updateAdminProfile,
     sendNewsletterToSingle,
     sendNewsletterBulk,
-    getPromotedPosts
+    getPromotedPosts,
+    getPromotionOptions,
+    addPromotionOption,
+    updatePromotionOption,
+    deletePromotionOption
 } from "../controllers/admin/admin.controller.mjs";
 import { adminAuth } from "../middleware/adminAuth.mjs";
 import { upload } from "../middleware/upload.mjs";
@@ -85,5 +89,9 @@ router.post("/newsletter/send-single", adminAuth, sendNewsletterToSingle);
 router.get("/profile", adminAuth, getAdminProfile);
 router.put("/edit-profile", adminAuth, upload.single("image"), updateAdminProfile);
 router.get("/promotions", adminAuth, getPromotedPosts);
+router.get("/", adminAuth, getPromotionOptions);
+router.post("/", adminAuth, addPromotionOption);
+router.patch("/:id", adminAuth, updatePromotionOption);
+router.delete("/:id", adminAuth, deletePromotionOption);
 
 export default router;
