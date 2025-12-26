@@ -25,6 +25,18 @@ export const createPromotionCheckout = async (req, res) => {
     const ad = await Model.findById(adId);
     if (!ad) return res.status(404).json({ message: "Ad not found" });
 
+    if (
+      ad.promotion?.isPromoted &&
+      ad.promotion?.endDate &&
+      new Date(ad.promotion.endDate) > new Date()
+    ) {
+      return res.status(400).json({
+        message: `This post is already promoted until ${new Date(
+          ad.promotion.endDate
+        ).toLocaleDateString()}`,
+      });
+    }
+
     const amountUSD = plan === "10_days" ? 15 : 20;
 
     const session = await stripe.checkout.sessions.create({
@@ -52,11 +64,13 @@ export const createPromotionCheckout = async (req, res) => {
     });
 
     ad.promotion = {
+      ...ad.promotion,
       isPromoted: false,
       plan,
       amountUSD,
       paymentStatus: "pending",
     };
+
     await ad.save();
 
     res.json({ id: session.id, url: session.url });
@@ -71,11 +85,11 @@ export const handleStripeWebhook = async (req, res) => {
   let event;
 
   try {
-event = stripe.webhooks.constructEvent(
-  req.rawBody || req.body,
-  sig,
-  process.env.STRIPE_PROMOTION_WEBHOOK_SECRET
-);
+  event = stripe.webhooks.constructEvent(
+    req.rawBody || req.body,
+    sig,
+    process.env.STRIPE_PROMOTION_WEBHOOK_SECRET
+  );
 
   } catch (err) {
     console.error("⚠️  Webhook signature verification failed.", err.message);
@@ -98,7 +112,11 @@ event = stripe.webhooks.constructEvent(
       startDate.getDate() + (plan === "10_days" ? 10 : 30)
     );
 
+    ad.promotion.promotionCount =
+      (ad.promotion.promotionCount || 0) + 1;
+
     ad.promotion = {
+      ...ad.promotion,
       isPromoted: true,
       plan,
       amountUSD: parseFloat(amountUSD),
@@ -109,6 +127,7 @@ event = stripe.webhooks.constructEvent(
     };
 
     await ad.save();
+
     console.log(`Promotion activated for Ad ${ad._id}`);
   }
 

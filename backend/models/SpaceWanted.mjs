@@ -11,7 +11,7 @@ const PromotionSchema = new mongoose.Schema(
     paymentId: { type: String, default: null },
     startDate: { type: Date, default: null },
     endDate: { type: Date, default: null },
-
+    promotionCount: { type: Number, default: 0 },
     promotionType: {
       type: String,
       enum: ["user", "admin"],

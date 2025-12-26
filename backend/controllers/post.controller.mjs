@@ -421,15 +421,15 @@ export const createTeamUp = async (req, res) => {
       });
     }
 
-if (req.body.amenities) {
-    if (typeof req.body.amenities === "string") {
-        try {
-            req.body.amenities = JSON.parse(req.body.amenities);
-        } catch (e) {
-            req.body.amenities = [];
+    if (req.body.amenities) {
+        if (typeof req.body.amenities === "string") {
+            try {
+                req.body.amenities = JSON.parse(req.body.amenities);
+            } catch (e) {
+                req.body.amenities = [];
+            }
         }
     }
-}
 
     const teamUpData = {
       ...req.body,
@@ -437,11 +437,11 @@ if (req.body.amenities) {
       photos: uploadedPhotos,
     };
 
-["smoke", "pets", "petsPreference"].forEach((field) => {
-  if (teamUpData[field] === "true") teamUpData[field] = true;
-  if (teamUpData[field] === "false") teamUpData[field] = false;
-  if (teamUpData[field] === "") teamUpData[field] = null;
-});
+    ["smoke", "pets", "petsPreference"].forEach((field) => {
+      if (teamUpData[field] === "true") teamUpData[field] = true;
+      if (teamUpData[field] === "false") teamUpData[field] = false;
+      if (teamUpData[field] === "") teamUpData[field] = null;
+    });
 
 
     const newPost = await TeamUp.create(teamUpData);

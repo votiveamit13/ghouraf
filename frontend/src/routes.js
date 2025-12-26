@@ -29,6 +29,8 @@ import EditAd from "components/admin/ad-managmenet/EditAd";
 import Newsletter from "pages/admin/newsletter-management/page";
 import ViewProfile from "components/admin/profile-management/ViewProfile";
 import EditProfile from "components/admin/profile-management/EditProfile";
+import PaymentOptions from "pages/admin/promotion-management/payment-options/page";
+import PromotedList from "pages/admin/promotion-management/promoted-list/page";
 
 export const adminRoutes = [
   {
@@ -128,6 +130,26 @@ export const adminRoutes = [
         component: <ReportList/>,
         layout: "/admin",
       }
+    ]
+  },
+    {
+    name: "Promotion Management",
+    icon: <BsFillFileEarmarkPostFill size={20} className="text-[#565ABF]" />,
+    subRoutes: [
+      {
+        path: "/promotion-management/payment-options",
+        name: "Payment Options",
+        icon: <MdOutlineBedroomParent className="text-[#565ABF]" />,
+        component: <PaymentOptions />,
+        layout: "/admin",
+      },
+      {
+        path: "/promotion-management/list",
+        name: "Promoted Post List",
+        icon: <MdOutlineHomeWork className="text-[#565ABF]" />,
+        component: <PromotedList />,
+        layout: "/admin",
+      },
     ]
   },
     {

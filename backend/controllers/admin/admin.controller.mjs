@@ -1669,3 +1669,81 @@ export const updateAdminProfile = async (req, res) => {
     res.status(500).json({ message: "Failed to update admin profile" });
   }
 };
+
+//promotion management
+export const getPromotedPosts = async (req, res) => {
+  try {
+    const { category = "all", page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+    const now = new Date();
+
+    const promotionMatch = {
+      "promotion.isPromoted": true,
+      "promotion.paymentStatus": "success",
+      "promotion.startDate": { $lte: now },
+      "promotion.endDate": { $gte: now },
+      is_deleted: false,
+      status: "active",
+    };
+
+    let results = [];
+    let total = 0;
+
+    const fetchData = async (Model, postCategory) => {
+      const data = await Model.find(promotionMatch)
+        .populate("user", "name email")
+        .sort({ "promotion.startDate": -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .lean();
+
+      const count = await Model.countDocuments(promotionMatch);
+
+      return data.map((item) => ({
+        ...item,
+        postCategory,
+      }));
+    };
+
+    if (category === "Space" || category === "all") {
+      const data = await fetchData(Space, "Space");
+      results.push(...data);
+      total += await Space.countDocuments(promotionMatch);
+    }
+
+    if (category === "Spacewanted" || category === "all") {
+      const data = await fetchData(SpaceWanted, "Spacewanted");
+      results.push(...data);
+      total += await SpaceWanted.countDocuments(promotionMatch);
+    }
+
+    if (category === "Teamup" || category === "all") {
+      const data = await fetchData(TeamUp, "Teamup");
+      results.push(...data);
+      total += await TeamUp.countDocuments(promotionMatch);
+    }
+
+    results.sort(
+      (a, b) =>
+        new Date(b.promotion.startDate) -
+        new Date(a.promotion.startDate)
+    );
+
+    res.status(200).json({
+      success: true,
+      data: results,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Get promoted posts error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch promoted posts",
+    });
+  }
+};
