@@ -55,8 +55,8 @@ const durationDays = promotionPlan.plan;
           price_data: {
             currency: "usd",
             product_data: {
-  name: `Promote ${postCategory} Ad (${durationDays} days)`
-}
+              name: `Promote ${postCategory} Ad (${durationDays} days)`
+            },
 
             unit_amount: amountUSD * 100,
           },
