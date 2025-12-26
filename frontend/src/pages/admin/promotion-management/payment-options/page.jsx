@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import PaginationComponent from "components/common/Pagination";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "react-toastify";
-import SearchFilter from "components/common/SearchFilter";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 import Header from "components/admin/Headers/Header";
 import axios from "axios";
-import ExportData from "components/admin/export-data/ExportData";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { FaRegEdit } from "react-icons/fa";
@@ -18,7 +16,6 @@ export default function PaymentOptions() {
 
   const [plans, setPlans] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1 });
-  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -29,14 +26,14 @@ export default function PaymentOptions() {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${apiUrl}/admin?page=${page}&limit=10&search=${searchTerm}`,
+        `${apiUrl}/admin`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
 
-      setPlans(data?.data || []);
-      setPagination(data?.pagination || { page: 1, pages: 1 });
+      setPlans(data || []);
+      setPagination({ page: 1, pages: 1 });
     } catch (err) {
       toast.error("Failed to load promotion plans");
     } finally {
@@ -46,7 +43,7 @@ export default function PaymentOptions() {
 
   useEffect(() => {
     fetchPlans(currentPage);
-  }, [currentPage, searchTerm]);
+  }, [currentPage]);
 
   const handleDelete = async () => {
     if (!planToDelete) return;

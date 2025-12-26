@@ -5,7 +5,7 @@ import roomAvailableForType from '../constants/roomAvailableFor.type.mjs';
 const PromotionSchema = new mongoose.Schema(
   {
     isPromoted: { type: Boolean, default: false },
-    plan: { type: String, enum: ["10_days", "30_days"], default: null },
+    plan: { type: String, default: null },
     amountUSD: { type: Number, default: 0 },
     paymentStatus: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
     paymentId: { type: String, default: null },

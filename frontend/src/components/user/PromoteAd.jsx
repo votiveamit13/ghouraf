@@ -1,13 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import promote from "../../assets/img/ghouraf/promote.png";
 import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const PromoteAdModal = ({ show, onClose, onPublishNormally, onProceedToPayment, loading }) => {
-  const [selectedPlan, setSelectedPlan] = useState("10");
+  const apiUrl = process.env.REACT_APP_API_URL;
 
-  if (!show) return null;
+  const [plans, setPlans] = useState([]);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+
+   useEffect(() => {
+    if (!show) return;
+
+    axios.get(`${apiUrl}getplans`)
+      .then(res => {
+        setPlans(res.data);
+        if (res.data.length) {
+          setSelectedPlanId(res.data[0]._id);
+        }
+      })
+      .catch(() => console.error("Failed to load promotion plans"));
+  }, [show]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -38,40 +52,34 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally, onProceedToPayment, 
           interested users.
         </p>
 
-        <div className="flex flex-col items-center gap-3 mb-4">
-          <label className="flex items-center space-x-2">
-            <input
-              type="radio"
-              name="plan"
-              value="10"
-              checked={selectedPlan === "10"}
-              onChange={(e) => setSelectedPlan(e.target.value)}
-              className="accent-purple-600"
-            />
-            <span className="text-sm text-gray-700">10 days for 15 USD</span>
-          </label>
+<div className="flex flex-col items-center gap-3 mb-4">
+  {plans.map(plan => (
+    <label key={plan._id} className="flex items-center space-x-2">
+      <input
+        type="radio"
+        name="plan"
+        value={plan._id}
+        checked={selectedPlanId === plan._id}
+        onChange={() => setSelectedPlanId(plan._id)}
+        className="accent-purple-600"
+      />
+      <span className="text-sm text-gray-700">
+        {plan.plan} days for {plan.amountUSD} USD
+      </span>
+    </label>
+  ))}
+</div>
 
-          <label className="flex items-center space-x-2">
-            <input
-              type="radio"
-              name="plan"
-              value="20"
-              checked={selectedPlan === "20"}
-              onChange={(e) => setSelectedPlan(e.target.value)}
-              className="accent-purple-600"
-            />
-            <span className="text-sm text-gray-700">30 days for 20 USD</span>
-          </label>
-        </div>
 
         <div className="flex flex-col gap-3">
-          <button
-          onClick={() => onProceedToPayment(selectedPlan)}
-           disabled={loading}
-            className="bg-[#4E2DD2] hover:bg-[#3c21aa] text-white font-medium py-2.5 px-4 rounded-lg transition"
-          >
-            {loading ? "Processing..." : "Proceed To Promotion Payment"}
-          </button>
+<button
+  disabled={loading || !selectedPlanId}
+  onClick={() => onProceed(selectedPlanId)}
+  className="bg-[#4E2DD2] text-white py-2.5 px-4 rounded-lg"
+>
+  {loading ? "Processing..." : "Proceed To Promotion Payment"}
+</button>
+
 
           <button
             onClick={onPublishNormally}

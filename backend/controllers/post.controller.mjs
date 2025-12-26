@@ -8,6 +8,7 @@ import SpaceWanted from "../models/SpaceWanted.mjs";
 import SpaceTeamUps from "../models/SpaceTeamUps.mjs";
 import Stripe from "stripe";
 import Report from "../models/Report.mjs";
+import PromotionOption from "../models/PromotionOption.mjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //Spaces
@@ -104,32 +105,35 @@ export const createSpace = async (req, res) => {
     };
 
     if (promote === "true") {
-      const planPrices = {
-        "10_days": 15,
-        "30_days": 20,
-      };
+  const promotionPlan = await PromotionOption.findById(plan);
 
-      const amountUSD = planPrices[plan];
-      if (!amountUSD) {
-        return res.status(400).json({ message: "Invalid promotion plan" });
-      }
+  if (!promotionPlan || promotionPlan.status !== "active") {
+    return res.status(400).json({ message: "Invalid promotion plan" });
+  }
 
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amountUSD * 100,
-        currency: "usd",
-        metadata: {
-          userId: req.user._id.toString(),
-          plan,
-          spaceData: JSON.stringify(spaceData),
-        },
-      });
+  const amountUSD = promotionPlan.amountUSD;
+  const durationDays = promotionPlan.plan;
 
-      return res.status(200).json({
-        message: "Promotion payment initiated",
-        clientSecret: paymentIntent.client_secret,
-        promotionInfo: { plan, amountUSD },
-      });
-    }
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amountUSD * 100,
+    currency: "usd",
+    metadata: {
+      userId: req.user._id.toString(),
+      planId: promotionPlan._id.toString(),
+      durationDays: durationDays.toString(),
+      spaceData: JSON.stringify(spaceData),
+    },
+  });
+
+  return res.status(200).json({
+    clientSecret: paymentIntent.client_secret,
+    promotionInfo: {
+      durationDays,
+      amountUSD,
+    },
+  });
+}
+
 
     const space = new Space({
       user: req.user._id,
@@ -1270,4 +1274,14 @@ export const createReport = async (req, res) => {
   }
 };
 
+export const getActivePromotionOptions = async (req, res) => {
+  try {
+    const plans = await PromotionOption.find({ status: "active" })
+      .sort({ plan: 1 });
+
+    res.json(plans);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch promotion plans" });
+  }
+};
 

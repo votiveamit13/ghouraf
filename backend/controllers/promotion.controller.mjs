@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import Space from "../models/Space.mjs";
 import SpaceWanted from "../models/SpaceWanted.mjs";
 import TeamUp from "../models/TeamUp.mjs";
+import PromotionOption from "../models/PromotionOption.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -37,7 +38,14 @@ export const createPromotionCheckout = async (req, res) => {
       });
     }
 
-    const amountUSD = plan === "10_days" ? 15 : 20;
+    const promotionPlan = await PromotionOption.findById(plan);
+if (!promotionPlan) {
+  return res.status(400).json({ message: "Invalid promotion plan" });
+}
+
+const amountUSD = promotionPlan.amountUSD;
+const durationDays = promotionPlan.plan;
+
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -46,7 +54,10 @@ export const createPromotionCheckout = async (req, res) => {
         {
           price_data: {
             currency: "usd",
-            product_data: { name: `Promote ${postCategory} Ad (${plan})` },
+            product_data: {
+  name: `Promote ${postCategory} Ad (${durationDays} days)`
+}
+
             unit_amount: amountUSD * 100,
           },
           quantity: 1,
@@ -54,11 +65,11 @@ export const createPromotionCheckout = async (req, res) => {
       ],
       metadata: {
         adId,
-        plan,
         postCategory,
+        planDays: promotionPlan.plan.toString(),
+        amountUSD: promotionPlan.amountUSD.toString(),
         userId: userId.toString(),
-        amountUSD: amountUSD.toString(),
-      },
+      }
       success_url: `${process.env.FRONTEND_URL}/user/my-ads?payment=success`,
       cancel_url: `${process.env.FRONTEND_URL}/user/my-ads?payment=cancel`,
     });
@@ -66,7 +77,7 @@ export const createPromotionCheckout = async (req, res) => {
     ad.promotion = {
       ...ad.promotion,
       isPromoted: false,
-      plan,
+      plan: `${promotionPlan.plan}_days`,
       amountUSD,
       paymentStatus: "pending",
     };
@@ -98,7 +109,7 @@ export const handleStripeWebhook = async (req, res) => {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    const { adId, postCategory, plan, amountUSD } = session.metadata;
+    const { adId, postCategory, durationDays, amountUSD } = session.metadata;
 
     const Model = modelMap[postCategory];
     if (!Model) return res.status(400).send("Invalid post category in metadata");
@@ -107,10 +118,8 @@ export const handleStripeWebhook = async (req, res) => {
     if (!ad) return res.status(404).send("Ad not found");
 
     const startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(
-      startDate.getDate() + (plan === "10_days" ? 10 : 30)
-    );
+const endDate = new Date(startDate);
+endDate.setDate(startDate.getDate() + Number(durationDays));
 
     ad.promotion.promotionCount =
       (ad.promotion.promotionCount || 0) + 1;
@@ -118,7 +127,7 @@ export const handleStripeWebhook = async (req, res) => {
     ad.promotion = {
       ...ad.promotion,
       isPromoted: true,
-      plan,
+      plan: `${durationDays}_days`,
       amountUSD: parseFloat(amountUSD),
       paymentStatus: "success",
       paymentId: session.payment_intent,

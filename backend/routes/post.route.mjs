@@ -49,6 +49,7 @@ router.post("/createspacewanted", auth, upload.array("photos"), createSpaceWante
 router.get("/spacewanted", getSpaceWanted);
 router.get("/spacewanted/:id", getSpaceWantedById);
 router.post("/create-report", auth, createReport);
+router.get("/getplans", getActivePromotionOptions);
 
 
 export default router;
