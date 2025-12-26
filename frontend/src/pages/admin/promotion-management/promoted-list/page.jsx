@@ -16,28 +16,54 @@ export default function PromotedList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchPromotedPosts = async () => {
-    try {
-      setLoading(true);
+const fetchPromotedPosts = async () => {
+  try {
+    const token = localStorage.getItem("authToken");
 
-      const res = await axios.get(`${apiUrl}admin/promotions`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-        params: {
-          page: currentPage,
-          limit: 10,
-          search: searchTerm,
-        },
-      });
+    console.log("🔐 Admin Token:", token);
+    console.log("📤 Fetching promoted posts with params:", {
+      page: currentPage,
+      search: searchTerm,
+    });
 
-      setPromotions(res.data.data || []);
-      setTotalPages(res.data.pagination?.totalPages || 1);
-    } catch (err) {
-      console.error("Failed to fetch promoted posts", err);
-      toast.error("Failed to load promoted posts");
-    } finally {
-      setLoading(false);
+    setLoading(true);
+
+    const res = await axios.get(`${apiUrl}admin/promotions`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page: currentPage,
+        limit: 10,
+        search: searchTerm,
+      },
+    });
+
+    console.log("✅ API Response:", res.data);
+
+    console.log("📦 Promotions Data:", res.data?.data);
+    console.log("📄 Pagination:", res.data?.pagination);
+
+    setPromotions(res.data.data || []);
+    setTotalPages(res.data.pagination?.totalPages || 1);
+  } catch (err) {
+    console.error("❌ Failed to fetch promoted posts");
+
+    if (err.response) {
+      console.error("🔴 Status:", err.response.status);
+      console.error("🔴 Response Data:", err.response.data);
+    } else {
+      console.error("🔴 Error:", err.message);
     }
-  };
+
+    toast.error("Failed to load promoted posts");
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  console.log("🚀 PromotedList mounted");
+}, []);
+
 
   useEffect(() => {
     fetchPromotedPosts();

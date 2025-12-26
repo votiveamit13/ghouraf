@@ -1681,7 +1681,10 @@ export const getPromotedPosts = async (req, res) => {
       "promotion.isPromoted": true,
       "promotion.paymentStatus": "success",
       "promotion.startDate": { $lte: now },
-      "promotion.endDate": { $gte: now },
+      $or: [
+        { "promotion.endDate": { $gte: now } },
+        { "promotion.endDate": null },
+      ],
       is_deleted: false,
       status: "active",
     };
