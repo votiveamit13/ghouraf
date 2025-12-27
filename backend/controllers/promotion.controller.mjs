@@ -39,12 +39,12 @@ export const createPromotionCheckout = async (req, res) => {
     }
 
     const promotionPlan = await PromotionOption.findById(plan);
-if (!promotionPlan) {
-  return res.status(400).json({ message: "Invalid promotion plan" });
-}
+    if (!promotionPlan) {
+      return res.status(400).json({ message: "Invalid promotion plan" });
+    }
 
-const amountUSD = promotionPlan.amountUSD;
-const durationDays = promotionPlan.plan;
+    const amountUSD = promotionPlan.amountUSD;
+    const durationDays = promotionPlan.plan;
 
 
     const session = await stripe.checkout.sessions.create({
@@ -66,7 +66,7 @@ const durationDays = promotionPlan.plan;
       metadata: {
         adId,
         postCategory,
-        planDays: promotionPlan.plan.toString(),
+        durationDays: promotionPlan.plan.toString(),
         amountUSD: promotionPlan.amountUSD.toString(),
         userId: userId.toString(),
       },

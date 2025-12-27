@@ -1,32 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import promote from "../../../assets/img/ghouraf/promote.png";
-import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const PromoteAdModal = ({ show, onClose, onProceed,  loading }) => {
+const PromoteAdModal = ({ show, onClose, onProceed, loading }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  
-    const [plans, setPlans] = useState([]);
-    const [selectedPlanId, setSelectedPlanId] = useState(null);
-  
-     useEffect(() => {
-      if (!show) return;
-  
-      axios.get(`${apiUrl}getplans`)
-        .then(res => {
-          setPlans(res.data);
-          if (res.data.length) {
-            setSelectedPlanId(res.data[0]._id);
-          }
-        })
-        .catch(() => console.error("Failed to load promotion plans"));
-    }, [show]);
 
-  
+  const [plans, setPlans] = useState([]);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+
+  useEffect(() => {
+    if (!show) return;
+
+    const fetchPlans = async () => {
+      try {
+        const { data } = await axios.get(`${apiUrl}getplans`);
+        setPlans(data || []);
+        if (data?.length) {
+          setSelectedPlanId(data[0]._id); // auto-select first
+        }
+      } catch (err) {
+        console.error("Failed to load promotion plans");
+      }
+    };
+
+    fetchPlans();
+  }, [show]);
+
+  if (!show) return null;
+
   const handleProceed = () => {
-    onProceed(selectedPlanId);
+    if (!selectedPlanId) return;
+    onProceed(selectedPlanId); // ✅ send planId only
   };
 
   return (
@@ -40,11 +45,7 @@ const PromoteAdModal = ({ show, onClose, onProceed,  loading }) => {
         </button>
 
         <div className="mb-4 flex justify-center">
-          <img
-            src={promote}
-            alt="Promote Ad"
-            className="w-16 h-16"
-          />
+          <img src={promote} alt="Promote Ad" className="w-16 h-16" />
         </div>
 
         <h2 className="text-lg font-semibold mb-2 text-black">
@@ -54,36 +55,40 @@ const PromoteAdModal = ({ show, onClose, onProceed,  loading }) => {
         <p className="text-gray-600 text-sm mb-4">
           Would you like to boost your listing’s visibility?
           <br />
-          Promoted ads appear at the top of search results and reach more
-          interested users.
+          Promoted ads appear at the top of search results and reach more users.
         </p>
 
-<div className="flex flex-col items-center gap-3 mb-4">
-  {plans.map(plan => (
-    <label key={plan._id} className="flex items-center space-x-2">
-      <input
-        type="radio"
-        name="plan"
-        value={plan._id}
-        checked={selectedPlanId === plan._id}
-        onChange={() => setSelectedPlanId(plan._id)}
-        className="accent-purple-600"
-      />
-      <span className="text-sm text-gray-700">
-        {plan.plan} days for {plan.amountUSD} USD
-      </span>
-    </label>
-  ))}
-</div>
+        {/* Plans */}
+        <div className="flex flex-col items-center gap-3 mb-4">
+          {plans.map((plan) => (
+            <label key={plan._id} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="plan"
+                value={plan._id}
+                checked={selectedPlanId === plan._id}
+                onChange={() => setSelectedPlanId(plan._id)}
+                className="accent-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                {plan.plan} days for {plan.amountUSD} USD
+              </span>
+            </label>
+          ))}
+
+          {!plans.length && (
+            <p className="text-sm text-gray-500">No promotion plans available</p>
+          )}
+        </div>
 
         <div className="flex flex-col gap-3">
-<button
-  disabled={loading || !selectedPlanId}
-  onClick={() => onProceed(selectedPlanId)}
-  className="bg-[#4E2DD2] text-white py-2.5 px-4 rounded-lg"
->
-  {loading ? "Processing..." : "Proceed To Promotion Payment"}
-</button>
+          <button
+            disabled={loading || !selectedPlanId}
+            onClick={handleProceed}
+            className="bg-[#4E2DD2] hover:bg-[#3c21aa] text-white font-medium py-2.5 px-4 rounded-lg transition"
+          >
+            {loading ? "Processing..." : "Proceed To Promotion Payment"}
+          </button>
         </div>
       </div>
     </div>
