@@ -480,7 +480,7 @@ export default function Navbar() {
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg py-2 z-50">
+                    <div className="absolute right-0 mt-2 w-52 bg-[#E7E7E7] rounded-lg shadow-lg py-2 z-[9999]">
                       <a href="/user"
                         className="flex items-center px-4 py-2 hover:text-[#565ABF]"
                         onClick={() => handleDropdownAction()}

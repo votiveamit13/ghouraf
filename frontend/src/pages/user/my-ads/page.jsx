@@ -282,7 +282,7 @@ const handleProceedToPayment = async (planId) => {
                                                     setOpenMenu(openMenu === ad._id ? null : ad._id);
                                                 }}
 
-                                                className="relative z-[9999] p-2 rounded-full bg-black text-white shadow-md"
+                                                className="relative z-[999] p-2 rounded-full bg-black text-white shadow-md"
                                             >
                                                 <BsThreeDots />
                                             </button>
