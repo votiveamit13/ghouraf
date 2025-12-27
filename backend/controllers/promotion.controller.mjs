@@ -80,6 +80,7 @@ export const createPromotionCheckout = async (req, res) => {
       plan: `${promotionPlan.plan}_days`,
       amountUSD,
       paymentStatus: "pending",
+      promotionType: "user",
     };
 
     await ad.save();
@@ -133,6 +134,7 @@ endDate.setDate(startDate.getDate() + Number(durationDays));
       paymentId: session.payment_intent,
       startDate,
       endDate,
+      promotionType: "user",
     };
 
     await ad.save();
