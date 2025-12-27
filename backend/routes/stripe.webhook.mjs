@@ -20,37 +20,33 @@ router.post(
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
+    // Handle payment_intent.succeeded
     if (event.type === "payment_intent.succeeded") {
       const paymentIntent = event.data.object;
-      const { userId, plan, spaceData } = paymentIntent.metadata;
+      const { spaceId, planId, durationDays } = paymentIntent.metadata;
 
       try {
-        const parsedData = JSON.parse(spaceData);
+        const space = await Space.findById(spaceId);
+        if (!space) throw new Error(`Space not found: ${spaceId}`);
 
-        const days = plan === "30_days" ? 30 : 10;
         const startDate = new Date();
         const endDate = new Date();
-        endDate.setDate(startDate.getDate() + days);
+        endDate.setDate(startDate.getDate() + Number(durationDays || 30)); // default 30 days
 
-        const space = new Space({
-          user: userId,
-          ...parsedData,
-          promotion: {
-            isPromoted: true,
-            plan,
-            amountUSD: paymentIntent.amount / 100,
-            paymentStatus: "success",
-            paymentId: paymentIntent.id,
-            startDate,
-            endDate,
-          },
-          status: "inactive",
-        });
+        space.promotion = {
+          isPromoted: true,
+          plan: planId,
+          amountUSD: paymentIntent.amount / 100,
+          paymentStatus: "success",
+          paymentId: paymentIntent.id,
+          startDate,
+          endDate,
+        };
 
         await space.save();
-        console.log("✅ Promoted space created successfully after payment");
+        console.log(`✅ Promotion updated for space ${spaceId} after successful payment`);
       } catch (error) {
-        console.error("❌ Error creating promoted space:", error);
+        console.error("❌ Error updating promoted space:", error);
       }
     } else {
       console.log(`⚠️ Unhandled event type: ${event.type}`);
