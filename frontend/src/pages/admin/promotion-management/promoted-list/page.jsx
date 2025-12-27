@@ -100,7 +100,7 @@ export default function PromotedList() {
                   <th className="px-3 py-3">S. No.</th>
                   <th className="px-3 py-3 text-left">Post Title</th>
                   <th className="px-3 py-3">Category</th>
-                  <th className="px-3 py-3">Plan</th>
+                  {/* <th className="px-3 py-3">Plan</th> */}
                   <th className="px-3 py-3">Amount</th>
                   <th className="px-3 py-3">Start</th>
                   <th className="px-3 py-3">End</th>
@@ -129,9 +129,9 @@ export default function PromotedList() {
                     </td>
                     <td className="px-3 py-2 font-medium">{post.title}</td>
                     <td className="px-3 py-2 text-left">{post.postCategory}</td>
-                    <td className="px-3 py-2 text-center">
+                    {/* <td className="px-3 py-2 text-center">
                       {post.promotion?.plan?.plan || "-"}
-                    </td>
+                    </td> */}
                     <td className="px-3 py-2 text-center">
                       ${post.promotion?.amountUSD || 0}
                     </td>
