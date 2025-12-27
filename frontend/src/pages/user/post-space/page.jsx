@@ -107,6 +107,7 @@ export default function PostSpace() {
   const [clientSecret, setClientSecret] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [promotionLoading, setPromotionLoading] = useState(false);
+  const [selectedPromotionPlanId, setSelectedPromotionPlanId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -390,60 +391,63 @@ export default function PostSpace() {
     }
   };
 
-  const initiatePromotionPayment = async (planShort) => {
-    const planKey = planShort === "30" ? "30_days" : "10_days";
-    setPromotionLoading(true);
+const initiatePromotionPayment = async (planId) => {
+  setPromotionLoading(true);
 
-    try {
-      const formPayload = new FormData();
+  try {
+    const formPayload = new FormData();
 
-      const processedData = {
-        ...formData,
-        furnishing: formData.furnishing === "true",
-        smoking: formData.smoking === "true",
-        bedrooms: parseInt(formData.bedrooms, 10),
-        budget: parseFloat(formData.budget || 0),
-        size: parseFloat(formData.size || 0),
-      };
+    const processedData = {
+      ...formData,
+      furnishing: formData.furnishing === "true",
+      smoking: formData.smoking === "true",
+      bedrooms: parseInt(formData.bedrooms, 10),
+      budget: parseFloat(formData.budget || 0),
+      size: parseFloat(formData.size || 0),
+    };
 
-      Object.keys(processedData).forEach((key) => {
-        if (key === "amenities") {
-          processedData.amenities.forEach((a) => formPayload.append("amenities[]", a));
-        } else if (!["photos", "featuredImage"].includes(key)) {
-          if (key === "bedrooms" || key === "budget" || key === "size") {
-            formPayload.append(key, processedData[key].toString());
-          } else {
-            formPayload.append(key, processedData[key]);
-          }
-        }
-      });
+    Object.keys(processedData).forEach((key) => {
+      if (key === "amenities") {
+        processedData.amenities.forEach((a) =>
+          formPayload.append("amenities[]", a)
+        );
+      } else if (!["photos", "featuredImage"].includes(key)) {
+        formPayload.append(key, processedData[key]);
+      }
+    });
 
-      if (featured) formPayload.append("featuredImage", featured);
-      photos.forEach((photo) => formPayload.append("photos", photo));
+    if (featured) formPayload.append("featuredImage", featured);
+    photos.forEach((photo) => formPayload.append("photos", photo));
 
-      formPayload.append("promote", "true");
-      formPayload.append("plan", planKey);
+    // 🔥 PROMOTION FLAGS
+    formPayload.append("promote", "true");
+    formPayload.append("plan", planId); // ✅ MongoDB _id
 
-      const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+    const res = await axios.post(`${apiUrl}createspaces`, formPayload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-      const { clientSecret } = res.data;
-      if (!clientSecret) throw new Error("No clientSecret returned from server");
-
-      setSelectedPlanForPayment(planShort);
-      setClientSecret(clientSecret);
-      setShowPaymentModal(true);
-    } catch (err) {
-      console.error("Promotion init error:", err.response?.data || err.message);
-      toast.error(err.response?.data?.message || "Failed to initiate promotion payment");
-    } finally {
-      setPromotionLoading(false);
+    if (!res.data?.clientSecret) {
+      throw new Error("Payment initialization failed");
     }
-  };
+
+    setClientSecret(res.data.clientSecret);
+    setShowPaymentModal(true);
+  } catch (err) {
+    console.error("Promotion init error:", {
+  message: err.response?.data?.message,
+  errors: err.response?.data?.errors,
+});
+
+    toast.error(err.response?.data?.message || "Failed to initiate promotion");
+  } finally {
+    setPromotionLoading(false);
+  }
+};
+
 
 
   const getPhotoUrl = (photo) => {
@@ -969,10 +973,10 @@ export default function PostSpace() {
                 setShowPromoteModal(false);
                 handlePublish();
               }}
-              onProceedToPayment={(planShort) => {
+              onProceedToPayment={(planId) => {
                 // planShort e.g. "10" or "30"
                 setShowPromoteModal(false);
-                initiatePromotionPayment(planShort);
+                initiatePromotionPayment(planId);
               }}
               loading={promotionLoading}
             />

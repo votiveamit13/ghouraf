@@ -105,6 +105,15 @@ furnishing: Joi.boolean().truthy("true").falsy("false").required(),
        .items(Joi.string()).optional(),
        
     promote: Joi.boolean().truthy("true").falsy("false").default(false),
-  plan: Joi.string().valid("10_days", "30_days").allow(null, ""),
+  plan: Joi.string()
+  .when("promote", {
+    is: true,
+    then: Joi.string().required().messages({
+      "string.empty": "Promotion plan is required",
+      "any.required": "Promotion plan is required",
+    }),
+    otherwise: Joi.optional().allow(null, ""),
+  }),
+
 
 });
