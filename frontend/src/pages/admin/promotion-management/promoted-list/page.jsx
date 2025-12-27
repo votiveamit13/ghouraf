@@ -130,7 +130,7 @@ export default function PromotedList() {
                     <td className="px-3 py-2 font-medium">{post.title}</td>
                     <td className="px-3 py-2 text-left">{post.postCategory}</td>
                     <td className="px-3 py-2 text-center">
-                      {post.promotion?.plan || "-"}
+                      {post.promotion?.plan?.plan || "-"}
                     </td>
                     <td className="px-3 py-2 text-center">
                       ${post.promotion?.amountUSD || 0}
