@@ -1696,6 +1696,12 @@ export const getPromotedPosts = async (req, res) => {
     const fetchData = async (Model, postCategory) => {
       const data = await Model.find(promotionMatch)
         .populate("user", "name email")
+        // ✅ populate the plan field from PromotionOption
+        .populate({
+          path: "promotion.plan",
+          model: PromotionOption,
+          select: "plan -_id", // only include plan number
+        })
         .sort({ "promotion.startDate": -1 })
         .skip(skip)
         .limit(Number(limit))
@@ -1729,8 +1735,7 @@ export const getPromotedPosts = async (req, res) => {
 
     results.sort(
       (a, b) =>
-        new Date(b.promotion.startDate) -
-        new Date(a.promotion.startDate)
+        new Date(b.promotion.startDate) - new Date(a.promotion.startDate)
     );
 
     res.status(200).json({
