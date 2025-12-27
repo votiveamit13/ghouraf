@@ -102,57 +102,55 @@ export const createSpace = async (req, res) => {
       amenities: processedAmenities,
       featuredImage: featuredImagePath,
       photos,
+      promotion: {
+        isPromoted: false,
+        paymentStatus: promote === "true" ? "pending" : "success",
+      },
+      status: "inactive",
     };
 
-    if (promote === "true") {
-  const promotionPlan = await PromotionOption.findById(plan);
+    const space = await Space.create(spaceData);
 
-  if (!promotionPlan || promotionPlan.status !== "active") {
-    return res.status(400).json({ message: "Invalid promotion plan" });
-  }
+    // 🔵 NORMAL POST
+    if (promote !== "true") {
+      return res.status(201).json({
+        message: "Space posted successfully",
+        space,
+      });
+    }
 
-  const amountUSD = promotionPlan.amountUSD;
-  const durationDays = promotionPlan.plan;
+    // 🔥 PROMOTED POST
+    const promotionPlan = await PromotionOption.findById(plan);
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amountUSD * 100,
-    currency: "usd",
-    metadata: {
-      userId: req.user._id.toString(),
-      planId: promotionPlan._id.toString(),
-      durationDays: durationDays.toString(),
-      spaceData: JSON.stringify(spaceData),
-    },
-  });
+    if (!promotionPlan || promotionPlan.status !== "active") {
+      return res.status(400).json({ message: "Invalid promotion plan" });
+    }
 
-  return res.status(200).json({
-    clientSecret: paymentIntent.client_secret,
-    promotionInfo: {
-      durationDays,
-      amountUSD,
-    },
-  });
-}
-
-
-    const space = new Space({
-      user: req.user._id,
-      ...spaceData,
-      promotion: { isPromoted: false, paymentStatus: "pending" },
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: promotionPlan.amountUSD * 100,
+      currency: "usd",
+      metadata: {
+        spaceId: space._id.toString(),
+        planId: promotionPlan._id.toString(),
+        durationDays: promotionPlan.plan.toString(),
+      },
     });
 
-    await space.save();
-    res.status(201).json({ message: "Space posted successfully", space });
+    return res.status(200).json({
+      clientSecret: paymentIntent.client_secret,
+      spaceId: space._id,
+    });
+
   } catch (err) {
-    console.error("Error creating space:", err);
-    res.status(500).json({ message: "Server Error", error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
 export const handleStripeWebhook = async (req, res) => {
   const sig = req.headers["stripe-signature"];
-  let event;
 
+  let event;
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
@@ -160,46 +158,40 @@ export const handleStripeWebhook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error("Webhook signature verification failed:", err.message);
+    console.error("Webhook verification failed:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    const { userId, plan, spaceData } = paymentIntent.metadata;
+    const intent = event.data.object;
+    const { spaceId, planId, durationDays } = intent.metadata;
 
     try {
-      const parsedData = JSON.parse(spaceData);
-
-      const days = plan === "30_days" ? 30 : 10;
       const startDate = new Date();
       const endDate = new Date();
-      endDate.setDate(startDate.getDate() + days);
+      endDate.setDate(startDate.getDate() + Number(durationDays));
 
-      const space = new Space({
-        user: userId,
-        ...parsedData,
+      await Space.findByIdAndUpdate(spaceId, {
         promotion: {
           isPromoted: true,
-          plan,
-          amountUSD: paymentIntent.amount / 100,
+          plan: planId,
+          amountUSD: intent.amount / 100,
           paymentStatus: "success",
-          paymentId: paymentIntent.id,
+          paymentId: intent.id,
           startDate,
           endDate,
         },
-        status: "inactive",
       });
 
-      await space.save();
-      console.log("Promoted space created successfully after payment");
-    } catch (error) {
-      console.error("Error creating promoted space:", error);
+      console.log("Promotion activated for space:", spaceId);
+    } catch (err) {
+      console.error("Promotion activation failed:", err);
     }
   }
 
   res.json({ received: true });
 };
+
 
 export const getSpaces = async (req, res) => {
   try {

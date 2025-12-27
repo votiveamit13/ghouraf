@@ -11,8 +11,9 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally,  onProceedToPayment,
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
 
-   useEffect(() => {
-    if (!show) return;
+  // ✅ Hook is ALWAYS called
+  useEffect(() => {
+    if (!show) return; // ✅ conditional logic inside hook
 
     axios.get(`${apiUrl}getplans`)
       .then(res => {
@@ -23,6 +24,9 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally,  onProceedToPayment,
       })
       .catch(() => console.error("Failed to load promotion plans"));
   }, [show]);
+
+  // ✅ Conditional rendering AFTER hooks
+  if (!show) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -53,33 +57,33 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally,  onProceedToPayment,
           interested users.
         </p>
 
-<div className="flex flex-col items-center gap-3 mb-4">
-  {plans.map(plan => (
-    <label key={plan._id} className="flex items-center space-x-2">
-      <input
-        type="radio"
-        name="plan"
-        value={plan._id}
-        checked={selectedPlanId === plan._id}
-        onChange={() => setSelectedPlanId(plan._id)}
-        className="accent-purple-600"
-      />
-      <span className="text-sm text-gray-700">
-        {plan.plan} days for {plan.amountUSD} USD
-      </span>
-    </label>
-  ))}
-</div>
+        <div className="flex flex-col items-center gap-3 mb-4">
+          {plans.map(plan => (
+            <label key={plan._id} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="plan"
+                value={plan._id}
+                checked={selectedPlanId === plan._id}
+                onChange={() => setSelectedPlanId(plan._id)}
+                className="accent-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                {plan.plan} days for {plan.amountUSD} USD
+              </span>
+            </label>
+          ))}
+        </div>
 
 
         <div className="flex flex-col gap-3">
-<button
-  disabled={loading || !selectedPlanId}
-  onClick={() => onProceedToPayment(selectedPlanId)}
-  className="bg-[#4E2DD2] text-white py-2.5 px-4 rounded-lg"
->
-  {loading ? "Processing..." : "Proceed To Promotion Payment"}
-</button>
+          <button
+            disabled={loading || !selectedPlanId}
+            onClick={() => onProceedToPayment(selectedPlanId)}
+            className="bg-[#4E2DD2] text-white py-2.5 px-4 rounded-lg"
+          >
+            {loading ? "Processing..." : "Proceed To Promotion Payment"}
+          </button>
 
 
           <button

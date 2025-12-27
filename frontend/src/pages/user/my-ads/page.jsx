@@ -127,37 +127,29 @@ export default function MyAds() {
         setShowPromoteModal(true);
     };
 
-    const handleProceedToPayment = async (planDays) => {
-        try {
-            setLoadingPayment(true);
-            const plan = planDays === "10" ? "10_days" : "30_days";
+const handleProceedToPayment = async (planId) => {
+  try {
+    setLoadingPayment(true);
 
-            console.log("Promoting Ad payload:", {
-                adId: promotingAd._id,
-                postCategory: promotingAd.postCategory,
-                plan,
-            });
+    const res = await axios.post(
+      `${apiUrl}stripe/webhooks/create-promotion-session`,
+      {
+        adId: promotingAd._id,
+        postCategory: promotingAd.postCategory,
+        plan: planId, // ✅ MUST be Mongo ObjectId
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
+    window.location.href = res.data.url;
+  } catch (err) {
+    console.error("Promotion payment error:", err.response?.data || err.message);
+    toast.error("Failed to start promotion payment.");
+  } finally {
+    setLoadingPayment(false);
+  }
+};
 
-            const res = await axios.post(
-                `${apiUrl}stripe/webhooks/create-promotion-session`,
-                {
-                    adId: promotingAd._id,
-                    postCategory: promotingAd.postCategory,
-                    plan,
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            window.location.href = res.data.url;
-
-        } catch (err) {
-            console.error("Promotion payment error:", err);
-            toast.error("Failed to start promotion payment.");
-        } finally {
-            setLoadingPayment(false);
-        }
-    };
 
 
 
