@@ -84,6 +84,7 @@ export const createSpace = async (req, res) => {
     }
 
     const spaceData = {
+      user: req.user._id,
       title,
       propertyType,
       budget: Number(budget),
