@@ -33,6 +33,8 @@ import PaymentOptions from "pages/admin/promotion-management/payment-options/pag
 import PromotedList from "pages/admin/promotion-management/promoted-list/page";
 import AddPlan from "components/admin/promotion-management/AddPlan";
 import EditPlan from "components/admin/promotion-management/EditPlan";
+import { GrAnnounce } from "react-icons/gr";
+import { TfiAnnouncement } from "react-icons/tfi";
 
 export const adminRoutes = [
   {
@@ -136,19 +138,19 @@ export const adminRoutes = [
   },
     {
     name: "Promotion Management",
-    icon: <BsFillFileEarmarkPostFill size={20} className="text-[#565ABF]" />,
+    icon: <GrAnnounce size={20} className="text-[#565ABF]" />,
     subRoutes: [
       {
         path: "/promotion-management/payment-options",
         name: "Payment Options",
-        icon: <MdOutlineBedroomParent className="text-[#565ABF]" />,
+        icon: <TfiAnnouncement className="text-[#565ABF]" />,
         component: <PaymentOptions />,
         layout: "/admin",
       },
       {
         path: "/promotion-management/list",
         name: "Promoted Post List",
-        icon: <MdOutlineHomeWork className="text-[#565ABF]" />,
+        icon: <TfiAnnouncement className="text-[#565ABF]" />,
         component: <PromotedList />,
         layout: "/admin",
       },

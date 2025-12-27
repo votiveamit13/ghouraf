@@ -29,7 +29,7 @@ const PromoteAdModal = ({ show, onClose, onPublishNormally,  onProceedToPayment,
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 z-[9999]">
       <div className="relative bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-4 text-center">
         <button
           onClick={onClose}
