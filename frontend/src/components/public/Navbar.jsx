@@ -534,7 +534,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="lg:hidden flex items-center space-x-4">
+          <div className="lg:hidden flex items-center gap-2">
             {user && (
               <>
                 <NotificationPanel userId={user?._id} isMobile={true} />
@@ -553,7 +553,7 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       <div
         className={`
-    fixed inset-0 z-[999] bg-white transform transition-transform duration-300 lg:hidden
+    fixed inset-0 z-[9999] bg-white transform transition-transform duration-300 lg:hidden
     ${isOpen ? "translate-x-0" : "translate-x-full"}
   `}
       >
