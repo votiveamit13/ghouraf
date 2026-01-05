@@ -35,6 +35,36 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, [fetchProfile]);
 
+  useEffect(() => {
+    if (!user?._id) return;
+
+    setUserOnlineStatus(user._id);
+
+    const interval = setInterval(() => {
+      setUserOnlineStatus(user._id);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [user?._id]);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const handleVisibility = () => {
+      setUserOnlineStatus(user._id);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("beforeunload", handleVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleVisibility);
+    };
+  }, [user?._id]);
+
+
+
   const login = async (idToken) => {
     try {
       const res = await axios.post(`${apiUrl}auth/login`, { idToken });
@@ -51,7 +81,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.data.user);
         setToken(idToken);
         localStorage.setItem("token", idToken);
-        setUserOnlineStatus(res.data.user._id, true);
+        setUserOnlineStatus(res.data.user._id);
       }
 
       return res.data;
@@ -82,9 +112,6 @@ export const AuthProvider = ({ children }) => {
 
 
   const logout = () => {
-    if (user?._id) {
-      setUserOnlineStatus(user._id, false);
-    }
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");

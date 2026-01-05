@@ -53,7 +53,7 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileView, setIsMobileView] = useState(false);
   const [showChatList, setShowChatList] = useState(true);
-const [sending, setSending] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -175,17 +175,30 @@ const [sending, setSending] = useState(false);
 
       const statusRef = doc(db, "userStatus", otherUserId);
       return onSnapshot(statusRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setUserStatusMap(prev => ({
-            ...prev,
-            [otherUserId]: docSnap.data().online
-          }));
-        }
-      });
+  if (!docSnap.exists()) return;
+
+  const data = docSnap.data();
+
+  // ✅ store lastSeen ONLY
+  setUserStatusMap((prev) => ({
+    ...prev,
+    [otherUserId]: data?.lastSeen?.toMillis() || null,
+  }));
+});
+
     }).filter(Boolean);
 
     return () => unsubscribes.forEach(u => u());
   }, [chats, user]);
+
+  useEffect(() => {
+  const interval = setInterval(() => {
+    setUserStatusMap((prev) => ({ ...prev }));
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, []);
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -336,6 +349,15 @@ if (!receiverIsInsideChat) {
     setShowAttach(false);
   };
 
+  const ONLINE_TIMEOUT = 5000;
+
+const isOnline = (userId) => {
+  const lastSeen = userStatusMap[userId];
+  if (!lastSeen) return false;
+  return Date.now() - lastSeen < ONLINE_TIMEOUT;
+};
+
+
   return (
     <div className="container user-layout">
       {loadingChats ? (
@@ -385,7 +407,7 @@ if (!receiverIsInsideChat) {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <GoDotFill
-                        fill={userStatusMap[otherUserId] ? "#27C200" : "#A1A1A1"}
+                        fill={isOnline(otherUserId) ? "#27C200" : "#A1A1A1"}
                         className="absolute right-[-3px] bottom-[-4px]"
                       />
                     </div>
@@ -428,9 +450,9 @@ if (!receiverIsInsideChat) {
                       <p className="text-xs text-[#636A80] flex items-center gap-1">
                         <GoDotFill
                           size={20}
-                          fill={userStatusMap[receiverId] ? "#27C200" : "#A1A1A1"}
+                          fill={isOnline(receiverId) ? "#27C200" : "#A1A1A1"}
                         />
-                        {userStatusMap[receiverId] ? "Active Now" : "Offline"}
+                        {isOnline(receiverId) ? "Active Now" : "Offline"}
                       </p>
                     </div>
                   </div>

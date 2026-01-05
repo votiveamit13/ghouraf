@@ -15,6 +15,7 @@ export default function NotificationPanel({ userId, isMobile }) {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
+  const [hasNewNotification, setHasNewNotification] = useState(false);
 
   const timeAgo = (timestamp) => {
     if (!timestamp?.toDate) return "";
@@ -78,6 +79,13 @@ export default function NotificationPanel({ userId, isMobile }) {
 
 
     const unsub = onSnapshot(q, async (snapshot) => {
+      const changes = snapshot.docChanges();
+
+      // 🔴 If any NEW notification arrives
+      if (changes.some(change => change.type === "added")) {
+        setHasNewNotification(true);
+      }
+
       const notifs = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const notif = { id: doc.id, ...doc.data() };
@@ -99,6 +107,7 @@ export default function NotificationPanel({ userId, isMobile }) {
 
       setNotifications(notifs);
     });
+
 
     return () => unsub();
   }, [userId]);
@@ -168,13 +177,17 @@ export default function NotificationPanel({ userId, isMobile }) {
     return (
       <>
         <button
+          onClick={() => {
+            setOpen(prev => !prev);
+            setHasNewNotification(false);
+          }}
           className="relative text-black hover:text-[#A321A6]"
-          onClick={() => setOpen(true)}
         >
           <IoMdNotificationsOutline size={24} />
-          {notifications.some((n) => !n.read) && (
+          {hasNewNotification && (
             <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
           )}
+
         </button>
 
         {open && (
@@ -202,13 +215,17 @@ export default function NotificationPanel({ userId, isMobile }) {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => {
+          setOpen(prev => !prev);
+          setHasNewNotification(false);
+        }}
         className="relative text-black hover:text-[#A321A6]"
       >
         <IoMdNotificationsOutline size={24} />
-        {notifications.some((n) => !n.read) && (
+        {hasNewNotification && (
           <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
         )}
+
       </button>
 
       {open && (

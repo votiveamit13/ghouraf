@@ -393,6 +393,13 @@ const handleProceedToPayment = async (planId) => {
                                                 Under Review
                                             </span>
                                         )}
+
+                                        {ad.status === "active" && ad?.promotion?.isPromoted && (
+                                            <span className="absolute top-0 left-0 bg-[#565ABF] text-white text-sm font-semibold py-1 px-3 rounded-md shadow">
+                                                Sponsored
+                                            </span>
+                                        )}
+
                                     </div>
 
 

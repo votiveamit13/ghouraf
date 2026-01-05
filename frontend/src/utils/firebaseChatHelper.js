@@ -168,12 +168,19 @@ export const listenChats = (userId, callback) => {
   });
 };
 
-export const setUserOnlineStatus = async (userId, isOnline) => {
+export const setUserOnlineStatus = async (userId) => {
+  if (!userId) return;
+
   const statusRef = doc(db, "userStatus", userId);
-  await setDoc(statusRef, {
-    online: isOnline,
-    lastSeen: serverTimestamp()
-  }, { merge: true });
+
+  await setDoc(
+    statusRef,
+    {
+      online: true,
+      lastSeen: serverTimestamp()
+    },
+    { merge: true }
+  );
 };
 
 export const deleteChat = async (chatId, userId) => {
