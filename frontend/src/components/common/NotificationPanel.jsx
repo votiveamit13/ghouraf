@@ -191,7 +191,7 @@ export default function NotificationPanel({ userId, isMobile }) {
         </button>
 
         {open && (
-          <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-[9999] p-4">
             <div className="bg-white rounded-[15px] w-full max-w-sm relative shadow-lg">
               <button
                 className="absolute top-2 right-3 text-gray-600 hover:text-black text-xl"
@@ -229,7 +229,7 @@ export default function NotificationPanel({ userId, isMobile }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-[9999]">
           <div className="flex justify-between items-center border-b px-2 py-2">
             <h3 className="text-sm font-semibold text-gray-700">
               Notifications
