@@ -9,34 +9,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "context/AuthContext";
 
-export default function PropertyCard({ property }) {
+export default function PropertyCard({ property, savedPosts, onToggleSave }) {
     const locationString = getFullLocation(property.city, property.state, property.country);
     const apiUrl = process.env.REACT_APP_API_URL;
-    const [saved, setSaved] = useState(false);
+    const saved = savedPosts?.includes(property._id);
     const { user, token } = useAuth();
     const userId = user?._id;
-
-    useEffect(() => {
-        if (!userId) return;
-
-        const checkSaved = async () => {
-            try {
-                const res = await axios.get(`${apiUrl}save/list`, {
-                    params: { postCategory: "Space" },
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    }
-                });
-
-                const savedPosts = res.data.data;
-                const isSaved = savedPosts.some(p => p.postId === property._id);
-                setSaved(isSaved);
-            } catch (err) {
-                console.error("Error fetching saved posts:", err);
-            }
-        };
-        checkSaved();
-    }, [property._id, apiUrl, userId, token]);
 
     const handleSaveToggle = async (e) => {
         e.preventDefault();
@@ -58,7 +36,8 @@ export default function PropertyCard({ property }) {
                 }
             });
 
-            setSaved(res.data.saved);
+            // setSaved(res.data.saved);
+            onToggleSave(property._id, res.data.saved);
             toast.success(res.data.message);
         } catch (err) {
             console.error("Error saving post:", err);

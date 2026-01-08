@@ -241,8 +241,7 @@ export default function AdManagement() {
               <img
                 src={selectedAd.image}
                 alt={selectedAd.title}
-                className="rounded border"
-                style={{ width: 150, height: 150, objectFit: "cover" }}
+                className="rounded border w-full h-full object-cover"
               />
               <h4 className="text-lg text-black font-semibold break-all">
                 {selectedAd.title}

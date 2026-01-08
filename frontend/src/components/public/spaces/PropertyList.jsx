@@ -2,7 +2,7 @@ import React from "react";
 import PropertyCard from "./PropertyCard";
 import AdBanner from "../AdBanner";
 
-export default function PropertyList({ properties = [], ads = [] }) {
+export default function PropertyList({ properties = [], ads = [], savedPosts = [], onToggleSave }) {
   if ((!properties || properties.length === 0) && (!ads || ads.length === 0)) {
     return (
       <div className="text-center py-20 text-gray-500 font-medium text-lg">
@@ -48,7 +48,7 @@ export default function PropertyList({ properties = [], ads = [] }) {
           {item.isAd ? (
             <AdBanner ad={item.ad} />
           ) : (
-            <PropertyCard property={item} />
+            <PropertyCard property={item} savedPosts={savedPosts} onToggleSave={onToggleSave} />
           )}
         </React.Fragment>
       ))}

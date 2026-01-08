@@ -2,11 +2,12 @@ import UserPagination from "components/common/UserPagination";
 import Filters from "components/public/spaces/Filters";
 import PropertyList from "components/public/spaces/PropertyList";
 import SearchBar from "components/public/SearchBar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from 'axios';
 import Loader from "components/common/Loader";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
+import { useAuth } from "context/AuthContext";
 
 export default function Spaces() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -17,6 +18,9 @@ export default function Spaces() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [ads, setAds] = useState([]);
+  const [savedPosts, setSavedPosts] = useState([]);
+  const { user, token } = useAuth();
+  const userId = user?._id;
 
   const [filters, setFilters] = useState({
     minValue: 0,
@@ -34,6 +38,7 @@ export default function Spaces() {
     adPostedBy: "",
     amenities: [],
   });
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
   const itemsPerPage = 20;
   const adsPerPage = 4;
@@ -51,6 +56,21 @@ export default function Spaces() {
     setPage(1);
   }, [locationHook.search]);
 
+  const prevFilters = useRef(filters);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (JSON.stringify(prevFilters.current) !== JSON.stringify(filters)) {
+        setPage(1);
+        prevFilters.current = filters;
+      }
+      setDebouncedFilters(filters);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [filters]);
+
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -59,8 +79,8 @@ export default function Spaces() {
           page,
           limit: itemsPerPage,
           sortBy,
-          ...filters,
-          amenities: filters.amenities.join(',')
+          ...debouncedFilters,
+          amenities: debouncedFilters.amenities.join(',')
         };
 
         Object.keys(spaceParams).forEach((key) => {
@@ -91,7 +111,25 @@ export default function Spaces() {
     };
 
     fetchData();
-  }, [page, filters, sortBy, apiUrl]);
+  }, [page, debouncedFilters, sortBy, apiUrl]);
+
+  useEffect(() => {
+  if (!userId) return;
+
+  axios.get(`${apiUrl}save/list`, {
+    params: { postCategory: "Space" },
+    headers: { Authorization: `Bearer ${token}` }
+  }).then(res => {
+    setSavedPosts(res.data.data.map(p => p.postId));
+  }).catch(console.error);
+}, [userId, token]);
+
+const handleToggleSave = (id, saved) => {
+  setSavedPosts(prev =>
+    saved ? [...prev, id] : prev.filter(x => x !== id)
+  );
+};
+
 
   return (
     <div className="container user-layout mt-5 mb-8 grid grid-cols-1 lg:grid-cols-4 gap-0 lg:gap-6">
@@ -126,6 +164,8 @@ export default function Spaces() {
             <PropertyList
               properties={spaces}
               ads={ads}
+              savedPosts={savedPosts}
+              onToggleSave={handleToggleSave}
             />
             {spaces.length > 0 && (
               <div className="text-end flex justify-end mt-5">
