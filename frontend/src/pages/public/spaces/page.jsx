@@ -2,12 +2,13 @@ import UserPagination from "components/common/UserPagination";
 import Filters from "components/public/spaces/Filters";
 import PropertyList from "components/public/spaces/PropertyList";
 import SearchBar from "components/public/SearchBar";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import axios from 'axios';
 import Loader from "components/common/Loader";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import { useAuth } from "context/AuthContext";
+import { toast } from "react-toastify";
 
 export default function Spaces() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -124,12 +125,51 @@ export default function Spaces() {
   }).catch(console.error);
 }, [userId, token]);
 
-const handleToggleSave = (id, saved) => {
-  setSavedPosts(prev =>
-    saved ? [...prev, id] : prev.filter(x => x !== id)
-  );
-};
+const handleToggleSave = useCallback(async (id) => {
+  if (!userId) {
+    toast.info("Please login first to save posts.");
+    return;
+  }
 
+  try {
+    const res = await axios.post(`${apiUrl}save`, {
+      postId: id,
+      postCategory: "Space",
+      listingPage: "Space",
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const { saved, message } = res.data;
+
+    setSavedPosts(prev =>
+      saved ? [...prev, id] : prev.filter(x => x !== id)
+    );
+
+    toast.success(message);
+
+  } catch (err) {
+    console.error("Error saving:", err);
+    toast.error("Failed to save post");
+  }
+}, [userId, token]);
+
+    const handleShare = useCallback((property) => {
+  const locationString = `${property.city || ""}, ${property.state || ""}, ${property.country || ""}`;
+
+  const shareData = {
+    title: property.title,
+    text: `Check out this in ${locationString}!`,
+    url: `${window.location.origin}/spaces/${property._id}`,
+  };
+
+  if (navigator.share) {
+    navigator.share(shareData);
+  } else {
+    navigator.clipboard.writeText(shareData.url);
+    toast.info("Link copied to clipboard!");
+  }
+}, []);
 
   return (
     <div className="container user-layout mt-5 mb-8 grid grid-cols-1 lg:grid-cols-4 gap-0 lg:gap-6">
@@ -166,6 +206,7 @@ const handleToggleSave = (id, saved) => {
               ads={ads}
               savedPosts={savedPosts}
               onToggleSave={handleToggleSave}
+              onShare={handleShare}
             />
             {spaces.length > 0 && (
               <div className="text-end flex justify-end mt-5">

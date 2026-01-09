@@ -1,7 +1,7 @@
 import UserPagination from "components/common/UserPagination";
 import Filters from "components/public/place_wanted/Filters";
 import PropertyList from "components/public/place_wanted/PropertyList";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SearchBar from "components/public/SearchBar";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -12,7 +12,7 @@ import { useAuth } from "context/AuthContext";
 import ConfirmationDialog from "components/common/ConfirmationDialog";
 
 export default function PlaceWanted() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, token } = useAuth();
     const apiUrl = process.env.REACT_APP_API_URL;
     const [properties, setProperties] = useState([]);
     const [page, setPage] = useState(1);
@@ -26,6 +26,21 @@ export default function PlaceWanted() {
     const adsPerPage = 4;
     const navigate = useNavigate();
     const [showInvalidDialog, setShowInvalidDialog] = useState(false);
+    const [debouncedFilters, setDebouncedFilters] = useState(filters);
+    const prevFilters = useRef(filters);
+    const [savedPosts, setSavedPosts] = useState([]);
+
+    useEffect(() => {
+    const handler = setTimeout(() => {
+        if (JSON.stringify(prevFilters.current) !== JSON.stringify(filters)) {
+        setPage(1);
+        prevFilters.current = filters;
+        }
+        setDebouncedFilters(filters);
+    }, 400);
+
+    return () => clearTimeout(handler);
+    }, [filters]);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -46,7 +61,8 @@ export default function PlaceWanted() {
 
     useEffect(() => {
         fetchData();
-    }, [page, sortBy, filters]);
+    }, [page, sortBy, debouncedFilters]);
+
 
    const fetchData = async () => {
         setLoading(true);
@@ -55,8 +71,8 @@ export default function PlaceWanted() {
                 page,
                 limit: itemsPerPage,
                 sortBy,
-                ...filters,
-                amenities: filters.amenities ? filters.amenities.join(',') : undefined,
+                ...debouncedFilters,
+                amenities: debouncedFilters.amenities ? debouncedFilters.amenities.join(',') : undefined,
             };
 
             Object.keys(propertyParams).forEach((key) => {
@@ -90,6 +106,63 @@ export default function PlaceWanted() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+    if (!user?._id) return;
+
+    axios.get(`${apiUrl}save/list`, {
+        params: { postCategory: "Spacewanted" },
+        headers: { Authorization: `Bearer ${token}` }
+    }).then(res => {
+        setSavedPosts(res.data.data.map(p => p.postId));
+    }).catch(console.error);
+    }, [user, token]);
+
+    const handleToggleSave = useCallback(async (id) => {
+  if (!user?._id) {
+    toast.info("Please login first to save posts.");
+    return;
+  }
+
+  try {
+    const res = await axios.post(`${apiUrl}save`, {
+      postId: id,
+      postCategory: "Spacewanted",
+      listingPage: "Spacewanted",
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const { saved, message } = res.data;
+
+    setSavedPosts(prev =>
+      saved ? [...prev, id] : prev.filter(x => x !== id)
+    );
+
+    toast.success(message);
+  } catch (err) {
+    console.error("Error saving:", err);
+    toast.error("Failed to save post");
+  }
+}, [user, token]);
+
+    const handleShare = useCallback((property) => {
+  const locationString = `${property.city || ""}, ${property.state || ""}, ${property.country || ""}`;
+
+  const shareData = {
+    title: property.title,
+    text: `Check out this in ${locationString}!`,
+    url: `${window.location.origin}/place-wanted/${property._id}`,
+  };
+
+  if (navigator.share) {
+    navigator.share(shareData);
+  } else {
+    navigator.clipboard.writeText(shareData.url);
+    toast.info("Link copied to clipboard!");
+  }
+}, []);
+
 
 
     return (
@@ -136,7 +209,13 @@ export default function PlaceWanted() {
                         {loading ? (
                             <Loader fullScreen={false} />
                         ) : (
-                            <PropertyList properties={properties} ads={ads} />
+                            <PropertyList
+                                properties={properties}
+                                ads={ads}
+                                savedPosts={savedPosts}
+                                onToggleSave={handleToggleSave}
+                                onShare={handleShare}
+                            />
                         )}
 
                         {properties.length > 0 && !loading && (
