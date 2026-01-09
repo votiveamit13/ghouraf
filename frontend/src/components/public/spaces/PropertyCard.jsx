@@ -8,7 +8,10 @@ import { Link } from "react-router-dom";
 
 function PropertyCard({ property, savedPosts, onToggleSave, onShare }) {
   const locationString = getFullLocation(property.city, property.state, property.country);
-  const image = property.photos?.[0]?.url || defaultImage;
+  const image =
+  property.photos?.[0]?.url ||
+  property.featuredImage ||
+  defaultImage;
   const avatar = property.user?.profile?.photo || defaultImage;
   const name = `${property.user?.profile?.firstName || ""} ${property.user?.profile?.lastName || ""}`;
   const saved = savedPosts?.includes(property._id);
