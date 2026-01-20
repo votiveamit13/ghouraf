@@ -16,6 +16,7 @@ export default function NotificationPanel({ userId, isMobile }) {
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
   const [hasNewNotification, setHasNewNotification] = useState(false);
+  const isInitialLoad = useRef(true);
 
   const timeAgo = (timestamp) => {
     if (!timestamp?.toDate) return "";
@@ -31,6 +32,26 @@ export default function NotificationPanel({ userId, isMobile }) {
     if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
     if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
     return timestamp.toDate().toLocaleDateString();
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const unread = notifications.filter(n => !n.read);
+
+      await Promise.all(
+        unread.map(n =>
+          updateDoc(doc(db, "notifications", n.id), { read: true })
+        )
+      );
+
+      setNotifications(prev =>
+        prev.map(n => ({ ...n, read: true }))
+      );
+
+      setHasNewNotification(false);
+    } catch (err) {
+      console.error("Failed to mark all as read", err);
+    }
   };
 
   const handleNotificationClick = async (notif) => {
@@ -69,48 +90,58 @@ export default function NotificationPanel({ userId, isMobile }) {
 
 
   useEffect(() => {
-    if (!userId) return;
-    const q = query(
-      collection(db, "notifications"),
-      where("userId", "==", userId),
-      where("read", "==", false),
-      orderBy("createdAt", "desc")
-    );
+  if (!userId) return;
+
+  const q = query(
+  collection(db, "notifications"),
+  where("userId", "==", userId),
+  orderBy("createdAt", "desc")
+);
 
 
-    const unsub = onSnapshot(q, async (snapshot) => {
-      const changes = snapshot.docChanges();
+  const unsub = onSnapshot(q, async (snapshot) => {
+    const changes = snapshot.docChanges();
 
-      // 🔴 If any NEW notification arrives
-      if (changes.some(change => change.type === "added")) {
-        setHasNewNotification(true);
-      }
-
-      const notifs = await Promise.all(
-        snapshot.docs.map(async (doc) => {
-          const notif = { id: doc.id, ...doc.data() };
-
-          if (notif.senderId && !notif.meta) {
-            try {
-              const res = await axios.get(
-                `${process.env.REACT_APP_API_URL}/users/${notif.senderId}`
-              );
-              notif.meta = res.data;
-            } catch (err) {
-              console.error("Failed to fetch sender info", err);
-            }
-          }
-
-          return notif;
-        })
+    // ✅ Only show red dot for REAL new unread notifications
+    if (!isInitialLoad.current) {
+      const hasRealNew = changes.some(
+        (change) =>
+          change.type === "added" &&
+          change.doc.data()?.read === false
       );
 
-      setNotifications(notifs);
-    });
+      if (hasRealNew) {
+        setHasNewNotification(true);
+      }
+    }
 
+    isInitialLoad.current = false;
 
-    return () => unsub();
-  }, [userId]);
+    const notifs = await Promise.all(
+      snapshot.docs.map(async (docSnap) => {
+        const notif = { id: docSnap.id, ...docSnap.data() };
+
+        if (notif.senderId && !notif.meta) {
+          try {
+            const res = await axios.get(
+              `${process.env.REACT_APP_API_URL}/users/${notif.senderId}`
+            );
+            notif.meta = res.data;
+          } catch (err) {
+            console.error("Failed to fetch sender info", err);
+          }
+        }
+
+        return notif;
+      })
+    );
+
+    setNotifications(notifs);
+  });
+
+  return () => unsub();
+}, [userId]);
+
   useEffect(() => {
     if (isMobile) return;
     const handleClickOutside = (e) => {
@@ -177,9 +208,9 @@ export default function NotificationPanel({ userId, isMobile }) {
     return (
       <>
         <button
-          onClick={() => {
+          onClick={async () => {
+            await markAllAsRead();
             setOpen(prev => !prev);
-            setHasNewNotification(false);
           }}
           className="relative text-black hover:text-[#A321A6]"
         >
@@ -215,9 +246,9 @@ export default function NotificationPanel({ userId, isMobile }) {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => {
+        onClick={async () => {
+          await markAllAsRead();
           setOpen(prev => !prev);
-          setHasNewNotification(false);
         }}
         className="relative text-black hover:text-[#A321A6]"
       >
