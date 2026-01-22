@@ -3,6 +3,9 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import flatmate1 from "assets/img/ghouraf/flatmate1.jpg";
+import flatmate2 from "assets/img/ghouraf/flatmate2.jpg";
+import flatmate3 from "assets/img/ghouraf/flatmate3.jpg";
 
 export default function WelcomeToGhouraf() {
   const navigate = useNavigate();
@@ -16,9 +19,9 @@ export default function WelcomeToGhouraf() {
       try {
         const { data } = await axios.get(`${apiUrl}admin/aboutussection-image`);
         const urls = [
-          data.imagePath1 ? `${data.imagePath1}` : null,
-          data.imagePath2 ? `${data.imagePath2}` : null,
-          data.imagePath3 ? `${data.imagePath3}` : null,
+          data.imagePath1 ? `${data.imagePath1}` : `${flatmate1}`,
+          data.imagePath2 ? `${data.imagePath2}` : `${flatmate2}`,
+          data.imagePath3 ? `${data.imagePath3}` : `${flatmate3}`,
         ];
         setImages(urls);
       } catch (error) {

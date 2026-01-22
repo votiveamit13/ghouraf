@@ -137,6 +137,13 @@ export default function NotificationPanel({ userId, isMobile }) {
     );
 
     setNotifications(notifs);
+    const hasUnread = notifs.some(n => n.read === false);
+
+    if (hasUnread) {
+      setHasNewNotification(true);
+    } else {
+      setHasNewNotification(false);
+    }
   });
 
   return () => unsub();
