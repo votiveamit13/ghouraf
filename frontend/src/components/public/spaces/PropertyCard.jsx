@@ -46,9 +46,9 @@ function PropertyCard({ property, savedPosts, onToggleSave, onShare }) {
       <Link to={`/spaces/${property._id}`}>
         <div className="w-full md:w-[200px] h-[260px] relative">
           {/* Skeleton placeholder */}
-          {!loaded && (
+          {/* {!loaded && (
             <div className="absolute inset-0 animate-pulse bg-gray-200 rounded-[10px]" />
-          )}
+          )} */}
 
           {/* Lazy Image */}
           <img
@@ -58,7 +58,8 @@ function PropertyCard({ property, savedPosts, onToggleSave, onShare }) {
             loading="lazy"
             decoding="async"
             onLoad={() => setLoaded(true)}
-            className={`w-full h-full object-cover rounded-[10px] duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+      className={`w-full h-full object-cover rounded-[10px] transition-all duration-300
+        ${loaded ? "opacity-100 blur-0" : "opacity-50 blur-sm"}`}
           />
         </div>
       </Link>
