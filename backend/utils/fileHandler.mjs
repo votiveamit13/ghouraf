@@ -12,7 +12,9 @@ export const fileHandler = {
   validateExtension(filename, type) {
     const ext = path.extname(filename).toLowerCase();
     if (!extensionGroups[type]?.includes(ext)) {
-      throw new Error(`Invalid file type. Allowed: ${extensionGroups[type].join(", ")}`);
+      throw new Error(
+        `Invalid file type. Allowed: ${extensionGroups[type].join(", ")}`
+      );
     }
   },
 
@@ -26,31 +28,37 @@ export const fileHandler = {
     const ext = path.extname(file.originalname).toLowerCase();
     const isImage = extensionGroups.image.includes(ext);
 
-    let fileName;
+    const baseName = Date.now();
+
+    let fileName = file.originalname;
     let fullPath;
     let relativePath;
 
     if (isImage) {
-      fileName = `${Date.now()}.webp`;
+      // Convert ONLY images
+      fileName = `${baseName}.webp`;
       fullPath = path.join(uploadDir, fileName);
 
       await sharp(file.buffer)
-        .webp({ quality: 80 }) // adjustable
+        .webp({ quality: 80 })
         .toFile(fullPath);
 
-      relativePath = `/uploads/${folderName}/${fileName}`;
     } else {
-      fileName = `${Date.now()}-${file.originalname}`;
+      // Keep original name
+      fileName = `${baseName}-${file.originalname}`;
       fullPath = path.join(uploadDir, fileName);
+
       fs.writeFileSync(fullPath, file.buffer);
-      relativePath = `/uploads/${folderName}/${fileName}`;
     }
 
+    relativePath = `/uploads/${folderName}/${fileName}`;
+
+    // Critical: Return same structure as old version
     return {
       fileName,
       fullPath,
       relativePath,
-      isImage,
+      isImage, // non-breaking addition
     };
   },
 };
