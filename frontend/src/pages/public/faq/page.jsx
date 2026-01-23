@@ -11,7 +11,7 @@ export default function Faqs() {
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
-        const res = await axios.get(`${apiUrl}/faqs`);
+        const res = await axios.get(`${apiUrl}faqs`);
         setFaqs(res.data.data);
       } catch (err){
         console.error("Error fetching faqs", err);

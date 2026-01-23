@@ -40,7 +40,7 @@ export default function EditFaq() {
       const token = localStorage.getItem("authToken");
 
       const response = await axios.patch(
-        `${apiUrl}/admin/faq/${faq._id}`,
+        `${apiUrl}admin/faq/${faq._id}`,
         formData,
         {
           headers: {

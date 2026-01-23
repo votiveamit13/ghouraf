@@ -39,7 +39,7 @@ export default function AddPlan() {
     try {
       setLoading(true);
       await axios.post(
-        `${apiUrl}/admin`,
+        `${apiUrl}admin`,
         {
           plan: Number(formData.plan),
           amountUSD: Number(formData.amountUSD),

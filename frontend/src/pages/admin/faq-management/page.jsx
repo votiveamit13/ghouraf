@@ -22,7 +22,7 @@ export default function FaqManagement() {
     useEffect(() => {
         const fetchFaqs = async () => {
             try {
-                const res = await axios.get(`${apiUrl}/admin/faqs`, {
+                const res = await axios.get(`${apiUrl}admin/faqs`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setFaqs(res.data);
@@ -36,7 +36,7 @@ export default function FaqManagement() {
     const handleActionChange = async (mongoId, value) => {
         const status = value === "active" ? "active" : "inactive";
         try {
-            const res = await axios.patch(`${apiUrl}/admin/faq/${mongoId}/status`,
+            const res = await axios.patch(`${apiUrl}admin/faq/${mongoId}/status`,
                 { status },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -57,7 +57,7 @@ export default function FaqManagement() {
     const handleDelete = async () => {
     if (!selectedFaq) return;
     try {
-        await axios.delete(`${apiUrl}/admin/faq/${selectedFaq._id}`, {
+        await axios.delete(`${apiUrl}admin/faq/${selectedFaq._id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

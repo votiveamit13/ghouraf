@@ -25,7 +25,7 @@ export default function ContactForm() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`${apiUrl}/admin/messages`, {
+        const res = await axios.get(`${apiUrl}admin/messages`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMessages(res.data);
@@ -59,7 +59,7 @@ export default function ContactForm() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${apiUrl}/admin/message/${selectedMessage._id}`, {
+      await axios.delete(`${apiUrl}admin/message/${selectedMessage._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(prev => prev.filter(u => u._id !== selectedMessage._id));

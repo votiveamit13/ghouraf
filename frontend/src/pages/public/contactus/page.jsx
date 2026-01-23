@@ -28,7 +28,7 @@ export default function ContactUs() {
         setErrors({});
 
         try {
-            const res = await axios.post(`${apiUrl}/sendMessage`, formData);
+            const res = await axios.post(`${apiUrl}sendMessage`, formData);
 
             toast.success(res.data.message || "Message sent successfully!");
             setFormData({

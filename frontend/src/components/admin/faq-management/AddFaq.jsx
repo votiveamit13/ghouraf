@@ -26,7 +26,7 @@ export default function AddFaq() {
         setErrors({});
 
         try {
-            const res = await axios.post(`${apiUrl}/admin/addfaq`, formData);
+            const res = await axios.post(`${apiUrl}admin/addfaq`, formData);
 
             toast.success(res.data.message || "Add successfully");
             setFormData({

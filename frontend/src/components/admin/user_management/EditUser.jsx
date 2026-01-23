@@ -86,7 +86,7 @@ export default function EditUser() {
 
       const token = localStorage.getItem("authToken");
       await axios.patch(
-        `${apiUrl}/admin/users/${user._id}`,
+        `${apiUrl}admin/users/${user._id}`,
         data,
         {
           headers: {

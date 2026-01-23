@@ -26,7 +26,7 @@ export default function PaymentOptions() {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${apiUrl}/admin`,
+        `${apiUrl}admin`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -50,7 +50,7 @@ export default function PaymentOptions() {
 
     try {
       await axios.delete(
-        `${apiUrl}/admin/${planToDelete._id}`,
+        `${apiUrl}admin/${planToDelete._id}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }

@@ -31,7 +31,7 @@ const handleSaveProfile = async (data) => {
     }
 
     formData.append("section", "profile");
-    const res = await axios.put(`${apiUrl}/auth/profile`, formData, {
+    const res = await axios.put(`${apiUrl}auth/profile`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -47,7 +47,7 @@ const handleSaveProfile = async (data) => {
 
     const handleSave = async (data, section) => {
         try{
-            const res = await axios.put(`${apiUrl}/auth/profile`,
+            const res = await axios.put(`${apiUrl}auth/profile`,
                 { ...data, section},
                 { headers: { Authorization: `Bearer ${token}`}}
             );

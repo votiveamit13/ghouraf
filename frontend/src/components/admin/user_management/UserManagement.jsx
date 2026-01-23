@@ -24,7 +24,7 @@ const UserManagement = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`${apiUrl}/admin/users`, {
+        const res = await axios.get(`${apiUrl}admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const sortedUsers = res.data.sort(
@@ -41,7 +41,7 @@ const UserManagement = () => {
   const handleActionChange = async (mongoId, value) => {
     const status = value === "unblock" ? "active" : "inactive";
     try {
-      const res = await axios.patch(`${apiUrl}/admin/users/${mongoId}/status`,
+      const res = await axios.patch(`${apiUrl}admin/users/${mongoId}/status`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -81,7 +81,7 @@ const UserManagement = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${apiUrl}/admin/user/${selectedUser._id}`, {
+      await axios.delete(`${apiUrl}admin/user/${selectedUser._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(prev => prev.filter(u => u._id !== selectedUser._id));

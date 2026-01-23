@@ -41,7 +41,7 @@ export default function EditPlan() {
     try {
       setLoading(true);
       await axios.patch(
-        `${apiUrl}/admin/${planData._id}`,
+        `${apiUrl}admin/${planData._id}`,
         {
           plan: Number(formData.plan),
           amountUSD: Number(formData.amountUSD),

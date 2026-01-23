@@ -219,7 +219,7 @@ export default function Navbar() {
 
     setRegisterLoading(true);
     try {
-      await axios.post(`${apiUrl}/auth/register`, {
+      await axios.post(`${apiUrl}auth/register`, {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
