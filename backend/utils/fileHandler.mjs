@@ -8,21 +8,35 @@ const extensionGroups = {
   video: [".mp4", ".mov", ".avi"],
 };
 
-// internal async handler only for images
-async function convertToWebp(file, uploadDir, folderName) {
+// Internal async worker
+function convertImage(file, uploadDir, folderName, ext) {
   const fileName = `${Date.now()}.webp`;
   const fullPath = path.join(uploadDir, fileName);
 
-  await sharp(file.buffer)
+  return sharp(file.buffer)
     .webp({ quality: 80 })
-    .toFile(fullPath);
+    .toFile(fullPath)
+    .then(() => ({
+      fileName,
+      fullPath,
+      relativePath: `/uploads/${folderName}/${fileName}`,
+      isImage: true,
+    }))
+    .catch(err => {
+      console.error("Webp conversion failed:", err.message);
 
-  return {
-    fileName,
-    fullPath,
-    relativePath: `/uploads/${folderName}/${fileName}`,
-    isImage: true,
-  };
+      // fallback to original
+      const fallbackName = `${Date.now()}-${file.originalname}`;
+      const fallbackFull = path.join(uploadDir, fallbackName);
+      fs.writeFileSync(fallbackFull, file.buffer);
+
+      return {
+        fileName: fallbackName,
+        fullPath: fallbackFull,
+        relativePath: `/uploads/${folderName}/${fallbackName}`,
+        isImage: true,
+      };
+    });
 }
 
 export const fileHandler = {
@@ -43,28 +57,13 @@ export const fileHandler = {
     const ext = path.extname(file.originalname).toLowerCase();
     const isImage = extensionGroups.image.includes(ext);
 
-    // If file is image -> convert to webp async BUT return resolved result
+    // IMPORTANT: Ensure return is resolved synchronously
+    // using async worker but returning Promise
     if (isImage) {
-      return convertToWebp(file, uploadDir, folderName)
-        .then(result => result)
-        .catch(err => {
-          console.error("Image convert failed, saving original file:", err.message);
-
-          // fallback to original file if conversion fails
-          const fileName = `${Date.now()}-${file.originalname}`;
-          const fullPath = path.join(uploadDir, fileName);
-          fs.writeFileSync(fullPath, file.buffer);
-
-          return {
-            fileName,
-            fullPath,
-            relativePath: `/uploads/${folderName}/${fileName}`,
-            isImage: true,
-          };
-        });
+      return convertImage(file, uploadDir, folderName, ext);
     }
 
-    // non-image — default old behavior
+    // non-image → behave same as old
     const fileName = `${Date.now()}-${file.originalname}`;
     const fullPath = path.join(uploadDir, fileName);
     fs.writeFileSync(fullPath, file.buffer);
