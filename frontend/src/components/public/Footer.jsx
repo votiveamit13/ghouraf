@@ -77,7 +77,7 @@ export default function Footer() {
           <a href="/" className="w-8 h-8 flex items-center justify-center">
             <FaTwitter />
           </a> */}
-          <a href="/" className="w-8 h-8 flex items-center justify-center">
+          <a href="https://www.instagram.com/ghouraf.leb" target="_blank" className="w-8 h-8 flex items-center justify-center">
             <FaInstagram />
           </a>
         </div>

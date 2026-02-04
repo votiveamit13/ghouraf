@@ -106,7 +106,7 @@ export default function WelcomeToGhouraf() {
                 <GoArrowUpRight size={25} />
               </span>
             </button>
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <div className="w-14 h-14 rounded-full bg-[#565ABF] flex items-center justify-center">
                 <FaPhoneAlt className="text-white text-lg" />
               </div>
@@ -114,7 +114,7 @@ export default function WelcomeToGhouraf() {
                 <p className="text-gray-500 text-sm">Need help?</p>
                 <p className="font-semibold text-[#1A1A1A]">(012) 345–67890</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

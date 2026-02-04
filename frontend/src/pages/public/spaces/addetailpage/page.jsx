@@ -335,6 +335,32 @@ export default function DetailPage({ targetUserId }) {
             </p>
           </div>
 
+          <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
+            <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">Details</h3>
+            <div className="px-4 py-3 mt-0">
+              <table className="text-sm w-full text-black">
+                <tbody>
+                  <tr>
+                    <td className="py-1 w-40 font-medium">Property Type</td>
+                    <td>{space.propertyType}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 w-40 font-medium">{space.propertyType} Size</td>
+                    <td>{space.size}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 w-40 font-medium">Furnishing</td>
+                    <td>{space.furnishing ? "Yes" : "No"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 w-40 font-medium">Bedrooms</td>
+                    <td>{space.bedrooms}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {space.amenities?.length > 0 && (
             <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
               <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">
@@ -351,7 +377,7 @@ export default function DetailPage({ targetUserId }) {
             </div>
           )}
 
-          <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
+          {/* <div className="g-white shadow-xl border border-[#D7D7D7] rounded-[15px] space-y-3">
             <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">Availability</h3>
             <div className="px-4 py-3 mt-0">
               <table className="text-sm w-full text-black">
@@ -360,18 +386,18 @@ export default function DetailPage({ targetUserId }) {
                     <td className="py-1 w-40 font-medium">Available</td>
                     <td>Yes</td>
                   </tr>
-                  {/* <tr>
+                  <tr>
                     <td className="py-1 w-40 font-medium">Minimum term</td>
                     <td>None</td>
                   </tr>
                   <tr>
                     <td className="py-1 w-40 font-medium">Maximum term</td>
                     <td>None</td>
-                  </tr> */}
+                  </tr>
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> */}
 
           <div className="g-white mb-6 shadow-xl border border-[#D7D7D7] rounded-[15px]">
             <h3 className="font-medium bg-[#565ABF] px-4 py-3 text-white rounded-t-[15px]">New roommate preferences</h3>

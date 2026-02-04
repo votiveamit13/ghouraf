@@ -1137,14 +1137,16 @@ export default function Navbar() {
                     <span>
                       Yes, I have read and agree to the{" "}
                       <a
-                        href="/"
+                        href="/terms-and-conditions"
+                        target="_blank"
                         className="underline hover:underline hover:text-[#565ABF]"
                       >
                         Terms of Use
                       </a>{" "}
                       and{" "}
                       <a
-                        href="/"
+                        href="/privacy-policy"
+                        target="_blank"
                         className="underline hover:underline hover:text-[#565ABF]"
                       >
                         Privacy Policy.
