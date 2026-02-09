@@ -8,6 +8,7 @@ export default function ProfileEdit({ initialData, onSave }) {
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     ...initialData,
+    gender: initialData.gender || "male",
     dob: initialData.dob ? initialData.dob.split("T")[0] : "",
     age: initialData.dob ? calculateAge(initialData.dob) : initialData.age,
   });
@@ -76,6 +77,10 @@ export default function ProfileEdit({ initialData, onSave }) {
 
   const validate = () => {
     let newErrors = {};
+
+    if (!formData.gender) {
+      newErrors.gender = "Gender is required";
+    }
 
     if (!formData.mobile) {
       newErrors.mobile = "Mobile number is required";

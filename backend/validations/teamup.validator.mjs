@@ -14,7 +14,7 @@ export const createTeamUpSchema = Joi.object({
   budgetType: Joi.string().valid(...budgetType).required(),
 
   // moveInDate: Joi.date().optional(),
-  period: Joi.string().optional(),
+  period: Joi.string().allow("", null).optional(),
 
   amenities: Joi.alternatives().try(
   Joi.array().items(Joi.string()),

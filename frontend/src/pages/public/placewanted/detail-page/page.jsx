@@ -287,7 +287,7 @@ export default function SpaceWantedDetailPage() {
                                     </tr>
                                     <tr>
                                         <td className="py-1 w-40 font-medium">Minimum Space Size</td>
-                                        <td>{spacewanted.roomSize}</td>
+                                        <td>{spacewanted.roomSize} m<sup>2</sup></td>
                                     </tr>
                                     {/* <tr>
                                         <td className="py-1 w-40 font-medium">Available</td>

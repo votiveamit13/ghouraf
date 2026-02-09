@@ -570,7 +570,7 @@ Object.keys(formData).forEach(key => {
                                             name="budget"
                                             value={formData.budget}
                                             onChange={handleChange}
-                                            placeholder="Total budget range for the flat"
+                                            placeholder="Total budget range for the flat in USD"
                                             className="w-full border-[1px] border-[#D7D7D7] rounded-[14px] form-control"
                                         />
                                         {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}

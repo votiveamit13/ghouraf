@@ -535,7 +535,7 @@ const initiatePromotionPayment = async (planId) => {
                 <input
                   type="text"
                   name="budget"
-                  placeholder="Enter your budget"
+                  placeholder="Enter your budget in USD"
                   className={`form-control`}
                   value={formData.budget}
                   onChange={handleChange}

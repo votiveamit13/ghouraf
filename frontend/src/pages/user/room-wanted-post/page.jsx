@@ -459,7 +459,7 @@ export default function RoomWantedAd() {
                                         value={formData.budget}
                                         onChange={handleChange}
                                         className={getInputClass("budget")}
-                                        placeholder="Enter budget"
+                                        placeholder="Enter budget in USD"
                                     />
                                     {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
                                 </div>
