@@ -43,7 +43,7 @@ import ScrollToTop from "components/ScrollToTop";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-const isAdminHost = window.location.hostname.startsWith("admin.");
+const isAdminHost = window.location.hostname === "panel.ghouraf.com";
 
 root.render(
   <BrowserRouter>
