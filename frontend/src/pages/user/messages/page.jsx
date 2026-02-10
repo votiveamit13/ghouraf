@@ -16,7 +16,7 @@ import {
   setUserActiveChat,
   deleteChat,
   markChatNotificationsAsRead,
-  clearUserActiveChat // Add this import
+  clearUserActiveChat
 } from "utils/firebaseChatHelper";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -175,16 +175,16 @@ export default function Messages() {
 
       const statusRef = doc(db, "userStatus", otherUserId);
       return onSnapshot(statusRef, (docSnap) => {
-  if (!docSnap.exists()) return;
+        if (!docSnap.exists()) return;
 
-  const data = docSnap.data();
+        const data = docSnap.data();
 
-  // ✅ store lastSeen ONLY
-  setUserStatusMap((prev) => ({
-    ...prev,
-    [otherUserId]: data?.lastSeen?.toMillis() || null,
-  }));
-});
+        //  store lastSeen ONLY
+        setUserStatusMap((prev) => ({
+          ...prev,
+          [otherUserId]: data?.lastSeen?.toMillis() || null,
+        }));
+      });
 
     }).filter(Boolean);
 
@@ -192,12 +192,12 @@ export default function Messages() {
   }, [chats, user]);
 
   useEffect(() => {
-  const interval = setInterval(() => {
-    setUserStatusMap((prev) => ({ ...prev }));
-  }, 5000);
+    const interval = setInterval(() => {
+      setUserStatusMap((prev) => ({ ...prev }));
+    }, 5000);
 
-  return () => clearInterval(interval);
-}, []);
+    return () => clearInterval(interval);
+  }, []);
 
 
   useEffect(() => {
@@ -240,62 +240,62 @@ export default function Messages() {
     await clearUserActiveChat(user._id);
   };
 
-const handleSend = async () => {
-  if (!text.trim() || !chatId || !receiverId) return;
+  const handleSend = async () => {
+    if (!text.trim() || !chatId || !receiverId) return;
 
-  const messageText = text; // store user-typed text
-  setText("");              // 🔥 instantly clear input (fixes glitch)
-  setSending(true);
+    const messageText = text;
+    setText("");              
+    setSending(true);
 
-  try {
-    await sendMessage(chatId, user._id, receiverId, messageText, null, null, {
-      firstName: user.profile?.firstName,
-      lastName: user.profile?.lastName,
-      photo: user.profile?.photo,
-    });
+    try {
+      await sendMessage(chatId, user._id, receiverId, messageText, null, null, {
+        firstName: user.profile?.firstName,
+        lastName: user.profile?.lastName,
+        photo: user.profile?.photo,
+      });
 
-     const receiverStatusRef = doc(db, "userStatus", receiverId);
-    const receiverStatusSnap = await getDoc(receiverStatusRef);
+      const receiverStatusRef = doc(db, "userStatus", receiverId);
+      const receiverStatusSnap = await getDoc(receiverStatusRef);
 
-    const receiverIsInsideChat =
-      receiverStatusSnap.exists() &&
-      receiverStatusSnap.data().activeChatId === chatId;
+      const receiverIsInsideChat =
+        receiverStatusSnap.exists() &&
+        receiverStatusSnap.data().activeChatId === chatId;
 
-if (!receiverIsInsideChat) {
-  const receiver = userMap[receiverId];
+      if (!receiverIsInsideChat) {
+        const receiver = userMap[receiverId];
 
-  // console.log("📧 Attempting to call backend email API...");
-  // console.log("📡 API URL:", `${apiUrl}chat-message`);
-  // console.log("📨 Payload:", {
-  //   toEmail: receiver?.email,
-  //   receiverFirstName: receiver?.profile?.firstName,
-  //   senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
-  //   messagePreview: messageText.slice(0, 80) + "...",
-  // });
+        // console.log("📧 Attempting to call backend email API...");
+        // console.log("📡 API URL:", `${apiUrl}chat-message`);
+        // console.log("📨 Payload:", {
+        //   toEmail: receiver?.email,
+        //   receiverFirstName: receiver?.profile?.firstName,
+        //   senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+        //   messagePreview: messageText.slice(0, 80) + "...",
+        // });
 
-  try {
-    const res = await axios.post(`${apiUrl}chat-message`, {
-      toEmail: receiver?.email,
-      receiverFirstName: receiver?.profile?.firstName,
-      senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
-      messagePreview: messageText.slice(0, 80) + "...",
-    });
+        try {
+          const res = await axios.post(`${apiUrl}chat-message`, {
+            toEmail: receiver?.email,
+            receiverFirstName: receiver?.profile?.firstName,
+            senderName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+            messagePreview: messageText.slice(0, 80) + "...",
+          });
 
-    console.log("📬 Backend response:", res.data);
-  } catch (err) {
-    console.log("❌ Email API failed:", err);
-  }
-}
+          console.log("📬 Backend response:", res.data);
+        } catch (err) {
+          console.log("❌ Email API failed:", err);
+        }
+      }
 
-  } catch (error) {
-    console.error("Message sending failed:", error);
+    } catch (error) {
+      console.error("Message sending failed:", error);
 
-    // optional: restore message if send fails
-    setText(messageText);
-  } finally {
-    setSending(false);
-  }
-};
+      // optional: restore message if send fails
+      setText(messageText);
+    } finally {
+      setSending(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -351,11 +351,11 @@ if (!receiverIsInsideChat) {
 
   const ONLINE_TIMEOUT = 5000;
 
-const isOnline = (userId) => {
-  const lastSeen = userStatusMap[userId];
-  if (!lastSeen) return false;
-  return Date.now() - lastSeen < ONLINE_TIMEOUT;
-};
+  const isOnline = (userId) => {
+    const lastSeen = userStatusMap[userId];
+    if (!lastSeen) return false;
+    return Date.now() - lastSeen < ONLINE_TIMEOUT;
+  };
 
 
   return (
@@ -406,10 +406,10 @@ const isOnline = (userId) => {
                         alt={otherUser?.firstName || "User"}
                         className="w-10 h-10 rounded-full object-cover"
                       />
-                      <GoDotFill
+                      {/* <GoDotFill
                         fill={isOnline(otherUserId) ? "#27C200" : "#A1A1A1"}
                         className="absolute right-[-3px] bottom-[-4px]"
-                      />
+                      /> */}
                     </div>
                     <div className={`flex-1`}>
                       <h4 className={`text-sm font-medium ${chat.id === chatId ? "text-white" : ""}`}>
@@ -447,13 +447,13 @@ const isOnline = (userId) => {
                       <h3 className="font-medium text-gray-800">
                         {userMap[receiverId]?.profile?.firstName || "User"} {userMap[receiverId]?.profile?.lastName || ""}
                       </h3>
-                      <p className="text-xs text-[#636A80] flex items-center gap-1">
+                      {/* <p className="text-xs text-[#636A80] flex items-center gap-1">
                         <GoDotFill
                           size={20}
                           fill={isOnline(receiverId) ? "#27C200" : "#A1A1A1"}
                         />
                         {isOnline(receiverId) ? "Active Now" : "Offline"}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   <div>
@@ -508,21 +508,21 @@ const isOnline = (userId) => {
                           )}
                           <p className="leading-[20px]">{msg.text}</p>
                         </div>
-<span className="text-xs text-gray-400">
-  {sending && msg.senderId === user._id && !msg.timestamp ? (
-    <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-  ) : (
-    msg.timestamp?.toDate &&
-    msg.timestamp.toDate().toLocaleString([], {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
-  )}
-</span>
+                        <span className="text-xs text-gray-400">
+                          {sending && msg.senderId === user._id && !msg.timestamp ? (
+                            <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            msg.timestamp?.toDate &&
+                            msg.timestamp.toDate().toLocaleString([], {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                          )}
+                        </span>
 
 
                       </div>
@@ -607,13 +607,13 @@ const isOnline = (userId) => {
                       className="w-full pl-[35px] pr-4 py-2 text-[15px]"
                     />
                   </div>
-<button
-  type="submit"
-  disabled={sending}
-  className="bg-black text-white px-3 py-2 rounded-[5px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
->
-  <TbSend2 size={28} />
-</button>
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className="bg-black text-white px-3 py-2 rounded-[5px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <TbSend2 size={28} />
+                  </button>
 
                 </form>
               </>
