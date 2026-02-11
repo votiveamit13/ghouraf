@@ -330,6 +330,11 @@ export default function DetailPage({ targetUserId }) {
             </h2>
             <p className="text-[18px] text-black font-semibold mt-0">${space.budget} / {space.budgetType}</p>
             <p className="text-[16px] text-black flex items-center gap-2"><TfiLocationPin /> {locationString}</p>
+            {space.location && space.location.trim() !== "" && (
+              <p className="text-[16px] text-black flex items-center gap-2">
+                Location: {space.location}
+              </p>
+            )}
             <p className="text-black text-[16px]">
               {space.description}
             </p>

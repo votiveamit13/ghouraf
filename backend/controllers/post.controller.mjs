@@ -309,7 +309,7 @@ export const getSpaces = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const spaces = await Space.find(query)
-      .select("title postCategory propertyType budget budgetType personalInfo amenities size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted promotion")
+      .select("title postCategory propertyType budget budgetType personalInfo amenities size furnishing smoking roomsAvailableFor bedrooms country state city description featuredImage status available is_deleted promotion location")
       .populate("user", "profile.firstName profile.lastName profile.photo")
       .sort(sortOption)
       .skip(skip)
