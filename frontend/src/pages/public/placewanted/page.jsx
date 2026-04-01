@@ -56,12 +56,22 @@ export default function PlaceWanted() {
 
     useEffect(() => {
         const parsed = queryString.parse(locationHook.search);
-        setFilters((prev) => ({
-            ...prev,
-            city: parsed.city || "",
-            state: parsed.state || "",
-            country: parsed.country || "",
-        }));
+        setFilters((prev) => {
+            const next = {
+                ...prev,
+                city: parsed.city || "",
+                state: parsed.state || "",
+                country: parsed.country || "",
+            };
+            if (
+                prev.city === next.city &&
+                prev.state === next.state &&
+                prev.country === next.country
+            ) {
+                return prev;
+            }
+            return next;
+        });
         setPage(1);
     }, [locationHook.search]);
 
