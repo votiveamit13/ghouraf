@@ -453,28 +453,36 @@ export const updateSpaceStatus = async (req, res) => {
     space.status = status;
     await space.save();
 
-    await dbAdmin.collection("notifications").add({
-      userId: space.user._id.toString(),
-      senderId: req.user?._id || "admin",
-      title: "Your space post status was updated",
-      body: `Your post "${space.title}" is now ${status}.`,
-      meta: {
-        firstName: space.user.firstName || "",
-        lastName: space.user.lastName || "",
-        email: space.user.email || "",
-        postId: space._id.toString(),
-        postCategory: "Space",
-      },
-      read: false,
-      createdAt: new Date(),
-    });
+    try {
+      await dbAdmin.collection("notifications").add({
+        userId: space.user._id.toString(),
+        senderId: req.user?._id || "admin",
+        title: "Your space post status was updated",
+        body: `Your post "${space.title}" is now ${status}.`,
+        meta: {
+          firstName: space.user.profile?.firstName || "",
+          lastName: space.user.profile?.lastName || "",
+          email: space.user.email || "",
+          postId: space._id.toString(),
+          postCategory: "Space",
+        },
+        read: false,
+        createdAt: new Date(),
+      });
+    } catch (notificationError) {
+      console.error("Failed to send notification:", notificationError);
+    }
 
-    await sendPostUpdateEmail(
-      space.user.email,
-      space.user.profile.firstName,
-      space.title,
-      `Your post <b>${space.title}</b> is now <b>${status}</b>.`
-    );
+    try {
+      await sendPostUpdateEmail(
+        space.user.email,
+        space.user.profile?.firstName || "User",
+        space.title,
+        `Your post <b>${space.title}</b> is now <b>${status}</b>.`
+      );
+    } catch (emailError) {
+      console.error("Failed to send email:", emailError);
+    }
 
     res.json({ message: `Space status updated to ${status}`, space });
   } catch (err) {
@@ -497,30 +505,38 @@ export const deleteSpace = async (req, res) => {
     space.is_deleted = true;
     await space.save();
 
-    await dbAdmin.collection("notifications").add({
-      userId: space.user._id.toString(),
-      senderId: req.user?._id || "admin",
-      title: "Your space post was deleted",
-      body: `Your post "${space.title}" has been removed by admin.`,
-      meta: {
-        firstName: space.user.firstName || "",
-        lastName: space.user.lastName || "",
-        email: space.user.email || "",
-        postId: space._id.toString(),
-        postCategory: "Space",
-      },
-      read: false,
-      createdAt: new Date(),
-    });
+    // Send notification (non-blocking, error won't affect deletion)
+    try {
+      await dbAdmin.collection("notifications").add({
+        userId: space.user._id.toString(),
+        senderId: req.user?._id || "admin",
+        title: "Your space post was deleted",
+        body: `Your post "${space.title}" has been removed by admin.`,
+        meta: {
+          firstName: space.user.profile?.firstName || "",
+          lastName: space.user.profile?.lastName || "",
+          email: space.user.email || "",
+          postId: space._id.toString(),
+          postCategory: "Space",
+        },
+        read: false,
+        createdAt: new Date(),
+      });
+    } catch (notificationError) {
+      console.error("Failed to send notification:", notificationError);
+    }
 
-    await sendPostUpdateEmail(
-      space.user.email,
-      space.user.profile.firstName,
-      space.title,
-      `Your post <b>${space.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
-    );
-
-
+    // Send email (non-blocking, error won't affect deletion)
+    try {
+      await sendPostUpdateEmail(
+        space.user.email,
+        space.user.profile?.firstName || "User",
+        space.title,
+        `Your post <b>${space.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
+      );
+    } catch (emailError) {
+      console.error("Failed to send email:", emailError);
+    }
 
     res.json({ message: "Space deleted successfully", space });
   } catch (err) {
@@ -605,8 +621,8 @@ export const updateTeamUpStatus = async (req, res) => {
         title: "Your Team Up post status was updated",
         body: `Your Team Up post "${teamup.title}" is now ${status}.`,
         meta: {
-          firstName: teamup.user.firstName || "",
-          lastName: teamup.user.lastName || "",
+          firstName: teamup.user.profile?.firstName || "",
+          lastName: teamup.user.profile?.lastName || "",
           email: teamup.user.email || "",
           postId: teamup._id.toString(),
           postCategory: "Teamup",
@@ -617,7 +633,7 @@ export const updateTeamUpStatus = async (req, res) => {
 
       await sendPostUpdateEmail(
         teamup.user.email,
-        teamup.user.profile.firstName,
+        teamup.user.profile?.firstName || "User",
         teamup.title,
         `Your post <b>${teamup.title}</b> is now <b>${status}</b>.`
       );
@@ -636,8 +652,8 @@ export const updateTeamUpStatus = async (req, res) => {
         title: "Your Team Up (Space Wanted) post status was updated",
         body: `Your Space Wanted post "${spaceWanted.title}" is now ${status}.`,
         meta: {
-          firstName: spaceWanted.user.firstName || "",
-          lastName: spaceWanted.user.lastName || "",
+          firstName: spaceWanted.user.profile?.firstName || "",
+          lastName: spaceWanted.user.profile?.lastName || "",
           email: spaceWanted.user.email || "",
           postId: spaceWanted._id.toString(),
           postCategory: "Teamup",
@@ -648,7 +664,7 @@ export const updateTeamUpStatus = async (req, res) => {
 
       await sendPostUpdateEmail(
         spaceWanted.user.email,
-        spaceWanted.user.profile.firstName,
+        spaceWanted.user.profile?.firstName || "User",
         spaceWanted.title,
         `Your post <b>${spaceWanted.title}</b> is now <b>${status}</b>.`
       );
@@ -680,8 +696,8 @@ export const deleteTeamUp = async (req, res) => {
         title: "Your Team Up post was deleted",
         body: `Your post "${teamup.title}" has been removed by admin.`,
         meta: {
-          firstName: teamup.user.firstName || "",
-          lastName: teamup.user.lastName || "",
+          firstName: teamup.user.profile?.firstName || "",
+          lastName: teamup.user.profile?.lastName || "",
           email: teamup.user.email || "",
           postId: teamup._id.toString(),
           postCategory: "Teamup",
@@ -692,7 +708,7 @@ export const deleteTeamUp = async (req, res) => {
 
       await sendPostUpdateEmail(
         teamup.user.email,
-        teamup.user.profile.firstName,
+        teamup.user.profile?.firstName || "User",
         teamup.title,
         `Your post <b>${teamup.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
       );
@@ -714,8 +730,8 @@ export const deleteTeamUp = async (req, res) => {
         title: "Your Team Up (Space Wanted) post was deleted",
         body: `Your Space Wanted post "${spaceWanted.title}" has been removed by admin.`,
         meta: {
-          firstName: spaceWanted.user.firstName || "",
-          lastName: spaceWanted.user.lastName || "",
+          firstName: spaceWanted.user.profile?.firstName || "",
+          lastName: spaceWanted.user.profile?.lastName || "",
           email: spaceWanted.user.email || "",
           postId: spaceWanted._id.toString(),
           postCategory: "Teamup",
@@ -726,7 +742,7 @@ export const deleteTeamUp = async (req, res) => {
 
       await sendPostUpdateEmail(
         spaceWanted.user.email,
-        spaceWanted.user.profile.firstName,
+        spaceWanted.user.profile?.firstName || "User",
         spaceWanted.title,
         `Your post <b>${spaceWanted.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
       );
@@ -804,8 +820,8 @@ export const updateSpaceWantedStatus = async (req, res) => {
       title: "Your space wanted post status was updated",
       body: `Your post "${spacewanted.title}" is now ${status}.`,
       meta: {
-        firstName: spacewanted.user.firstName || "",
-        lastName: spacewanted.user.lastName || "",
+        firstName: spacewanted.user.profile?.firstName || "",
+        lastName: spacewanted.user.profile?.lastName || "",
         email: spacewanted.user.email || "",
         postId: spacewanted._id.toString(),
         postCategory: "Spacewanted",
@@ -816,7 +832,7 @@ export const updateSpaceWantedStatus = async (req, res) => {
 
     await sendPostUpdateEmail(
       spacewanted.user.email,
-      spacewanted.user.profile.firstName,
+      spacewanted.user.profile?.firstName || "User",
       spacewanted.title,
       `Your post <b>${spacewanted.title}</b> is now <b>${status}</b>.`
     );
@@ -832,7 +848,7 @@ export const deleteSpaceWanted = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const spacewanted = await SpaceWanted.findById(id).populate("user");
+    const spacewanted = await SpaceWanted.findById(id).populate("user", "profile.firstName profile.lastName profile.photo email");
     if (!spacewanted) return res.status(404).json({ message: "Space Wanted not found" });
 
     if (spacewanted.is_deleted) {
@@ -848,8 +864,8 @@ export const deleteSpaceWanted = async (req, res) => {
       title: "Your space wanted post was deleted",
       body: `Your post "${spacewanted.title}" has been removed by admin.`,
       meta: {
-        firstName: spacewanted.user.firstName || "",
-        lastName: spacewanted.user.lastName || "",
+        firstName: spacewanted.user.profile?.firstName || "",
+        lastName: spacewanted.user.profile?.lastName || "",
         email: spacewanted.user.email || "",
         postId: spacewanted._id.toString(),
         postCategory: "Spacewanted",
@@ -860,7 +876,7 @@ export const deleteSpaceWanted = async (req, res) => {
 
     await sendPostUpdateEmail(
       spacewanted.user.email,
-      spacewanted.user.profile.firstName,
+      spacewanted.user.profile?.firstName || "User",
       spacewanted.title,
       `Your post <b>${spacewanted.title}</b> has been <span style="color:red;">rejected</span> by admin for not abiding with the terms and conditions of Ghouraf.`
     );
