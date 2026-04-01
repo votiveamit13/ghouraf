@@ -63,3 +63,8 @@
   padding-left: 0rem;
     padding-right: 0rem;
 }
+
+/* Hide confirm button in dialog when user is not logged in */
+.hide-confirm-button button:last-child {
+  display: none;
+}

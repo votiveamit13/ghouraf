@@ -4,7 +4,6 @@ import { getFullLocation } from "utils/locationHelper";
 import { City } from "country-state-city";
 
 export default function SearchBar() {
-  const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
   const [selected, setSelected] = useState("");
@@ -67,6 +66,7 @@ const fetchLocations = async (query) => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
+    setSelectedLocation({ city: "", stateCode: "", countryCode: "" });
     fetchLocations(value);
   };
 
@@ -79,15 +79,29 @@ const handleSelectSuggestion = (item) => {
 
 
   const handleSearch = () => {
-    if (!searchInput.trim()) return;
+    const searchValue = searchInput.trim();
+    if (!searchValue) return;
+
     if (selected === "spaces") {
-      navigate(
-      `/spaces?city=${selectedLocation.city}&state=${selectedLocation.stateCode}&country=${selectedLocation.countryCode}`
-    );
+      if (selectedLocation.city) {
+        navigate(
+          `/spaces?city=${encodeURIComponent(selectedLocation.city)}&state=${encodeURIComponent(selectedLocation.stateCode)}&country=${encodeURIComponent(selectedLocation.countryCode)}`
+        );
+      } else {
+        navigate(`/spaces?location=${encodeURIComponent(searchValue)}`);
+      }
     } else if (selected === "placewanted") {
-      navigate(`/place-wanted?city=${selectedLocation.city}&state=${selectedLocation.stateCode}&country=${selectedLocation.countryCode}`);
+      if (selectedLocation.city) {
+        navigate(`/place-wanted?city=${encodeURIComponent(selectedLocation.city)}&state=${encodeURIComponent(selectedLocation.stateCode)}&country=${encodeURIComponent(selectedLocation.countryCode)}`);
+      } else {
+        navigate(`/place-wanted?city=${encodeURIComponent(searchValue)}`);
+      }
     } else if (selected === "teamup") {
-      navigate(`/team-up?city=${selectedLocation.city}&state=${selectedLocation.stateCode}&country=${selectedLocation.countryCode}`);
+      if (selectedLocation.city) {
+        navigate(`/team-up?city=${encodeURIComponent(selectedLocation.city)}&state=${encodeURIComponent(selectedLocation.stateCode)}&country=${encodeURIComponent(selectedLocation.countryCode)}`);
+      } else {
+        navigate(`/team-up?city=${encodeURIComponent(searchValue)}`);
+      }
     }
   };
 
@@ -139,7 +153,7 @@ const handleSelectSuggestion = (item) => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search by City"
+            placeholder="Search by City, Area"
             value={searchInput}
             onChange={handleInputChange}
             className="w-full border rounded-[5px] px-3 py-2"

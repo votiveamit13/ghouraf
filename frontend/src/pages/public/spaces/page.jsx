@@ -13,17 +13,8 @@ import { toast } from "react-toastify";
 export default function Spaces() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const locationHook = useLocation();
-  const [sortBy, setSortBy] = useState("Newest Ads");
-  const [page, setPage] = useState(1);
-  const [spaces, setSpaces] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [ads, setAds] = useState([]);
-  const [savedPosts, setSavedPosts] = useState([]);
-  const { user, token } = useAuth();
-  const userId = user?._id;
-
-  const [filters, setFilters] = useState({
+  const parsedQuery = queryString.parse(locationHook.search);
+  const initialFilters = {
     minValue: 0,
     maxValue: 100000,
     priceType: "",
@@ -35,11 +26,25 @@ export default function Spaces() {
     roomAvailable: "any",
     bedrooms: "Any",
     moveInDate: "",
-    location: "",
+    location: parsedQuery.location || "",
     adPostedBy: "",
     amenities: [],
-  });
-  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+    city: parsedQuery.city || "",
+    state: parsedQuery.state || "",
+    country: parsedQuery.country || "",
+  };
+  const [sortBy, setSortBy] = useState("Newest Ads");
+  const [page, setPage] = useState(1);
+  const [spaces, setSpaces] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [ads, setAds] = useState([]);
+  const [savedPosts, setSavedPosts] = useState([]);
+  const { user, token } = useAuth();
+  const userId = user?._id;
+
+  const [filters, setFilters] = useState(initialFilters);
+  const [debouncedFilters, setDebouncedFilters] = useState(initialFilters);
 
   const itemsPerPage = 20;
   const adsPerPage = 4;
@@ -52,6 +57,7 @@ export default function Spaces() {
       city: parsed.city || "",
       state: parsed.state || "",
       country: parsed.country || "",
+      location: parsed.location || "",
     }));
 
     setPage(1);
@@ -76,9 +82,12 @@ export default function Spaces() {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const isLocationOnlySearch = debouncedFilters.location && !debouncedFilters.city;
+        const fetchLimit = isLocationOnlySearch ? 1000 : itemsPerPage;
+
         const spaceParams = {
           page,
-          limit: itemsPerPage,
+          limit: fetchLimit,
           sortBy,
           ...debouncedFilters,
           amenities: debouncedFilters.amenities.join(',')
@@ -98,8 +107,22 @@ export default function Spaces() {
 
         const [spaceRes, adsRes] = await Promise.all([spaceReq, adsReq]);
 
-        setSpaces(spaceRes.data.data);
-        setTotalPages(spaceRes.data.pages);
+        let fetchedSpaces = spaceRes.data.data;
+        let totalSpacePages = spaceRes.data.pages;
+
+        if (isLocationOnlySearch) {
+          const locationTerm = debouncedFilters.location.trim().toLowerCase();
+          const allLocationSpaces = fetchedSpaces.filter((space) =>
+            space.location?.toLowerCase().includes(locationTerm)
+          );
+
+          totalSpacePages = Math.max(1, Math.ceil(allLocationSpaces.length / itemsPerPage));
+          const startIndex = (page - 1) * itemsPerPage;
+          fetchedSpaces = allLocationSpaces.slice(startIndex, startIndex + itemsPerPage);
+        }
+
+        setSpaces(fetchedSpaces);
+        setTotalPages(totalSpacePages);
         setAds(adsRes.data.data);
       } catch (err) {
         console.error("Failed to fetch spaces or ads:", err);

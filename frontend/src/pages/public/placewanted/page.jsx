@@ -14,19 +14,25 @@ import ConfirmationDialog from "components/common/ConfirmationDialog";
 export default function PlaceWanted() {
     const { user, loading: authLoading, token } = useAuth();
     const apiUrl = process.env.REACT_APP_API_URL;
+    const locationHook = useLocation();
+    const parsedQuery = queryString.parse(locationHook.search);
+    const initialFilters = {
+        city: parsedQuery.city || "",
+        state: parsedQuery.state || "",
+        country: parsedQuery.country || "",
+    };
     const [properties, setProperties] = useState([]);
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState("Newest Ads");
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [filters, setFilters] = useState({});
+    const [filters, setFilters] = useState(initialFilters);
     const [ads, setAds] = useState([]);
-    const locationHook = useLocation();
     const itemsPerPage = 20;
     const adsPerPage = 4;
     const navigate = useNavigate();
     const [showInvalidDialog, setShowInvalidDialog] = useState(false);
-    const [debouncedFilters, setDebouncedFilters] = useState(filters);
+    const [debouncedFilters, setDebouncedFilters] = useState(initialFilters);
     const prevFilters = useRef(filters);
     const [savedPosts, setSavedPosts] = useState([]);
 
