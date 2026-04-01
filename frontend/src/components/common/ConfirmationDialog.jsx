@@ -1,7 +1,7 @@
 import React from "react";
 import Loader from "./Loader";
 
-const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel, loading = false, className = "" }) => {
+const ConfirmationDialog = ({ show, title, message, onConfirm, onCancel, loading = false, className = "", hideConfirm = false }) => {
   if (!show) return null;
 
   return (

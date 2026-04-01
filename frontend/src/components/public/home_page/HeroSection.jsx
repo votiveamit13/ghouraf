@@ -39,6 +39,7 @@ useEffect(() => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
+    setSelectedLocation({ city: "", stateCode: "", countryCode: "" });
 
     if (!value || value.trim().length < 2) {
       setSuggestions([]);
@@ -73,16 +74,29 @@ useEffect(() => {
   };
 
   const handleSearch = () => {
-    if (!searchInput.trim()) return;
+    const input = searchInput.trim();
+    if (!input) return;
 
     const { city, stateCode, countryCode } = selectedLocation;
 
     if (activeTab === "spaces") {
-      navigate(`/spaces?city=${city}&state=${stateCode}&country=${countryCode}`);
+      if (city) {
+        navigate(`/spaces?city=${encodeURIComponent(city)}&state=${encodeURIComponent(stateCode)}&country=${encodeURIComponent(countryCode)}`);
+      } else {
+        navigate(`/spaces?location=${encodeURIComponent(input)}`);
+      }
     } else if (activeTab === "place wanted") {
-      navigate(`/place-wanted?city=${city}&state=${stateCode}&country=${countryCode}`);
+      if (city) {
+        navigate(`/place-wanted?city=${encodeURIComponent(city)}&state=${encodeURIComponent(stateCode)}&country=${encodeURIComponent(countryCode)}`);
+      } else {
+        navigate(`/place-wanted?city=${encodeURIComponent(input)}`);
+      }
     } else if (activeTab === "team up") {
-      navigate(`/team-up?city=${city}&state=${stateCode}&country=${countryCode}`);
+      if (city) {
+        navigate(`/team-up?city=${encodeURIComponent(city)}&state=${encodeURIComponent(stateCode)}&country=${encodeURIComponent(countryCode)}`);
+      } else {
+        navigate(`/team-up?city=${encodeURIComponent(input)}`);
+      }
     }
   };
 
@@ -126,7 +140,7 @@ useEffect(() => {
             <div className="flex items-center bg-white rounded-full overflow-hidden shadow-lg w-full">
               <input
                 type="text"
-                placeholder="Search by City"
+                placeholder="Search by City, Area"
                 className="flex-grow px-4 text-[#A321A6] placeholder-[#A321A6] outline-none text-sm sm:text-base"
                 value={searchInput}
                 onChange={handleInputChange}

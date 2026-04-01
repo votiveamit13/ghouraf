@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 export default function TeamUp() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const locationHook = useLocation();
+  const parsedQuery = queryString.parse(locationHook.search);
   const { user, loading: authLoading, token } = useAuth();
   const navigate = useNavigate();
 
@@ -32,7 +33,7 @@ export default function TeamUp() {
   const itemsPerPage = 20;
   const adsPerPage = 4;
 
-  const [filters, setFilters] = useState({
+  const initialFilters = {
     minValue: 0,
     maxValue: 100000,
     priceType: "",
@@ -44,9 +45,14 @@ export default function TeamUp() {
     occupation: "all",
     minAge: "",
     maxAge: "",
-  });
+    city: parsedQuery.city || "",
+    state: parsedQuery.state || "",
+    country: parsedQuery.country || "",
+  };
 
-  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+  const [filters, setFilters] = useState(initialFilters);
+
+  const [debouncedFilters, setDebouncedFilters] = useState(initialFilters);
   const prevFilters = useRef(filters);
 
   useEffect(() => {
@@ -222,6 +228,8 @@ export default function TeamUp() {
             title="Team Up"
             message="Please login or create an account to view the posts."
             onCancel={() => { setShowInvalidDialog(false); navigate("/"); }}
+            onConfirm={() => {}}
+            className="hide-confirm-button"
           />
         ) : (
           <>
