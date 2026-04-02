@@ -17,6 +17,18 @@ export default function PlaceWanted() {
     const locationHook = useLocation();
     const parsedQuery = queryString.parse(locationHook.search);
     const initialFilters = {
+        minValue: 0,
+        maxValue: 100000,
+        priceType: "",
+        propertyType: "all",
+        period: "",
+        minSize: "",
+        maxSize: "",
+        occupation: "all",
+        minAge: "",
+        maxAge: "",
+        location: "",
+        amenities: [],
         city: parsedQuery.city || "",
         state: parsedQuery.state || "",
         country: parsedQuery.country || "",
