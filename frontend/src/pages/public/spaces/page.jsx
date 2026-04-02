@@ -52,13 +52,26 @@ export default function Spaces() {
   useEffect(() => {
     const parsed = queryString.parse(locationHook.search);
 
-    setFilters((prev) => ({
-      ...prev,
-      city: parsed.city || "",
-      state: parsed.state || "",
-      country: parsed.country || "",
-      location: parsed.location || "",
-    }));
+    setFilters((prev) => {
+      const next = {
+        ...prev,
+        city: parsed.city || "",
+        state: parsed.state || "",
+        country: parsed.country || "",
+        location: parsed.location || "",
+      };
+
+      if (
+        prev.city === next.city &&
+        prev.state === next.state &&
+        prev.country === next.country &&
+        prev.location === next.location
+      ) {
+        return prev;
+      }
+
+      return next;
+    });
 
     setPage(1);
   }, [locationHook.search]);
@@ -146,7 +159,7 @@ export default function Spaces() {
   }).then(res => {
     setSavedPosts(res.data.data.map(p => p.postId));
   }).catch(console.error);
-}, [userId, token]);
+}, [userId, token, apiUrl]);
 
 const handleToggleSave = useCallback(async (id) => {
   if (!userId) {
@@ -175,7 +188,7 @@ const handleToggleSave = useCallback(async (id) => {
     console.error("Error saving:", err);
     toast.error("Failed to save post");
   }
-}, [userId, token]);
+}, [userId, token, apiUrl]);
 
     const handleShare = useCallback((property) => {
   const locationString = `${property.city || ""}, ${property.state || ""}, ${property.country || ""}`;
