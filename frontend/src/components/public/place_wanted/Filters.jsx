@@ -23,9 +23,15 @@ export default function Filters({ setFilters: setParentFilters, setPage }) {
 
   const [filters, setFilters] = useState(defaultFilters);
 
+  const hasMounted = useRef(false);
+
   useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
     setParentFilters(filters);
-  }, [filters]);
+  }, [filters, setParentFilters]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
