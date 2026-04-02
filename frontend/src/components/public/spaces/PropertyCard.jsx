@@ -70,6 +70,7 @@ function PropertyCard({ property, savedPosts, onToggleSave, onShare }) {
         </Link>
 
         <p className="text-[16px] flex items-center gap-1"><TfiLocationPin />{locationString}</p>
+        <p className="bedrm"> Bedrooms: {property.bedrooms}</p>
         <p className="text-[15px] mt-1">{property.description}</p>
 
         <div className="flex items-center mt-2 gap-2">
