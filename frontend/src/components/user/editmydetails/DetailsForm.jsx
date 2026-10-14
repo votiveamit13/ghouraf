@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { toast } from "react-toastify";
 
-export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
+export default function DetailsForm({ title, fields, onSubmit, userEmail, disabled = false, disabledMessage = "" }) {
   const { logout } = useAuth();
   const [formData, setFormData] = useState(
     fields.reduce((acc, field) => {
@@ -93,6 +93,11 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
         {title}
       </div>
       <div className="card-body">
+              {disabled && (
+          <div className="mb-3 p-3 rounded-[8px] bg-[#FFF4E5] text-[#8A5A00] text-[13px]">
+            {disabledMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="row g-3">
             {fields.map((field, idx) => (
@@ -106,7 +111,7 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
                   onChange={handleChange}
                   className={`form-control ${errors[field.name] ? "border-red-500" : ""
                     }`}
-                  disabled={isSaving}
+                  disabled={isSaving || disabled}
                 />
                 {errors[field.name] && (
                   <div className="text-red-500 text-[12px] mt-1">
@@ -117,7 +122,7 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
             ))}
           </div>
 
-          {fields.some((f) => f.name.toLowerCase().includes("password")) && (
+                    {!disabled && fields.some((f) => f.name.toLowerCase().includes("password")) && (
             <div
               className="mt-2 text-[12px] text-[#565ABF] cursor-pointer hover:text-[#A321A6]"
               onClick={handleForgotPassword}
@@ -129,6 +134,7 @@ export default function DetailsForm({ title, fields, onSubmit, userEmail }) {
 
           <button
             type="submit"
+            disabled={disabled || isSaving}
             className="btn bg-[#565ABF] text-white text-[14px] font-medium mt-3 rounded-[12px] flex items-center gap-2"
           >
             {isSaving ? (

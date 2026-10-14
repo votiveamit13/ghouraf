@@ -59,23 +59,30 @@ const handleSaveProfile = async (data) => {
     toast.error(errorMsg);
         }
     };
+
+        const isSocial = !!user.isSocialOnly;
+    const socialMsg = "You signed in with Google, so this is managed by your Google account and can't be changed here.";
     return (
         <>
             <div className="container user-layout mt-5 mb-8">
                 <h2 className="text-[25px] font-bold text-black">Edit my details - <span className="text-[#A321A6]">{user.profile?.firstName}</span></h2>
                 <div className="mt-4">
-                    <DetailsForm
+                                        <DetailsForm
                         title="Change Your Name"
                         fields={[
                             { label: "First Name", name: "firstName", placeholder: "First Name", type: "text", value: `${user.profile?.firstName}` },
                             { label: "Last Name", name: "lastName", placeholder: "Last Name", type: "text", value: `${user.profile?.lastName}` },
-                            { label: "Your Password", name: "password", placeholder: "Your Password", type: "password" },
+                            ...(isSocial
+                                ? []
+                                : [{ label: "Your Password", name: "password", placeholder: "Your Password", type: "password" }]),
                         ]}
                         onSubmit={(data) => handleSave(data, "name")}
                         userEmail={user.email}
                     />
                     <DetailsForm
                         title="Change Email Address"
+                        disabled={isSocial}
+                        disabledMessage={socialMsg}
                         fields={[
                             { label: "Email", name: "email", placeholder: "Your Email", type: "text", value: `${user.email}` },
                             { label: "Confirm Email", name: "confirmEmail", placeholder: "Your Confirm Email", type: "text" },
@@ -86,6 +93,8 @@ const handleSaveProfile = async (data) => {
                     />
                     <DetailsForm
                         title="Change Your Password"
+                        disabled={isSocial}
+                        disabledMessage={socialMsg}
                         fields={[
                             { label: "Your current password", name: "currentPassword", placeholder: "Current Password", type: "password" },
                             { label: "Choose new password", name: "newPassword", placeholder: "New Password", type: "password" },

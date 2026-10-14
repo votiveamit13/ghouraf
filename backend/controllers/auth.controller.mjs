@@ -15,6 +15,19 @@ const validationFormat = (error) => {
 const randomString = (len = 32) =>
   [...Array(len)].map(() => (Math.random() * 36 | 0).toString(36)).join("");
 
+const isSocialOnlyUser = async (user) => {
+  try {
+    const fbUser = user.firebaseUid
+      ? await authAdmin.getUser(user.firebaseUid)
+      : await authAdmin.getUserByEmail(user.email);
+    const providers = (fbUser.providerData || []).map((p) => p.providerId);
+    return !providers.includes("password");
+  } catch (err) {
+    console.error("isSocialOnlyUser error:", err.message);
+    return false;
+  }
+};
+
 export const signup = async (req, res) => {
   try {
     const { email, password, firstName, lastName, gender, dob, termsAccepted } = req.body;
@@ -329,14 +342,27 @@ export const updateProfile = async (req, res) => {
     const user = await User.findById(req.user._id).select("+password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (section === "name") {
+    const socialOnly = await isSocialOnlyUser(user);
+
+    if (socialOnly && (section === "email" || section === "password")) {
+      return res.status(403).json({
+        message: "You signed in with Google. Email and password are managed by your Google account.",
+      });
+    }
+
+        if (section === "name") {
       const { firstName, lastName, password } = req.body;
-      if (!firstName || !lastName || !password) {
+      if (!firstName || !lastName) {
         return res.status(400).json({ message: "All fields are required" });
       }
 
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) return res.status(401).json({ message: "Invalid password" });
+      if (!socialOnly) {
+        if (!password) {
+          return res.status(400).json({ message: "Password is required" });
+        }
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) return res.status(401).json({ message: "Invalid password" });
+      }
 
       updates["profile.firstName"] = firstName;
       updates["profile.lastName"] = lastName;
@@ -463,7 +489,8 @@ export const updateProfile = async (req, res) => {
 };
 
 export const getProfile = async (req, res) => {
-  res.json(req.user);
+  const isSocialOnly = await isSocialOnlyUser(req.user);
+  res.json({ ...req.user.toJSON(), isSocialOnly });
 };
 
 export const getUserById = async (req, res) => {
@@ -490,9 +517,16 @@ export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email is required" });
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       return res.status(404).json({ message: "Email not found" });
+    }
+
+    if (await isSocialOnlyUser(user)) {
+      return res.status(400).json({
+        message: "This account uses Google login. Please click 'Google' to sign in. Password reset is not available.",
+        socialLogin: true,
+      });
     }
 
     const firstName = user.profile.firstName || "User";

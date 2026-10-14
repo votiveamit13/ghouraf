@@ -303,9 +303,13 @@ export default function Navbar() {
       toast.success(res.data.message || "Password reset email sent");
       setForgotDialog(false);
       setForgotEmail("");
-    } catch (err) {
+        } catch (err) {
       if (err.response?.status === 404) {
         toast.error("Email not found");
+      } else if (err.response?.data?.socialLogin) {
+        toast.info(err.response.data.message, { autoClose: 6000 });
+        setForgotDialog(false);
+        setForgotEmail("");
       } else {
         toast.error(err.response?.data?.message || "Failed to send reset email");
       }
