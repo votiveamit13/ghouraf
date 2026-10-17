@@ -15,6 +15,7 @@ import { useAuth } from "context/AuthContext";
 import { getChatId } from "utils/firebaseChatHelper";
 import { toast } from "react-toastify";
 import ReportAdDialog from "components/common/ReportAdDialog";
+import ImageLightbox from "components/common/ImageLightbox";
 
 export default function DetailPage({ targetUserId }) {
   const { id } = useParams();
@@ -29,6 +30,7 @@ export default function DetailPage({ targetUserId }) {
   const [teamUps, setTeamUps] = useState([]);
   const userId = user?._id;
   const [showReport, setShowReport] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     if (!id) return;
@@ -278,9 +280,10 @@ export default function DetailPage({ targetUserId }) {
                     <div className="hs-carousel-slide" key={idx}>
                       <div className="flex justify-center h-full bg-gray-100">
                         <img
-                          src={`${src}`}
+                          src={src}
                           alt={`Slide ${idx + 1}`}
-                          className="object-cover w-full h-full"
+                          onClick={() => setLightboxIndex(idx)}
+                          className="object-cover w-full h-full cursor-zoom-in"
                         />
                       </div>
                     </div>
@@ -502,6 +505,12 @@ export default function DetailPage({ targetUserId }) {
 
             </div>
           </div>
+          <ImageLightbox
+            images={images}
+            index={lightboxIndex}
+            onClose={() => setLightboxIndex(null)}
+            onChange={setLightboxIndex}
+          />
           {showReport && (
             <ReportAdDialog
               show={showReport}

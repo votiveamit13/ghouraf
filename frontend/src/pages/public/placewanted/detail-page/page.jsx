@@ -14,6 +14,7 @@ import { getFullLocation } from "utils/locationHelper";
 import { getChatId } from "utils/firebaseChatHelper";
 import Loader from "components/common/Loader";
 import ReportAdDialog from "components/common/ReportAdDialog";
+import ImageLightbox from "components/common/ImageLightbox";
 
 export default function SpaceWantedDetailPage() {
     const { id } = useParams();
@@ -24,6 +25,7 @@ export default function SpaceWantedDetailPage() {
     const { user, token } = useAuth();
     const [messageLoading, setMessageLoading] = useState(false);
     const [showReport, setShowReport] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(null);
 
     useEffect(() => {
         if (!id) return;
@@ -221,7 +223,8 @@ export default function SpaceWantedDetailPage() {
                                                     <img
                                                         src={src}
                                                         alt={`Slide ${idx + 1}`}
-                                                        className="object-cover w-full h-full"
+                                                        onClick={() => setLightboxIndex(idx)}
+                                                        className="object-cover w-full h-full cursor-zoom-in"
                                                     />
                                                 </div>
                                             </div>
@@ -432,6 +435,12 @@ export default function SpaceWantedDetailPage() {
                                 <BsFlag /> Report this ad
                             </button>
                         </div>
+                        <ImageLightbox
+                            images={images}
+                            index={lightboxIndex}
+                            onClose={() => setLightboxIndex(null)}
+                            onChange={setLightboxIndex}
+                        />
                         {showReport && (
                             <ReportAdDialog
                                 show={showReport}

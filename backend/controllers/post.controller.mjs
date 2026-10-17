@@ -143,6 +143,7 @@ export const createSpace = async (req, res) => {
     });
 
   } catch (err) {
+    if (err.isFileError) return res.status(400).json({ success: false, message: err.message });
     console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
@@ -448,6 +449,7 @@ export const createTeamUp = async (req, res) => {
       data: newPost,
     });
   } catch (error) {
+    if (error.isFileError) return res.status(400).json({ success: false, message: error.message });
     console.error("Create TeamUp error:", error);
     return res.status(500).json({
       message: "Failed to create TeamUp post",
@@ -942,6 +944,7 @@ export const updateAd = async (req, res) => {
       data: updatedAd,
     });
   } catch (error) {
+    if (error.isFileError) return res.status(400).json({ success: false, message: error.message }); 
     console.error("Error updating ad:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -1035,7 +1038,7 @@ export const createSpaceWanted = async (req, res) => {
           const saved = fileHandler.saveFile(file, "spacewanted");
           return { id: Date.now().toString(), url: saved.relativePath };
         } catch (err) {
-          throw new Error(`File upload failed: ${err.message}`);
+          throw err;
         }
       });
     }
@@ -1054,6 +1057,7 @@ export const createSpaceWanted = async (req, res) => {
       data: newPost,
     });
   } catch (err) {
+    if (err.isFileError) return res.status(400).json({ success: false, message: err.message }); 
     console.error("❌ Error creating SpaceWanted:", err);
     return res.status(500).json({
       success: false,

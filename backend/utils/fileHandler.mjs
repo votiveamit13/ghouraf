@@ -12,7 +12,13 @@ export const fileHandler = {
   validateExtension(filename, type) {
     const ext = path.extname(filename).toLowerCase();
     if (!extensionGroups[type]?.includes(ext)) {
-      throw new Error(`Invalid file type. Allowed: ${extensionGroups[type].join(", ")}`);
+      const allowed = extensionGroups[type].join(", ");
+      const err = new Error(
+        `Invalid file type${ext ? ` (${ext})` : ""}. Please upload only these formats: ${allowed}`
+      );
+      err.isFileError = true;
+      err.statusCode = 400;
+      throw err;
     }
   },
 
